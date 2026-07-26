@@ -5,7 +5,7 @@ project:
 book:
   title: "ID-5-02 (TO)"
   subtitle: "Mathematical Foundations of Diffusion Models · Monsoon 2026"
-  author: "Soma S Dhavala · IIT Jammu"
+  author: "Uma Satyaranjan · Soma S Dhavala · IIT Jammu"
   reader-mode: true
   sidebar:
     collapse-level: 1
@@ -24,6 +24,7 @@ book:
     - index.qmd
     - course.qmd
     - syllabus.qmd
+    - assignments.qmd
     - part: "Weekly Notes"
       chapters:
         - weeks/w01.qmd

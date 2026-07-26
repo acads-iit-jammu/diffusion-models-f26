@@ -1,6 +1,6 @@
 # ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026
 
-Course website for ID-5-02 (TO), IIT Jammu — instructor Soma S Dhavala.
+Course website for ID-5-02 (TO), IIT Jammu — instructors Uma Satyaranjan and Soma S Dhavala.
 
 Built with [Quarto](https://quarto.org/) (book project), themed for IIT Jammu.
 Same layout as the CS-1-01 (MO) course site.
