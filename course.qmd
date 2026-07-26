@@ -4,7 +4,8 @@
 
 | | |
 |---|---|
-| **Lectures** | 3 hours/week · slot & venue *to be announced* |
+| **Lectures** | Monday 9:00–9:50 · Tuesday 10:00–10:50 · Wednesday 11:00–11:50 |
+| **Venue** | 11AC4004 |
 | **Instructor** | [Soma S Dhavala](https://dhavala.github.io/) |
 | **Prerequisite** | CS-3-12 (MO) — Machine Learning |
 | **Open to** | All B.Tech programmes (2^nd^ year+), M.Tech, M.Sc, MS(R), PhD |
@@ -31,7 +32,7 @@ From the [IIT Jammu academic calendar for 2^nd^/3^rd^/4^th^ year UG students, Se
 
 ^\*^ Class tests are conducted with internal arrangements; whether and how this course uses them will be announced with the assessment scheme.
 
-**Institute holidays during the teaching term:** Sat Aug 15 (Independence Day), Wed Aug 26 (Milad-un-Nabi), Fri Sep 4 (Janamashtmi), Fri Oct 2 (Gandhi Jayanti), Mon Oct 19 & Tue Oct 20 (Dussehra), Sun Nov 8 – Wed Nov 11 (Diwali cluster), Tue Nov 24 (Guru Nanak Dev Ji Birthday).
+**Institute holidays that affect our slots:** Wed Aug 26 (Milad-un-Nabi), Mon Oct 19 & Tue Oct 20 (Dussehra), Mon Nov 9 – Wed Nov 11 (Diwali cluster).
 
 ## Assessment
 
@@ -39,30 +40,30 @@ The assessment scheme (weights for tests, mid-semester, end-semester, and any pr
 
 ## Weekly Plan
 
-The plan below maps the six syllabus modules (40 lecture hours) onto the semester; it is **tentative** and will firm up once the elective slot is announced. Readings refer to the [primary text](./resources.qmd) (*The Principles of Diffusion Models*, arXiv:2510.21890).
+Lectures run Mon/Tue/Wed; with the holidays above and the mid-sem week, the semester provides **exactly 40 lecture slots — matching the syllabus's 40 hours**. Readings refer to the [primary text](./resources.qmd) (*The Principles of Diffusion Models*, arXiv:2510.21890). The plan is tentative in pacing, not in coverage.
 
-| Week | Dates | Module · Topics |
+| Week | Class days | Module · Topics |
 |:---:|---|---|
-| [01](weeks/w01.qmd) | Jul 29 – 31 | **M1** Foundations of generative modeling: data distributions & model families, ML estimation, KL divergence |
-| [02](weeks/w02.qmd) | Aug 3 – 7 | **M1** Empirical risk minimization; challenges of high-dimensional density estimation |
-| [03](weeks/w03.qmd) | Aug 10 – 14 | **M2** Multivariate Gaussians: conditioning, marginalization, linear transformations |
-| [04](weeks/w04.qmd) | Aug 17 – 21 | **M2** Discrete-time Markov chains; noise accumulation via repeated Gaussian perturbation. *CT-1 window opens Aug 19* |
-| [05](weeks/w05.qmd) | Aug 24 – 28 | **M3** DDPM I: forward diffusion process; concept of the reverse process |
-| [06](weeks/w06.qmd) | Aug 31 – Sep 4 | **M3** DDPM II: variational lower bound, KL decomposition, reduction to noise-prediction loss |
-| [07](weeks/w07.qmd) | Sep 7 – 11 | **M4** Score functions; score matching |
-| [08](weeks/w08.qmd) | Sep 14 – 18 | **M4** Denoising score matching; synthesis of M1–M4. *Mid-sem begins Fri Sep 18* |
-| [09](weeks/w09.qmd) | Sep 21 – 25 | **Mid-Semester Examinations (Sep 18–23)** — covers M1–M4 |
-| [10](weeks/w10.qmd) | Sep 28 – Oct 2 | **M5** Random walks and Brownian motion; concept of an SDE |
-| [11](weeks/w11.qmd) | Oct 5 – 9 | **M5** Heat-equation intuition; density evolution under stochastic dynamics (Fokker–Planck) |
-| [12](weeks/w12.qmd) | Oct 12 – 16 | **M5** Continuous formulation of the forward equation. *CT-2 window opens Oct 14* |
-| [13](weeks/w13.qmd) | Oct 19 – 23 | **M6** Reverse-time drift (heuristic derivation). *Mon–Tue are Dussehra holidays* |
-| [14](weeks/w14.qmd) | Oct 26 – 30 | **M6** Entropy and information-flow interpretation |
-| [15](weeks/w15.qmd) | Nov 2 – 6 | **M6** Probability flow ODE |
-| [16](weeks/w16.qmd) | Nov 9 – 13 | **M6** Neural ODEs and flow-based models. *Mon–Wed are holidays (Diwali cluster)* |
-| [17](weeks/w17.qmd) | Nov 16 – 20 | Wrap-up: applications and extensions; revision. *Last day of classes Fri Nov 20* |
+| [01](weeks/w01.qmd) | Jul 29 | **M1** Course overview; generative modeling: data distributions and model families *(1 lecture)* |
+| [02](weeks/w02.qmd) | Aug 3, 4, 5 | **M1** Maximum-likelihood estimation; KL divergence; empirical risk minimization |
+| [03](weeks/w03.qmd) | Aug 10, 11, 12 | **M1** Challenges of high-dimensional density estimation · **M2** multivariate Gaussians |
+| [04](weeks/w04.qmd) | Aug 17, 18, 19 | **M2** Conditioning & marginalization; linear transformations; discrete-time Markov chains. *CT-1 window opens Aug 19* |
+| [05](weeks/w05.qmd) | Aug 24, 25 | **M2** Noise accumulation through repeated Gaussian perturbation *(no Wed class — Milad-un-Nabi)* |
+| [06](weeks/w06.qmd) | Aug 31, Sep 1, 2 | **M3** DDPM: forward diffusion process; concept of the reverse process |
+| [07](weeks/w07.qmd) | Sep 7, 8, 9 | **M3** Variational lower bound; decomposition of KL terms; reduction to noise-prediction loss |
+| [08](weeks/w08.qmd) | Sep 14, 15, 16 | **M4** Score functions; score matching. *Mid-sem begins Fri Sep 18* |
+| [09](weeks/w09.qmd) | — | **Mid-Semester Examinations (Sep 18–23)** — covers M1–M3 and W08's score-matching material |
+| [10](weeks/w10.qmd) | Sep 28, 29, 30 | **M4** Denoising score matching; synthesis |
+| [11](weeks/w11.qmd) | Oct 5, 6, 7 | **M5** Random walks and Brownian motion; the concept of an SDE |
+| [12](weeks/w12.qmd) | Oct 12, 13, 14 | **M5** Heat-equation intuition; Fokker–Planck equation. *CT-2 window opens Oct 14* |
+| [13](weeks/w13.qmd) | Oct 21 | **M5** Continuous formulation of the forward equation *(1 lecture — Mon/Tue are Dussehra holidays)* |
+| [14](weeks/w14.qmd) | Oct 26, 27, 28 | **M5** wrap-up · **M6** Heuristic derivation of reverse-time drift |
+| [15](weeks/w15.qmd) | Nov 2, 3, 4 | **M6** Entropy & information-flow interpretation; probability flow ODE |
+| [16](weeks/w16.qmd) | — | **No classes — holidays Mon Nov 9 – Wed Nov 11 (Diwali cluster)** |
+| [17](weeks/w17.qmd) | Nov 16, 17, 18 | **M6** Neural ODEs and flow-based models; applications & extensions; course wrap-up |
 
-: {tbl-colwidths="[7,18,75]"}
+: {tbl-colwidths="[7,16,77]"}
 
 ::: {.callout-note}
-Module hours per the syllabus: M1–M4 are 6 hours each; M5–M6 are 8 hours each (40 total). With ~3 lecture hours/week and the holiday weeks above, the mapping will be tuned once the actual class days are known.
+Module hours per the syllabus: M1–M4 are 6 hours each; M5–M6 are 8 hours each (40 total). The 40 available slots cover this exactly, so any lecture lost to unforeseen events will be made up on a compensatory day.
 :::
