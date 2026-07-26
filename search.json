@@ -1,0 +1,731 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ID-5-02 (TO)",
+    "section": "",
+    "text": "Welcome\nWelcome to ID-5-02 (TO): Mathematical Foundations of Diffusion Models, Monsoon 2026 (2026-01), Indian Institute of Technology Jammu.\nThis course introduces the mathematical principles underlying diffusion-based generative models used in modern AI — how noise is progressively added to data, and how neural networks are trained to reverse this process to generate realistic samples.",
+    "crumbs": [
+      "Welcome"
+    ]
+  },
+  {
+    "objectID": "index.html#at-a-glance",
+    "href": "index.html#at-a-glance",
+    "title": "ID-5-02 (TO)",
+    "section": "At a Glance",
+    "text": "At a Glance\n\n\n\n\n\n\n\nCourse\nID-5-02 (TO) · Mathematical Foundations of Diffusion Models\n\n\nStructure\n3-0-0 · 3 credits · Open Elective (Level 6)\n\n\nPrerequisite\nCS-3-12 (MO) — Machine Learning\n\n\nLectures\nSlot & venue: to be announced (see timetable)\n\n\nFirst week of classes\nWednesday, July 29, 2026\n\n\nInstructor\nSoma S Dhavala\n\n\n\nSee the Course page for the week-by-week plan and important dates.",
+    "crumbs": [
+      "Welcome"
+    ]
+  },
+  {
+    "objectID": "index.html#announcements",
+    "href": "index.html#announcements",
+    "title": "ID-5-02 (TO)",
+    "section": "Announcements",
+    "text": "Announcements\n\n[26-July-2026] Course website is live.\n[26-July-2026] Classes for the semester commence Wednesday, July 29, 2026; the slot/venue for this course will be announced once the elective timetable is out.",
+    "crumbs": [
+      "Welcome"
+    ]
+  },
+  {
+    "objectID": "index.html#primary-text",
+    "href": "index.html#primary-text",
+    "title": "ID-5-02 (TO)",
+    "section": "Primary Text",
+    "text": "Primary Text\nThe course closely follows:\n\nChieh-Hsin Lai, Yang Song, Dongjun Kim, Yuki Mitsufuji, Stefano Ermon. The Principles of Diffusion Models: From Origins to Advances. arXiv:2510.21890 — freely available online.\n\nSee Resources for the full reading list.",
+    "crumbs": [
+      "Welcome"
+    ]
+  },
+  {
+    "objectID": "course.html",
+    "href": "course.html",
+    "title": "Course",
+    "section": "",
+    "text": "Logistics",
+    "crumbs": [
+      "Course"
+    ]
+  },
+  {
+    "objectID": "course.html#logistics",
+    "href": "course.html#logistics",
+    "title": "Course",
+    "section": "",
+    "text": "Lectures\n3 hours/week · slot & venue to be announced\n\n\nInstructor\nSoma S Dhavala\n\n\nPrerequisite\nCS-3-12 (MO) — Machine Learning\n\n\nOpen to\nAll B.Tech programmes (2nd year+), M.Tech, M.Sc, MS(R), PhD",
+    "crumbs": [
+      "Course"
+    ]
+  },
+  {
+    "objectID": "course.html#important-dates",
+    "href": "course.html#important-dates",
+    "title": "Course",
+    "section": "Important Dates",
+    "text": "Important Dates\nFrom the IIT Jammu academic calendar for 2nd/3rd/4th year UG students, Semester 2026-01:\n\n\n\nEvent\nDates\n\n\n\n\nCommencement of classes\nWednesday, Jul 29, 2026\n\n\nAdd & drop of courses\nJul 29 – Aug 5, 2026\n\n\nClass Test-1*\nAug 19 – Aug 25, 2026\n\n\nMid-semester feedback (by students)\nSep 9 – Sep 15, 2026\n\n\nCourse withdrawal deadline\nSep 15, 2026\n\n\nMid-Semester Examination\nSep 18 – Sep 23, 2026\n\n\nClass Test-2*\nOct 14 – Oct 22, 2026\n\n\nLast day of classes\nFriday, Nov 20, 2026\n\n\nEnd-semester feedback (by students)\nNov 12 – Nov 17, 2026\n\n\nEnd-Semester Examination\nNov 23 – Nov 30, 2026\n\n\nGrades visible to students\nDec 15, 2026\n\n\n\n* Class tests are conducted with internal arrangements; whether and how this course uses them will be announced with the assessment scheme.\nInstitute holidays during the teaching term: Sat Aug 15 (Independence Day), Wed Aug 26 (Milad-un-Nabi), Fri Sep 4 (Janamashtmi), Fri Oct 2 (Gandhi Jayanti), Mon Oct 19 & Tue Oct 20 (Dussehra), Sun Nov 8 – Wed Nov 11 (Diwali cluster), Tue Nov 24 (Guru Nanak Dev Ji Birthday).",
+    "crumbs": [
+      "Course"
+    ]
+  },
+  {
+    "objectID": "course.html#assessment",
+    "href": "course.html#assessment",
+    "title": "Course",
+    "section": "Assessment",
+    "text": "Assessment\nThe assessment scheme (weights for tests, mid-semester, end-semester, and any project/paper-reading component) will be announced in the first week of classes.",
+    "crumbs": [
+      "Course"
+    ]
+  },
+  {
+    "objectID": "course.html#weekly-plan",
+    "href": "course.html#weekly-plan",
+    "title": "Course",
+    "section": "Weekly Plan",
+    "text": "Weekly Plan\nThe plan below maps the six syllabus modules (40 lecture hours) onto the semester; it is tentative and will firm up once the elective slot is announced. Readings refer to the primary text (The Principles of Diffusion Models, arXiv:2510.21890).\n\n\n\n\n\n\n\n\nWeek\nDates\nModule · Topics\n\n\n\n\n01\nJul 29 – 31\nM1 Foundations of generative modeling: data distributions & model families, ML estimation, KL divergence\n\n\n02\nAug 3 – 7\nM1 Empirical risk minimization; challenges of high-dimensional density estimation\n\n\n03\nAug 10 – 14\nM2 Multivariate Gaussians: conditioning, marginalization, linear transformations\n\n\n04\nAug 17 – 21\nM2 Discrete-time Markov chains; noise accumulation via repeated Gaussian perturbation. CT-1 window opens Aug 19\n\n\n05\nAug 24 – 28\nM3 DDPM I: forward diffusion process; concept of the reverse process\n\n\n06\nAug 31 – Sep 4\nM3 DDPM II: variational lower bound, KL decomposition, reduction to noise-prediction loss\n\n\n07\nSep 7 – 11\nM4 Score functions; score matching\n\n\n08\nSep 14 – 18\nM4 Denoising score matching; synthesis of M1–M4. Mid-sem begins Fri Sep 18\n\n\n09\nSep 21 – 25\nMid-Semester Examinations (Sep 18–23) — covers M1–M4\n\n\n10\nSep 28 – Oct 2\nM5 Random walks and Brownian motion; concept of an SDE\n\n\n11\nOct 5 – 9\nM5 Heat-equation intuition; density evolution under stochastic dynamics (Fokker–Planck)\n\n\n12\nOct 12 – 16\nM5 Continuous formulation of the forward equation. CT-2 window opens Oct 14\n\n\n13\nOct 19 – 23\nM6 Reverse-time drift (heuristic derivation). Mon–Tue are Dussehra holidays\n\n\n14\nOct 26 – 30\nM6 Entropy and information-flow interpretation\n\n\n15\nNov 2 – 6\nM6 Probability flow ODE\n\n\n16\nNov 9 – 13\nM6 Neural ODEs and flow-based models. Mon–Wed are holidays (Diwali cluster)\n\n\n17\nNov 16 – 20\nWrap-up: applications and extensions; revision. Last day of classes Fri Nov 20\n\n\n\n\n\n\n\n\n\nModule hours per the syllabus: M1–M4 are 6 hours each; M5–M6 are 8 hours each (40 total). With ~3 lecture hours/week and the holiday weeks above, the mapping will be tuned once the actual class days are known.",
+    "crumbs": [
+      "Course"
+    ]
+  },
+  {
+    "objectID": "syllabus.html",
+    "href": "syllabus.html",
+    "title": "Syllabus",
+    "section": "",
+    "text": "Basic Information",
+    "crumbs": [
+      "Syllabus"
+    ]
+  },
+  {
+    "objectID": "syllabus.html#basic-information",
+    "href": "syllabus.html#basic-information",
+    "title": "Syllabus",
+    "section": "",
+    "text": "Proposing Department\nInterdisciplinary Programs\n\n\nCourse Title\nMathematical Foundations of Diffusion Models\n\n\nL-T-P Structure\n3-0-0\n\n\nCredits\n3 (Grade Point Earning Course)\n\n\nCategory\nOpen Elective — all B.Tech programmes, M.Tech, M.Sc, MS(R), PhD\n\n\nPrerequisite\nCS-3-12 (MO) — Machine Learning\n\n\nFrequency\nOnce every year\n\n\nCourse Instructor\nSoma S Dhavala",
+    "crumbs": [
+      "Syllabus"
+    ]
+  },
+  {
+    "objectID": "syllabus.html#course-objectives",
+    "href": "syllabus.html#course-objectives",
+    "title": "Syllabus",
+    "section": "Course Objectives",
+    "text": "Course Objectives\nThis course introduces the mathematical principles underlying diffusion-based generative models used in modern AI. Students will learn how noise is progressively added to data and how neural networks are trained to reverse this process to generate realistic samples. The course builds on probability, Gaussian distributions, and optimization to explain diffusion processes, denoising objectives, and sampling algorithms. Emphasis is placed on intuitive derivations, geometric interpretation of probability distributions, and connections to familiar machine learning concepts such as maximum likelihood and variational inference. By the end of the course, students will understand diffusion models both conceptually and mathematically.",
+    "crumbs": [
+      "Syllabus"
+    ]
+  },
+  {
+    "objectID": "syllabus.html#course-outcomes",
+    "href": "syllabus.html#course-outcomes",
+    "title": "Syllabus",
+    "section": "Course Outcomes",
+    "text": "Course Outcomes\nAt the end of this course, students will be able to:\n\nExplain the forward and reverse diffusion processes.\nDerive the Gaussian noise perturbation model used in diffusion models.\nUnderstand and interpret the denoising training objective.\nConnect diffusion models with likelihood-based learning.\nImplement and analyze simplified diffusion sampling algorithms.\nCompare diffusion models with GANs and VAEs.\nRead and interpret recent diffusion model research papers.",
+    "crumbs": [
+      "Syllabus"
+    ]
+  },
+  {
+    "objectID": "syllabus.html#course-contents",
+    "href": "syllabus.html#course-contents",
+    "title": "Syllabus",
+    "section": "Course Contents",
+    "text": "Course Contents\nGaussian noise and Markov chains; denoising and score functions; forward diffusion process; reverse process and sampling; training objectives for diffusion models; applications and extensions.\n\nDetailed Contents (40 lecture hours)\n\n\n\n\n\n\n\n\nModule\nTopic\nHours\n\n\n\n\n1\nFoundations of Generative Modeling — data distribution and model family, ML estimation, KL divergence, empirical risk minimization, challenges in high-dimension density estimation\n6\n\n\n2\nGaussian Distributions and Noise Accumulation — multivariate Gaussian distributions, conditioning and marginalization, linear transformations of Gaussian variables, discrete-time Markov chains, noise accumulation through repeated Gaussian perturbation\n6\n\n\n3\nDiscrete Diffusion Models: The DDPM Framework — forward diffusion process, concept of reverse process, variational lower bound, decomposition of KL terms, reduction to noise-prediction loss\n6\n\n\n4\nScore Matching and Denoising — score function, score matching and denoising\n6\n\n\n5\nContinuous-time and Probability Flow Models — random walks and Brownian motion, concept of stochastic differential equations, heat-equation intuition, density evolution under stochastic dynamics (Fokker–Planck equation), continuous formulation of the forward equation\n8\n\n\n6\nReverse-time Dynamics and Probability Flow — heuristic derivation of reverse-time drift, entropy and information-flow interpretation, probability flow ODE, neural ODEs and flow-based models\n8\n\n\n\nTotal lecture hours\n40",
+    "crumbs": [
+      "Syllabus"
+    ]
+  },
+  {
+    "objectID": "syllabus.html#texts-and-references",
+    "href": "syllabus.html#texts-and-references",
+    "title": "Syllabus",
+    "section": "Texts and References",
+    "text": "Texts and References\nText book\n\nChieh-Hsin Lai, Yang Song, Dongjun Kim, Yuki Mitsufuji, Stefano Ermon. The Principles of Diffusion Models: From Origins to Advances. Available online (arXiv:2510.21890); in the process of being published.\n\nReference books\n\nG. A. Pavliotis. Stochastic Processes and Applications. Springer, 2014.",
+    "crumbs": [
+      "Syllabus"
+    ]
+  },
+  {
+    "objectID": "weeks/w01.html",
+    "href": "weeks/w01.html",
+    "title": "W01: Generative Modeling I",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W01: Generative Modeling I"
+    ]
+  },
+  {
+    "objectID": "weeks/w01.html#in-class",
+    "href": "weeks/w01.html#in-class",
+    "title": "W01: Generative Modeling I",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W01: Generative Modeling I"
+    ]
+  },
+  {
+    "objectID": "weeks/w01.html#after-class",
+    "href": "weeks/w01.html#after-class",
+    "title": "W01: Generative Modeling I",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W01: Generative Modeling I"
+    ]
+  },
+  {
+    "objectID": "weeks/w02.html",
+    "href": "weeks/w02.html",
+    "title": "W02: Generative Modeling II",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W02: Generative Modeling II"
+    ]
+  },
+  {
+    "objectID": "weeks/w02.html#in-class",
+    "href": "weeks/w02.html#in-class",
+    "title": "W02: Generative Modeling II",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W02: Generative Modeling II"
+    ]
+  },
+  {
+    "objectID": "weeks/w02.html#after-class",
+    "href": "weeks/w02.html#after-class",
+    "title": "W02: Generative Modeling II",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W02: Generative Modeling II"
+    ]
+  },
+  {
+    "objectID": "weeks/w03.html",
+    "href": "weeks/w03.html",
+    "title": "W03: Gaussians",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W03: Gaussians"
+    ]
+  },
+  {
+    "objectID": "weeks/w03.html#in-class",
+    "href": "weeks/w03.html#in-class",
+    "title": "W03: Gaussians",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W03: Gaussians"
+    ]
+  },
+  {
+    "objectID": "weeks/w03.html#after-class",
+    "href": "weeks/w03.html#after-class",
+    "title": "W03: Gaussians",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W03: Gaussians"
+    ]
+  },
+  {
+    "objectID": "weeks/w04.html",
+    "href": "weeks/w04.html",
+    "title": "W04: Markov Chains & Noise Accumulation",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W04: Markov Chains & Noise Accumulation"
+    ]
+  },
+  {
+    "objectID": "weeks/w04.html#in-class",
+    "href": "weeks/w04.html#in-class",
+    "title": "W04: Markov Chains & Noise Accumulation",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W04: Markov Chains & Noise Accumulation"
+    ]
+  },
+  {
+    "objectID": "weeks/w04.html#after-class",
+    "href": "weeks/w04.html#after-class",
+    "title": "W04: Markov Chains & Noise Accumulation",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W04: Markov Chains & Noise Accumulation"
+    ]
+  },
+  {
+    "objectID": "weeks/w05.html",
+    "href": "weeks/w05.html",
+    "title": "W05: DDPM I",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W05: DDPM I"
+    ]
+  },
+  {
+    "objectID": "weeks/w05.html#in-class",
+    "href": "weeks/w05.html#in-class",
+    "title": "W05: DDPM I",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W05: DDPM I"
+    ]
+  },
+  {
+    "objectID": "weeks/w05.html#after-class",
+    "href": "weeks/w05.html#after-class",
+    "title": "W05: DDPM I",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W05: DDPM I"
+    ]
+  },
+  {
+    "objectID": "weeks/w06.html",
+    "href": "weeks/w06.html",
+    "title": "W06: DDPM II",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W06: DDPM II"
+    ]
+  },
+  {
+    "objectID": "weeks/w06.html#in-class",
+    "href": "weeks/w06.html#in-class",
+    "title": "W06: DDPM II",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W06: DDPM II"
+    ]
+  },
+  {
+    "objectID": "weeks/w06.html#after-class",
+    "href": "weeks/w06.html#after-class",
+    "title": "W06: DDPM II",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W06: DDPM II"
+    ]
+  },
+  {
+    "objectID": "weeks/w07.html",
+    "href": "weeks/w07.html",
+    "title": "W07: Score Matching",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W07: Score Matching"
+    ]
+  },
+  {
+    "objectID": "weeks/w07.html#in-class",
+    "href": "weeks/w07.html#in-class",
+    "title": "W07: Score Matching",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W07: Score Matching"
+    ]
+  },
+  {
+    "objectID": "weeks/w07.html#after-class",
+    "href": "weeks/w07.html#after-class",
+    "title": "W07: Score Matching",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W07: Score Matching"
+    ]
+  },
+  {
+    "objectID": "weeks/w08.html",
+    "href": "weeks/w08.html",
+    "title": "W08: Denoising Score Matching",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W08: Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "weeks/w08.html#in-class",
+    "href": "weeks/w08.html#in-class",
+    "title": "W08: Denoising Score Matching",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W08: Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "weeks/w08.html#after-class",
+    "href": "weeks/w08.html#after-class",
+    "title": "W08: Denoising Score Matching",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W08: Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "weeks/w09.html",
+    "href": "weeks/w09.html",
+    "title": "W09: Mid-Semester Examinations",
+    "section": "",
+    "text": "Dates: Sep 21 – 25, 2026 · class days TBA\n\n\n\n\n\n\nNo classes — mid-semester examinations (Sep 18–23). Coverage: Modules 1–4. Best of luck!",
+    "crumbs": [
+      "Weekly Notes",
+      "W09: Mid-Semester Examinations"
+    ]
+  },
+  {
+    "objectID": "weeks/w10.html",
+    "href": "weeks/w10.html",
+    "title": "W10: Brownian Motion & SDEs",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W10: Brownian Motion & SDEs"
+    ]
+  },
+  {
+    "objectID": "weeks/w10.html#in-class",
+    "href": "weeks/w10.html#in-class",
+    "title": "W10: Brownian Motion & SDEs",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W10: Brownian Motion & SDEs"
+    ]
+  },
+  {
+    "objectID": "weeks/w10.html#after-class",
+    "href": "weeks/w10.html#after-class",
+    "title": "W10: Brownian Motion & SDEs",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W10: Brownian Motion & SDEs"
+    ]
+  },
+  {
+    "objectID": "weeks/w11.html",
+    "href": "weeks/w11.html",
+    "title": "W11: Fokker–Planck",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W11: Fokker–Planck"
+    ]
+  },
+  {
+    "objectID": "weeks/w11.html#in-class",
+    "href": "weeks/w11.html#in-class",
+    "title": "W11: Fokker–Planck",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W11: Fokker–Planck"
+    ]
+  },
+  {
+    "objectID": "weeks/w11.html#after-class",
+    "href": "weeks/w11.html#after-class",
+    "title": "W11: Fokker–Planck",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W11: Fokker–Planck"
+    ]
+  },
+  {
+    "objectID": "weeks/w12.html",
+    "href": "weeks/w12.html",
+    "title": "W12: Continuous Forward Equation",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W12: Continuous Forward Equation"
+    ]
+  },
+  {
+    "objectID": "weeks/w12.html#in-class",
+    "href": "weeks/w12.html#in-class",
+    "title": "W12: Continuous Forward Equation",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W12: Continuous Forward Equation"
+    ]
+  },
+  {
+    "objectID": "weeks/w12.html#after-class",
+    "href": "weeks/w12.html#after-class",
+    "title": "W12: Continuous Forward Equation",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W12: Continuous Forward Equation"
+    ]
+  },
+  {
+    "objectID": "weeks/w13.html",
+    "href": "weeks/w13.html",
+    "title": "W13: Reverse-time Drift",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W13: Reverse-time Drift"
+    ]
+  },
+  {
+    "objectID": "weeks/w13.html#in-class",
+    "href": "weeks/w13.html#in-class",
+    "title": "W13: Reverse-time Drift",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W13: Reverse-time Drift"
+    ]
+  },
+  {
+    "objectID": "weeks/w13.html#after-class",
+    "href": "weeks/w13.html#after-class",
+    "title": "W13: Reverse-time Drift",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W13: Reverse-time Drift"
+    ]
+  },
+  {
+    "objectID": "weeks/w14.html",
+    "href": "weeks/w14.html",
+    "title": "W14: Entropy & Information Flow",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W14: Entropy & Information Flow"
+    ]
+  },
+  {
+    "objectID": "weeks/w14.html#in-class",
+    "href": "weeks/w14.html#in-class",
+    "title": "W14: Entropy & Information Flow",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W14: Entropy & Information Flow"
+    ]
+  },
+  {
+    "objectID": "weeks/w14.html#after-class",
+    "href": "weeks/w14.html#after-class",
+    "title": "W14: Entropy & Information Flow",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W14: Entropy & Information Flow"
+    ]
+  },
+  {
+    "objectID": "weeks/w15.html",
+    "href": "weeks/w15.html",
+    "title": "W15: Probability Flow ODE",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W15: Probability Flow ODE"
+    ]
+  },
+  {
+    "objectID": "weeks/w15.html#in-class",
+    "href": "weeks/w15.html#in-class",
+    "title": "W15: Probability Flow ODE",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W15: Probability Flow ODE"
+    ]
+  },
+  {
+    "objectID": "weeks/w15.html#after-class",
+    "href": "weeks/w15.html#after-class",
+    "title": "W15: Probability Flow ODE",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W15: Probability Flow ODE"
+    ]
+  },
+  {
+    "objectID": "weeks/w16.html",
+    "href": "weeks/w16.html",
+    "title": "W16: Neural ODEs & Flows",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W16: Neural ODEs & Flows"
+    ]
+  },
+  {
+    "objectID": "weeks/w16.html#in-class",
+    "href": "weeks/w16.html#in-class",
+    "title": "W16: Neural ODEs & Flows",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W16: Neural ODEs & Flows"
+    ]
+  },
+  {
+    "objectID": "weeks/w16.html#after-class",
+    "href": "weeks/w16.html#after-class",
+    "title": "W16: Neural ODEs & Flows",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W16: Neural ODEs & Flows"
+    ]
+  },
+  {
+    "objectID": "weeks/w17.html",
+    "href": "weeks/w17.html",
+    "title": "W17: Applications & Wrap-up",
+    "section": "",
+    "text": "Pre-read\nTo be posted (typically by the weekend before) — section references into the primary text.",
+    "crumbs": [
+      "Weekly Notes",
+      "W17: Applications & Wrap-up"
+    ]
+  },
+  {
+    "objectID": "weeks/w17.html#in-class",
+    "href": "weeks/w17.html#in-class",
+    "title": "W17: Applications & Wrap-up",
+    "section": "In Class",
+    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W17: Applications & Wrap-up"
+    ]
+  },
+  {
+    "objectID": "weeks/w17.html#after-class",
+    "href": "weeks/w17.html#after-class",
+    "title": "W17: Applications & Wrap-up",
+    "section": "After Class",
+    "text": "After Class\nExercises and pointers will be posted here.",
+    "crumbs": [
+      "Weekly Notes",
+      "W17: Applications & Wrap-up"
+    ]
+  },
+  {
+    "objectID": "resources.html",
+    "href": "resources.html",
+    "title": "Resources",
+    "section": "",
+    "text": "Primary Text",
+    "crumbs": [
+      "Resources"
+    ]
+  },
+  {
+    "objectID": "resources.html#primary-text",
+    "href": "resources.html#primary-text",
+    "title": "Resources",
+    "section": "",
+    "text": "Chieh-Hsin Lai, Yang Song, Dongjun Kim, Yuki Mitsufuji, Stefano Ermon. The Principles of Diffusion Models: From Origins to Advances. arXiv:2510.21890. Freely available; the course follows its arc from likelihood-based foundations through DDPMs, score matching, SDE/probability-flow formulations.",
+    "crumbs": [
+      "Resources"
+    ]
+  },
+  {
+    "objectID": "resources.html#reference",
+    "href": "resources.html#reference",
+    "title": "Resources",
+    "section": "Reference",
+    "text": "Reference\n\nG. A. Pavliotis. Stochastic Processes and Applications: Diffusion Processes, the Fokker-Planck and Langevin Equations. Springer, 2014 — for the stochastic-processes machinery of Modules 5–6.",
+    "crumbs": [
+      "Resources"
+    ]
+  },
+  {
+    "objectID": "resources.html#supplementary-reading",
+    "href": "resources.html#supplementary-reading",
+    "title": "Resources",
+    "section": "Supplementary Reading",
+    "text": "Supplementary Reading\n\nHow to Build a Diffusion Language Model — Kuleshov Group. A modern application of the ideas in this course to language modeling.\nPrerequisite refresher: your CS-3-12 (Machine Learning) notes on maximum likelihood, KL divergence, and variational inference will be assumed working knowledge from Week 1.\n\nAdditional papers and notes will be added here week by week.",
+    "crumbs": [
+      "Resources"
+    ]
+  }
+]
