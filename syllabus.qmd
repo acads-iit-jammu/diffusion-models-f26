@@ -1,0 +1,62 @@
+# Syllabus {.unnumbered}
+
+This page reproduces the official course template for **ID-5-02 (TO) — Mathematical Foundations of Diffusion Models** (Interdisciplinary Programs, Scheme 2022, Level 6).
+
+## Basic Information
+
+| | |
+|---|---|
+| **Proposing Department** | Interdisciplinary Programs |
+| **Course Title** | Mathematical Foundations of Diffusion Models |
+| **L-T-P Structure** | 3-0-0 |
+| **Credits** | 3 (Grade Point Earning Course) |
+| **Category** | Open Elective — all B.Tech programmes, M.Tech, M.Sc, MS(R), PhD |
+| **Prerequisite** | CS-3-12 (MO) — Machine Learning |
+| **Frequency** | Once every year |
+| **Course Instructor** | Soma S Dhavala |
+
+: {tbl-colwidths="[35,65]"}
+
+## Course Objectives
+
+This course introduces the mathematical principles underlying diffusion-based generative models used in modern AI. Students will learn how noise is progressively added to data and how neural networks are trained to reverse this process to generate realistic samples. The course builds on probability, Gaussian distributions, and optimization to explain diffusion processes, denoising objectives, and sampling algorithms. Emphasis is placed on intuitive derivations, geometric interpretation of probability distributions, and connections to familiar machine learning concepts such as maximum likelihood and variational inference. By the end of the course, students will understand diffusion models both conceptually and mathematically.
+
+## Course Outcomes
+
+At the end of this course, students will be able to:
+
+1. Explain the forward and reverse diffusion processes.
+2. Derive the Gaussian noise perturbation model used in diffusion models.
+3. Understand and interpret the denoising training objective.
+4. Connect diffusion models with likelihood-based learning.
+5. Implement and analyze simplified diffusion sampling algorithms.
+6. Compare diffusion models with GANs and VAEs.
+7. Read and interpret recent diffusion model research papers.
+
+## Course Contents
+
+Gaussian noise and Markov chains; denoising and score functions; forward diffusion process; reverse process and sampling; training objectives for diffusion models; applications and extensions.
+
+### Detailed Contents (40 lecture hours)
+
+| Module | Topic | Hours |
+|:---:|---|:---:|
+| 1 | **Foundations of Generative Modeling** — data distribution and model family, ML estimation, KL divergence, empirical risk minimization, challenges in high-dimension density estimation | 6 |
+| 2 | **Gaussian Distributions and Noise Accumulation** — multivariate Gaussian distributions, conditioning and marginalization, linear transformations of Gaussian variables, discrete-time Markov chains, noise accumulation through repeated Gaussian perturbation | 6 |
+| 3 | **Discrete Diffusion Models: The DDPM Framework** — forward diffusion process, concept of reverse process, variational lower bound, decomposition of KL terms, reduction to noise-prediction loss | 6 |
+| 4 | **Score Matching and Denoising** — score function, score matching and denoising | 6 |
+| 5 | **Continuous-time and Probability Flow Models** — random walks and Brownian motion, concept of stochastic differential equations, heat-equation intuition, density evolution under stochastic dynamics (Fokker–Planck equation), continuous formulation of the forward equation | 8 |
+| 6 | **Reverse-time Dynamics and Probability Flow** — heuristic derivation of reverse-time drift, entropy and information-flow interpretation, probability flow ODE, neural ODEs and flow-based models | 8 |
+| | **Total lecture hours** | **40** |
+
+: {tbl-colwidths="[10,75,15]"}
+
+## Texts and References
+
+**Text book**
+
+1. Chieh-Hsin Lai, Yang Song, Dongjun Kim, Yuki Mitsufuji, Stefano Ermon. *The Principles of Diffusion Models: From Origins to Advances.* Available online ([arXiv:2510.21890](https://arxiv.org/abs/2510.21890)); in the process of being published.
+
+**Reference books**
+
+1. G. A. Pavliotis. *Stochastic Processes and Applications.* Springer, 2014.

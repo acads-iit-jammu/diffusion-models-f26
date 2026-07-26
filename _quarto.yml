@@ -1,0 +1,57 @@
+project:
+  type: book
+  output-dir: _site
+
+book:
+  title: "ID-5-02 (TO)"
+  subtitle: "Mathematical Foundations of Diffusion Models · Monsoon 2026"
+  author: "Soma S Dhavala · IIT Jammu"
+  reader-mode: true
+  sidebar:
+    collapse-level: 1
+
+  page-footer:
+    left: |
+      ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu
+    right: |
+      Built with <a href="https://quarto.org/">Quarto</a>.
+
+  site-url: https://acads-iit-jammu.github.io/ID-5-02-TO-F26
+  repo-url: https://github.com/acads-iit-jammu/ID-5-02-TO-F26
+  repo-branch: main
+
+  chapters:
+    - index.qmd
+    - course.qmd
+    - syllabus.qmd
+    - part: "Weekly Notes"
+      chapters:
+        - weeks/w01.qmd
+        - weeks/w02.qmd
+        - weeks/w03.qmd
+        - weeks/w04.qmd
+        - weeks/w05.qmd
+        - weeks/w06.qmd
+        - weeks/w07.qmd
+        - weeks/w08.qmd
+        - weeks/w09.qmd
+        - weeks/w10.qmd
+        - weeks/w11.qmd
+        - weeks/w12.qmd
+        - weeks/w13.qmd
+        - weeks/w14.qmd
+        - weeks/w15.qmd
+        - weeks/w16.qmd
+        - weeks/w17.qmd
+    - resources.qmd
+
+format:
+  html:
+    theme:
+      - cosmo
+      - iitjammu.scss
+    callout-appearance: simple
+    number-sections: false
+    link-external-newwindow: true
+
+editor: source

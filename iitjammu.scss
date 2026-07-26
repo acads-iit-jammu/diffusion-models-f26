@@ -1,0 +1,91 @@
+/*-- scss:defaults --*/
+
+// Fonts: Roboto / Roboto Slab / Roboto Mono
+// (as used on https://kuleshov-group.github.io/blog/)
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Slab:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+// IIT Jammu palette (iitjammu.ac.in)
+$iitjmu-blue:      #003f87;
+$iitjmu-blue-dark: #002d63;
+$iitjmu-blue-mid:  #0056b8;
+$iitjmu-blue-sky:  #4da3ff;
+$iitjmu-blue-pale: #eaf3ff;
+
+$primary:    $iitjmu-blue;
+$link-color: $iitjmu-blue-mid;
+
+$font-family-sans-serif: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+$font-family-monospace:  "Roboto Mono", SFMono-Regular, Menlo, Consolas, monospace;
+$headings-font-family:   "Roboto Slab", "Roboto", Georgia, serif;
+$headings-color:         $iitjmu-blue-dark;
+
+// Keep the overall font size much smaller
+$font-size-root: 12.5px;
+$code-font-size: 0.9em;
+
+$table-border-color: lighten($iitjmu-blue-sky, 18%);
+
+/*-- scss:rules --*/
+
+// Quarto books emit a late ':root { font-size: 11pt }' that beats
+// $font-size-root; this rules-layer override wins by cascade order.
+:root {
+  font-size: 12.5px;
+}
+
+.sidebar-title {
+  color: #003f87;
+  font-family: "Roboto Slab", Georgia, serif;
+}
+
+div.sidebar-item-container .active {
+  font-weight: bold;
+  color: #003f87;
+}
+
+.sidebar nav[role=doc-toc] ul > li > a.active,
+.sidebar nav[role=doc-toc] ul > li > ul > li > a.active {
+  font-weight: bold;
+  color: #003f87;
+}
+
+/* Headings */
+
+#title-block-header.quarto-title-block.default .quarto-title h1.title {
+  margin-bottom: 0.5rem;
+}
+
+h1 { font-weight: 600; }
+h2 { margin-top: 2rem; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600;
+     border-bottom: 2px solid #eaf3ff; padding-bottom: .3rem; }
+h3 { margin-top: 1.5em; font-size: 1.2rem; font-weight: 500; }
+h4 { margin-top: 1.5em; font-size: 1.1rem; }
+h5 { margin-top: 1.5em; font-size: 1rem; }
+
+.quarto-section-identifier {
+  color: #6c6c6c;
+  font-weight: normal;
+}
+
+/* Tables */
+
+thead {
+  background-color: #eaf3ff;
+  color: #002d63;
+}
+
+/* Code */
+
+code {
+  color: #373a3c;
+}
+
+code a:any-link {
+  text-decoration: underline;
+  text-decoration-color: #ccc;
+}
+
+pre {
+  background-image: linear-gradient(160deg, #f6faff 0, #eef4fb 100%);
+  border-left: 3px solid #4da3ff;
+}

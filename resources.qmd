@@ -1,0 +1,16 @@
+# Resources {.unnumbered}
+
+## Primary Text
+
+- Chieh-Hsin Lai, Yang Song, Dongjun Kim, Yuki Mitsufuji, Stefano Ermon. **The Principles of Diffusion Models: From Origins to Advances.** [arXiv:2510.21890](https://arxiv.org/abs/2510.21890). Freely available; the course follows its arc from likelihood-based foundations through DDPMs, score matching, SDE/probability-flow formulations.
+
+## Reference
+
+- G. A. Pavliotis. *Stochastic Processes and Applications: Diffusion Processes, the Fokker-Planck and Langevin Equations.* Springer, 2014 — for the stochastic-processes machinery of Modules 5–6.
+
+## Supplementary Reading
+
+- [How to Build a Diffusion Language Model](https://kuleshov-group.github.io/blog/blog/2026/how-to-build-a-diffusion-language-model/) — Kuleshov Group. A modern application of the ideas in this course to language modeling.
+- Prerequisite refresher: your CS-3-12 (Machine Learning) notes on maximum likelihood, KL divergence, and variational inference will be assumed working knowledge from Week 1.
+
+*Additional papers and notes will be added here week by week.*
