@@ -12,6 +12,10 @@
 
 ## In Class
 
+- Companion note: [The World's Smallest Diffusion Model](../materials/two-point-diffusion.qmd) — a complete diffusion model on a two-point dataset, every step exact.
+- [Interactive demo](../materials/two-point-diffusion-demo.html) used in the lecture: forward melting, the tanh denoiser, and reverse-time generation.
+- Warm-up demo: [Progressively Adding Noise](../materials/one-point-noise-demo.html) — one point at 0, kicked by noise; one walker, then many, with the √t envelope and the live Gaussian cross-section.
+
 *Lecture notes/board scans will be posted here.*
 
 ## After Class

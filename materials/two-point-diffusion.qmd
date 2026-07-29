@@ -1,0 +1,192 @@
+# The World's Smallest Diffusion Model {.unnumbered}
+
+*Companion note to Lecture 1 (W01). Interactive version:
+[live demo](./two-point-diffusion-demo.html) — every figure in this note, animated.*
+
+Diffusion models generate images from pure noise. Before we spend forty lectures on the
+mathematics, this note builds a **complete diffusion model with a dataset of two points**
+— small enough that every quantity the course will later approximate with a neural
+network can be computed *exactly*, with nothing beyond Bayes' rule.
+
+## The dataset
+
+Our data distribution puts equal mass on two points:
+
+$$
+p_{\text{data}}(x_0) \;=\; \tfrac{1}{2}\,\delta(x_0 + 1) \;+\; \tfrac{1}{2}\,\delta(x_0 - 1),
+\qquad x_0 \in \{-1, +1\}.
+$$
+
+Generative modeling asks: given samples from $p_{\text{data}}$, produce *more* samples.
+For this dataset the answer is a coin flip — which is exactly why it is the right
+dataset: the machinery becomes transparent.
+
+## Forward process: noise melts the data
+
+Corrupt a clean sample with Gaussian noise of size $\sigma$:
+
+$$
+x_\sigma \;=\; x_0 + \sigma z, \qquad z \sim \mathcal{N}(0, 1).
+$$
+
+Since $x_0 = \pm 1$ with probability $\tfrac12$ each, the density of the corrupted
+sample is a two-component Gaussian mixture:
+
+$$
+p_\sigma(x) \;=\; \tfrac{1}{2}\,\mathcal{N}(x;\, -1,\, \sigma^2)
+\;+\; \tfrac{1}{2}\,\mathcal{N}(x;\, +1,\, \sigma^2).
+$$
+
+Two facts, both visible in the demo:
+
+- **Small $\sigma$:** two sharp bumps at $\pm 1$ — the data is intact.
+- **Large $\sigma$:** the bumps merge. Indeed $\mathbb{E}[x_\sigma] = 0$ and
+  $\operatorname{Var}(x_\sigma) = \mathbb{E}[x_0^2] + \sigma^2 = 1 + \sigma^2$, and for
+  $\sigma \gtrsim 3$ the mixture is visually indistinguishable from
+  $\mathcal{N}(0,\, 1 + \sigma^2)$.
+
+This is the first design principle of diffusion models: **destroying structure is easy,
+fully understood, and ends somewhere known** (a Gaussian), no matter what the data was.
+
+## Denoising: Bayes' rule gives the optimal denoiser in closed form
+
+Now invert: we observe a noisy $x_\sigma = x$ and want the clean $x_0$. The best guess
+under squared error is the **posterior mean** $\mathbb{E}[x_0 \mid x_\sigma = x]$
+(we will prove this optimality claim in Module 1; for now, take it).
+
+The posterior over the two candidates follows from Bayes' rule:
+
+$$
+\mathbb{P}(x_0 = +1 \mid x)
+= \frac{\tfrac12\,\mathcal{N}(x; +1, \sigma^2)}
+       {\tfrac12\,\mathcal{N}(x; +1, \sigma^2) + \tfrac12\,\mathcal{N}(x; -1, \sigma^2)}
+= \frac{1}{1 + \exp\!\big(-\tfrac{2x}{\sigma^2}\big)}
+= \operatorname{sigmoid}\!\Big(\frac{2x}{\sigma^2}\Big),
+$$
+
+where the middle step divides through by $\mathcal{N}(x; +1, \sigma^2)$ and uses
+$\exp\!\big(-\tfrac{(x+1)^2}{2\sigma^2}\big) \big/ \exp\!\big(-\tfrac{(x-1)^2}{2\sigma^2}\big)
+= \exp\!\big(-\tfrac{2x}{\sigma^2}\big)$. Therefore
+
+$$
+\boxed{\;\mathbb{E}[x_0 \mid x_\sigma = x]
+= (+1)\,\mathbb{P}(+1 \mid x) + (-1)\,\mathbb{P}(-1 \mid x)
+= \tanh\!\Big(\frac{x}{\sigma^2}\Big).\;}
+$$
+
+The optimal denoiser is a **tanh** — an activation function you already know, produced
+by nothing but probability. Sanity-check its two regimes:
+
+- $\sigma \to 0$: $\tanh(x/\sigma^2)$ becomes a hard step — snap to the nearer data point.
+- $\sigma \to \infty$: $\tanh(x/\sigma^2) \approx x/\sigma^2 \to 0$ — the observation is
+  all noise, so the best guess is the prior mean $0$.
+
+## The score function (a preview of Module 4)
+
+Differentiate $\log p_\sigma$ directly. With
+$\varphi_\pm(x) = \mathcal{N}(x; \pm 1, \sigma^2)$ and
+$\varphi_\pm'(x) = -\tfrac{x \mp 1}{\sigma^2}\varphi_\pm(x)$,
+
+$$
+\nabla_x \log p_\sigma(x)
+= \frac{\tfrac12\varphi_-'(x) + \tfrac12\varphi_+'(x)}{p_\sigma(x)}
+= -\frac{x - \mathbb{E}[x_0 \mid x]}{\sigma^2}
+= \frac{\tanh\!\big(\tfrac{x}{\sigma^2}\big) - x}{\sigma^2}.
+$$
+
+Rearranged, this is **Tweedie's formula**, one of the two or three most important
+identities of the course:
+
+$$
+\mathbb{E}[x_0 \mid x_\sigma = x] \;=\; x + \sigma^2\, \nabla_x \log p_\sigma(x).
+$$
+
+*Denoising and knowing the score are the same thing.* The score
+$\nabla_x \log p_\sigma$ points from $x$ toward where the (noised) data is denser; the
+denoiser just takes a $\sigma^2$-sized step along it.
+
+## Reverse process: run the denoiser backwards
+
+Generation now works by *annealing*: start from pure noise at a large
+$\sigma_{\max}$, and lower $\sigma$ along a grid
+$\sigma_{\max} = \sigma_0 > \sigma_1 > \cdots > \sigma_K \approx 0$, nudging the sample
+along the score at every step:
+
+$$
+x_{k+1} \;=\; x_k \;+\; \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\,
+\nabla_x \log p_{\sigma_k}(x_k)
+\;=\; x_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\cdot
+\frac{\tanh\!\big(x_k/\sigma_k^2\big) - x_k}{\sigma_k^2}.
+$$
+
+This deterministic rule is the discretization of the **probability-flow ODE**; adding
+fresh noise at each step,
+
+$$
+x_{k+1} = x_k + \big(\sigma_k^2 - \sigma_{k+1}^2\big)\,\nabla_x \log p_{\sigma_k}(x_k)
++ \sqrt{\sigma_k^2 - \sigma_{k+1}^2}\; z_k, \qquad z_k \sim \mathcal{N}(0,1),
+$$
+
+gives the **reverse-time SDE**. Where these updates *come from* is the business of
+Modules 5–6 (Fokker–Planck, reverse-time dynamics); today we only need to *watch them
+work*: a cloud of particles started from $\mathcal{N}(0,\, 1+\sigma_{\max}^2)$ splits,
+condenses, and lands on exactly $\{-1, +1\}$ with the right proportions.
+
+The full sampler, with no neural network anywhere:
+
+```python
+import numpy as np
+
+def score(x, s2):                 # ∇ log p_σ(x), exact for the two-point data
+    return (np.tanh(x / s2) - x) / s2
+
+smax, smin, K, N = 3.0, 1e-2, 500, 100_000
+sig = smax * (smin / smax) ** (np.arange(K + 1) / K)    # geometric σ grid
+x = np.sqrt(1 + smax**2) * np.random.randn(N)           # start from pure noise
+
+for k in range(K):                                       # probability-flow ODE
+    d = sig[k]**2 - sig[k + 1]**2
+    x += 0.5 * d * score(x, sig[k]**2)
+
+print(np.abs(x).mean(), (x > 0).mean())   # ≈ 1.0 and ≈ 0.5 — data regenerated
+```
+
+## Why the course exists: what breaks for images
+
+Everything above was exact because the posterior mean had a formula. For images it does
+not — and it cannot be tabulated either: a $64 \times 64$ RGB image lives in a space of
+$256^{12288}$ configurations, and the data occupies a vanishingly thin filament of it
+(Module 1: the curse of dimensionality). The entire role of the neural network in a
+diffusion model is to **approximate the map $(x, \sigma) \mapsto \mathbb{E}[x_0 \mid x]$**
+— to be the tanh we can no longer derive. Every other ingredient of this note survives
+unchanged, and each becomes a module of the course:
+
+| In this note | In the course |
+|---|---|
+| MLE / "what is a generative model" framing | M1 — Foundations of generative modeling |
+| Gaussian mixture, conditioning, $\operatorname{Var} = 1+\sigma^2$ | M2 — Gaussians and noise accumulation |
+| Discrete noise grid, noise-prediction view of denoising | M3 — DDPM framework |
+| $\nabla_x \log p_\sigma$, Tweedie's formula | M4 — Score matching and denoising |
+| The $\sigma$-continuum, densities evolving with $\sigma$ | M5 — SDEs and Fokker–Planck |
+| The reverse update and the probability-flow ODE | M6 — Reverse-time dynamics |
+
+: {tbl-colwidths="[50,50]"}
+
+## Exercises
+
+1. Fill in the algebra for
+   $\mathbb{P}(x_0 = +1 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)$ and
+   $\mathbb{E}[x_0 \mid x] = \tanh(x/\sigma^2)$.
+2. Show $\operatorname{Var}(x_\sigma) = 1 + \sigma^2$, and more generally
+   $\operatorname{Var}(x_\sigma) = \operatorname{Var}(x_0) + \sigma^2$ for any
+   zero-mean data distribution.
+3. **Unequal weights.** Let $\mathbb{P}(x_0 = +1) = \pi$. Show
+   $\mathbb{E}[x_0 \mid x] = \tanh\!\big(\tfrac{x}{\sigma^2} + \tfrac12 \log\tfrac{\pi}{1-\pi}\big)$
+   — the denoiser acquires a *bias*. What does the extra term do as $\sigma \to \infty$?
+4. **More points.** For data uniform on $\{a_1, \dots, a_m\}$, show
+   $\mathbb{E}[x_0 \mid x] = \sum_i a_i\, w_i(x)$ with
+   $w_i(x) \propto \exp\!\big(\tfrac{a_i x}{\sigma^2} - \tfrac{a_i^2}{2\sigma^2}\big)$ —
+   a *softmax*. (So the optimal denoiser for any finite dataset is attention-like:
+   a similarity-weighted average of the training points.)
+5. Run the sampler above with the SDE update instead of the ODE. Compare the spread of
+   the final samples around $\pm 1$ for both, as a function of $K$.

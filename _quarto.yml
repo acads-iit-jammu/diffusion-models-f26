@@ -1,6 +1,9 @@
 project:
   type: book
   output-dir: _site
+  resources:
+    - materials/two-point-diffusion-demo.html
+    - materials/one-point-noise-demo.html
 
 book:
   title: "ID-5-02 (TO)"
@@ -45,6 +48,9 @@ book:
         - weeks/w16.qmd
         - weeks/w17.qmd
     - resources.qmd
+
+  appendices:
+    - materials/two-point-diffusion.qmd
 
 format:
   html:

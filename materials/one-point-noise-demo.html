@@ -1,0 +1,633 @@
+<meta charset="utf-8">
+<title>Progressively Adding Noise</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --ring: rgba(11, 11, 11, 0.10);
+    --data: #2a78d6;      /* series 1: distributions */
+    --data-soft: rgba(42, 120, 214, 0.16);
+    --noise: #eb6834;     /* series 2: the walker(s) */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --ring: rgba(255, 255, 255, 0.10);
+      --data: #3987e5;
+      --data-soft: rgba(57, 135, 229, 0.20);
+      --noise: #d95926;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --ring: rgba(255, 255, 255, 0.10);
+    --data: #3987e5;
+    --data-soft: rgba(57, 135, 229, 0.20);
+    --noise: #d95926;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --ring: rgba(11, 11, 11, 0.10);
+    --data: #2a78d6;
+    --data-soft: rgba(42, 120, 214, 0.16);
+    --noise: #eb6834;
+  }
+
+  html { background: var(--page); }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+  }
+
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  header .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.75rem;
+  }
+  h1 {
+    font-size: clamp(1.9rem, 5.5vw, 2.7rem);
+    line-height: 1.12;
+    margin: 0 0 0.6rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act {
+    display: block;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--data);
+    margin-bottom: 0.35rem;
+  }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+
+  .math { font-style: italic; white-space: nowrap; }
+  .mathblock {
+    text-align: center;
+    font-size: 1.12rem;
+    margin: 1.1rem 0;
+    overflow-x: auto;
+    padding: 0.15rem 0;
+  }
+  sub, sup { line-height: 0; font-size: 0.68em; }
+
+  figure {
+    margin: 0;
+    background: var(--surface);
+    border: 1px solid var(--ring);
+    border-radius: 10px;
+    padding: 1rem 1rem 0.85rem;
+  }
+  .figlabel {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.6rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .legend { display: flex; gap: 1.1rem; font-size: 0.74rem; color: var(--ink-2); text-transform: none; letter-spacing: 0; }
+  .legend .key { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend .swatch { width: 14px; height: 0; border-top: 2.5px solid var(--noise); border-radius: 2px; }
+  .legend .swatch.env { border-top-style: dashed; border-top-color: var(--muted); border-top-width: 1.5px; }
+  .legend .swatch.dist { border-top-color: var(--data); }
+
+  canvas { display: block; width: 100%; height: 320px; touch-action: pan-y; }
+  #c-fan { height: 460px; }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--grid);
+    font-size: 0.82rem;
+    color: var(--ink-2);
+  }
+  .controls .group { display: inline-flex; align-items: center; gap: 0.55rem; }
+  .controls .group > .lbl { color: var(--muted); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.3rem; }
+  input[type="radio"] { accent-color: var(--data); margin: 0; }
+  .readout { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 9.5em; }
+  button {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--axis);
+    border-radius: 6px;
+    padding: 0.32rem 0.85rem;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  button.primary { background: var(--data); border-color: var(--data); color: #fff; }
+
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+
+  .takeaway {
+    border-left: 3px solid var(--data);
+    padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2);
+    font-size: 1.02rem;
+    max-width: 38rem;
+  }
+  .takeaway strong { color: var(--ink); }
+
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid); padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Lecture 1 demo</p>
+    <h1>Progressively Adding Noise</h1>
+    <p class="dek">One point at <span class="math">x = 0</span>. Kick it with a little noise,
+    again and again, and watch how far &#8212; and how predictably &#8212; it strays.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I &#183; One walker</span>One kick at a time</h2>
+    <p>Start at <span class="math">x&#8320; = 0</span>. Each kick adds a small, independent
+    Gaussian nudge:</p>
+    <p class="mathblock"><span class="math">x<sub>k</sub> = x<sub>k&#8722;1</sub> + &#948; z<sub>k</sub>,
+    &#8195; z<sub>k</sub> &#8764; N(0, 1).</span></p>
+    <p>Press <strong>Add one kick</strong> a few times &#8212; each press is one noise step,
+    and time runs downward. No single kick does much, but they never cancel perfectly:
+    the walker drifts away from 0. The dashed envelope marks
+    <span class="math">&#177;&#8730;t</span> and <span class="math">&#177;2&#8730;t</span> &#8212;
+    the point diverges like the <em>square root</em> of time.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>A single noisy walk &#183; start (top) &#8594; time t = 1 (bottom)</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> the walker</span>
+          <span class="key"><span class="swatch env"></span> &#177;&#8730;t, &#177;2&#8730;t</span>
+        </span>
+      </div>
+      <canvas id="c-walk" role="img" aria-label="A single random walk starting at zero, drawn downward over time, wandering inside a square-root-of-time envelope."></canvas>
+      <div class="controls">
+        <button id="kick" class="primary" type="button">Add one kick</button>
+        <button id="play-walk" type="button">Play</button>
+        <button id="reset-walk" type="button">Reset</button>
+        <span class="readout" id="r-walk">k = 0 &#183; x = 0.00</span>
+      </div>
+      <figcaption>Every Reset gives a different path &#8212; but the same envelope.
+      That contrast is the whole story.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II &#183; Many walkers</span>Same start, every fate &#8212; and one shape</h2>
+    <p>Now release many walkers from the same point 0. Individually each path is
+    unpredictable; collectively the cloud spreads with a fixed profile. After
+    <span class="math">k</span> kicks,</p>
+    <p class="mathblock"><span class="math">x<sub>k</sub> = &#948;(z&#8321; + &#8943; + z<sub>k</sub>)
+    &#8764; N(0, k&#948;&#178;)</span> &#8195;&#8212;&#8195; <span class="math">sd = &#948;&#8730;k.</span></p>
+    <p>The blue strip at the bottom is the live histogram of the walkers' current positions,
+    with the exact Gaussian <span class="math">N(0, t)</span> drawn over it. Switch the kicks
+    to <strong>coin flips</strong> (&#177;&#948;, no Gaussian anywhere in the noise) &#8212;
+    the histogram still marches to the same bell: the <em>central limit theorem</em> at work.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>Walkers from 0 &#183; cross-section below</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> paths</span>
+          <span class="key"><span class="swatch env"></span> &#177;&#8730;t, &#177;2&#8730;t</span>
+          <span class="key"><span class="swatch dist"></span> N(0, t)</span>
+        </span>
+      </div>
+      <canvas id="c-fan" role="img" aria-label="Many random walks fanning out from zero inside a square-root envelope, with a live histogram of positions matching a Gaussian curve."></canvas>
+      <div class="controls">
+        <button id="play-fan" class="primary" type="button">Release walkers</button>
+        <button id="reset-fan" type="button">Resample</button>
+        <span class="group"><span class="lbl">walkers</span>
+          <label><input type="radio" name="np" value="16"> 16</label>
+          <label><input type="radio" name="np" value="64" checked> 64</label>
+          <label><input type="radio" name="np" value="256"> 256</label>
+        </span>
+        <span class="group"><span class="lbl">kicks</span>
+          <label><input type="radio" name="kick" value="gauss" checked> Gaussian</label>
+          <label><input type="radio" name="kick" value="coin"> coin flip &#177;&#948;</label>
+        </span>
+      </div>
+      <figcaption>Pause mid-flight: at <em>every</em> intermediate time the cross-section is
+      already the right Gaussian &#8212; noise accumulation is Gaussian all the way down,
+      not just at the end.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="takeaway"><strong>Why diffusion models care.</strong> Variances add:
+    after k independent kicks the spread is exactly &#948;&#8730;k, and by the CLT the
+    shape is Gaussian regardless of the kicks' own distribution. So repeatedly noising
+    <em>any</em> data lands somewhere fully known &#8212; a Gaussian &#8212; which is what
+    makes the forward half of a diffusion model trivial, and the reverse half worth a course.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion demos and notes on the
+    <a href="https://acads-iit-jammu.github.io/ID-5-02-TO-F26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const css = (name) =>
+    getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+  let spare = null;
+  function randn() {
+    if (spare !== null) { const v = spare; spare = null; return v; }
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    const r = Math.sqrt(-2 * Math.log(u));
+    spare = r * Math.sin(2 * Math.PI * v);
+    return r * Math.cos(2 * Math.PI * v);
+  }
+
+  const SQRT2PI = Math.sqrt(2 * Math.PI);
+  const phi = (x, s2) => Math.exp(-(x * x) / (2 * s2)) / (Math.sqrt(s2) * SQRT2PI);
+
+  function setupCanvas(id, draw) {
+    const el = document.getElementById(id);
+    const ctx = el.getContext("2d");
+    const state = { el, ctx, w: 0, h: 0 };
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = el.getBoundingClientRect();
+      state.w = rect.width; state.h = rect.height;
+      el.width = Math.round(rect.width * dpr);
+      el.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(state);
+    }
+    new ResizeObserver(resize).observe(el);
+    state.redraw = () => draw(state);
+    return state;
+  }
+
+  const XR = 3.6;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function chrome(ctx, w, h, pad, xToPx) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    for (const v of [-3, -2, -1, 0, 1, 2, 3]) {
+      ctx.strokeStyle = css("--grid");
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xToPx(v), pad.t);
+      ctx.lineTo(xToPx(v), h - pad.b);
+      ctx.stroke();
+      ctx.fillStyle = css("--muted");
+      ctx.fillText(String(v), xToPx(v), h - pad.b + 5);
+    }
+    ctx.strokeStyle = css("--axis");
+    ctx.beginPath();
+    ctx.moveTo(pad.l, h - pad.b);
+    ctx.lineTo(w - pad.r, h - pad.b);
+    ctx.stroke();
+  }
+
+  // dashed +-sqrt(t) and +-2 sqrt(t) envelopes, time k=0..K mapped to [pad.t, yBottom]
+  function envelopes(ctx, pad, yBottom, K, xToPx, kToPx) {
+    ctx.strokeStyle = css("--muted");
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4, 4]);
+    for (const m of [1, 2, -1, -2]) {
+      ctx.beginPath();
+      let started = false;
+      for (let k = 0; k <= K; k++) {
+        const x = m * Math.sqrt(k / K);
+        if (Math.abs(x) > XR) break;
+        const px = xToPx(x), py = kToPx(k);
+        started ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+        started = true;
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.fillStyle = css("--muted");
+    ctx.font = "10px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText("\u221at", xToPx(1) + 5, yBottom - 8);
+    ctx.fillText("2\u221at", xToPx(2) + 5, yBottom - 8);
+  }
+
+  // ---- Act I: single walker --------------------------------------------
+  const K1 = 160;
+  const D1 = Math.sqrt(1 / K1);
+  let walk = [0];
+
+  const walkView = setupCanvas("c-walk", (st) => {
+    const { ctx, w, h } = st;
+    const pad = { l: 14, r: 14, t: 20, b: 26 };
+    const xToPx = (x) => pad.l + ((x + XR) / (2 * XR)) * (w - pad.l - pad.r);
+    const kToPx = (k) => pad.t + (k / K1) * (h - pad.t - pad.b);
+    chrome(ctx, w, h, pad, xToPx);
+    envelopes(ctx, pad, h - pad.b, K1, xToPx, kToPx);
+
+    ctx.fillStyle = css("--muted");
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "top";
+    ctx.fillText("start", xToPx(0) - 8, pad.t - 14);
+
+    ctx.strokeStyle = css("--noise");
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(xToPx(walk[0]), kToPx(0));
+    for (let k = 1; k < walk.length; k++) ctx.lineTo(xToPx(walk[k]), kToPx(k));
+    ctx.stroke();
+
+    const k = walk.length - 1;
+    ctx.fillStyle = css("--noise");
+    ctx.beginPath();
+    ctx.arc(xToPx(walk[k]), kToPx(k), 4.5, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = css("--surface");
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = css("--ink");
+    ctx.beginPath();
+    ctx.arc(xToPx(0), kToPx(0), 3.5, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+
+  const rWalk = document.getElementById("r-walk");
+  const fmt = (v, d = 2) => (Math.abs(v) < 1e-10 ? 0 : v).toFixed(d);
+  function updateWalkReadout() {
+    const k = walk.length - 1;
+    rWalk.innerHTML = "k = " + k + " \u00b7 x = " + fmt(walk[k]);
+  }
+  function oneKick() {
+    if (walk.length > K1) return false;
+    const x = walk[walk.length - 1] + D1 * randn();
+    walk.push(Math.max(-XR, Math.min(XR, x)));
+    updateWalkReadout();
+    walkView.redraw();
+    return walk.length <= K1;
+  }
+
+  let walkAnim = null;
+  const playWalk = document.getElementById("play-walk");
+  function stopWalk() {
+    if (walkAnim) { cancelAnimationFrame(walkAnim); walkAnim = null; }
+    playWalk.textContent = "Play";
+  }
+  document.getElementById("kick").addEventListener("click", () => { stopWalk(); oneKick(); });
+  playWalk.addEventListener("click", () => {
+    if (walkAnim) { stopWalk(); return; }
+    if (walk.length > K1) { walk = [0]; }
+    playWalk.textContent = "Pause";
+    const per = reduced ? 8 : 2;
+    const tick = () => {
+      let more = true;
+      for (let i = 0; i < per && more; i++) more = oneKick();
+      if (more) walkAnim = requestAnimationFrame(tick);
+      else stopWalk();
+    };
+    walkAnim = requestAnimationFrame(tick);
+  });
+  document.getElementById("reset-walk").addEventListener("click", () => {
+    stopWalk();
+    walk = [0];
+    updateWalkReadout();
+    walkView.redraw();
+  });
+
+  // ---- Act II: fan of walkers + live cross-section ----------------------
+  const K2 = 240;
+  let NP = 64;
+  let kickMode = "gauss";
+  let fanPaths = [];
+  let fanFilled = 0;
+
+  function fanResample() {
+    fanPaths = [];
+    for (let i = 0; i < NP; i++) {
+      const p = new Float64Array(K2 + 1);
+      fanPaths.push(p);
+    }
+    fanFilled = 0;
+  }
+  fanResample();
+
+  function fanStep() {
+    const d = Math.sqrt(1 / K2);
+    const k = fanFilled;
+    for (const p of fanPaths) {
+      const kick = kickMode === "gauss" ? d * randn() : (Math.random() < 0.5 ? d : -d);
+      p[k + 1] = Math.max(-XR, Math.min(XR, p[k] + kick));
+    }
+    fanFilled++;
+  }
+
+  const HIST = 96; // px height of the cross-section strip
+
+  const fanView = setupCanvas("c-fan", (st) => {
+    const { ctx, w, h } = st;
+    const pad = { l: 14, r: 14, t: 20, b: 26 + HIST };
+    const xToPx = (x) => pad.l + ((x + XR) / (2 * XR)) * (w - pad.l - pad.r);
+    const kToPx = (k) => pad.t + (k / K2) * (h - pad.t - pad.b);
+    const yBottom = h - pad.b;
+    chrome(ctx, w, h, { l: pad.l, r: pad.r, t: pad.t, b: 26 }, xToPx);
+
+    // separator between trajectory panel and histogram strip
+    ctx.strokeStyle = css("--axis");
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, yBottom);
+    ctx.lineTo(w - pad.r, yBottom);
+    ctx.stroke();
+
+    envelopes(ctx, pad, yBottom, K2, xToPx, kToPx);
+
+    // trajectories
+    const alpha = NP <= 16 ? 0.55 : NP <= 64 ? 0.3 : 0.14;
+    ctx.strokeStyle = css("--noise");
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = 1.3;
+    for (const p of fanPaths) {
+      ctx.beginPath();
+      ctx.moveTo(xToPx(p[0]), kToPx(0));
+      for (let k = 1; k <= fanFilled; k++) ctx.lineTo(xToPx(p[k]), kToPx(k));
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // current positions
+    ctx.fillStyle = css("--noise");
+    for (const p of fanPaths) {
+      ctx.beginPath();
+      ctx.arc(xToPx(p[fanFilled]), kToPx(fanFilled), 2.4, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    // start point marker
+    ctx.fillStyle = css("--ink");
+    ctx.beginPath();
+    ctx.arc(xToPx(0), kToPx(0), 3.5, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // ---- cross-section strip ----
+    const t = fanFilled / K2;
+    const stripTop = yBottom + 12;
+    const stripH = h - 26 - stripTop - 2;
+    ctx.fillStyle = css("--muted");
+    ctx.font = "10px system-ui, sans-serif";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "top";
+    ctx.fillText("cross-section at t = " + fmt(t), w - pad.r, yBottom + 1);
+
+    if (fanFilled > 0 && stripH > 12) {
+      const BINS = 37;
+      const counts = new Float64Array(BINS);
+      for (const p of fanPaths) {
+        const b = Math.floor(((p[fanFilled] + XR) / (2 * XR)) * BINS);
+        counts[Math.max(0, Math.min(BINS - 1, b))]++;
+      }
+      const binW = (2 * XR) / BINS;
+      // theoretical bin masses under N(0, t)
+      const theo = new Float64Array(BINS);
+      for (let b = 0; b < BINS; b++) {
+        const xc = -XR + (b + 0.5) * binW;
+        theo[b] = phi(xc, t) * binW * NP;
+      }
+      const peak = Math.max(Math.max(...counts), Math.max(...theo)) || 1;
+      const pxW = (w - pad.l - pad.r) / BINS;
+      ctx.fillStyle = css("--data-soft");
+      for (let b = 0; b < BINS; b++) {
+        const bh = (counts[b] / peak) * stripH;
+        if (bh > 0)
+          ctx.fillRect(pad.l + b * pxW + 1, h - 26 - bh, pxW - 2, bh);
+      }
+      ctx.strokeStyle = css("--data");
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let b = 0; b < BINS; b++) {
+        const px = pad.l + (b + 0.5) * pxW;
+        const py = h - 26 - (theo[b] / peak) * stripH;
+        b === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+  });
+
+  let fanAnim = null;
+  const playFan = document.getElementById("play-fan");
+  function stopFan() {
+    if (fanAnim) { cancelAnimationFrame(fanAnim); fanAnim = null; }
+    playFan.textContent = fanFilled === 0 ? "Release walkers" : "Resume";
+    if (fanFilled >= K2) playFan.textContent = "Release again";
+  }
+  playFan.addEventListener("click", () => {
+    if (fanAnim) { stopFan(); return; }
+    if (fanFilled >= K2) fanResample();
+    playFan.textContent = "Pause";
+    const per = reduced ? 10 : 2;
+    const tick = () => {
+      for (let i = 0; i < per && fanFilled < K2; i++) fanStep();
+      fanView.redraw();
+      if (fanFilled < K2) fanAnim = requestAnimationFrame(tick);
+      else stopFan();
+    };
+    fanAnim = requestAnimationFrame(tick);
+  });
+  document.getElementById("reset-fan").addEventListener("click", () => {
+    stopFan(); fanResample(); fanView.redraw();
+    playFan.textContent = "Release walkers";
+  });
+  document.querySelectorAll('input[name="np"]').forEach((r) =>
+    r.addEventListener("change", () => {
+      NP = +document.querySelector('input[name="np"]:checked').value;
+      stopFan(); fanResample(); fanView.redraw();
+      playFan.textContent = "Release walkers";
+    })
+  );
+  document.querySelectorAll('input[name="kick"]').forEach((r) =>
+    r.addEventListener("change", () => {
+      kickMode = document.querySelector('input[name="kick"]:checked').value;
+      stopFan(); fanResample(); fanView.redraw();
+      playFan.textContent = "Release walkers";
+    })
+  );
+
+  // ---- theme switches ----------------------------------------------------
+  const redrawAll = () => { walkView.redraw(); fanView.redraw(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
+  new MutationObserver(redrawAll).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"],
+  });
+})();
+</script>
