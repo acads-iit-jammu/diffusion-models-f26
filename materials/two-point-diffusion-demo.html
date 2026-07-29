@@ -1,0 +1,817 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The World's Smallest Diffusion Model</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --ring: rgba(11, 11, 11, 0.10);
+    --data: #2a78d6;      /* series 1: the data / model */
+    --data-soft: rgba(42, 120, 214, 0.16);
+    --noise: #eb6834;     /* series 2: noise / limit reference */
+    --noise-soft: rgba(235, 104, 52, 0.55);
+    --heat: 42, 120, 214; /* rgb triple for the density field */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --ring: rgba(255, 255, 255, 0.10);
+      --data: #3987e5;
+      --data-soft: rgba(57, 135, 229, 0.20);
+      --noise: #d95926;
+      --noise-soft: rgba(217, 89, 38, 0.60);
+      --heat: 57, 135, 229;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --ring: rgba(255, 255, 255, 0.10);
+    --data: #3987e5;
+    --data-soft: rgba(57, 135, 229, 0.20);
+    --noise: #d95926;
+    --noise-soft: rgba(217, 89, 38, 0.60);
+    --heat: 57, 135, 229;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --ring: rgba(11, 11, 11, 0.10);
+    --data: #2a78d6;
+    --data-soft: rgba(42, 120, 214, 0.16);
+    --noise: #eb6834;
+    --noise-soft: rgba(235, 104, 52, 0.55);
+    --heat: 42, 120, 214;
+  }
+
+  html { background: var(--page); }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+  }
+
+  header .eyebrow, .figlabel, .controls, .axislabel, .legend, button, .sigma-readout {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  header .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.75rem;
+  }
+  h1 {
+    font-size: clamp(1.9rem, 5.5vw, 2.7rem);
+    line-height: 1.12;
+    margin: 0 0 0.6rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    text-wrap: balance;
+  }
+  h2 .act {
+    display: block;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--data);
+    margin-bottom: 0.35rem;
+  }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+
+  .math {
+    font-style: italic;
+    white-space: nowrap;
+  }
+  .mathblock {
+    text-align: center;
+    font-size: 1.12rem;
+    margin: 1.1rem 0;
+    overflow-x: auto;
+    padding: 0.15rem 0;
+  }
+  sub, sup { line-height: 0; font-size: 0.68em; }
+  .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 0.12em; }
+  .frac > span { display: block; padding: 0 0.25em; }
+  .frac > .den { border-top: 1px solid currentColor; }
+
+  figure {
+    margin: 0;
+    background: var(--surface);
+    border: 1px solid var(--ring);
+    border-radius: 10px;
+    padding: 1rem 1rem 0.85rem;
+  }
+  .figlabel {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.6rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .legend { display: flex; gap: 1.1rem; font-size: 0.74rem; color: var(--ink-2); text-transform: none; letter-spacing: 0; }
+  .legend .key { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend .swatch { width: 14px; height: 0; border-top: 2.5px solid var(--data); border-radius: 2px; }
+  .legend .swatch.dashed { border-top-style: dashed; border-top-color: var(--noise); }
+  .legend .swatch.muted-line { border-top-style: dashed; border-top-color: var(--muted); border-top-width: 1.5px; }
+
+  canvas { display: block; width: 100%; height: 300px; touch-action: pan-y; }
+  #c-reverse { height: 380px; }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--grid);
+    font-size: 0.82rem;
+    color: var(--ink-2);
+  }
+  .controls label { display: inline-flex; align-items: center; gap: 0.45rem; }
+  input[type="range"] { width: 170px; accent-color: var(--data); }
+  input[type="radio"] { accent-color: var(--data); margin: 0 0.15rem 0 0; }
+  .sigma-readout {
+    font-variant-numeric: tabular-nums;
+    min-width: 4.6em;
+    color: var(--ink);
+  }
+  button {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--axis);
+    border-radius: 6px;
+    padding: 0.32rem 0.85rem;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--data);
+    outline-offset: 2px;
+  }
+  button.primary { background: var(--data); border-color: var(--data); color: #fff; }
+
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+
+  .takeaway {
+    border-left: 3px solid var(--data);
+    padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2);
+    font-size: 1.02rem;
+    max-width: 38rem;
+  }
+  .takeaway strong { color: var(--ink); }
+
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid); padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Lecture 1 demo</p>
+    <h1>The World's Smallest Diffusion Model</h1>
+    <p class="dek">Two data points, one line of Bayes' rule, and a complete generative
+    model &#8212; every step below is computed exactly, with no neural network anywhere.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I &#183; Forward</span>Noise melts the data</h2>
+    <p>Our entire dataset is two points, <span class="math">x&#8320; = &#8722;1</span> and
+    <span class="math">x&#8320; = +1</span>, equally likely. Corrupt a sample with Gaussian noise,
+    <span class="math">x<sub>&#963;</sub> = x&#8320; + &#963;z</span> with <span class="math">z &#8764; N(0,1)</span>.
+    The density of the corrupted data is a two-bump mixture:</p>
+    <p class="mathblock"><span class="math">p<sub>&#963;</sub>(x) = &#189; N(x; &#8722;1, &#963;&#178;) + &#189; N(x; +1, &#963;&#178;).</span></p>
+    <p>Drag &#963; (or press Play) and watch the two spikes melt into a single Gaussian.
+    By &#963; &#8776; 3 the mixture is indistinguishable from <span class="math">N(0, 1 + &#963;&#178;)</span> &#8212;
+    all structure destroyed, destination fully known.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>Density of the noised data</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> p<sub>&#963;</sub>(x)</span>
+          <span class="key"><span class="swatch dashed"></span> N(0, 1+&#963;&#178;)</span>
+        </span>
+      </div>
+      <canvas id="c-forward" role="img" aria-label="Density of the two-point data after adding Gaussian noise of size sigma. Two spikes merge into one bell curve as sigma grows."></canvas>
+      <div class="controls">
+        <button id="play-forward" class="primary" type="button">Play</button>
+        <label>&#963;
+          <input id="s-forward" type="range" min="0.12" max="3" step="0.01" value="0.25">
+          <span class="sigma-readout" id="r-forward">&#963; = 0.25</span>
+        </label>
+      </div>
+      <figcaption>Hover to read off <span class="math">x</span> and
+      <span class="math">p<sub>&#963;</sub>(x)</span>. The vertical scale re-normalizes as &#963; changes.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II &#183; Denoise</span>Bayes' rule hands us the optimal denoiser</h2>
+    <p>Now the inverse problem: you observe a noisy <span class="math">x<sub>&#963;</sub></span> &#8212;
+    what was the clean point? The best guess (in mean-squared error) is the posterior mean,
+    and for a two-point prior it comes out in closed form:</p>
+    <p class="mathblock"><span class="math">E[x&#8320; | x<sub>&#963;</sub> = x] =
+      tanh</span><span class="math">(</span><span class="frac math"><span>x</span><span class="den">&#963;&#178;</span></span><span class="math">)</span>.</p>
+    <p>The optimal denoiser is a <strong>tanh</strong> &#8212; an activation function every ML student
+    knows, produced here by nothing but Bayes' rule. At small &#963; it is a hard
+    threshold (snap to the nearer point); at large &#963; it shrinks everything toward 0
+    (the noise is too loud to trust the observation).</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>The optimal denoiser</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> tanh(x/&#963;&#178;)</span>
+          <span class="key"><span class="swatch muted-line"></span> identity</span>
+        </span>
+      </div>
+      <canvas id="c-denoise" role="img" aria-label="Graph of the optimal denoiser tanh of x over sigma squared. Small sigma gives a step function, large sigma flattens it toward zero."></canvas>
+      <div class="controls">
+        <label>&#963;
+          <input id="s-denoise" type="range" min="0.3" max="2.5" step="0.01" value="0.8">
+          <span class="sigma-readout" id="r-denoise">&#963; = 0.80</span>
+        </label>
+      </div>
+      <figcaption>Horizontal gridlines mark the two data points &#177;1 &#8212; the denoiser's only
+      possible verdicts as &#963; &#8594; 0.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act III &#183; Reverse</span>Run the diffusion backwards: noise becomes data</h2>
+    <p>Start particles from pure noise at &#963;<sub>max</sub> = 3 and lower &#963; step by step,
+    each time nudging every particle in the direction its denoiser suggests:</p>
+    <p class="mathblock"><span class="math">y &#8592; y +
+      </span><span class="frac math"><span>&#963;<sub>k</sub>&#178; &#8722; &#963;<sub>k+1</sub>&#178;</span><span class="den">2</span></span>
+      <span class="math">&#183;</span>
+      <span class="frac math"><span>tanh(y/&#963;<sub>k</sub>&#178;) &#8722; y</span><span class="den">&#963;<sub>k</sub>&#178;</span></span>
+    </p>
+    <p>The cloud splits and condenses onto the two data points &#8722;1 and +1: <strong>generation</strong>.
+    The deterministic rule is the probability-flow ODE; the stochastic variant re-injects
+    noise at every step (the reverse-time SDE) and lands in the same place.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>64 particles &#183; noise (top) &#8594; data (bottom)</span>
+        <span class="legend">
+          <span class="key"><span class="swatch" style="border-top-color: var(--noise)"></span> trajectories</span>
+          <span class="key"><span class="swatch" style="border-top-width: 8px; border-top-color: var(--data-soft); border-radius: 3px;"></span> density p<sub>&#963;</sub></span>
+        </span>
+      </div>
+      <canvas id="c-reverse" role="img" aria-label="Particle trajectories flowing from a wide noise distribution at the top down to the two data points minus one and plus one at the bottom, over a shaded background showing the density at each noise level."></canvas>
+      <div class="controls">
+        <button id="play-reverse" class="primary" type="button">Generate</button>
+        <button id="reset-reverse" type="button">Resample</button>
+        <label><input type="radio" name="mode" value="ode" checked> deterministic (ODE)</label>
+        <label><input type="radio" name="mode" value="sde"> stochastic (SDE)</label>
+      </div>
+      <figcaption>The shaded field shows the <em>shape</em> of the exact density
+      <span class="math">p<sub>&#963;</sub>(x)</span>, contrast-enhanced and rescaled at each
+      noise level (brightness compares within a level, not across levels) &#8212; the
+      trajectories follow its ridges down to the data. The vertical axis is the step
+      index, so &#963; falls geometrically from 3 to 0.03.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="takeaway"><strong>The whole course in one demo.</strong> For images, the posterior mean
+    <span class="math">E[x&#8320; | x<sub>&#963;</sub>]</span> has no formula &#8212; training a network to predict the
+    clean sample (equivalently, the noise) from the noisy one is precisely how that tanh gets replaced.
+    Everything else &#8212; the forward melt, Bayes, the reverse flow &#8212; survives unchanged.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion note with full derivations on the
+    <a href="https://acads-iit-jammu.github.io/ID-5-02-TO-F26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const css = (name) =>
+    getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+  const SQRT2PI = Math.sqrt(2 * Math.PI);
+  const phi = (x, mu, s2) => Math.exp(-((x - mu) ** 2) / (2 * s2)) / (Math.sqrt(s2) * SQRT2PI);
+  const pMix = (x, s2) => 0.5 * phi(x, -1, s2) + 0.5 * phi(x, 1, s2);
+  const score = (x, s2) => (Math.tanh(x / s2) - x) / s2;
+
+  let spare = null;
+  function randn() {
+    if (spare !== null) { const v = spare; spare = null; return v; }
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    const r = Math.sqrt(-2 * Math.log(u));
+    spare = r * Math.sin(2 * Math.PI * v);
+    return r * Math.cos(2 * Math.PI * v);
+  }
+
+  // ---- canvas plumbing -------------------------------------------------
+  function setupCanvas(id, draw) {
+    const el = document.getElementById(id);
+    const ctx = el.getContext("2d");
+    const state = { el, ctx, w: 0, h: 0, hover: null };
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = el.getBoundingClientRect();
+      state.w = rect.width; state.h = rect.height;
+      el.width = Math.round(rect.width * dpr);
+      el.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(state);
+    }
+    new ResizeObserver(resize).observe(el);
+    el.addEventListener("pointermove", (e) => {
+      const rect = el.getBoundingClientRect();
+      state.hover = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      draw(state);
+    });
+    el.addEventListener("pointerleave", () => { state.hover = null; draw(state); });
+    state.redraw = () => draw(state);
+    return state;
+  }
+
+  function frame(ctx, w, h, pad) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = css("--axis");
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, h - pad.b);
+    ctx.lineTo(w - pad.r, h - pad.b);
+    ctx.stroke();
+  }
+
+  function xTicks(ctx, w, h, pad, xToPx, values) {
+    ctx.fillStyle = css("--muted");
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    for (const v of values) {
+      const px = xToPx(v);
+      ctx.strokeStyle = css("--grid");
+      ctx.beginPath();
+      ctx.moveTo(px, pad.t);
+      ctx.lineTo(px, h - pad.b);
+      ctx.stroke();
+      ctx.fillText(String(v), px, h - pad.b + 5);
+    }
+  }
+
+  const fmt = (v, d = 2) => (Math.abs(v) < 1e-10 ? 0 : v).toFixed(d);
+
+  function tooltip(ctx, x, y, lines, w) {
+    ctx.font = "11px system-ui, sans-serif";
+    const tw = Math.max(...lines.map((l) => ctx.measureText(l).width)) + 14;
+    const th = lines.length * 15 + 9;
+    let bx = x + 12, by = y - th - 6;
+    if (bx + tw > w - 4) bx = x - tw - 12;
+    if (by < 4) by = y + 12;
+    ctx.fillStyle = css("--surface");
+    ctx.strokeStyle = css("--axis");
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(bx, by, tw, th, 5);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = css("--ink");
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    lines.forEach((l, i) => ctx.fillText(l, bx + 7, by + 6 + i * 15));
+  }
+
+  // ---- Act I: forward melt --------------------------------------------
+  const XMAX = 4.5;
+  let sigmaF = 0.25;
+
+  const fwd = setupCanvas("c-forward", (st) => {
+    const { ctx, w, h } = st;
+    const pad = { l: 14, r: 14, t: 16, b: 26 };
+    const xToPx = (x) => pad.l + ((x + XMAX) / (2 * XMAX)) * (w - pad.l - pad.r);
+    const pxToX = (px) => ((px - pad.l) / (w - pad.l - pad.r)) * 2 * XMAX - XMAX;
+    frame(ctx, w, h, pad);
+    xTicks(ctx, w, h, pad, xToPx, [-4, -3, -2, -1, 0, 1, 2, 3, 4]);
+
+    const s2 = sigmaF * sigmaF;
+    const n = 361;
+    let peak = 0;
+    const ys = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      const x = -XMAX + (2 * XMAX * i) / (n - 1);
+      ys[i] = pMix(x, s2);
+      if (ys[i] > peak) peak = ys[i];
+    }
+    const yScale = (h - pad.t - pad.b) * 0.92 / peak;
+    const yToPx = (p) => h - pad.b - p * yScale;
+
+    // limiting Gaussian N(0, 1 + sigma^2), dashed
+    ctx.strokeStyle = css("--noise-soft");
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 5]);
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = -XMAX + (2 * XMAX * i) / (n - 1);
+      const px = xToPx(x), py = yToPx(phi(x, 0, 1 + s2));
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // mixture density: fill + line
+    ctx.beginPath();
+    ctx.moveTo(xToPx(-XMAX), yToPx(0));
+    for (let i = 0; i < n; i++) {
+      const x = -XMAX + (2 * XMAX * i) / (n - 1);
+      ctx.lineTo(xToPx(x), yToPx(ys[i]));
+    }
+    ctx.lineTo(xToPx(XMAX), yToPx(0));
+    ctx.closePath();
+    ctx.fillStyle = css("--data-soft");
+    ctx.fill();
+    ctx.strokeStyle = css("--data");
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = -XMAX + (2 * XMAX * i) / (n - 1);
+      const px = xToPx(x), py = yToPx(ys[i]);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    // data points \u00b11 on the baseline
+    ctx.fillStyle = css("--ink");
+    for (const m of [-1, 1]) {
+      ctx.beginPath();
+      ctx.arc(xToPx(m), h - pad.b, 3.5, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    if (st.hover && st.hover.x > pad.l && st.hover.x < w - pad.r) {
+      const xv = pxToX(st.hover.x);
+      const pv = pMix(xv, s2);
+      ctx.strokeStyle = css("--muted");
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(st.hover.x, pad.t);
+      ctx.lineTo(st.hover.x, h - pad.b);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = css("--data");
+      ctx.beginPath();
+      ctx.arc(st.hover.x, yToPx(pv), 4, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.strokeStyle = css("--surface");
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      tooltip(ctx, st.hover.x, yToPx(pv), [`x = ${fmt(xv)}`, `p(x) = ${fmt(pv, 3)}`], w);
+    }
+  });
+
+  const sForward = document.getElementById("s-forward");
+  const rForward = document.getElementById("r-forward");
+  function setSigmaF(v) {
+    sigmaF = v;
+    rForward.textContent = "\u03c3 = " + fmt(v);
+    fwd.redraw();
+  }
+  sForward.addEventListener("input", () => { stopFwd(); setSigmaF(+sForward.value); });
+
+  let fwdAnim = null;
+  let fwdDir = 1;
+  const playF = document.getElementById("play-forward");
+  function stopFwd() {
+    if (fwdAnim) { cancelAnimationFrame(fwdAnim); fwdAnim = null; playF.textContent = "Play"; }
+  }
+  playF.addEventListener("click", () => {
+    if (fwdAnim) { stopFwd(); return; }
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const v = sigmaF < 1.5 ? 3 : 0.12;   // no animation: jump to the far end
+      sForward.value = v;
+      setSigmaF(v);
+      return;
+    }
+    playF.textContent = "Pause";
+    if (sigmaF >= 2.99) fwdDir = -1;
+    else if (sigmaF <= 0.13) fwdDir = 1;
+    const step = () => {
+      let v = +sForward.value + fwdDir * 0.012;
+      if (v >= 3) { v = 3; fwdDir = -1; }
+      if (v <= 0.12) { v = 0.12; fwdDir = 1; }
+      sForward.value = v;
+      setSigmaF(v);
+      fwdAnim = requestAnimationFrame(step);
+    };
+    fwdAnim = requestAnimationFrame(step);
+  });
+
+  // ---- Act II: the tanh denoiser --------------------------------------
+  let sigmaD = 0.8;
+  const den = setupCanvas("c-denoise", (st) => {
+    const { ctx, w, h } = st;
+    const pad = { l: 14, r: 14, t: 14, b: 26 };
+    const YM = 1.6;
+    const xToPx = (x) => pad.l + ((x + XMAX) / (2 * XMAX)) * (w - pad.l - pad.r);
+    const pxToX = (px) => ((px - pad.l) / (w - pad.l - pad.r)) * 2 * XMAX - XMAX;
+    const yToPx = (y) => pad.t + ((YM - y) / (2 * YM)) * (h - pad.t - pad.b);
+    frame(ctx, w, h, pad);
+    xTicks(ctx, w, h, pad, xToPx, [-4, -3, -2, -1, 0, 1, 2, 3, 4]);
+
+    // reference lines at y = \u00b11 and the identity
+    ctx.strokeStyle = css("--grid");
+    ctx.lineWidth = 1;
+    for (const yv of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(pad.l, yToPx(yv));
+      ctx.lineTo(w - pad.r, yToPx(yv));
+      ctx.stroke();
+    }
+    ctx.fillStyle = css("--muted");
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+    ctx.fillText("+1", pad.l + 4, yToPx(1) - 3);
+    ctx.textBaseline = "top";
+    ctx.fillText("\u22121", pad.l + 4, yToPx(-1) + 3);
+
+    ctx.strokeStyle = css("--muted");
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(xToPx(-YM), yToPx(-YM));
+    ctx.lineTo(xToPx(YM), yToPx(YM));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const s2 = sigmaD * sigmaD;
+    ctx.strokeStyle = css("--data");
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    const n = 361;
+    for (let i = 0; i < n; i++) {
+      const x = -XMAX + (2 * XMAX * i) / (n - 1);
+      const px = xToPx(x), py = yToPx(Math.tanh(x / s2));
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    if (st.hover && st.hover.x > pad.l && st.hover.x < w - pad.r) {
+      const xv = pxToX(st.hover.x);
+      const yv = Math.tanh(xv / s2);
+      ctx.fillStyle = css("--data");
+      ctx.beginPath();
+      ctx.arc(st.hover.x, yToPx(yv), 4, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.strokeStyle = css("--surface");
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      tooltip(ctx, st.hover.x, yToPx(yv),
+        [`noisy x = ${fmt(xv)}`, `denoised = ${fmt(yv)}`], w);
+    }
+  });
+
+  const sDen = document.getElementById("s-denoise");
+  const rDen = document.getElementById("r-denoise");
+  sDen.addEventListener("input", () => {
+    sigmaD = +sDen.value;
+    rDen.textContent = "\u03c3 = " + fmt(sigmaD);
+    den.redraw();
+  });
+
+  // ---- Act III: reverse trajectories -----------------------------------
+  const SMAX = 3, SMIN = 0.03, NSTEP = 240, NPART = 64, XR = 6.5;
+  const sig = new Float64Array(NSTEP + 1);
+  for (let k = 0; k <= NSTEP; k++) sig[k] = SMAX * Math.pow(SMIN / SMAX, k / NSTEP);
+
+  let paths = [];        // per particle: Float64Array of positions, filled up to `filled`
+  let filled = 0;
+  let revAnim = null;
+  let mode = "ode";
+  let heatCanvas = null, heatKey = "";
+
+  let inits = [];
+  function restart() {   // fresh run from the SAME initial cloud (for ODE/SDE comparison)
+    paths = inits.map((x0) => {
+      const p = new Float64Array(NSTEP + 1);
+      p[0] = x0;
+      return p;
+    });
+    filled = 0;
+  }
+  function resample() {
+    inits = Array.from({ length: NPART }, () => randn() * Math.sqrt(1 + SMAX * SMAX));
+    restart();
+  }
+  resample();
+
+  function stepAll() {
+    const k = filled;
+    const s2 = sig[k] * sig[k];
+    const s2n = sig[k + 1] * sig[k + 1];
+    const d = s2 - s2n;
+    for (const p of paths) {
+      const x = p[k];
+      let nx;
+      if (mode === "ode") nx = x + 0.5 * d * score(x, s2);
+      else nx = x + d * score(x, s2) + Math.sqrt(d) * randn();
+      p[k + 1] = nx;   // unbounded; drawing is clipped to the plot area instead
+    }
+    filled++;
+  }
+
+  function buildHeat(w, h, pad) {
+    const key = `${Math.round(w)}x${Math.round(h)}-${css("--heat")}`;
+    if (heatKey === key) return;
+    heatKey = key;
+    const cols = 220, rows = 160;
+    const off = document.createElement("canvas");
+    off.width = cols; off.height = rows;
+    const octx = off.getContext("2d");
+    const img = octx.createImageData(cols, rows);
+    const [hr, hg, hb] = css("--heat").split(",").map((s) => +s.trim());
+    for (let r = 0; r < rows; r++) {
+      const k = Math.round((r / (rows - 1)) * NSTEP);
+      const s2 = sig[k] * sig[k];
+      let rowPeak = 0;
+      const vals = new Float64Array(cols);
+      for (let c = 0; c < cols; c++) {
+        const x = -XR + (2 * XR * c) / (cols - 1);
+        vals[c] = pMix(x, s2);
+        if (vals[c] > rowPeak) rowPeak = vals[c];
+      }
+      for (let c = 0; c < cols; c++) {
+        const a = Math.pow(vals[c] / rowPeak, 0.65) * 0.34;
+        const idx = (r * cols + c) * 4;
+        img.data[idx] = hr; img.data[idx + 1] = hg; img.data[idx + 2] = hb;
+        img.data[idx + 3] = Math.round(a * 255);
+      }
+    }
+    octx.putImageData(img, 0, 0);
+    heatCanvas = off;
+  }
+
+  const rev = setupCanvas("c-reverse", (st) => {
+    const { ctx, w, h } = st;
+    const pad = { l: 14, r: 14, t: 22, b: 26 };
+    const xToPx = (x) => pad.l + ((x + XR) / (2 * XR)) * (w - pad.l - pad.r);
+    const kToPx = (k) => pad.t + (k / NSTEP) * (h - pad.t - pad.b);
+    frame(ctx, w, h, pad);
+
+    buildHeat(w, h, pad);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(heatCanvas, pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b);
+
+    xTicks(ctx, w, h, pad, xToPx, [-6, -4, -2, -1, 0, 1, 2, 4, 6]);
+
+    // side annotations: sigma at top and bottom
+    ctx.fillStyle = css("--muted");
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText("\u03c3 = 3  (pure noise)", pad.l + 2, pad.t - 16);
+    ctx.textBaseline = "bottom";
+    ctx.fillText("\u03c3 \u2248 0  (data)", pad.l + 2, h - pad.b - 4);
+    ctx.textBaseline = "middle";
+    ctx.fillText("\u03c3 = 0.3  (halfway \u2014 \u03c3 falls geometrically)", pad.l + 2, kToPx(NSTEP / 2));
+
+    // trajectories drawn up to `filled`; states are unbounded, so clip to the plot area
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b);
+    ctx.clip();
+    ctx.strokeStyle = css("--noise");
+    ctx.globalAlpha = 0.42;
+    ctx.lineWidth = 1.4;
+    for (const p of paths) {
+      ctx.beginPath();
+      ctx.moveTo(xToPx(p[0]), kToPx(0));
+      for (let k = 1; k <= filled; k++) ctx.lineTo(xToPx(p[k]), kToPx(k));
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // current particle positions
+    ctx.fillStyle = css("--noise");
+    for (const p of paths) {
+      ctx.beginPath();
+      ctx.arc(xToPx(p[filled]), kToPx(filled), 2.6, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // when finished, mark the two data points
+    if (filled === NSTEP) {
+      ctx.fillStyle = css("--ink");
+      ctx.font = "600 12px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      for (const m of [-1, 1]) {
+        ctx.beginPath();
+        ctx.arc(xToPx(m), h - pad.b, 4, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillText(m === 1 ? "+1" : "\u22121", xToPx(m), h - pad.b - 8);
+      }
+    }
+  });
+
+  const playR = document.getElementById("play-reverse");
+  const resetR = document.getElementById("reset-reverse");
+  document.querySelectorAll('input[name="mode"]').forEach((r) =>
+    r.addEventListener("change", () => {
+      mode = document.querySelector('input[name="mode"]:checked').value;
+      stopRev(); restart(); rev.redraw();   // same initial cloud, so modes compare directly
+    })
+  );
+  function stopRev() {
+    if (revAnim) { cancelAnimationFrame(revAnim); revAnim = null; }
+    playR.textContent = "Generate";
+  }
+  playR.addEventListener("click", () => {
+    if (revAnim) { stopRev(); return; }
+    if (filled >= NSTEP) { resample(); }
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      while (filled < NSTEP) stepAll();   // no animation: show the finished result
+      rev.redraw();
+      stopRev();
+      return;
+    }
+    playR.textContent = "Pause";
+    const stepsPerFrame = 3;
+    const tick = () => {
+      for (let i = 0; i < stepsPerFrame && filled < NSTEP; i++) stepAll();
+      rev.redraw();
+      if (filled < NSTEP) revAnim = requestAnimationFrame(tick);
+      else stopRev();
+    };
+    revAnim = requestAnimationFrame(tick);
+  });
+  resetR.addEventListener("click", () => { stopRev(); resample(); rev.redraw(); });
+
+  // ---- theme switches redraw everything --------------------------------
+  const redrawAll = () => { heatKey = ""; fwd.redraw(); den.redraw(); rev.redraw(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
+  new MutationObserver(redrawAll).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"],
+  });
+})();
+</script>

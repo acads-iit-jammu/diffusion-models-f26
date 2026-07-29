@@ -205,7 +205,7 @@
     "href": "weeks/w01.html#in-class",
     "title": "W01: Generative Modeling I",
     "section": "In Class",
-    "text": "In Class\nLecture notes/board scans will be posted here.",
+    "text": "In Class\nSlides (three parts; press F for fullscreen, Esc for overview):\nPart 1 — Course Mechanics (open fullscreen):\n\n\nPart 2 — Why Diffusion Models? (open fullscreen):\n\n\nPart 3 — The World’s Smallest Diffusion Model (open fullscreen):\n\n\n\nCompanion note: The World’s Smallest Diffusion Model — a complete diffusion model on a two-point dataset, every step exact.\nInteractive demo used in the lecture: forward melting, the tanh denoiser, and reverse-time generation.\nWarm-up demo: Progressively Adding Noise — one point at 0, kicked by noise; one walker, then many, with the √t envelope and the live Gaussian cross-section.\n\nLecture notes/board scans will be posted here.",
     "crumbs": [
       "Weekly Notes",
       "W01: Generative Modeling I"
@@ -744,6 +744,83 @@
     "text": "Supplementary Reading\n\nHow to Build a Diffusion Language Model — Kuleshov Group. A modern application of the ideas in this course to language modeling.\nPrerequisite refresher: your CS-3-12 (Machine Learning) notes on maximum likelihood, KL divergence, and variational inference will be assumed working knowledge from Week 1.\n\nAdditional papers and notes will be added here week by week.",
     "crumbs": [
       "Resources"
+    ]
+  },
+  {
+    "objectID": "materials/two-point-diffusion.html",
+    "href": "materials/two-point-diffusion.html",
+    "title": "The World’s Smallest Diffusion Model",
+    "section": "",
+    "text": "The dataset\nOur data distribution puts equal mass on two points:\n\\[\np_{\\text{data}}(x_0) \\;=\\; \\tfrac{1}{2}\\,\\delta(x_0 + 1) \\;+\\; \\tfrac{1}{2}\\,\\delta(x_0 - 1),\n\\qquad x_0 \\in \\{-1, +1\\}.\n\\]\nGenerative modeling asks: given samples from \\(p_{\\text{data}}\\), produce more samples. For this dataset the answer is a coin flip — which is exactly why it is the right dataset: the machinery becomes transparent.",
+    "crumbs": [
+      "Appendices",
+      "The World's Smallest Diffusion Model"
+    ]
+  },
+  {
+    "objectID": "materials/two-point-diffusion.html#forward-process-noise-melts-the-data",
+    "href": "materials/two-point-diffusion.html#forward-process-noise-melts-the-data",
+    "title": "The World’s Smallest Diffusion Model",
+    "section": "Forward process: noise melts the data",
+    "text": "Forward process: noise melts the data\nCorrupt a clean sample with Gaussian noise of size \\(\\sigma\\):\n\\[\nx_\\sigma \\;=\\; x_0 + \\sigma z, \\qquad z \\sim \\mathcal{N}(0, 1) \\text{ independent of } x_0.\n\\]\nSince \\(x_0 = \\pm 1\\) with probability \\(\\tfrac12\\) each, the density of the corrupted sample is a two-component Gaussian mixture:\n\\[\np_\\sigma(x) \\;=\\; \\tfrac{1}{2}\\,\\mathcal{N}(x;\\, -1,\\, \\sigma^2)\n\\;+\\; \\tfrac{1}{2}\\,\\mathcal{N}(x;\\, +1,\\, \\sigma^2).\n\\]\nTwo facts, both visible in the demo:\n\nSmall \\(\\sigma\\): two sharp bumps at \\(\\pm 1\\) — the data is intact.\nLarge \\(\\sigma\\): the bumps merge. Indeed \\(\\mathbb{E}[x_\\sigma] = 0\\) and \\(\\operatorname{Var}(x_\\sigma) = \\mathbb{E}[x_0^2] + \\sigma^2 = 1 + \\sigma^2\\), and for \\(\\sigma \\gtrsim 3\\) the mixture is indistinguishable in practice from \\(\\mathcal{N}(0,\\, 1 + \\sigma^2)\\) — at \\(\\sigma = 3\\) its excess kurtosis is only \\(-0.02\\). (It is never exactly Gaussian at finite \\(\\sigma\\); the precise statement is \\(x_\\sigma / \\sqrt{1+\\sigma^2} \\Rightarrow \\mathcal{N}(0,1)\\) as \\(\\sigma \\to \\infty\\).)\n\nThis is the first design principle of diffusion models: destroying structure is easy, fully understood, and ends somewhere known (a Gaussian), no matter what the data was.",
+    "crumbs": [
+      "Appendices",
+      "The World's Smallest Diffusion Model"
+    ]
+  },
+  {
+    "objectID": "materials/two-point-diffusion.html#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form",
+    "href": "materials/two-point-diffusion.html#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form",
+    "title": "The World’s Smallest Diffusion Model",
+    "section": "Denoising: Bayes’ rule gives the optimal denoiser in closed form",
+    "text": "Denoising: Bayes’ rule gives the optimal denoiser in closed form\nNow invert: we observe a noisy \\(x_\\sigma = x\\) and want the clean \\(x_0\\). The best guess under squared error is the posterior mean \\(\\mathbb{E}[x_0 \\mid x_\\sigma = x]\\) (we will prove this optimality claim in Module 1; for now, take it).\nThe posterior over the two candidates follows from Bayes’ rule:\n\\[\n\\mathbb{P}(x_0 = +1 \\mid x)\n= \\frac{\\tfrac12\\,\\mathcal{N}(x; +1, \\sigma^2)}\n       {\\tfrac12\\,\\mathcal{N}(x; +1, \\sigma^2) + \\tfrac12\\,\\mathcal{N}(x; -1, \\sigma^2)}\n= \\frac{1}{1 + \\exp\\!\\big(-\\tfrac{2x}{\\sigma^2}\\big)}\n= \\operatorname{sigmoid}\\!\\Big(\\frac{2x}{\\sigma^2}\\Big),\n\\]\nwhere the middle step divides through by \\(\\mathcal{N}(x; +1, \\sigma^2)\\) and uses \\(\\exp\\!\\big(-\\tfrac{(x+1)^2}{2\\sigma^2}\\big) \\big/ \\exp\\!\\big(-\\tfrac{(x-1)^2}{2\\sigma^2}\\big)\n= \\exp\\!\\big(-\\tfrac{2x}{\\sigma^2}\\big)\\). Therefore\n\\[\n\\boxed{\\;\\mathbb{E}[x_0 \\mid x_\\sigma = x]\n= (+1)\\,\\mathbb{P}(+1 \\mid x) + (-1)\\,\\mathbb{P}(-1 \\mid x)\n= \\tanh\\!\\Big(\\frac{x}{\\sigma^2}\\Big).\\;}\n\\]\nThe optimal denoiser is a tanh — an activation function you already know, produced by nothing but probability. Sanity-check its two regimes:\n\n\\(\\sigma \\to 0\\): \\(\\tanh(x/\\sigma^2)\\) becomes a hard step — snap to the nearer data point.\n\\(\\sigma \\to \\infty\\): \\(\\tanh(x/\\sigma^2) \\approx x/\\sigma^2 \\to 0\\) — the observation is all noise, so the best guess is the prior mean \\(0\\).",
+    "crumbs": [
+      "Appendices",
+      "The World's Smallest Diffusion Model"
+    ]
+  },
+  {
+    "objectID": "materials/two-point-diffusion.html#the-score-function-a-preview-of-module-4",
+    "href": "materials/two-point-diffusion.html#the-score-function-a-preview-of-module-4",
+    "title": "The World’s Smallest Diffusion Model",
+    "section": "The score function (a preview of Module 4)",
+    "text": "The score function (a preview of Module 4)\nDifferentiate \\(\\log p_\\sigma\\) directly. With \\(\\varphi_\\pm(x) = \\mathcal{N}(x; \\pm 1, \\sigma^2)\\) and \\(\\varphi_\\pm'(x) = -\\tfrac{x \\mp 1}{\\sigma^2}\\varphi_\\pm(x)\\),\n\\[\n\\nabla_x \\log p_\\sigma(x)\n= \\frac{\\tfrac12\\varphi_-'(x) + \\tfrac12\\varphi_+'(x)}{p_\\sigma(x)}\n= -\\frac{x - \\mathbb{E}[x_0 \\mid x]}{\\sigma^2}\n= \\frac{\\tanh\\!\\big(\\tfrac{x}{\\sigma^2}\\big) - x}{\\sigma^2}.\n\\]\nRearranged, this is Tweedie’s formula, one of the two or three most important identities of the course:\n\\[\n\\mathbb{E}[x_0 \\mid x_\\sigma = x] \\;=\\; x + \\sigma^2\\, \\nabla_x \\log p_\\sigma(x).\n\\]\nDenoising and knowing the score are the same thing — for additive Gaussian noise of known size \\(\\sigma\\), which is exactly the diffusion setting. The score \\(\\nabla_x \\log p_\\sigma\\) points from \\(x\\) toward where the (noised) data is denser; the denoiser just moves by \\(\\sigma^2\\) times the score. One caveat: the score is a local quantity — at \\(x = 0\\) it vanishes by symmetry even though, in the two-bump regime, \\(x = 0\\) is a density minimum. It is an unstable equilibrium: the reverse dynamics leave a particle sitting exactly there alone, and push a particle on either side away toward the nearer mode.",
+    "crumbs": [
+      "Appendices",
+      "The World's Smallest Diffusion Model"
+    ]
+  },
+  {
+    "objectID": "materials/two-point-diffusion.html#reverse-process-run-the-diffusion-backwards",
+    "href": "materials/two-point-diffusion.html#reverse-process-run-the-diffusion-backwards",
+    "title": "The World’s Smallest Diffusion Model",
+    "section": "Reverse process: run the diffusion backwards",
+    "text": "Reverse process: run the diffusion backwards\nGeneration now works by annealing: start from pure noise at a large \\(\\sigma_{\\max}\\), and lower \\(\\sigma\\) along a grid \\(\\sigma_{\\max} = \\sigma_0 &gt; \\sigma_1 &gt; \\cdots &gt; \\sigma_K \\approx 0\\), nudging the sample along the score at every step. (We write \\(y_k\\) for the reverse iterate at noise level \\(\\sigma_k\\), keeping \\(x_0\\) reserved for the clean data point; \\(y_0\\) is pure noise and \\(y_K\\) is the generated sample.)\n\\[\ny_{k+1} \\;=\\; y_k \\;+\\; \\frac{\\sigma_k^2 - \\sigma_{k+1}^2}{2}\\,\n\\nabla_y \\log p_{\\sigma_k}(y_k)\n\\;=\\; y_k + \\frac{\\sigma_k^2 - \\sigma_{k+1}^2}{2}\\cdot\n\\frac{\\tanh\\!\\big(y_k/\\sigma_k^2\\big) - y_k}{\\sigma_k^2}.\n\\]\nThis deterministic rule is the explicit Euler discretization of the probability-flow ODE in the variance clock \\(\\tau = \\sigma^2\\). (Strictly, to speak of dynamics across noise levels we couple them: \\(x_\\tau = x_0 + w_\\tau\\) with \\(w\\) a Brownian motion — Module 5 makes this precise; nothing below needs it yet.) The stochastic variant both doubles the score drift and injects fresh independent noise at each step,\n\\[\ny_{k+1} = y_k + \\big(\\sigma_k^2 - \\sigma_{k+1}^2\\big)\\,\\nabla_y \\log p_{\\sigma_k}(y_k)\n+ \\sqrt{\\sigma_k^2 - \\sigma_{k+1}^2}\\; z_k, \\qquad z_k \\sim \\mathcal{N}(0,1)\n\\text{ i.i.d.},\n\\]\ngiving the Euler–Maruyama discretization of the reverse-time SDE. Where these updates come from is the business of Modules 5–6 (Fokker–Planck, reverse-time dynamics); today we only need to watch them work: a cloud of particles started from \\(\\mathcal{N}(0,\\, 1+\\sigma_{\\max}^2)\\) splits, condenses, and lands within \\(\\approx \\sigma_{\\min}\\) of \\(\\{-1, +1\\}\\), in equal proportions up to sampling error.\nTo be honest about the word “exact”: the formulas are exact, but the sampler carries four small approximations — we initialize from the moment-matched Gaussian rather than the true mixture \\(p_{\\sigma_{\\max}}\\) (indistinguishable at \\(\\sigma_{\\max} = 3\\), but not equal); we stop at \\(\\sigma_{\\min} = 10^{-2} &gt; 0\\), so samples end a hair’s width from the atoms; the Euler steps discretize the flow; and any finite run has sampling noise. Each vanishes in the appropriate limit — and every one of them has a counterpart in real diffusion models.\nThe full sampler, with no neural network anywhere:\nimport numpy as np\n\ndef score(y, s2):                 # ∇ log p_σ(y), exact for the two-point data\n    return (np.tanh(y / s2) - y) / s2\n\nsmax, smin, K, N = 3.0, 1e-2, 500, 100_000\nsig = smax * (smin / smax) ** (np.arange(K + 1) / K)    # geometric σ grid\ny = np.sqrt(1 + smax**2) * np.random.randn(N)           # start from pure noise\n\nfor k in range(K):                                       # probability-flow ODE\n    d = sig[k]**2 - sig[k + 1]**2\n    y += 0.5 * d * score(y, sig[k]**2)\n\nerr = np.abs(np.abs(y) - 1).max()      # worst distance to the nearest data point\nprint(err, (y &gt; 0).mean())   # ≈ 0 and ≈ 0.5, up to σ_min + discretization + sampling",
+    "crumbs": [
+      "Appendices",
+      "The World's Smallest Diffusion Model"
+    ]
+  },
+  {
+    "objectID": "materials/two-point-diffusion.html#why-the-course-exists-what-breaks-for-images",
+    "href": "materials/two-point-diffusion.html#why-the-course-exists-what-breaks-for-images",
+    "title": "The World’s Smallest Diffusion Model",
+    "section": "Why the course exists: what breaks for images",
+    "text": "Why the course exists: what breaks for images\nEverything above was exact because the posterior mean had a formula. For images there is no usable one. (Exercise 4 gives a closed form for any finite training set — but a sampler built on it can only ever reproduce the training points; what we actually want is the posterior mean under the unknown population distribution.) Nor can it be tabulated: a \\(64 \\times 64\\) RGB image lives in a space of \\(256^{12288}\\) configurations, and the data occupies a vanishingly thin filament of it (Module 1: the curse of dimensionality). The entire role of the neural network in a diffusion model is to approximate the map \\((x, \\sigma) \\mapsto \\mathbb{E}[x_0 \\mid x]\\) — to be the tanh we can no longer derive. Every other ingredient of this note survives unchanged, and each becomes a module of the course:\n\n\n\n\n\n\n\nIn this note\nIn the course\n\n\n\n\nThe “produce more samples” problem; why direct density estimation fails\nM1 — Foundations of generative modeling\n\n\nGaussian mixture, conditioning, \\(\\operatorname{Var} = 1+\\sigma^2\\)\nM2 — Gaussians and noise accumulation\n\n\nThe discrete \\(\\sigma\\) grid; denoising as the training target\nM3 — DDPM framework\n\n\n\\(\\nabla_x \\log p_\\sigma\\), Tweedie’s formula\nM4 — Score matching and denoising\n\n\nThe \\(\\sigma\\)-continuum, densities evolving with \\(\\sigma\\)\nM5 — SDEs and Fokker–Planck\n\n\nThe reverse update and the probability-flow ODE\nM6 — Reverse-time dynamics",
+    "crumbs": [
+      "Appendices",
+      "The World's Smallest Diffusion Model"
+    ]
+  },
+  {
+    "objectID": "materials/two-point-diffusion.html#exercises",
+    "href": "materials/two-point-diffusion.html#exercises",
+    "title": "The World’s Smallest Diffusion Model",
+    "section": "Exercises",
+    "text": "Exercises\n\nFill in the algebra for \\(\\mathbb{P}(x_0 = +1 \\mid x) = \\operatorname{sigmoid}(2x/\\sigma^2)\\) and \\(\\mathbb{E}[x_0 \\mid x] = \\tanh(x/\\sigma^2)\\).\nShow \\(\\operatorname{Var}(x_\\sigma) = 1 + \\sigma^2\\), and more generally \\(\\operatorname{Var}(x_\\sigma) = \\operatorname{Var}(x_0) + \\sigma^2\\) for any data distribution with finite variance (independence of \\(z\\) and \\(x_0\\) is all you need — zero mean is not required).\nUnequal weights. Let \\(\\mathbb{P}(x_0 = +1) = \\pi\\) with \\(0 &lt; \\pi &lt; 1\\). Show \\(\\mathbb{E}[x_0 \\mid x] = \\tanh\\!\\big(\\tfrac{x}{\\sigma^2} + \\tfrac12 \\log\\tfrac{\\pi}{1-\\pi}\\big)\\) — the denoiser acquires a bias. Check that as \\(\\sigma \\to \\infty\\) this tends to \\(2\\pi - 1\\), the prior mean, and work out what happens in the degenerate cases \\(\\pi \\in \\{0, 1\\}\\) by taking limits.\nMore points. For data uniform on \\(\\{a_1, \\dots, a_m\\}\\), show \\(\\mathbb{E}[x_0 \\mid x] = \\sum_i a_i\\, w_i(x)\\) with \\(w_i(x) \\propto \\exp\\!\\big(\\tfrac{a_i x}{\\sigma^2} - \\tfrac{a_i^2}{2\\sigma^2}\\big)\n\\propto \\exp\\!\\big(-\\tfrac{(x - a_i)^2}{2\\sigma^2}\\big)\\) — a softmax with Gaussian-kernel weights. (So the optimal denoiser for a finite dataset under Gaussian corruption is attention-like: an RBF-weighted average of the training points. For non-uniform weights \\(\\pi_i\\), each logit gains \\(\\log \\pi_i\\).)\nRun the sampler above with the SDE update instead of the ODE. Compare the RMS distance of the final samples to the nearest data point for both, as a function of \\(K\\) and of \\(\\sigma_{\\min}\\). (You should find that increasing \\(K\\) removes discretization error but both samplers retain a terminal width \\(\\approx \\sigma_{\\min}\\) — lowering \\(\\sigma_{\\min}\\), not raising \\(K\\), is what sharpens the atoms.)",
+    "crumbs": [
+      "Appendices",
+      "The World's Smallest Diffusion Model"
     ]
   }
 ]
