@@ -1,0 +1,196 @@
+---
+title: "The World's Smallest Diffusion Model"
+subtitle: "ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · W01"
+author: "Uma Satyaranjan · Soma S Dhavala — IIT Jammu"
+date: 2026-07-29
+format:
+  revealjs:
+    theme: default
+    slide-number: c/t
+    hash: true
+    transition: fade
+    footer: "ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"
+    html-math-method: mathjax
+---
+
+## The pitch {.center}
+
+A diffusion model turns **pure static into an image**.
+
+It does exactly one thing, about a thousand times:
+
+> subtract a *little* noise, correctly.
+
+This course is the mathematics that makes each subtraction correct.
+
+::: aside
+Demos for today: [progressively adding noise](./one-point-noise-demo.html){target="_blank"} · [the two-point diffusion model](./two-point-diffusion-demo.html){target="_blank"}
+:::
+
+## What is a generative model?
+
+You are given samples from an unknown distribution $p_{\text{data}}$:
+
+$$x^{(1)}, x^{(2)}, \dots, x^{(n)} \;\sim\; p_{\text{data}}$$
+
+**Task: produce more of the same.**
+
+. . .
+
+Today's entire dataset — two points:
+
+$$
+p_{\text{data}} = \tfrac12\,\delta_{-1} + \tfrac12\,\delta_{+1}
+$$
+
+Generating = flipping a coin. That's *why* it's the right dataset: nothing can hide.
+
+## You already know a generative model
+
+Fit a Gaussian to 1-D data by maximum likelihood:
+
+$$
+\hat\mu = \frac1n \sum_i x^{(i)}, \qquad
+\hat\sigma^2 = \frac1n \sum_i (x^{(i)} - \hat\mu)^2
+$$
+
+Sample from $\mathcal{N}(\hat\mu, \hat\sigma^2)$ → new data. **That is generative modeling**: pick a family, fit by MLE, sample.
+
+. . .
+
+*Module 1:* MLE is the same thing as minimizing $\operatorname{KL}(p_{\text{data}} \,\|\, p_\theta)$.
+
+## Why images break this
+
+- A $64 \times 64$ RGB image is a point in a space with $256^{12288}$ configurations.
+- Almost all of them are **static**. Sample pixels uniformly at random — you will *never* see a face.
+- Real data lives on a vanishingly thin filament of the space.
+
+. . .
+
+Writing down $p_\theta(\text{image})$ directly and fitting it is hopeless — **Module 1** makes this precise (curse of dimensionality).
+
+## The diffusion idea
+
+Don't model the hard distribution. Model a **sequence of easier ones**.
+
+$$
+x_\sigma = x_0 + \sigma z, \qquad z \sim \mathcal{N}(0,1) \ \text{independent of } x_0
+$$
+
+- Destroying structure with noise: **easy, fully understood**
+- It always ends somewhere known — a Gaussian
+- Then learn to walk **backwards**
+
+## Watch noise accumulate {.smaller}
+
+One point at $0$, kicked $k$ times by noise of size $\delta$: spread $= \delta\sqrt{k}$. Any kick distribution → same Gaussian (CLT).
+
+<iframe src="./one-point-noise-demo.html" width="100%" height="520" style="border:1px solid #ccc; border-radius:8px;" loading="lazy" title="Progressively adding noise demo"></iframe>
+
+## Forward: noise melts the two points {.smaller}
+
+$$
+p_\sigma(x) = \tfrac12\,\mathcal{N}(x; -1, \sigma^2) + \tfrac12\,\mathcal{N}(x; +1, \sigma^2),
+\qquad \operatorname{Var}(x_\sigma) = 1 + \sigma^2
+$$
+
+Two spikes → two bumps → one bell. By $\sigma \approx 3$, indistinguishable in practice from $\mathcal{N}(0, 1+\sigma^2)$.
+
+**Structure destroyed. Destination known.**
+
+## The inverse problem
+
+You observe a noisy $x$. What was the clean point?
+
+. . .
+
+Best guess under squared error = the **posterior mean** $\mathbb{E}[x_0 \mid x_\sigma = x]$.
+
+For the two-point prior, Bayes' rule gives it *in closed form*:
+
+$$
+\mathbb{P}(x_0 = +1 \mid x) = \operatorname{sigmoid}\!\Big(\frac{2x}{\sigma^2}\Big)
+$$
+
+One line of algebra. (Exercise 1 — do it tonight.)
+
+## The punchline {.center}
+
+$$
+\boxed{\ \mathbb{E}[x_0 \mid x_\sigma = x] \;=\; \tanh\!\Big(\frac{x}{\sigma^2}\Big)\ }
+$$
+
+The optimal denoiser is a **tanh** — produced by nothing but probability.
+
+- $\sigma \to 0$: hard threshold — snap to the nearer point
+- $\sigma \to \infty$: shrink to $0$ — trust the prior, not the observation
+
+## Denoising = knowing the score
+
+Differentiate $\log p_\sigma$ and compare (Tweedie's formula):
+
+$$
+\mathbb{E}[x_0 \mid x] \;=\; x + \sigma^2\, \nabla_x \log p_\sigma(x)
+$$
+
+The **score** $\nabla_x \log p_\sigma$ points toward where noised data is denser.
+
+Denoising and score estimation are the *same problem* — the hinge of Modules 3–4.
+
+## Run the diffusion backwards {.smaller}
+
+Anneal $\sigma_{\max} = \sigma_0 > \sigma_1 > \cdots > \sigma_K \approx 0$, nudge along the score:
+
+$$
+y_{k+1} = y_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2} \cdot
+\frac{\tanh(y_k/\sigma_k^2) - y_k}{\sigma_k^2}
+$$
+
+<iframe src="./two-point-diffusion-demo.html" width="100%" height="440" style="border:1px solid #ccc; border-radius:8px;" loading="lazy" title="Two-point diffusion demo"></iframe>
+
+## What you just saw
+
+- Particles start as pure noise
+- The cloud splits, condenses, lands on the two data points
+- **Generation — with every step computed exactly, no neural network**
+
+. . .
+
+The whole pipeline: *noise the data → learn to denoise → run it backwards.*
+
+## So where do neural networks come in?
+
+For images, $\mathbb{E}[x_0 \mid x]$ has **no usable formula**.
+
+The network's *only* job:
+
+$$
+\text{approximate } (x, \sigma) \;\mapsto\; \mathbb{E}[x_0 \mid x]
+$$
+
+— to be the tanh we can no longer derive. Everything else survives unchanged.
+
+## The course, mapped onto today {.smaller}
+
+| Today | Module |
+|---|---|
+| "Produce more samples"; why direct density estimation fails | **M1** Foundations |
+| Mixture, conditioning, $\operatorname{Var} = 1 + \sigma^2$ | **M2** Gaussians & noise |
+| The $\sigma$ grid; denoising as the training target | **M3** DDPM |
+| Score, Tweedie's formula | **M4** Score matching |
+| Noise levels as a continuum; densities evolving | **M5** SDEs, Fokker–Planck |
+| The reverse update; probability-flow ODE | **M6** Reverse-time dynamics |
+
+## Logistics {.smaller}
+
+- **Text:** Lai, Song, Kim, Mitsufuji, Ermon — *The Principles of Diffusion Models* (arXiv:2510.21890)
+- **Assessment (tentative):** HWs 20% · Mid-sem 30% · End-sem 40% · Mini coding project 10% (exams pen & paper)
+- **Site:** all notes, demos, and the week-by-week plan
+- **Tonight:** the companion note *The World's Smallest Diffusion Model* — read it, and do Exercise 1 (the tanh derivation)
+
+## Next lecture {.center}
+
+**Module 1 begins:** what exactly is a data distribution, what is a model family, and why maximum likelihood is KL divergence in disguise.
+
+Bring the tanh derivation.
