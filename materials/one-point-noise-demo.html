@@ -1,4 +1,6 @@
+<!doctype html>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Progressively Adding Noise</title>
 <style>
   :root {
@@ -232,8 +234,10 @@
         <button id="reset-walk" type="button">Reset</button>
         <span class="readout" id="r-walk">k = 0 &#183; x = 0.00</span>
       </div>
-      <figcaption>Every Reset gives a different path &#8212; but the same envelope.
-      That contrast is the whole story.</figcaption>
+      <figcaption>This walk uses K = 160 kicks of size
+      <span class="math">&#948; = &#8730;(1/160) &#8776; 0.079</span>, so the total spread at
+      the bottom is <span class="math">&#948;&#8730;K = 1</span>. Every Reset gives a different
+      path &#8212; but the same envelope. That contrast is the whole story.</figcaption>
     </figure>
   </section>
 
@@ -272,7 +276,10 @@
           <label><input type="radio" name="kick" value="coin"> coin flip &#177;&#948;</label>
         </span>
       </div>
-      <figcaption>Pause mid-flight: at <em>every</em> intermediate time the cross-section is
+      <figcaption>Here K = 240 kicks of size
+      <span class="math">&#948; = &#8730;(1/240) &#8776; 0.065</span>, so the cross-section at
+      time <span class="math">t = k/K</span> has sd <span class="math">&#948;&#8730;k = &#8730;t</span>.
+      Pause mid-flight: at <em>every</em> intermediate time the cross-section is
       already the right Gaussian &#8212; noise accumulation is Gaussian all the way down,
       not just at the end.</figcaption>
     </figure>
@@ -333,7 +340,24 @@
   }
 
   const XR = 3.6;
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function erf(x) {   // Abramowitz-Stegun 7.1.26, |error| < 1.5e-7
+    const s = x < 0 ? -1 : 1;
+    x = Math.abs(x);
+    const t = 1 / (1 + 0.3275911 * x);
+    const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t
+      - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+    return s * y;
+  }
+  const normCdf = (x, s2) => 0.5 * (1 + erf(x / Math.sqrt(2 * s2)));
+
+  function clipPlot(ctx, w, h, pad, yBottom) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pad.l, pad.t, w - pad.l - pad.r, yBottom - pad.t);
+    ctx.clip();
+  }
 
   function chrome(ctx, w, h, pad, xToPx) {
     ctx.clearRect(0, 0, w, h);
@@ -402,6 +426,7 @@
     ctx.textBaseline = "top";
     ctx.fillText("start", xToPx(0) - 8, pad.t - 14);
 
+    clipPlot(ctx, w, h, pad, h - pad.b);
     ctx.strokeStyle = css("--noise");
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -417,6 +442,7 @@
     ctx.strokeStyle = css("--surface");
     ctx.lineWidth = 2;
     ctx.stroke();
+    ctx.restore();
 
     ctx.fillStyle = css("--ink");
     ctx.beginPath();
@@ -432,8 +458,7 @@
   }
   function oneKick() {
     if (walk.length > K1) return false;
-    const x = walk[walk.length - 1] + D1 * randn();
-    walk.push(Math.max(-XR, Math.min(XR, x)));
+    walk.push(walk[walk.length - 1] + D1 * randn());   // unbounded; drawing clips
     updateWalkReadout();
     walkView.redraw();
     return walk.length <= K1;
@@ -445,12 +470,22 @@
     if (walkAnim) { cancelAnimationFrame(walkAnim); walkAnim = null; }
     playWalk.textContent = "Play";
   }
-  document.getElementById("kick").addEventListener("click", () => { stopWalk(); oneKick(); });
+  document.getElementById("kick").addEventListener("click", () => {
+    stopWalk();
+    if (walk.length > K1) { walk = [0]; updateWalkReadout(); }   // full: start a new walk
+    oneKick();
+  });
   playWalk.addEventListener("click", () => {
     if (walkAnim) { stopWalk(); return; }
     if (walk.length > K1) { walk = [0]; }
+    if (reduced()) {                    // no animation: show the finished walk
+      while (walk.length <= K1) walk.push(walk[walk.length - 1] + D1 * randn());
+      updateWalkReadout();
+      walkView.redraw();
+      return;
+    }
     playWalk.textContent = "Pause";
-    const per = reduced ? 8 : 2;
+    const per = 2;
     const tick = () => {
       let more = true;
       for (let i = 0; i < per && more; i++) more = oneKick();
@@ -488,7 +523,7 @@
     const k = fanFilled;
     for (const p of fanPaths) {
       const kick = kickMode === "gauss" ? d * randn() : (Math.random() < 0.5 ? d : -d);
-      p[k + 1] = Math.max(-XR, Math.min(XR, p[k] + kick));
+      p[k + 1] = p[k] + kick;   // unbounded; drawing clips, histogram drops out-of-range
     }
     fanFilled++;
   }
@@ -513,7 +548,8 @@
 
     envelopes(ctx, pad, yBottom, K2, xToPx, kToPx);
 
-    // trajectories
+    // trajectories (clipped to the panel; states are unbounded)
+    clipPlot(ctx, w, h, pad, yBottom);
     const alpha = NP <= 16 ? 0.55 : NP <= 64 ? 0.3 : 0.14;
     ctx.strokeStyle = css("--noise");
     ctx.globalAlpha = alpha;
@@ -539,6 +575,7 @@
     ctx.beginPath();
     ctx.arc(xToPx(0), kToPx(0), 3.5, 0, 2 * Math.PI);
     ctx.fill();
+    ctx.restore();
 
     // ---- cross-section strip ----
     const t = fanFilled / K2;
@@ -555,14 +592,16 @@
       const counts = new Float64Array(BINS);
       for (const p of fanPaths) {
         const b = Math.floor(((p[fanFilled] + XR) / (2 * XR)) * BINS);
-        counts[Math.max(0, Math.min(BINS - 1, b))]++;
+        if (b >= 0 && b < BINS) counts[b]++;   // out-of-range walkers are omitted
       }
       const binW = (2 * XR) / BINS;
-      // theoretical bin masses under N(0, t)
+      // expected bin counts under N(0, t): exact CDF differences, not a
+      // midpoint approximation (which overshoots when the bell is narrower
+      // than a bin at small t)
       const theo = new Float64Array(BINS);
       for (let b = 0; b < BINS; b++) {
-        const xc = -XR + (b + 0.5) * binW;
-        theo[b] = phi(xc, t) * binW * NP;
+        const lo = -XR + b * binW;
+        theo[b] = (normCdf(lo + binW, t) - normCdf(lo, t)) * NP;
       }
       const peak = Math.max(Math.max(...counts), Math.max(...theo)) || 1;
       const pxW = (w - pad.l - pad.r) / BINS;
@@ -594,8 +633,14 @@
   playFan.addEventListener("click", () => {
     if (fanAnim) { stopFan(); return; }
     if (fanFilled >= K2) fanResample();
+    if (reduced()) {                    // no animation: show the finished fan
+      while (fanFilled < K2) fanStep();
+      fanView.redraw();
+      stopFan();
+      return;
+    }
     playFan.textContent = "Pause";
-    const per = reduced ? 10 : 2;
+    const per = 2;
     const tick = () => {
       for (let i = 0; i < per && fanFilled < K2; i++) fanStep();
       fanView.redraw();

@@ -1,4 +1,6 @@
+<!doctype html>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The World's Smallest Diffusion Model</title>
 <style>
   :root {
@@ -295,15 +297,15 @@
   </section>
 
   <section>
-    <h2><span class="act">Act III &#183; Reverse</span>Run the denoiser backwards: noise becomes data</h2>
+    <h2><span class="act">Act III &#183; Reverse</span>Run the diffusion backwards: noise becomes data</h2>
     <p>Start particles from pure noise at &#963;<sub>max</sub> = 3 and lower &#963; step by step,
     each time nudging every particle in the direction its denoiser suggests:</p>
-    <p class="mathblock"><span class="math">x &#8592; x +
+    <p class="mathblock"><span class="math">y &#8592; y +
       </span><span class="frac math"><span>&#963;<sub>k</sub>&#178; &#8722; &#963;<sub>k+1</sub>&#178;</span><span class="den">2</span></span>
       <span class="math">&#183;</span>
-      <span class="frac math"><span>tanh(x/&#963;<sub>k</sub>&#178;) &#8722; x</span><span class="den">&#963;<sub>k</sub>&#178;</span></span>
+      <span class="frac math"><span>tanh(y/&#963;<sub>k</sub>&#178;) &#8722; y</span><span class="den">&#963;<sub>k</sub>&#178;</span></span>
     </p>
-    <p>The cloud splits and condenses onto exactly &#8722;1 and +1: <strong>generation</strong>.
+    <p>The cloud splits and condenses onto the two data points &#8722;1 and +1: <strong>generation</strong>.
     The deterministic rule is the probability-flow ODE; the stochastic variant re-injects
     noise at every step (the reverse-time SDE) and lands in the same place.</p>
 
@@ -322,8 +324,11 @@
         <label><input type="radio" name="mode" value="ode" checked> deterministic (ODE)</label>
         <label><input type="radio" name="mode" value="sde"> stochastic (SDE)</label>
       </div>
-      <figcaption>The shaded field is the exact density <span class="math">p<sub>&#963;</sub>(x)</span>
-      at every noise level &#8212; the trajectories follow its ridges down to the data.</figcaption>
+      <figcaption>The shaded field shows the <em>shape</em> of the exact density
+      <span class="math">p<sub>&#963;</sub>(x)</span>, contrast-enhanced and rescaled at each
+      noise level (brightness compares within a level, not across levels) &#8212; the
+      trajectories follow its ridges down to the data. The vertical axis is the step
+      index, so &#963; falls geometrically from 3 to 0.03.</figcaption>
     </figure>
   </section>
 
@@ -534,18 +539,26 @@
   sForward.addEventListener("input", () => { stopFwd(); setSigmaF(+sForward.value); });
 
   let fwdAnim = null;
+  let fwdDir = 1;
   const playF = document.getElementById("play-forward");
   function stopFwd() {
     if (fwdAnim) { cancelAnimationFrame(fwdAnim); fwdAnim = null; playF.textContent = "Play"; }
   }
   playF.addEventListener("click", () => {
     if (fwdAnim) { stopFwd(); return; }
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const v = sigmaF < 1.5 ? 3 : 0.12;   // no animation: jump to the far end
+      sForward.value = v;
+      setSigmaF(v);
+      return;
+    }
     playF.textContent = "Pause";
-    let dir = sigmaF > 2.9 ? -1 : 1;
+    if (sigmaF >= 2.99) fwdDir = -1;
+    else if (sigmaF <= 0.13) fwdDir = 1;
     const step = () => {
-      let v = +sForward.value + dir * 0.012;
-      if (v >= 3) { v = 3; dir = -1; }
-      if (v <= 0.12) { v = 0.12; dir = 1; }
+      let v = +sForward.value + fwdDir * 0.012;
+      if (v >= 3) { v = 3; fwdDir = -1; }
+      if (v <= 0.12) { v = 0.12; fwdDir = 1; }
       sForward.value = v;
       setSigmaF(v);
       fwdAnim = requestAnimationFrame(step);
@@ -636,14 +649,18 @@
   let mode = "ode";
   let heatCanvas = null, heatKey = "";
 
-  function resample() {
-    paths = [];
-    for (let i = 0; i < NPART; i++) {
+  let inits = [];
+  function restart() {   // fresh run from the SAME initial cloud (for ODE/SDE comparison)
+    paths = inits.map((x0) => {
       const p = new Float64Array(NSTEP + 1);
-      p[0] = randn() * Math.sqrt(1 + SMAX * SMAX);
-      paths.push(p);
-    }
+      p[0] = x0;
+      return p;
+    });
     filled = 0;
+  }
+  function resample() {
+    inits = Array.from({ length: NPART }, () => randn() * Math.sqrt(1 + SMAX * SMAX));
+    restart();
   }
   resample();
 
@@ -657,7 +674,7 @@
       let nx;
       if (mode === "ode") nx = x + 0.5 * d * score(x, s2);
       else nx = x + d * score(x, s2) + Math.sqrt(d) * randn();
-      p[k + 1] = Math.max(-XR, Math.min(XR, nx));
+      p[k + 1] = nx;   // unbounded; drawing is clipped to the plot area instead
     }
     filled++;
   }
@@ -714,8 +731,14 @@
     ctx.fillText("\u03c3 = 3  (pure noise)", pad.l + 2, pad.t - 16);
     ctx.textBaseline = "bottom";
     ctx.fillText("\u03c3 \u2248 0  (data)", pad.l + 2, h - pad.b - 4);
+    ctx.textBaseline = "middle";
+    ctx.fillText("\u03c3 = 0.3  (halfway \u2014 \u03c3 falls geometrically)", pad.l + 2, kToPx(NSTEP / 2));
 
-    // trajectories drawn up to `filled`
+    // trajectories drawn up to `filled`; states are unbounded, so clip to the plot area
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b);
+    ctx.clip();
     ctx.strokeStyle = css("--noise");
     ctx.globalAlpha = 0.42;
     ctx.lineWidth = 1.4;
@@ -734,6 +757,7 @@
       ctx.arc(xToPx(p[filled]), kToPx(filled), 2.6, 0, 2 * Math.PI);
       ctx.fill();
     }
+    ctx.restore();
 
     // when finished, mark the two data points
     if (filled === NSTEP) {
@@ -755,7 +779,7 @@
   document.querySelectorAll('input[name="mode"]').forEach((r) =>
     r.addEventListener("change", () => {
       mode = document.querySelector('input[name="mode"]:checked').value;
-      stopRev(); resample(); rev.redraw();
+      stopRev(); restart(); rev.redraw();   // same initial cloud, so modes compare directly
     })
   );
   function stopRev() {
@@ -765,8 +789,14 @@
   playR.addEventListener("click", () => {
     if (revAnim) { stopRev(); return; }
     if (filled >= NSTEP) { resample(); }
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      while (filled < NSTEP) stepAll();   // no animation: show the finished result
+      rev.redraw();
+      stopRev();
+      return;
+    }
     playR.textContent = "Pause";
-    const stepsPerFrame = matchMedia("(prefers-reduced-motion: reduce)").matches ? 12 : 3;
+    const stepsPerFrame = 3;
     const tick = () => {
       for (let i = 0; i < stepsPerFrame && filled < NSTEP; i++) stepAll();
       rev.redraw();
