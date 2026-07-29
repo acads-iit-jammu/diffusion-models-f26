@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="w01-slides_files/libs/clipboard/clipboard.min.js"></script>
-<script src="w01-slides_files/libs/quarto-html/tabby.min.js"></script>
-<script src="w01-slides_files/libs/quarto-html/popper.min.js"></script>
-<script src="w01-slides_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="w01-slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="w01-slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="w01-slides_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
-<link href="w01-slides_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="w01-slides-motivation_files/libs/clipboard/clipboard.min.js"></script>
+<script src="w01-slides-motivation_files/libs/quarto-html/tabby.min.js"></script>
+<script src="w01-slides-motivation_files/libs/quarto-html/popper.min.js"></script>
+<script src="w01-slides-motivation_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="w01-slides-motivation_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="w01-slides-motivation_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="w01-slides-motivation_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="w01-slides-motivation_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.55">
 
   <meta name="author" content="Uma Satyaranjan · Soma S Dhavala — IIT Jammu">
   <meta name="dcterms.date" content="2026-07-29">
-  <title>The World’s Smallest Diffusion Model</title>
+  <title>Why Diffusion Models?</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="w01-slides_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="w01-slides_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="w01-slides-motivation_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="w01-slides-motivation_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -31,11 +31,11 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="w01-slides_files/libs/revealjs/dist/theme/quarto.css">
-  <link href="w01-slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="w01-slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="w01-slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="w01-slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link rel="stylesheet" href="w01-slides-motivation_files/libs/revealjs/dist/theme/quarto.css">
+  <link href="w01-slides-motivation_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="w01-slides-motivation_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="w01-slides-motivation_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="w01-slides-motivation_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
 
   .callout {
@@ -327,8 +327,8 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">The World’s Smallest Diffusion Model</h1>
-  <p class="subtitle">ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · W01</p>
+  <h1 class="title">Why Diffusion Models?</h1>
+  <p class="subtitle">W01 · Part 2 · ID-5-02 (TO) · Mathematical Foundations of Diffusion Models</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -340,145 +340,119 @@ Uma Satyaranjan · Soma S Dhavala — IIT Jammu
 
   <p class="date">2026-07-29</p>
 </section>
-<section id="the-pitch" class="slide level2 center">
-<h2>The pitch</h2>
-<p>A diffusion model turns <strong>pure static into an image</strong>.</p>
-<p>It does exactly one thing, about a thousand times:</p>
-<blockquote>
-<p>subtract a <em>little</em> noise, correctly.</p>
-</blockquote>
-<p>This course is the mathematics that makes each subtraction correct.</p>
-
-<aside><div>
-<p>Demos for today: <a href="./one-point-noise-demo.html" target="_blank">progressively adding noise</a> · <a href="./two-point-diffusion-demo.html" target="_blank">the two-point diffusion model</a></p>
-</div></aside></section>
-<section id="what-is-a-generative-model" class="slide level2">
-<h2>What is a generative model?</h2>
-<p>You are given samples from an unknown distribution <span class="math inline">\(p_{\text{data}}\)</span>:</p>
-<p><span class="math display">\[x^{(1)}, x^{(2)}, \dots, x^{(n)} \;\sim\; p_{\text{data}}\]</span></p>
-<p><strong>Task: produce more of the same.</strong></p>
-<div class="fragment">
-<p>Today’s entire dataset — two points:</p>
-<p><span class="math display">\[
-p_{\text{data}} = \tfrac12\,\delta_{-1} + \tfrac12\,\delta_{+1}
-\]</span></p>
-<p>Generating = flipping a coin. That’s <em>why</em> it’s the right dataset: nothing can hide.</p>
-</div>
-</section>
-<section id="you-already-know-a-generative-model" class="slide level2">
-<h2>You already know a generative model</h2>
-<p>Fit a Gaussian to 1-D data by maximum likelihood:</p>
-<p><span class="math display">\[
-\hat\mu = \frac1n \sum_i x^{(i)}, \qquad
-\hat\sigma^2 = \frac1n \sum_i (x^{(i)} - \hat\mu)^2
-\]</span></p>
-<p>Sample from <span class="math inline">\(\mathcal{N}(\hat\mu, \hat\sigma^2)\)</span> → new data. <strong>That is generative modeling</strong>: pick a family, fit by MLE, sample.</p>
-<div class="fragment">
-<p><em>Module 1:</em> MLE is the same thing as minimizing <span class="math inline">\(\operatorname{KL}(p_{\text{data}} \,\|\, p_\theta)\)</span>.</p>
-</div>
-</section>
-<section id="why-images-break-this" class="slide level2">
-<h2>Why images break this</h2>
+<section id="the-success-story" class="slide level2 smaller">
+<h2>The success story</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p>Diffusion models made <strong>photorealistic image generation from text</strong> a consumer product:</p>
 <ul>
-<li>A <span class="math inline">\(64 \times 64\)</span> RGB image is a point in a space with <span class="math inline">\(256^{12288}\)</span> configurations.</li>
-<li>Almost all of them are <strong>static</strong>. Sample pixels uniformly at random — you will <em>never</em> see a face.</li>
-<li>Real data lives on a vanishingly thin filament of the space.</li>
+<li><strong>DALL·E 2</strong> (OpenAI, 2022) — the famous <em>“an astronaut riding a horse”</em></li>
+<li><strong>Stable Diffusion</strong> (2022) — open-source, latent diffusion; ran on a gaming GPU</li>
+<li><strong>Imagen</strong> (Google), <strong>Midjourney</strong> — an award-winning art scene almost overnight</li>
+</ul>
+<p>Type a sentence → get an image that never existed. Diffusion is the engine.</p>
+</div><div class="column" style="width:45%;">
+<p><img data-src="./img/astronaut-sdxl.jpg" style="width:100.0%"></p>
+<div style="font-size: 0.55em; color: #777;">
+<p>“An astronaut riding a horse” — Stable Diffusion XL (Wikimedia Commons)</p>
+</div>
+</div></div>
+</section>
+<section id="far-beyond-images" class="slide level2 smaller">
+<h2>Far beyond images</h2>
+<p>The same mathematical recipe now drives:</p>
+<ul>
+<li><strong>Video</strong> — Sora (OpenAI), Veo (Google): text → coherent video clips</li>
+<li><strong>Audio &amp; speech</strong> — music and voice synthesis</li>
+<li><strong>Science</strong> — protein <em>design</em> (RFdiffusion); <strong>AlphaFold 3</strong>’s structure module is a diffusion model; weather forecasting (GenCast)</li>
+<li><strong>…and now language</strong> — diffusion LLMs generate text by <em>denoising whole passages in parallel</em> instead of one token at a time: Mercury (Inception Labs), Gemini Diffusion, LLaDA (all 2025)</li>
 </ul>
 <div class="fragment">
-<p>Writing down <span class="math inline">\(p_\theta(\text{image})\)</span> directly and fitting it is hopeless — <strong>Module 1</strong> makes this precise (curse of dimensionality).</p>
+<p>One idea, moving discipline to discipline. That is usually the signature of good mathematics.</p>
 </div>
 </section>
-<section id="the-diffusion-idea" class="slide level2">
-<h2>The diffusion idea</h2>
-<p>Don’t model the hard distribution. Model a <strong>sequence of easier ones</strong>.</p>
-<p><span class="math display">\[
-x_\sigma = x_0 + \sigma z, \qquad z \sim \mathcal{N}(0,1) \ \text{independent of } x_0
-\]</span></p>
+<section id="the-field-agrees" class="slide level2 smaller">
+<h2>The field agrees</h2>
 <ul>
-<li>Destroying structure with noise: <strong>easy, fully understood</strong></li>
-<li>It always ends somewhere known — a Gaussian</li>
-<li>Then learn to walk <strong>backwards</strong></li>
-</ul>
-</section>
-<section id="watch-noise-accumulate" class="slide level2 smaller">
-<h2>Watch noise accumulate</h2>
-<p>One point at <span class="math inline">\(0\)</span>, kicked <span class="math inline">\(k\)</span> times by noise of size <span class="math inline">\(\delta\)</span>: spread <span class="math inline">\(= \delta\sqrt{k}\)</span>. Any kick distribution → same Gaussian (CLT).</p>
-<iframe src="./one-point-noise-demo.html" width="100%" height="520" style="border:1px solid #ccc; border-radius:8px;" loading="lazy" title="Progressively adding noise demo">
-</iframe>
-</section>
-<section id="forward-noise-melts-the-two-points" class="slide level2 smaller">
-<h2>Forward: noise melts the two points</h2>
-<p><span class="math display">\[
-p_\sigma(x) = \tfrac12\,\mathcal{N}(x; -1, \sigma^2) + \tfrac12\,\mathcal{N}(x; +1, \sigma^2),
-\qquad \operatorname{Var}(x_\sigma) = 1 + \sigma^2
-\]</span></p>
-<p>Two spikes → two bumps → one bell. By <span class="math inline">\(\sigma \approx 3\)</span>, indistinguishable in practice from <span class="math inline">\(\mathcal{N}(0, 1+\sigma^2)\)</span>.</p>
-<p><strong>Structure destroyed. Destination known.</strong></p>
-</section>
-<section id="the-inverse-problem" class="slide level2">
-<h2>The inverse problem</h2>
-<p>You observe a noisy <span class="math inline">\(x\)</span>. What was the clean point?</p>
-<div class="fragment">
-<p>Best guess under squared error = the <strong>posterior mean</strong> <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma = x]\)</span>.</p>
-<p>For the two-point prior, Bayes’ rule gives it <em>in closed form</em>:</p>
-<p><span class="math display">\[
-\mathbb{P}(x_0 = +1 \mid x) = \operatorname{sigmoid}\!\Big(\frac{2x}{\sigma^2}\Big)
-\]</span></p>
-<p>One line of algebra. (Exercise 1 — do it tonight.)</p>
-</div>
-</section>
-<section id="the-punchline" class="slide level2 center">
-<h2>The punchline</h2>
-<p><span class="math display">\[
-\boxed{\ \mathbb{E}[x_0 \mid x_\sigma = x] \;=\; \tanh\!\Big(\frac{x}{\sigma^2}\Big)\ }
-\]</span></p>
-<p>The optimal denoiser is a <strong>tanh</strong> — produced by nothing but probability.</p>
-<ul>
-<li><span class="math inline">\(\sigma \to 0\)</span>: hard threshold — snap to the nearer point</li>
-<li><span class="math inline">\(\sigma \to \infty\)</span>: shrink to <span class="math inline">\(0\)</span> — trust the prior, not the observation</li>
-</ul>
-</section>
-<section id="denoising-knowing-the-score" class="slide level2">
-<h2>Denoising = knowing the score</h2>
-<p>Differentiate <span class="math inline">\(\log p_\sigma\)</span> and compare (Tweedie’s formula):</p>
-<p><span class="math display">\[
-\mathbb{E}[x_0 \mid x] \;=\; x + \sigma^2\, \nabla_x \log p_\sigma(x)
-\]</span></p>
-<p>The <strong>score</strong> <span class="math inline">\(\nabla_x \log p_\sigma\)</span> points toward where noised data is denser.</p>
-<p>Denoising and score estimation are the <em>same problem</em> — the hinge of Modules 3–4.</p>
-</section>
-<section id="run-the-diffusion-backwards" class="slide level2 smaller">
-<h2>Run the diffusion backwards</h2>
-<p>Anneal <span class="math inline">\(\sigma_{\max} = \sigma_0 &gt; \sigma_1 &gt; \cdots &gt; \sigma_K \approx 0\)</span>, nudge along the score:</p>
-<p><span class="math display">\[
-y_{k+1} = y_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2} \cdot
-\frac{\tanh(y_k/\sigma_k^2) - y_k}{\sigma_k^2}
-\]</span></p>
-<iframe src="./two-point-diffusion-demo.html" width="100%" height="440" style="border:1px solid #ccc; border-radius:8px;" loading="lazy" title="Two-point diffusion demo">
-</iframe>
-</section>
-<section id="what-you-just-saw" class="slide level2">
-<h2>What you just saw</h2>
-<ul>
-<li>Particles start as pure noise</li>
-<li>The cloud splits, condenses, lands on the two data points</li>
-<li><strong>Generation — with every step computed exactly, no neural network</strong></li>
+<li><strong>ICLR 2021 Outstanding Paper</strong> — <em>Score-Based Generative Modeling through SDEs</em> (Song et al.): the continuous-time framework we build up to in Modules 5–6</li>
+<li><strong>ICML 2024 Best Paper</strong> — <em>Discrete Diffusion Modeling…</em> (Lou, Meng, Ermon): diffusion for text</li>
+<li>Top-venue best-paper awards keep landing on diffusion papers — this is where the field’s frontier is</li>
 </ul>
 <div class="fragment">
-<p>The whole pipeline: <em>noise the data → learn to denoise → run it backwards.</em></p>
+<p><strong>This course:</strong> the mathematics behind that success, in a deliberately simpler setting — low dimensions, Gaussians, formulas you can derive by hand. By the end, you read those papers.</p>
 </div>
 </section>
-<section id="so-where-do-neural-networks-come-in" class="slide level2">
-<h2>So where do neural networks come in?</h2>
-<p>For images, <span class="math inline">\(\mathbb{E}[x_0 \mid x]\)</span> has <strong>no usable formula</strong>.</p>
-<p>The network’s <em>only</em> job:</p>
-<p><span class="math display">\[
-\text{approximate } (x, \sigma) \;\mapsto\; \mathbb{E}[x_0 \mid x]
-\]</span></p>
-<p>— to be the tanh we can no longer derive. Everything else survives unchanged.</p>
+<section id="so-what-is-diffusion" class="slide level2 center">
+<h2>So <em>what is</em> diffusion?</h2>
+<p>Forget AI for ten minutes.</p>
+<p>Put a drop of ink in still water. Watch.</p>
+<div class="fragment">
+<p>It spreads. Always. Nobody stirs, nothing pushes — <strong>pure randomness moves matter from crowded to empty</strong>, and structure dissolves into uniformity.</p>
+<p>That spreading is diffusion. The mathematics of it is 200 years old.</p>
+</div>
 </section>
-<section id="the-course-mapped-onto-today" class="slide level2 smaller">
-<h2>The course, mapped onto today</h2>
+<section id="two-centuries-before-aiml" class="slide level2 smaller">
+<h2>Two centuries before AI/ML</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Year</th>
+<th>Who</th>
+<th>What diffused</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1822</td>
+<td>Fourier</td>
+<td><strong>Heat</strong> — the heat equation</td>
+</tr>
+<tr class="even">
+<td>1827</td>
+<td>Brown</td>
+<td><strong>Pollen grains</strong> jiggling in water</td>
+</tr>
+<tr class="odd">
+<td>1855</td>
+<td>Fick</td>
+<td><strong>Chemicals</strong> — concentration gradients</td>
+</tr>
+<tr class="even">
+<td>1900</td>
+<td>Bachelier</td>
+<td><strong>Stock prices</strong> — five years <em>before</em> Einstein</td>
+</tr>
+<tr class="odd">
+<td>1905</td>
+<td>Einstein</td>
+<td>Brownian motion ⇒ <strong>atoms are real</strong> (Perrin’s Nobel)</td>
+</tr>
+<tr class="even">
+<td>1931</td>
+<td>Kolmogorov</td>
+<td>The <strong>probability theory</strong> of diffusion processes</td>
+</tr>
+<tr class="odd">
+<td>1962</td>
+<td>Rogers</td>
+<td><strong>Ideas</strong> — “diffusion of innovations”</td>
+</tr>
+<tr class="even">
+<td>1973</td>
+<td>Black–Scholes–Merton</td>
+<td><strong>Option prices</strong> — finance runs on diffusions</td>
+</tr>
+</tbody>
+</table>
+<p>Same equations every time. You will recognize all of them in this course.</p>
+</section>
+<section id="then-it-made-it-big-in-ai" class="slide level2 smaller">
+<h2>Then it made it big in AI</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 50%">
@@ -486,54 +460,52 @@ y_{k+1} = y_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2} \cdot
 </colgroup>
 <thead>
 <tr class="header">
-<th>Today</th>
-<th>Module</th>
+<th>Year</th>
+<th>Step</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>“Produce more samples”; why direct density estimation fails</td>
-<td><strong>M1</strong> Foundations</td>
+<td>2015</td>
+<td>Sohl-Dickstein et al.&nbsp;— borrow <em>non-equilibrium thermodynamics</em> for generative modeling</td>
 </tr>
 <tr class="even">
-<td>Mixture, conditioning, <span class="math inline">\(\operatorname{Var} = 1 + \sigma^2\)</span></td>
-<td><strong>M2</strong> Gaussians &amp; noise</td>
+<td>2019</td>
+<td>Song &amp; Ermon — generate by following the <strong>score</strong></td>
 </tr>
 <tr class="odd">
-<td>The <span class="math inline">\(\sigma\)</span> grid; denoising as the training target</td>
-<td><strong>M3</strong> DDPM</td>
+<td>2020</td>
+<td>Ho et al.&nbsp;— <strong>DDPM</strong>: diffusion matches GANs on images</td>
 </tr>
 <tr class="even">
-<td>Score, Tweedie’s formula</td>
-<td><strong>M4</strong> Score matching</td>
+<td>2021</td>
+<td>Song et al.&nbsp;— one <strong>SDE</strong> unifies everything</td>
 </tr>
 <tr class="odd">
-<td>Noise levels as a continuum; densities evolving</td>
-<td><strong>M5</strong> SDEs, Fokker–Planck</td>
+<td>2022</td>
+<td>DALL·E 2, Imagen, Stable Diffusion — the public moment</td>
 </tr>
 <tr class="even">
-<td>The reverse update; probability-flow ODE</td>
-<td><strong>M6</strong> Reverse-time dynamics</td>
+<td>2024–</td>
+<td>Video, proteins, weather, <strong>language</strong></td>
 </tr>
 </tbody>
 </table>
+<div class="fragment">
+<p>The one twist AI added to 200 years of physics: <strong>run the diffusion backwards.</strong></p>
+</div>
 </section>
-<section id="logistics" class="slide level2 smaller">
-<h2>Logistics</h2>
-<ul>
-<li><strong>Text:</strong> Lai, Song, Kim, Mitsufuji, Ermon — <em>The Principles of Diffusion Models</em> (arXiv:2510.21890)</li>
-<li><strong>Assessment (tentative):</strong> HWs 20% · Mid-sem 30% · End-sem 40% · Mini coding project 10% (exams pen &amp; paper)</li>
-<li><strong>Site:</strong> all notes, demos, and the week-by-week plan</li>
-<li><strong>Tonight:</strong> the companion note <em>The World’s Smallest Diffusion Model</em> — read it, and do Exercise 1 (the tanh derivation)</li>
-</ul>
-</section>
-<section id="next-lecture" class="slide level2 center">
-<h2>Next lecture</h2>
-<p><strong>Module 1 begins:</strong> what exactly is a data distribution, what is a model family, and why maximum likelihood is KL divergence in disguise.</p>
-<p>Bring the tanh derivation.</p>
+<section id="the-plan-for-this-course" class="slide level2 center">
+<h2>The plan for this course</h2>
+<p>Physics destroys structure with noise — reliably, predictably.</p>
+<p>We will learn to <em>undo</em> it: mathematics that turns noise back into data.</p>
+<div class="fragment">
+<p>And we start with the smallest example that contains the whole idea:</p>
+<p><strong>two data points.</strong> →</p>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 <p>ID-5-02 (TO) · Monsoon 2026 · IIT Jammu</p>
+</div>
 </div>
 </div>
 </section>
@@ -541,19 +513,19 @@ y_{k+1} = y_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2} \cdot
   </div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="w01-slides_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="w01-slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="w01-slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="w01-slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="w01-slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="w01-slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="w01-slides_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="w01-slides_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="w01-slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="w01-slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="w01-slides-motivation_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>

@@ -1,6 +1,6 @@
 ---
 title: "The World's Smallest Diffusion Model"
-subtitle: "ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · W01"
+subtitle: "W01 · Part 3: The Toy Example · ID-5-02 (TO)"
 author: "Uma Satyaranjan · Soma S Dhavala — IIT Jammu"
 date: 2026-07-29
 format:
@@ -182,15 +182,11 @@ $$
 | Noise levels as a continuum; densities evolving | **M5** SDEs, Fokker–Planck |
 | The reverse update; probability-flow ODE | **M6** Reverse-time dynamics |
 
-## Logistics {.smaller}
+## Tonight {.smaller}
 
-- **Text:** Lai, Song, Kim, Mitsufuji, Ermon — *The Principles of Diffusion Models* (arXiv:2510.21890)
-- **Assessment (tentative):** HWs 20% · Mid-sem 30% · End-sem 40% · Mini coding project 10% (exams pen & paper)
-- **Site:** all notes, demos, and the week-by-week plan
-- **Tonight:** the companion note *The World's Smallest Diffusion Model* — read it, and do Exercise 1 (the tanh derivation)
+- Read the companion note *The World's Smallest Diffusion Model* (on the course site, with both demos)
+- Try **Exercise 1** — the tanh derivation; it is one application of Bayes' rule
 
 ## Next lecture {.center}
 
 **Module 1 begins:** what exactly is a data distribution, what is a model family, and why maximum likelihood is KL divergence in disguise.
-
-Bring the tanh derivation.

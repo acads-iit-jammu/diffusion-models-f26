@@ -1,0 +1,79 @@
+---
+title: "Course Mechanics"
+subtitle: "W01 · Part 1 · ID-5-02 (TO) · Mathematical Foundations of Diffusion Models"
+author: "Uma Satyaranjan · Soma S Dhavala — IIT Jammu"
+date: 2026-07-29
+format:
+  revealjs:
+    theme: default
+    slide-number: c/t
+    hash: true
+    transition: fade
+    footer: "ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"
+    html-math-method: mathjax
+---
+
+## The course at a glance {.smaller}
+
+| | |
+|---|---|
+| **Course** | ID-5-02 (TO) — Mathematical Foundations of Diffusion Models |
+| **Instructors** | Uma Satyaranjan · Soma S Dhavala |
+| **Structure** | L-T-P 3-0-0 · 3 credits · Open Elective |
+| **Open to** | All B.Tech (2^nd^ year+), M.Tech, M.Sc, MS(R), PhD |
+| **Prerequisite** | CS-3-12 (MO) — Machine Learning |
+| **Text** | Lai, Song, Kim, Mitsufuji, Ermon — *The Principles of Diffusion Models* (arXiv:2510.21890, free online) |
+
+## When and where
+
+- **Monday** 9:00–9:50 · **Tuesday** 10:00–10:50 · **Wednesday** 11:00–11:50
+- Venue: **11AC4004**
+- 40 lecture slots across the semester — exactly matching the syllabus's 40 hours
+- Everything lives on the **course site**: week-by-week plan, notes, interactive demos, assignments
+
+## Important dates {.smaller}
+
+| Event | Dates |
+|---|---|
+| Add & drop | Jul 29 – Aug 5 |
+| Course withdrawal deadline | Sep 15 |
+| **Mid-Semester Examination** | **Sep 18 – Sep 23** |
+| Last day of classes | Nov 20 |
+| **End-Semester Examination** | **Nov 23 – Nov 30** |
+
+Holidays that eat our slots: Aug 26 (Milad-un-Nabi), Oct 19–20 (Dussehra), Nov 9–11 (Diwali).
+
+## Assessment (tentative) {.smaller}
+
+| Component | Weight |
+|---|:---:|
+| Assignments — **five homeworks** | 20% |
+| Mid-semester exam (**pen & paper**) | 30% |
+| End-semester exam (**pen & paper**) | 40% |
+| **Mini coding project** | 10% |
+
+Any change will be announced in class and on the site's Assignments page.
+
+## The 40 hours, in six modules {.smaller}
+
+| Module | Topic | Hours |
+|:---:|---|:---:|
+| 1 | Foundations of generative modeling | 6 |
+| 2 | Gaussians and noise accumulation | 6 |
+| 3 | Discrete diffusion: the DDPM framework | 6 |
+| 4 | Score matching and denoising | 6 |
+| 5 | Continuous time: SDEs, Fokker–Planck | 8 |
+| 6 | Reverse-time dynamics and probability flow | 8 |
+
+## What we expect from you
+
+- Comfort with **probability** (conditioning, expectation, Gaussians) and **linear algebra** — we will refresh, not reteach
+- The ML prerequisite: you have seen likelihoods, loss functions, gradient descent
+- Pen-and-paper derivations are the heart of this course — the exams look like the homeworks
+- The mini project: a *small* working sampler, not a product
+
+## How to do well {.center}
+
+Come to class. Do the five homeworks yourself.
+
+Every exam question will have a sibling in the homeworks or the weekly notes.

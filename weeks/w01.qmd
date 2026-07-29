@@ -12,9 +12,19 @@
 
 ## In Class
 
-**Slides** ([open fullscreen](../materials/w01-slides.html){target="_blank"} — press `F` for fullscreen, `Esc` for overview):
+**Slides** (three parts; press `F` for fullscreen, `Esc` for overview):
 
-<iframe src="../materials/w01-slides.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 lecture slides"></iframe>
+*Part 1 — Course Mechanics* ([open fullscreen](../materials/w01-slides-mechanics.html){target="_blank"}):
+
+<iframe src="../materials/w01-slides-mechanics.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 slides part 1: course mechanics"></iframe>
+
+*Part 2 — Why Diffusion Models?* ([open fullscreen](../materials/w01-slides-motivation.html){target="_blank"}):
+
+<iframe src="../materials/w01-slides-motivation.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 slides part 2: motivation"></iframe>
+
+*Part 3 — The World's Smallest Diffusion Model* ([open fullscreen](../materials/w01-slides-toy.html){target="_blank"}):
+
+<iframe src="../materials/w01-slides-toy.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 slides part 3: the toy example"></iframe>
 
 - Companion note: [The World's Smallest Diffusion Model](../materials/two-point-diffusion.qmd) — a complete diffusion model on a two-point dataset, every step exact.
 - [Interactive demo](../materials/two-point-diffusion-demo.html) used in the lecture: forward melting, the tanh denoiser, and reverse-time generation.

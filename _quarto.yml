@@ -4,8 +4,13 @@ project:
   resources:
     - materials/two-point-diffusion-demo.html
     - materials/one-point-noise-demo.html
-    - materials/w01-slides.html
-    - materials/w01-slides_files/**
+    - materials/w01-slides-mechanics.html
+    - materials/w01-slides-mechanics_files/**
+    - materials/w01-slides-motivation.html
+    - materials/w01-slides-motivation_files/**
+    - materials/w01-slides-toy.html
+    - materials/w01-slides-toy_files/**
+    - materials/img/**
 
 book:
   title: "ID-5-02 (TO)"
