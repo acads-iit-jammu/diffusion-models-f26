@@ -1,0 +1,490 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Likelihood Lens</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+      --heat: 57, 135, 229;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+    --heat: 57, 135, 229;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  .math { font-style: italic; white-space: nowrap; }
+  sub, sup { line-height: 0; font-size: 0.68em; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  .legend { display: flex; gap: 1.1rem; font-size: 0.74rem; color: var(--ink-2);
+    text-transform: none; letter-spacing: 0; }
+  .legend .key { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend .swatch { width: 14px; height: 0; border-top: 2.5px solid var(--data); border-radius: 2px; }
+  .legend .swatch.lik { border-top-color: var(--lik); }
+  canvas { display: block; width: 100%; touch-action: none; }
+  #c-heat { height: 300px; }
+  .panes { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+  .panes > div { flex: 1; min-width: 0; }
+  .panes canvas { height: 170px; }
+  .panelabel { font-family: system-ui, sans-serif; font-size: 0.72rem; color: var(--muted);
+    letter-spacing: 0.08em; margin: 0 0 0.3rem; }
+  #c-loglik { height: 300px; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.4rem; }
+  input[type="range"] { width: 150px; accent-color: var(--data); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.4em; display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.85rem; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid); padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; W02 demo</p>
+    <h1>The Likelihood Lens</h1>
+    <p class="dek">One function, <span class="math">f(x; &#956;)</span> &#8212; read along <span class="math">x</span>
+    it is a density; read along <span class="math">&#956;</span> it is a likelihood.
+    The entire confusion, dissolved by two slices of the same surface.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I &#183; Two slices</span>The same surface, sliced both ways</h2>
+    <p>The heatmap is <span class="math">f(x; &#956;) = N(x; &#956;, &#963;&#178;)</span> over the
+    <span class="math">(x, &#956;)</span> plane. <strong>Drag the two lines.</strong>
+    The <em>horizontal</em> slice (fix &#956;, vary x) is the <strong>pdf</strong> &#8212; a distribution
+    over data, area = 1. The <em>vertical</em> slice (fix the observed x, vary &#956;) is the
+    <strong>likelihood</strong> &#8212; a ranking of parameters, whose area means nothing.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span><span style="text-transform:none">f(x; &#956;)</span> &#8212; drag the slice lines</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> pdf slice (&#956; fixed)</span>
+          <span class="key"><span class="swatch lik"></span> likelihood slice (x fixed)</span>
+        </span>
+      </div>
+      <canvas id="c-heat" aria-label="Heatmap of the Gaussian density as a function of data x and mean mu, with a draggable horizontal line fixing mu and a draggable vertical line fixing x."></canvas>
+      <div class="panes">
+        <div>
+          <p class="panelabel" id="pdf-label">pdf: &#956; fixed at 0.0</p>
+          <canvas id="c-pdf" aria-label="The horizontal slice: the probability density function of x for the fixed mu."></canvas>
+        </div>
+        <div>
+          <p class="panelabel" id="lik-label">likelihood: x observed at 1.0</p>
+          <canvas id="c-lik" aria-label="The vertical slice: the likelihood of mu for the fixed observation x."></canvas>
+        </div>
+      </div>
+      <div class="controls">
+        <label>&#963; <input id="s-sigma" type="range" min="0.4" max="2" step="0.02" value="0.8">
+          <span class="val" id="v-sigma">0.80</span></label>
+      </div>
+      <figcaption>For the Gaussian the two slices happen to have the same bell shape &#8212;
+      a coincidence of the symmetry <span class="math">f(x; &#956;) = f(&#956;; x)</span>, not a general
+      fact. What is <em>always</em> true: the blue slice integrates to 1; the orange one need not.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II &#183; A dataset</span>Likelihood of n points: drag them, watch the peak</h2>
+    <p>With data <span class="math">x&#8321;, &#8230;, x&#8326;</span> the log-likelihood is
+    <span class="math">&#8467;(&#956;) = &#931;&#7522; log f(x&#7522;; &#956;)</span> &#8212; a downward parabola in &#956;.
+    <strong>Drag the data points</strong> and watch the maximizer track one statistic and
+    nothing else: the sample mean.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>log-likelihood &#8467;(&#956;) &#183; drag the points on the axis</span>
+        <span class="legend">
+          <span class="key"><span class="swatch lik"></span> &#8467;(&#956;)</span>
+          <span class="key"><span class="swatch" style="border-top-width:5px; border-top-color: var(--data);"></span> data points</span>
+        </span>
+      </div>
+      <canvas id="c-loglik" aria-label="Log-likelihood curve as a function of mu with draggable data points on the horizontal axis; a marker tracks the maximizing mu, which equals the sample mean."></canvas>
+      <div class="controls">
+        <label>&#963; <input id="s-sigma2" type="range" min="0.4" max="2" step="0.02" value="0.8">
+          <span class="val" id="v-sigma2">0.80</span></label>
+        <button id="randomize" type="button">Randomize points</button>
+      </div>
+      <div class="readout" id="mle-readout"></div>
+      <figcaption>&#963; changes how <em>sharp</em> the parabola is &#8212; never <em>where</em> its peak sits.
+      The maximum-likelihood estimate of &#956; is the sample mean, whatever &#963; is. (Tonight's
+      exercise: prove it by differentiating &#8467;.)</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="takeaway"><strong>The one-sentence summary.</strong> The pdf and the likelihood are the
+    same formula read along different axes: <em>fix parameters, vary data</em> &#8594; a distribution;
+    <em>fix the observed data, vary parameters</em> &#8594; a score for fitting. The likelihood is not a
+    probability distribution over &#956; &#8212; only its <em>argmax</em> (and shape near it) carries meaning.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion notes on the <a href="https://acads-iit-jammu.github.io/ID-5-02-TO-F26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const SQRT2PI = Math.sqrt(2 * Math.PI);
+  const pdf = (x, m, s) => Math.exp(-((x - m) ** 2) / (2 * s * s)) / (s * SQRT2PI);
+
+  const XLO = -4, XHI = 4, MLO = -3, MHI = 3;
+  let sigma = 0.8;
+  let mu0 = 0.0;     // horizontal slice (pdf)
+  let x0 = 1.0;      // vertical slice (likelihood)
+
+  function setupCanvas(id, draw, onDrag) {
+    const el = document.getElementById(id);
+    const ctx = el.getContext("2d");
+    const st = { el, ctx, w: 0, h: 0 };
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const r = el.getBoundingClientRect();
+      st.w = r.width; st.h = r.height;
+      el.width = Math.round(r.width * dpr); el.height = Math.round(r.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(st);
+    }
+    new ResizeObserver(resize).observe(el);
+    if (onDrag) {
+      let active = false;
+      el.addEventListener("pointerdown", (ev) => {
+        active = true; el.setPointerCapture(ev.pointerId);
+        onDrag(st, ev, true);
+      });
+      el.addEventListener("pointermove", (ev) => { if (active) onDrag(st, ev, false); });
+      el.addEventListener("pointerup", () => { active = false; });
+      el.addEventListener("pointercancel", () => { active = false; });
+    }
+    st.redraw = () => draw(st);
+    return st;
+  }
+
+  // ---------------- Act I: heatmap + slices ----------------
+  let heatCanvas = null, heatKey = "";
+  function buildHeat(s) {
+    const key = css("--heat") + "-" + sigma.toFixed(3);
+    if (heatKey === key) return;
+    heatKey = key;
+    const cols = 240, rows = 180;
+    const off = document.createElement("canvas");
+    off.width = cols; off.height = rows;
+    const octx = off.getContext("2d");
+    const img = octx.createImageData(cols, rows);
+    const [hr, hg, hb] = css("--heat").split(",").map((v) => +v.trim());
+    const peak = pdf(0, 0, sigma);
+    for (let r = 0; r < rows; r++) {
+      const m = MHI - ((MHI - MLO) * r) / (rows - 1);
+      for (let c = 0; c < cols; c++) {
+        const x = XLO + ((XHI - XLO) * c) / (cols - 1);
+        const a = Math.pow(pdf(x, m, sigma) / peak, 0.8) * 0.75;
+        const i = (r * cols + c) * 4;
+        img.data[i] = hr; img.data[i + 1] = hg; img.data[i + 2] = hb;
+        img.data[i + 3] = Math.round(a * 255);
+      }
+    }
+    octx.putImageData(img, 0, 0);
+    heatCanvas = off;
+  }
+
+  const padH = { l: 30, r: 14, t: 10, b: 24 };
+  function hx(st, x) { return padH.l + ((x - XLO) / (XHI - XLO)) * (st.w - padH.l - padH.r); }
+  function hm(st, m) { return padH.t + ((MHI - m) / (MHI - MLO)) * (st.h - padH.t - padH.b); }
+
+  const heat = setupCanvas("c-heat", (st) => {
+    const { ctx, w, h } = st;
+    ctx.clearRect(0, 0, w, h);
+    buildHeat(st);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(heatCanvas, padH.l, padH.t, w - padH.l - padH.r, h - padH.t - padH.b);
+
+    // axes labels
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.fillStyle = css("--muted");
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (const t of [-4, -2, 0, 2, 4]) ctx.fillText(String(t), hx(st, t), h - padH.b + 5);
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (const t of [-2, 0, 2]) ctx.fillText(String(t), padH.l - 6, hm(st, t));
+    ctx.save();
+    ctx.translate(10, (padH.t + h - padH.b) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("\u03bc (parameter)", 0, 0);
+    ctx.restore();
+    ctx.textAlign = "right"; ctx.textBaseline = "bottom";
+    ctx.fillText("x (data)", w - padH.r, h - 1);
+
+    // frame
+    ctx.strokeStyle = css("--axis"); ctx.lineWidth = 1;
+    ctx.strokeRect(padH.l, padH.t, w - padH.l - padH.r, h - padH.t - padH.b);
+
+    // pdf slice line (horizontal, blue)
+    ctx.strokeStyle = css("--data"); ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(padH.l, hm(st, mu0)); ctx.lineTo(w - padH.r, hm(st, mu0)); ctx.stroke();
+    // likelihood slice line (vertical, orange)
+    ctx.strokeStyle = css("--lik"); ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(hx(st, x0), padH.t); ctx.lineTo(hx(st, x0), h - padH.b); ctx.stroke();
+    // intersection dot
+    ctx.fillStyle = css("--ink");
+    ctx.beginPath(); ctx.arc(hx(st, x0), hm(st, mu0), 4, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = css("--surface"); ctx.lineWidth = 2; ctx.stroke();
+  }, (st, ev) => {
+    const r = st.el.getBoundingClientRect();
+    const px = ev.clientX - r.left, py = ev.clientY - r.top;
+    const dH = Math.abs(py - hm(st, mu0));
+    const dV = Math.abs(px - hx(st, x0));
+    // move whichever line is nearer to the pointer
+    if (dH <= dV) {
+      mu0 = Math.max(MLO, Math.min(MHI, MHI - ((py - padH.t) / (st.h - padH.t - padH.b)) * (MHI - MLO)));
+    } else {
+      x0 = Math.max(XLO, Math.min(XHI, XLO + ((px - padH.l) / (st.w - padH.l - padH.r)) * (XHI - XLO)));
+    }
+    redrawAct1();
+  });
+
+  function slicePanel(st, kind) {
+    const { ctx, w, h } = st;
+    const pad = { l: 10, r: 10, t: 8, b: 20 };
+    ctx.clearRect(0, 0, w, h);
+    const lo = kind === "pdf" ? XLO : MLO, hi = kind === "pdf" ? XHI : MHI;
+    const xToPx = (x) => pad.l + ((x - lo) / (hi - lo)) * (w - pad.l - pad.r);
+    const peak = pdf(0, 0, Math.min(sigma, 0.55));   // shared, generous scale
+    const yToPx = (v) => h - pad.b - Math.min(v / peak, 1) * (h - pad.t - pad.b) * 0.94;
+    ctx.strokeStyle = css("--axis"); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, h - pad.b); ctx.lineTo(w - pad.r, h - pad.b); ctx.stroke();
+    ctx.font = "10px system-ui, sans-serif"; ctx.fillStyle = css("--muted");
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (const t of [-2, 0, 2]) ctx.fillText(String(t), xToPx(t), h - pad.b + 4);
+
+    const N = 201;
+    const f = (v) => kind === "pdf" ? pdf(v, mu0, sigma) : pdf(x0, v, sigma);
+    if (kind === "pdf") {
+      ctx.beginPath();
+      ctx.moveTo(xToPx(lo), yToPx(0));
+      for (let i = 0; i < N; i++) {
+        const v = lo + ((hi - lo) * i) / (N - 1);
+        ctx.lineTo(xToPx(v), yToPx(f(v)));
+      }
+      ctx.lineTo(xToPx(hi), yToPx(0));
+      ctx.closePath();
+      ctx.fillStyle = css("--data-soft");
+      ctx.fill();
+    }
+    ctx.strokeStyle = kind === "pdf" ? css("--data") : css("--lik");
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < N; i++) {
+      const v = lo + ((hi - lo) * i) / (N - 1);
+      const px = xToPx(v), py = yToPx(f(v));
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    // marker of the other slice's position on this curve
+    const at = kind === "pdf" ? x0 : mu0;
+    ctx.fillStyle = css("--ink");
+    ctx.beginPath(); ctx.arc(xToPx(at), yToPx(f(at)), 3.5, 0, 2 * Math.PI); ctx.fill();
+    // annotation
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "left"; ctx.textBaseline = "top";
+    ctx.fillStyle = css("--ink-2");
+    ctx.fillText(kind === "pdf" ? "area = 1, always" : "area: meaningless", pad.l + 2, pad.t);
+    if (kind === "lik") {
+      // mark the peak: at mu = x0
+      ctx.strokeStyle = css("--muted"); ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(xToPx(x0), yToPx(f(x0))); ctx.lineTo(xToPx(x0), h - pad.b); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = css("--muted");
+      ctx.textAlign = "center";
+      ctx.fillText("peak at \u03bc = x", xToPx(Math.max(lo + 0.8, Math.min(hi - 0.8, x0))), pad.t);
+    }
+  }
+  const pdfPane = setupCanvas("c-pdf", (st) => slicePanel(st, "pdf"));
+  const likPane = setupCanvas("c-lik", (st) => slicePanel(st, "lik"));
+
+  const pdfLabel = document.getElementById("pdf-label");
+  const likLabel = document.getElementById("lik-label");
+  function redrawAct1() {
+    pdfLabel.textContent = "pdf: \u03bc fixed at " + mu0.toFixed(1);
+    likLabel.textContent = "likelihood: x observed at " + x0.toFixed(1);
+    heat.redraw(); pdfPane.redraw(); likPane.redraw();
+  }
+
+  const sSigma = document.getElementById("s-sigma");
+  const vSigma = document.getElementById("v-sigma");
+  sSigma.addEventListener("input", () => {
+    sigma = +sSigma.value;
+    vSigma.textContent = sigma.toFixed(2);
+    document.getElementById("s-sigma2").value = sigma;
+    document.getElementById("v-sigma2").textContent = sigma.toFixed(2);
+    redrawAct1(); loglik.redraw(); updateMLE();
+  });
+
+  // ---------------- Act II: dataset log-likelihood ----------------
+  let pts = [-1.6, -0.7, 0.2, 0.6, 1.4, 2.1];
+  let dragIdx = -1;
+
+  const padL = { l: 14, r: 14, t: 16, b: 40 };
+  function lx(st, m) { return padL.l + ((m - MLO) / (MHI - MLO)) * (st.w - padL.l - padL.r); }
+
+  function loglikOf(m) {
+    let s = 0;
+    for (const p of pts) s += Math.log(pdf(p, m, sigma));
+    return s;
+  }
+  const mean = () => pts.reduce((a, b) => a + b, 0) / pts.length;
+
+  const loglik = setupCanvas("c-loglik", (st) => {
+    const { ctx, w, h } = st;
+    ctx.clearRect(0, 0, w, h);
+    ctx.font = "11px system-ui, sans-serif";
+    for (const t of [-3, -2, -1, 0, 1, 2, 3]) {
+      ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(lx(st, t), padL.t); ctx.lineTo(lx(st, t), h - padL.b); ctx.stroke();
+      ctx.fillStyle = css("--muted"); ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText(String(t), lx(st, t), h - padL.b + 22);
+    }
+    ctx.strokeStyle = css("--axis");
+    ctx.beginPath(); ctx.moveTo(padL.l, h - padL.b); ctx.lineTo(w - padL.r, h - padL.b); ctx.stroke();
+
+    // log-likelihood curve, normalized: top 94% of panel spans [max-12, max]
+    const N = 241;
+    let best = -Infinity;
+    const vals = new Float64Array(N);
+    for (let i = 0; i < N; i++) {
+      const m = MLO + ((MHI - MLO) * i) / (N - 1);
+      vals[i] = loglikOf(m);
+      if (vals[i] > best) best = vals[i];
+    }
+    const span = 14;
+    const yToPx = (v) => padL.t + (1 - Math.max(0, (v - (best - span)) / span)) * (h - padL.t - padL.b) * 0.94;
+    ctx.strokeStyle = css("--lik"); ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let i = 0; i < N; i++) {
+      const m = MLO + ((MHI - MLO) * i) / (N - 1);
+      const px = lx(st, m), py = yToPx(vals[i]);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    // argmax marker = sample mean
+    const mb = mean();
+    if (mb >= MLO && mb <= MHI) {
+      ctx.strokeStyle = css("--ink"); ctx.setLineDash([4, 4]); ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(lx(st, mb), yToPx(loglikOf(mb))); ctx.lineTo(lx(st, mb), h - padL.b); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = css("--ink");
+      ctx.font = "600 11px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      ctx.fillText("\u03bc\u0302 = x\u0304 = " + mb.toFixed(2), lx(st, mb), yToPx(loglikOf(mb)) - 6);
+    }
+
+    // draggable data points on the axis
+    for (let i = 0; i < pts.length; i++) {
+      ctx.fillStyle = css("--data");
+      ctx.beginPath(); ctx.arc(lx(st, pts[i]), h - padL.b, 7, 0, 2 * Math.PI); ctx.fill();
+      ctx.strokeStyle = css("--surface"); ctx.lineWidth = 2; ctx.stroke();
+    }
+  }, (st, ev, isDown) => {
+    const r = st.el.getBoundingClientRect();
+    const px = ev.clientX - r.left;
+    if (isDown) {
+      let bd = 18; dragIdx = -1;
+      for (let i = 0; i < pts.length; i++) {
+        const d = Math.abs(px - lx(st, pts[i]));
+        if (d < bd) { bd = d; dragIdx = i; }
+      }
+    }
+    if (dragIdx >= 0) {
+      pts[dragIdx] = Math.max(MLO + 0.05, Math.min(MHI - 0.05,
+        MLO + ((px - padL.l) / (st.w - padL.l - padL.r)) * (MHI - MLO)));
+      loglik.redraw(); updateMLE();
+    }
+  });
+
+  const mleReadout = document.getElementById("mle-readout");
+  function updateMLE() {
+    mleReadout.innerHTML = "data: [" + pts.map((p) => p.toFixed(2)).join(", ") +
+      "] &nbsp;&nbsp; <b>\u03bc\u0302 = " + mean().toFixed(3) + "</b> = the sample mean, for every \u03c3.";
+  }
+  updateMLE();
+
+  document.getElementById("randomize").addEventListener("click", () => {
+    const c = (Math.random() - 0.5) * 2.4;
+    pts = pts.map(() => Math.max(MLO + 0.05, Math.min(MHI - 0.05, c + (Math.random() - 0.5) * 2.6)));
+    loglik.redraw(); updateMLE();
+  });
+  const sSigma2 = document.getElementById("s-sigma2");
+  sSigma2.addEventListener("input", () => {
+    sigma = +sSigma2.value;
+    document.getElementById("v-sigma2").textContent = sigma.toFixed(2);
+    sSigma.value = sigma; vSigma.textContent = sigma.toFixed(2);
+    redrawAct1(); loglik.redraw(); updateMLE();
+  });
+
+  // ---------------- theme ----------------
+  const redrawAll = () => { heatKey = ""; redrawAct1(); loglik.redraw(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
+  new MutationObserver(redrawAll).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

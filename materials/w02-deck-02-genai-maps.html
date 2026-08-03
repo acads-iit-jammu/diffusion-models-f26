@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W02 · Deck 02 · Generative AI, in Its Simplest Form · ID-5-02 (TO) · IIT Jammu</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#003f87; --blue-dark:#002d63; --blue-mid:#0056b8; --blue-sky:#4da3ff; --blue-pale:#eaf3ff;
+    --ink:#22262a; --star:#f4b400;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#0b1e3a;font-family:Roboto,system-ui,sans-serif;color:var(--ink)}
+  #root{height:100%}
+  .deck{height:100%;display:flex;flex-direction:column;overflow:hidden}
+  .slide{flex:1;display:flex;flex-direction:column;justify-content:center;padding:5vh 8vw;
+         background:#fff;overflow:auto}
+  .slide.title{background:linear-gradient(160deg,var(--blue-dark) 0%,var(--blue) 70%,var(--blue-mid) 100%);color:#fff}
+  .slide.accent{background:linear-gradient(160deg,#f6faff,var(--blue-pale))}
+  h1{font-family:"Roboto Slab",serif;font-size:clamp(1.8rem,4.5vw,3.2rem);margin:.2em 0;line-height:1.15}
+  h2{font-family:"Roboto Slab",serif;font-size:clamp(1.4rem,3vw,2.2rem);color:var(--blue-dark);margin:.2em 0 .6em;
+     border-bottom:3px solid var(--blue-pale);padding-bottom:.25em}
+  .title h2{color:#cfe3ff;border:none;font-weight:400;font-size:clamp(1rem,2vw,1.5rem)}
+  .kicker{font-size:clamp(.8rem,1.4vw,1rem);letter-spacing:.14em;text-transform:uppercase;color:var(--blue-sky)}
+  p,li{font-size:clamp(1rem,1.9vw,1.35rem);line-height:1.55}
+  li{margin:.35em 0}
+  .big{font-size:clamp(1.3rem,2.6vw,1.9rem);font-weight:500;color:var(--blue-dark)}
+  table{border-collapse:collapse;font-size:clamp(.95rem,1.7vw,1.25rem);margin:.4em 0;width:100%}
+  th{background:var(--blue);color:#fff;text-align:left}
+  th,td{border:1px solid #cfdcec;padding:.35em .7em}
+  tr:nth-child(even) td{background:#f4f8fd}
+  code,.mono{font-family:"Roboto Mono",monospace;color:var(--blue-mid)}
+  .cols{display:flex;gap:4vw;flex-wrap:wrap}
+  .cols>div{flex:1;min-width:260px}
+  .note{background:var(--blue-pale);border-left:5px solid var(--blue);padding:.5em 1em;border-radius:0 8px 8px 0;
+        font-size:clamp(.95rem,1.7vw,1.2rem)}
+  .quote{font-family:"Roboto Slab",serif;font-size:clamp(1.4rem,3.4vw,2.4rem);color:var(--blue-dark);
+         text-align:center;line-height:1.4;margin:auto 0}
+  .quote small{display:block;font-family:Roboto,sans-serif;font-size:.55em;color:#667;margin-top:1em}
+  /* chrome */
+  .bar{height:5px;background:#12305c}
+  .bar>div{height:100%;background:var(--blue-sky);transition:width .25s}
+  .foot{display:flex;justify-content:space-between;align-items:center;background:#0b1e3a;color:#8fb4e8;
+        font-size:.75rem;padding:6px 14px;font-family:"Roboto Mono",monospace}
+  .foot b{color:#cfe3ff;font-weight:500}
+  .navhint{opacity:.7}
+  .clickzone{position:fixed;top:0;bottom:30px;width:18vw;cursor:pointer;z-index:5}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+"use strict";
+const e = React.createElement;
+const F = React.Fragment;
+
+/* ---------- content ---------- */
+const li = (...items)=> e("ul",null, ...items.map(t=> e("li",{dangerouslySetInnerHTML:{__html:t}})));
+const html = (tag,s)=> e(tag,{dangerouslySetInnerHTML:{__html:s}});
+const table = (head,rows)=> e("table",null,
+  e("thead",null, e("tr",null, ...head.map(hh=>e("th",null,hh)))),
+  e("tbody",null, ...rows.map(r=> e("tr",null, ...r.map(c=> html("td",c))))));
+
+const SLIDES = [
+
+{cls:"title", body:()=> e(F,null,
+  e("div",{className:"kicker"},"ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"),
+  e("h1",null,"Generative AI, in Its Simplest Form"),
+  e("h2",null,"W02 · Part 2 — conditional generation, and sampling as a deterministic map"),
+  e("p",{style:{marginTop:"2em",color:"#cfe3ff"}},"Uma Satyaranjan · Soma S Dhavala"),
+  e("p",{style:{color:"#8fb4e8",fontSize:"1rem"}},"→ arrow keys or click the right edge to advance"))},
+
+{title:"Two ways to describe the same generator", body:()=> e(F,null,
+  li("So far: a generative model = a fitted distribution you can sample",
+     "Now two deeper views, each one line long:",
+     "<b>View 1 — hierarchy:</b> sample step by step, conditionally (a Bayesian model)",
+     "<b>View 2 — a map:</b> one deterministic function applied to uniform noise"),
+  html("p",'<span class="big">Every modern generative model — diffusion included — is View 2 with a learned map.</span>'))},
+
+{title:"View 1: conditional generation", body:()=> e(F,null,
+  html("p",'<span class="big" style="display:block;text-align:center">z ∼ Bernoulli(π), &nbsp;&nbsp; x | z ∼ N(μ<sub>z</sub>, σ²)</span>'),
+  li("Flip a hidden coin z (the <b>latent variable</b>), then draw from the chosen Gaussian",
+     "This is <b>ancestral sampling</b>: follow the arrows of the hierarchy",
+     "The marginal you observe is the two-component mixture: p(x) = π N(μ₁, σ²) + (1−π) N(μ₂, σ²)"),
+  html("div",'<div class="note">Generation runs z → x. Inference runs x → z: the posterior P(z | x). For μ = ±1, its mean was W01’s tanh denoiser — you have already met conditional inference.</div>'))},
+
+{title:"Live: coin first, Gaussian second", body:()=> e(F,null,
+  html("div",'<iframe src="./sampling-as-a-map.html" style="width:100%;height:62vh;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="Sampling as a map demo"></iframe>'))},
+
+{title:"View 2: remove the coin", body:()=> e(F,null,
+  html("p",'The <b>inverse-CDF construction</b>: for any distribution with CDF F,'),
+  html("p",'<span class="big" style="display:block;text-align:center">u ∼ Uniform(0, 1) &nbsp;⟹&nbsp; x = F⁻¹(u) has CDF F</span>'),
+  li("Proof is one line: P(F⁻¹(U) ≤ x) = P(U ≤ F(x)) = F(x)",
+     "All the randomness lives in one uniform number; everything after it is <b>deterministic</b>",
+     "The coin has not vanished — it is hidden inside u: u &lt; π picks component 1"))},
+
+{title:"The two-point limit", body:()=> e(F,null,
+  html("p",'Slide σ → 0 in the demo. The CDF becomes a staircase: jump at μ₁, plateau at height π, jump at μ₂. The map becomes'),
+  html("p",'<span class="big" style="display:block;text-align:center">x = sign(u − π)&nbsp;&nbsp; (for μ = ±1)</span>'),
+  li("W01’s two-point dataset, generated by <b>thresholding a uniform</b>",
+     "Pure sampling has become a formula — analytically, no approximation",
+     "The plateau of F is the empty region between the clusters: no u ever lands there"))},
+
+{title:"Why this reframing matters", body:()=> e(F,null,
+  table(["Model","Simple noise","The map","How the map is obtained"],[
+    ["This demo","u ∼ Uniform(0,1)","F⁻¹ (analytic)","we know the distribution"],
+    ["GAN","z ∼ N(0, I)","a neural network","adversarial training"],
+    ["VAE","z ∼ N(0, I)","a neural network","variational inference"],
+    ["Normalizing flow","z ∼ N(0, I)","an <i>invertible</i> network","exact likelihood"],
+    ["<b>Diffusion</b>","z ∼ N(0, I)","<b>the reverse ODE/SDE</b>","<b>learned denoiser (this course)</b>"]]),
+  html("p",'One column changes; the recipe never does.'))},
+
+{title:"You have already seen the diffusion map", body:()=> e(F,null,
+  li("W01, Act III: particles from N(0, 1+σ²<sub>max</sub>) flowed deterministically to ±1",
+     "That probability-flow ODE <b>is</b> an F⁻¹-like map — from Gaussian noise to the data distribution",
+     "Built not from the CDF, but from the <b>score</b> — which a network can learn in high dimension"),
+  html("div",'<div class="note">When no formula for the map exists, we learn it. Learning that map — carefully, with all the mathematics — is the rest of this course.</div>'))},
+
+{cls:"accent", body:()=> e(F,null,
+  e("div",{className:"quote"},"A generative model is a deterministic map applied to simple randomness.",
+    e("small",null,"Analytic today. Learned, from tomorrow onward — starting with how to measure a model’s error: KL divergence.")))},
+
+];
+
+/* ---------- deck engine ---------- */
+function Deck(){
+  const [i,setI] = React.useState(()=>{
+    const n=parseInt(location.hash.slice(1)); return Number.isInteger(n)&&n>=0&&n<SLIDES.length? n:0; });
+  const go = React.useCallback(d=>{
+    setI(cur=>{ const n=Math.min(SLIDES.length-1, Math.max(0, cur+d)); location.hash="#"+n; return n; });
+  },[]);
+  React.useEffect(()=>{
+    const k=ev=>{ if(["ArrowRight","PageDown"," "].includes(ev.key)) go(1);
+                  else if(["ArrowLeft","PageUp"].includes(ev.key)) go(-1);
+                  else if(ev.key==="Home"){ setI(0); location.hash="#0"; } };
+    window.addEventListener("keydown",k); return ()=>window.removeEventListener("keydown",k);
+  },[go]);
+  const s=SLIDES[i];
+  return e("div",{className:"deck"},
+    e("div",{className:"clickzone",style:{left:0},onClick:()=>go(-1)}),
+    e("div",{className:"clickzone",style:{right:0},onClick:()=>go(1)}),
+    e("div",{className:"slide "+(s.cls||"")},
+      s.title? e("h2",null,s.title):null,
+      s.body()),
+    e("div",{className:"bar"}, e("div",{style:{width:((i+1)/SLIDES.length*100)+"%"}})),
+    e("div",{className:"foot"},
+      e("span",null, e("b",null,"ID-5-02 (TO)")," · W02 · Deck 02 · Gen AI, Simplest Form"),
+      e("span",{className:"navhint"},"← → to navigate"),
+      e("span",null, (i+1)+" / "+SLIDES.length)));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(e(Deck));
+</script>
+</body>
+</html>

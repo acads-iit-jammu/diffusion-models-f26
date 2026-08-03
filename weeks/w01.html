@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -69,6 +103,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -257,23 +320,6 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Resources</span></a>
   </div>
 </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../materials/two-point-diffusion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
     </ul>
     </div>
 </nav>
@@ -286,6 +332,16 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#pre-read" id="toc-pre-read" class="nav-link active" data-scroll-target="#pre-read">Pre-read</a></li>
   <li><a href="#in-class" id="toc-in-class" class="nav-link" data-scroll-target="#in-class">In Class</a></li>
+  <li><a href="#companion-note-the-worlds-smallest-diffusion-model" id="toc-companion-note-the-worlds-smallest-diffusion-model" class="nav-link" data-scroll-target="#companion-note-the-worlds-smallest-diffusion-model">Companion Note: The World’s Smallest Diffusion Model</a>
+  <ul class="collapse">
+  <li><a href="#the-dataset" id="toc-the-dataset" class="nav-link" data-scroll-target="#the-dataset">The dataset</a></li>
+  <li><a href="#forward-process-noise-melts-the-data" id="toc-forward-process-noise-melts-the-data" class="nav-link" data-scroll-target="#forward-process-noise-melts-the-data">Forward process: noise melts the data</a></li>
+  <li><a href="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" id="toc-denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="nav-link" data-scroll-target="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</a></li>
+  <li><a href="#the-score-function-a-preview-of-module-4" id="toc-the-score-function-a-preview-of-module-4" class="nav-link" data-scroll-target="#the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</a></li>
+  <li><a href="#reverse-process-run-the-diffusion-backwards" id="toc-reverse-process-run-the-diffusion-backwards" class="nav-link" data-scroll-target="#reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</a></li>
+  <li><a href="#why-the-course-exists-what-breaks-for-images" id="toc-why-the-course-exists-what-breaks-for-images" class="nav-link" data-scroll-target="#why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  </ul></li>
   <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After Class</a></li>
   </ul>
 </nav>
@@ -321,22 +377,180 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="in-class" class="level2">
 <h2 class="anchored" data-anchor-id="in-class">In Class</h2>
-<p><strong>Slides</strong> (three parts; press <code>F</code> for fullscreen, <code>Esc</code> for overview):</p>
-<p><em>Part 1 — Course Mechanics</em> (<a href="../materials/w01-slides-mechanics.html" target="_blank">open fullscreen</a>):</p>
-<iframe src="../materials/w01-slides-mechanics.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 slides part 1: course mechanics">
+<p><strong>Slides</strong> (three parts; ← → arrows or click the edges to navigate):</p>
+<p><em>Part 1 — Course Mechanics</em> (<a href="../materials/w01-deck-01-mechanics.html" target="_blank">open fullscreen</a>):</p>
+<iframe src="../materials/w01-deck-01-mechanics.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 deck 1: course mechanics">
 </iframe>
-<p><em>Part 2 — Why Diffusion Models?</em> (<a href="../materials/w01-slides-motivation.html" target="_blank">open fullscreen</a>):</p>
-<iframe src="../materials/w01-slides-motivation.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 slides part 2: motivation">
+<p><em>Part 2 — Why Diffusion Models?</em> (<a href="../materials/w01-deck-02-motivation.html" target="_blank">open fullscreen</a>):</p>
+<iframe src="../materials/w01-deck-02-motivation.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 deck 2: motivation">
 </iframe>
-<p><em>Part 3 — The World’s Smallest Diffusion Model</em> (<a href="../materials/w01-slides-toy.html" target="_blank">open fullscreen</a>):</p>
-<iframe src="../materials/w01-slides-toy.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 slides part 3: the toy example">
+<p><em>Part 3 — The World’s Smallest Diffusion Model</em> (<a href="../materials/w01-deck-03-toy-example.html" target="_blank">open fullscreen</a>):</p>
+<iframe src="../materials/w01-deck-03-toy-example.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 deck 3: the toy example">
 </iframe>
 <ul>
-<li>Companion note: <a href="../materials/two-point-diffusion.html">The World’s Smallest Diffusion Model</a> — a complete diffusion model on a two-point dataset, every step exact.</li>
+<li>Companion note: <em>The World’s Smallest Diffusion Model</em> — below on this page: a complete diffusion model on a two-point dataset, every step exact.</li>
 <li><a href="../materials/two-point-diffusion-demo.html">Interactive demo</a> used in the lecture: forward melting, the tanh denoiser, and reverse-time generation.</li>
 <li>Warm-up demo: <a href="../materials/one-point-noise-demo.html">Progressively Adding Noise</a> — one point at 0, kicked by noise; one walker, then many, with the √t envelope and the live Gaussian cross-section.</li>
 </ul>
 <p><em>Lecture notes/board scans will be posted here.</em></p>
+</section>
+<section id="companion-note-the-worlds-smallest-diffusion-model" class="level2">
+<h2 class="anchored" data-anchor-id="companion-note-the-worlds-smallest-diffusion-model">Companion Note: The World’s Smallest Diffusion Model</h2>
+<p><em>Companion note to Lecture 1 (W01). Interactive version: <a href="../materials/two-point-diffusion-demo.html">live demo</a> — every figure in this note, animated.</em></p>
+<p>Diffusion models generate images from pure noise. Before we spend forty lectures on the mathematics, this note builds a <strong>complete diffusion model with a dataset of two points</strong> — small enough that every quantity the course will later approximate with a neural network can be computed <em>exactly</em>, with nothing beyond Bayes’ rule.</p>
+<section id="the-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="the-dataset">The dataset</h3>
+<p>Our data distribution puts equal mass on two points:</p>
+<p><span class="math display">\[
+p_{\text{data}}(x_0) \;=\; \tfrac{1}{2}\,\delta(x_0 + 1) \;+\; \tfrac{1}{2}\,\delta(x_0 - 1),
+\qquad x_0 \in \{-1, +1\}.
+\]</span></p>
+<p>Generative modeling asks: given samples from <span class="math inline">\(p_{\text{data}}\)</span>, produce <em>more</em> samples. For this dataset the answer is a coin flip — which is exactly why it is the right dataset: the machinery becomes transparent.</p>
+</section>
+<section id="forward-process-noise-melts-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="forward-process-noise-melts-the-data">Forward process: noise melts the data</h3>
+<p>Corrupt a clean sample with Gaussian noise of size <span class="math inline">\(\sigma\)</span>:</p>
+<p><span class="math display">\[
+x_\sigma \;=\; x_0 + \sigma z, \qquad z \sim \mathcal{N}(0, 1) \text{ independent of } x_0.
+\]</span></p>
+<p>Since <span class="math inline">\(x_0 = \pm 1\)</span> with probability <span class="math inline">\(\tfrac12\)</span> each, the density of the corrupted sample is a two-component Gaussian mixture:</p>
+<p><span class="math display">\[
+p_\sigma(x) \;=\; \tfrac{1}{2}\,\mathcal{N}(x;\, -1,\, \sigma^2)
+\;+\; \tfrac{1}{2}\,\mathcal{N}(x;\, +1,\, \sigma^2).
+\]</span></p>
+<p>Two facts, both visible in the demo:</p>
+<ul>
+<li><strong>Small <span class="math inline">\(\sigma\)</span>:</strong> two sharp bumps at <span class="math inline">\(\pm 1\)</span> — the data is intact.</li>
+<li><strong>Large <span class="math inline">\(\sigma\)</span>:</strong> the bumps merge. Indeed <span class="math inline">\(\mathbb{E}[x_\sigma] = 0\)</span> and <span class="math inline">\(\operatorname{Var}(x_\sigma) = \mathbb{E}[x_0^2] + \sigma^2 = 1 + \sigma^2\)</span>, and for <span class="math inline">\(\sigma \gtrsim 3\)</span> the mixture is indistinguishable in practice from <span class="math inline">\(\mathcal{N}(0,\, 1 + \sigma^2)\)</span> — at <span class="math inline">\(\sigma = 3\)</span> its excess kurtosis is only <span class="math inline">\(-0.02\)</span>. (It is never <em>exactly</em> Gaussian at finite <span class="math inline">\(\sigma\)</span>; the precise statement is <span class="math inline">\(x_\sigma / \sqrt{1+\sigma^2} \Rightarrow \mathcal{N}(0,1)\)</span> as <span class="math inline">\(\sigma \to \infty\)</span>.)</li>
+</ul>
+<p>This is the first design principle of diffusion models: <strong>destroying structure is easy, fully understood, and ends somewhere known</strong> (a Gaussian), no matter what the data was.</p>
+</section>
+<section id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="level3">
+<h3 class="anchored" data-anchor-id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</h3>
+<p>Now invert: we observe a noisy <span class="math inline">\(x_\sigma = x\)</span> and want the clean <span class="math inline">\(x_0\)</span>. The best guess under squared error is the <strong>posterior mean</strong> <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma = x]\)</span> (we will prove this optimality claim in Module 1; for now, take it).</p>
+<p>The posterior over the two candidates follows from Bayes’ rule:</p>
+<p><span class="math display">\[
+\mathbb{P}(x_0 = +1 \mid x)
+= \frac{\tfrac12\,\mathcal{N}(x; +1, \sigma^2)}
+       {\tfrac12\,\mathcal{N}(x; +1, \sigma^2) + \tfrac12\,\mathcal{N}(x; -1, \sigma^2)}
+= \frac{1}{1 + \exp\!\big(-\tfrac{2x}{\sigma^2}\big)}
+= \operatorname{sigmoid}\!\Big(\frac{2x}{\sigma^2}\Big),
+\]</span></p>
+<p>where the middle step divides through by <span class="math inline">\(\mathcal{N}(x; +1, \sigma^2)\)</span> and uses <span class="math inline">\(\exp\!\big(-\tfrac{(x+1)^2}{2\sigma^2}\big) \big/ \exp\!\big(-\tfrac{(x-1)^2}{2\sigma^2}\big)
+= \exp\!\big(-\tfrac{2x}{\sigma^2}\big)\)</span>. Therefore</p>
+<p><span class="math display">\[
+\boxed{\;\mathbb{E}[x_0 \mid x_\sigma = x]
+= (+1)\,\mathbb{P}(+1 \mid x) + (-1)\,\mathbb{P}(-1 \mid x)
+= \tanh\!\Big(\frac{x}{\sigma^2}\Big).\;}
+\]</span></p>
+<p>The optimal denoiser is a <strong>tanh</strong> — an activation function you already know, produced by nothing but probability. Sanity-check its two regimes:</p>
+<ul>
+<li><span class="math inline">\(\sigma \to 0\)</span>: <span class="math inline">\(\tanh(x/\sigma^2)\)</span> becomes a hard step — snap to the nearer data point.</li>
+<li><span class="math inline">\(\sigma \to \infty\)</span>: <span class="math inline">\(\tanh(x/\sigma^2) \approx x/\sigma^2 \to 0\)</span> — the observation is all noise, so the best guess is the prior mean <span class="math inline">\(0\)</span>.</li>
+</ul>
+</section>
+<section id="the-score-function-a-preview-of-module-4" class="level3">
+<h3 class="anchored" data-anchor-id="the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</h3>
+<p>Differentiate <span class="math inline">\(\log p_\sigma\)</span> directly. With <span class="math inline">\(\varphi_\pm(x) = \mathcal{N}(x; \pm 1, \sigma^2)\)</span> and <span class="math inline">\(\varphi_\pm'(x) = -\tfrac{x \mp 1}{\sigma^2}\varphi_\pm(x)\)</span>,</p>
+<p><span class="math display">\[
+\nabla_x \log p_\sigma(x)
+= \frac{\tfrac12\varphi_-'(x) + \tfrac12\varphi_+'(x)}{p_\sigma(x)}
+= -\frac{x - \mathbb{E}[x_0 \mid x]}{\sigma^2}
+= \frac{\tanh\!\big(\tfrac{x}{\sigma^2}\big) - x}{\sigma^2}.
+\]</span></p>
+<p>Rearranged, this is <strong>Tweedie’s formula</strong>, one of the two or three most important identities of the course:</p>
+<p><span class="math display">\[
+\mathbb{E}[x_0 \mid x_\sigma = x] \;=\; x + \sigma^2\, \nabla_x \log p_\sigma(x).
+\]</span></p>
+<p><em>Denoising and knowing the score are the same thing</em> — for additive Gaussian noise of known size <span class="math inline">\(\sigma\)</span>, which is exactly the diffusion setting. The score <span class="math inline">\(\nabla_x \log p_\sigma\)</span> points from <span class="math inline">\(x\)</span> toward where the (noised) data is denser; the denoiser just moves by <span class="math inline">\(\sigma^2\)</span> times the score. One caveat: the score is a <em>local</em> quantity — at <span class="math inline">\(x = 0\)</span> it vanishes by symmetry even though, in the two-bump regime, <span class="math inline">\(x = 0\)</span> is a density <em>minimum</em>. It is an unstable equilibrium: the reverse dynamics leave a particle sitting exactly there alone, and push a particle on either side away toward the nearer mode.</p>
+</section>
+<section id="reverse-process-run-the-diffusion-backwards" class="level3">
+<h3 class="anchored" data-anchor-id="reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</h3>
+<p>Generation now works by <em>annealing</em>: start from pure noise at a large <span class="math inline">\(\sigma_{\max}\)</span>, and lower <span class="math inline">\(\sigma\)</span> along a grid <span class="math inline">\(\sigma_{\max} = \sigma_0 &gt; \sigma_1 &gt; \cdots &gt; \sigma_K \approx 0\)</span>, nudging the sample along the score at every step. (We write <span class="math inline">\(y_k\)</span> for the reverse iterate at noise level <span class="math inline">\(\sigma_k\)</span>, keeping <span class="math inline">\(x_0\)</span> reserved for the clean data point; <span class="math inline">\(y_0\)</span> is pure noise and <span class="math inline">\(y_K\)</span> is the generated sample.)</p>
+<p><span class="math display">\[
+y_{k+1} \;=\; y_k \;+\; \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\,
+\nabla_y \log p_{\sigma_k}(y_k)
+\;=\; y_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\cdot
+\frac{\tanh\!\big(y_k/\sigma_k^2\big) - y_k}{\sigma_k^2}.
+\]</span></p>
+<p>This deterministic rule is the explicit Euler discretization of the <strong>probability-flow ODE</strong> in the variance clock <span class="math inline">\(\tau = \sigma^2\)</span>. (Strictly, to speak of dynamics <em>across</em> noise levels we couple them: <span class="math inline">\(x_\tau = x_0 + w_\tau\)</span> with <span class="math inline">\(w\)</span> a Brownian motion — Module 5 makes this precise; nothing below needs it yet.) The stochastic variant both <strong>doubles the score drift and injects fresh independent noise</strong> at each step,</p>
+<p><span class="math display">\[
+y_{k+1} = y_k + \big(\sigma_k^2 - \sigma_{k+1}^2\big)\,\nabla_y \log p_{\sigma_k}(y_k)
++ \sqrt{\sigma_k^2 - \sigma_{k+1}^2}\; z_k, \qquad z_k \sim \mathcal{N}(0,1)
+\text{ i.i.d.},
+\]</span></p>
+<p>giving the Euler–Maruyama discretization of the <strong>reverse-time SDE</strong>. Where these updates <em>come from</em> is the business of Modules 5–6 (Fokker–Planck, reverse-time dynamics); today we only need to <em>watch them work</em>: a cloud of particles started from <span class="math inline">\(\mathcal{N}(0,\, 1+\sigma_{\max}^2)\)</span> splits, condenses, and lands within <span class="math inline">\(\approx \sigma_{\min}\)</span> of <span class="math inline">\(\{-1, +1\}\)</span>, in equal proportions up to sampling error.</p>
+<p>To be honest about the word “exact”: the <em>formulas</em> are exact, but the sampler carries four small approximations — we initialize from the moment-matched Gaussian rather than the true mixture <span class="math inline">\(p_{\sigma_{\max}}\)</span> (indistinguishable at <span class="math inline">\(\sigma_{\max} = 3\)</span>, but not equal); we stop at <span class="math inline">\(\sigma_{\min} = 10^{-2} &gt; 0\)</span>, so samples end a hair’s width from the atoms; the Euler steps discretize the flow; and any finite run has sampling noise. Each vanishes in the appropriate limit — and every one of them has a counterpart in real diffusion models.</p>
+<p>The full sampler, with no neural network anywhere:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(y, s2):                 <span class="co"># ∇ log p_σ(y), exact for the two-point data</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (np.tanh(y <span class="op">/</span> s2) <span class="op">-</span> y) <span class="op">/</span> s2</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>smax, smin, K, N <span class="op">=</span> <span class="fl">3.0</span>, <span class="fl">1e-2</span>, <span class="dv">500</span>, <span class="dv">100_000</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sig <span class="op">=</span> smax <span class="op">*</span> (smin <span class="op">/</span> smax) <span class="op">**</span> (np.arange(K <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> K)    <span class="co"># geometric σ grid</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> smax<span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> np.random.randn(N)           <span class="co"># start from pure noise</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):                                       <span class="co"># probability-flow ODE</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> sig[k]<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> sig[k <span class="op">+</span> <span class="dv">1</span>]<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    y <span class="op">+=</span> <span class="fl">0.5</span> <span class="op">*</span> d <span class="op">*</span> score(y, sig[k]<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>err <span class="op">=</span> np.<span class="bu">abs</span>(np.<span class="bu">abs</span>(y) <span class="op">-</span> <span class="dv">1</span>).<span class="bu">max</span>()      <span class="co"># worst distance to the nearest data point</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(err, (y <span class="op">&gt;</span> <span class="dv">0</span>).mean())   <span class="co"># ≈ 0 and ≈ 0.5, up to σ_min + discretization + sampling</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="why-the-course-exists-what-breaks-for-images" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</h3>
+<p>Everything above was exact because the posterior mean had a formula. For images there is no usable one. (Exercise 4 gives a closed form for any <em>finite</em> training set — but a sampler built on it can only ever reproduce the training points; what we actually want is the posterior mean under the unknown <em>population</em> distribution.) Nor can it be tabulated: a <span class="math inline">\(64 \times 64\)</span> RGB image lives in a space of <span class="math inline">\(256^{12288}\)</span> configurations, and the data occupies a vanishingly thin filament of it (Module 1: the curse of dimensionality). The entire role of the neural network in a diffusion model is to <strong>approximate the map <span class="math inline">\((x, \sigma) \mapsto \mathbb{E}[x_0 \mid x]\)</span></strong> — to be the tanh we can no longer derive. Every other ingredient of this note survives unchanged, and each becomes a module of the course:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>In this note</th>
+<th>In the course</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>The “produce more samples” problem; why direct density estimation fails</td>
+<td>M1 — Foundations of generative modeling</td>
+</tr>
+<tr class="even">
+<td>Gaussian mixture, conditioning, <span class="math inline">\(\operatorname{Var} = 1+\sigma^2\)</span></td>
+<td>M2 — Gaussians and noise accumulation</td>
+</tr>
+<tr class="odd">
+<td>The discrete <span class="math inline">\(\sigma\)</span> grid; denoising as the training target</td>
+<td>M3 — DDPM framework</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\nabla_x \log p_\sigma\)</span>, Tweedie’s formula</td>
+<td>M4 — Score matching and denoising</td>
+</tr>
+<tr class="odd">
+<td>The <span class="math inline">\(\sigma\)</span>-continuum, densities evolving with <span class="math inline">\(\sigma\)</span></td>
+<td>M5 — SDEs and Fokker–Planck</td>
+</tr>
+<tr class="even">
+<td>The reverse update and the probability-flow ODE</td>
+<td>M6 — Reverse-time dynamics</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="exercises" class="level3">
+<h3 class="anchored" data-anchor-id="exercises">Exercises</h3>
+<ol type="1">
+<li>Fill in the algebra for <span class="math inline">\(\mathbb{P}(x_0 = +1 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> and <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh(x/\sigma^2)\)</span>.</li>
+<li>Show <span class="math inline">\(\operatorname{Var}(x_\sigma) = 1 + \sigma^2\)</span>, and more generally <span class="math inline">\(\operatorname{Var}(x_\sigma) = \operatorname{Var}(x_0) + \sigma^2\)</span> for any data distribution with finite variance (independence of <span class="math inline">\(z\)</span> and <span class="math inline">\(x_0\)</span> is all you need — zero mean is not required).</li>
+<li><strong>Unequal weights.</strong> Let <span class="math inline">\(\mathbb{P}(x_0 = +1) = \pi\)</span> with <span class="math inline">\(0 &lt; \pi &lt; 1\)</span>. Show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh\!\big(\tfrac{x}{\sigma^2} + \tfrac12 \log\tfrac{\pi}{1-\pi}\big)\)</span> — the denoiser acquires a <em>bias</em>. Check that as <span class="math inline">\(\sigma \to \infty\)</span> this tends to <span class="math inline">\(2\pi - 1\)</span>, the prior mean, and work out what happens in the degenerate cases <span class="math inline">\(\pi \in \{0, 1\}\)</span> by taking limits.</li>
+<li><strong>More points.</strong> For data uniform on <span class="math inline">\(\{a_1, \dots, a_m\}\)</span>, show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \sum_i a_i\, w_i(x)\)</span> with <span class="math inline">\(w_i(x) \propto \exp\!\big(\tfrac{a_i x}{\sigma^2} - \tfrac{a_i^2}{2\sigma^2}\big)
+\propto \exp\!\big(-\tfrac{(x - a_i)^2}{2\sigma^2}\big)\)</span> — a <em>softmax</em> with Gaussian-kernel weights. (So the optimal denoiser for a finite dataset under Gaussian corruption is attention-like: an RBF-weighted average of the training points. For non-uniform weights <span class="math inline">\(\pi_i\)</span>, each logit gains <span class="math inline">\(\log \pi_i\)</span>.)</li>
+<li>Run the sampler above with the SDE update instead of the ODE. Compare the RMS distance of the final samples to the nearest data point for both, as a function of <span class="math inline">\(K\)</span> and of <span class="math inline">\(\sigma_{\min}\)</span>. (You should find that increasing <span class="math inline">\(K\)</span> removes discretization error but both samplers retain a terminal width <span class="math inline">\(\approx \sigma_{\min}\)</span> — lowering <span class="math inline">\(\sigma_{\min}\)</span>, not raising <span class="math inline">\(K\)</span>, is what sharpens the atoms.)</li>
+</ol>
+</section>
 </section>
 <section id="after-class" class="level2">
 <h2 class="anchored" data-anchor-id="after-class">After Class</h2>
