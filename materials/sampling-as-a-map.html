@@ -1,0 +1,544 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sampling as a Map</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --comp2: #eb6834; --comp2-soft: rgba(235,104,52,0.30);
+    --uni: #1baf7a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --comp2: #d95926; --comp2-soft: rgba(217,89,38,0.35);
+      --uni: #199e70;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --comp2: #d95926; --comp2-soft: rgba(217,89,38,0.35);
+    --uni: #199e70;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --comp2: #eb6834; --comp2-soft: rgba(235,104,52,0.30);
+    --uni: #1baf7a;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  .math { font-style: italic; white-space: nowrap; }
+  .mathblock { text-align: center; font-size: 1.12rem; margin: 1.1rem 0; overflow-x: auto; padding: 0.15rem 0; }
+  sub, sup { line-height: 0; font-size: 0.68em; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  .legend { display: flex; gap: 1.1rem; font-size: 0.74rem; color: var(--ink-2);
+    text-transform: none; letter-spacing: 0; }
+  .legend .key { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend .swatch { width: 14px; height: 0; border-top: 2.5px solid var(--data); border-radius: 2px; }
+  .legend .swatch.c2 { border-top-color: var(--comp2); }
+  .legend .swatch.u { border-top-color: var(--uni); }
+  canvas { display: block; width: 100%; touch-action: pan-y; }
+  #c-anc { height: 340px; }
+  #c-map { height: 420px; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.4rem; }
+  input[type="range"] { width: 110px; accent-color: var(--data); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 2.8em; display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.85rem; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  button.primary { background: var(--data); border-color: var(--data); color: #fff; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); min-height: 1.4em; }
+  .readout b { color: var(--ink); }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid); padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; W02 demo</p>
+    <h1>Sampling as a Map</h1>
+    <p class="dek">Generative AI in its simplest form: first generate by <em>ancestral sampling</em>
+    (flip a coin, then draw), then discover the same generator is a single
+    <em>deterministic map</em> applied to uniform randomness.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I &#183; Hierarchy</span>Conditional generation: coin first, Gaussian second</h2>
+    <p>A hierarchical (Bayesian) model, and the simplest conditional generator:</p>
+    <p class="mathblock"><span class="math">z &#8764; Bernoulli(&#960;),&#8195; x | z &#8764; N(&#956;<sub>z</sub>, &#963;&#178;)</span></p>
+    <p>Sample the latent coin <span class="math">z</span>, then sample <span class="math">x</span>
+    from the chosen component. The colors below remember each sample's ancestry &#8212; and the
+    marginal that emerges is exactly the two-component mixture
+    <span class="math">p(x) = &#960; N(x; &#956;&#8321;, &#963;&#178;) + (1&#8722;&#960;) N(x; &#956;&#8322;, &#963;&#178;)</span>.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>Ancestral sampling &#183; histogram colored by latent z</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> z = 1 (prob &#960;)</span>
+          <span class="key"><span class="swatch c2"></span> z = 2 (prob 1&#8722;&#960;)</span>
+        </span>
+      </div>
+      <canvas id="c-anc" aria-label="Stacked histogram of samples colored by which mixture component generated them, with the mixture density overlaid."></canvas>
+      <div class="controls">
+        <button id="anc-one" class="primary" type="button">Sample one</button>
+        <button id="anc-many" type="button">Sample 500</button>
+        <button id="anc-clear" type="button">Clear</button>
+        <label>&#960; <input id="p-pi" type="range" min="0.1" max="0.9" step="0.05" value="0.5"><span class="val" id="v-pi">0.50</span></label>
+        <label>&#956;&#8321; <input id="p-m1" type="range" min="-4" max="0" step="0.1" value="-1"><span class="val" id="v-m1">-1.0</span></label>
+        <label>&#956;&#8322; <input id="p-m2" type="range" min="0" max="4" step="0.1" value="1"><span class="val" id="v-m2">1.0</span></label>
+        <label>&#963; <input id="p-s" type="range" min="0.05" max="1.2" step="0.05" value="0.5"><span class="val" id="v-s">0.50</span></label>
+      </div>
+      <div class="readout" id="anc-readout">Press <b>Sample one</b> a few times &#8212; watch the coin, then the draw.</div>
+      <figcaption>Generation runs the hierarchy <em>forward</em>: z &#8594; x. Inference runs it
+      <em>backward</em>: given x, the posterior P(z | x) &#8212; for &#956; = &#177;1 that posterior mean was
+      exactly W01's tanh denoiser.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II &#183; The map</span>The same generator as one deterministic function</h2>
+    <p>Now remove the coin. Take a single uniform number <span class="math">u &#8764; Uniform(0, 1)</span>
+    and push it through the inverse of the cumulative distribution function:</p>
+    <p class="mathblock"><span class="math">x = F&#8315;&#185;(u), &#8195; F(x) = &#960; &#934;((x&#8722;&#956;&#8321;)/&#963;) + (1&#8722;&#960;) &#934;((x&#8722;&#956;&#8322;)/&#963;)</span></p>
+    <p>Below, uniform points enter on the <em>vertical</em> axis, travel to the curve
+    <span class="math">u = F(x)</span>, and drop to the <span class="math">x</span>-axis. The
+    histogram they build is the same mixture &#8212; <strong>no coin anywhere</strong>. Now slide
+    &#963; &#8594; 0: the curve becomes a staircase, and the map becomes
+    <span class="math">x = sign(u &#8722; &#960;)</span> &#8212; W01's two-point dataset, generated by
+    thresholding a uniform.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>u = F(x) &#183; uniform in (left axis) &#8594; data out (bottom axis)</span>
+        <span class="legend">
+          <span class="key"><span class="swatch u"></span> uniform input</span>
+          <span class="key"><span class="swatch"></span> CDF F</span>
+        </span>
+      </div>
+      <canvas id="c-map" aria-label="The mixture cumulative distribution function drawn as a curve; animated uniform samples enter on the vertical axis, reflect off the curve, and fall onto the horizontal axis, building the mixture histogram."></canvas>
+      <div class="controls">
+        <button id="map-one" class="primary" type="button">Map one</button>
+        <button id="map-many" type="button">Map 200</button>
+        <button id="map-clear" type="button">Clear</button>
+        <span>&#183; uses the same &#960;, &#956;&#8321;, &#956;&#8322;, &#963; sliders as Act I</span>
+      </div>
+      <div class="readout" id="map-readout">The flat plateau of F (height &#960;, between the bumps) is the empty region: no u lands there.</div>
+      <figcaption>The staircase limit: at &#963; &#8776; 0.05 the curve is two jumps and a plateau &#8212;
+      every u below &#960; maps to &#956;&#8321;, every u above maps to &#956;&#8322;. Pure sampling has become a
+      deterministic formula.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="takeaway"><strong>The definition hiding in this demo.</strong> A generative model
+    <em>is</em> a map that transforms simple randomness into data. Here the map is analytic
+    because the distribution is one-dimensional and known. Deep generative models keep the
+    recipe and <em>learn</em> the map: GANs and VAEs map Gaussian noise through a network;
+    normalizing flows make the map invertible; and W01's reverse
+    probability-flow ODE is exactly such a map &#8212; from a Gaussian to the data &#8212; built from a
+    learned denoiser. That family is where this course is headed.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion notes on the <a href="https://acads-iit-jammu.github.io/ID-5-02-TO-F26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const SQRT2PI = Math.sqrt(2 * Math.PI);
+  const nPdf = (x, m, s) => Math.exp(-((x - m) ** 2) / (2 * s * s)) / (s * SQRT2PI);
+  function erf(x) {
+    const s = x < 0 ? -1 : 1;
+    x = Math.abs(x);
+    const t = 1 / (1 + 0.3275911 * x);
+    const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t
+      - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+    return s * y;
+  }
+  const Phi = (z) => 0.5 * (1 + erf(z / Math.SQRT2));
+  let spare = null;
+  function randn() {
+    if (spare !== null) { const v = spare; spare = null; return v; }
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    const r = Math.sqrt(-2 * Math.log(u));
+    spare = r * Math.sin(2 * Math.PI * v);
+    return r * Math.cos(2 * Math.PI * v);
+  }
+
+  const XLO = -5, XHI = 5;
+  let PI_ = 0.5, MU1 = -1, MU2 = 1, SIG = 0.5;
+  const mixPdf = (x) => PI_ * nPdf(x, MU1, SIG) + (1 - PI_) * nPdf(x, MU2, SIG);
+  const mixCdf = (x) => PI_ * Phi((x - MU1) / SIG) + (1 - PI_) * Phi((x - MU2) / SIG);
+  function mixInv(u) {                       // bisection on the monotone CDF
+    let lo = XLO - 4, hi = XHI + 4;
+    for (let i = 0; i < 60; i++) {
+      const mid = (lo + hi) / 2;
+      if (mixCdf(mid) < u) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+  const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function setupCanvas(id, draw) {
+    const el = document.getElementById(id);
+    const ctx = el.getContext("2d");
+    const st = { el, ctx, w: 0, h: 0 };
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const r = el.getBoundingClientRect();
+      st.w = r.width; st.h = r.height;
+      el.width = Math.round(r.width * dpr); el.height = Math.round(r.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(st);
+    }
+    new ResizeObserver(resize).observe(el);
+    st.redraw = () => draw(st);
+    return st;
+  }
+
+  // ---------------- Act I: ancestral sampling ----------------
+  let anc = [];               // {x, z}
+  let ancFlash = null;        // {z, x, t} most recent, briefly highlighted
+
+  const anc_pad = { l: 14, r: 14, t: 34, b: 26 };
+  const ancView = setupCanvas("c-anc", (st) => {
+    const { ctx, w, h } = st;
+    ctx.clearRect(0, 0, w, h);
+    const xToPx = (x) => anc_pad.l + ((x - XLO) / (XHI - XLO)) * (w - anc_pad.l - anc_pad.r);
+    ctx.font = "11px system-ui, sans-serif";
+    for (const t of [-4, -2, 0, 2, 4]) {
+      ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(xToPx(t), anc_pad.t); ctx.lineTo(xToPx(t), h - anc_pad.b); ctx.stroke();
+      ctx.fillStyle = css("--muted"); ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText(String(t), xToPx(t), h - anc_pad.b + 5);
+    }
+    ctx.strokeStyle = css("--axis");
+    ctx.beginPath(); ctx.moveTo(anc_pad.l, h - anc_pad.b); ctx.lineTo(w - anc_pad.r, h - anc_pad.b); ctx.stroke();
+
+    // stacked histogram by component
+    const BINS = 50, bw = (XHI - XLO) / BINS;
+    const c1 = new Float64Array(BINS), c2 = new Float64Array(BINS);
+    for (const s of anc) {
+      const b = Math.floor((s.x - XLO) / bw);
+      if (b >= 0 && b < BINS) (s.z === 1 ? c1 : c2)[b]++;
+    }
+    let peak = 0;
+    const dens = new Float64Array(BINS);
+    for (let b = 0; b < BINS; b++) {
+      dens[b] = anc.length ? (c1[b] + c2[b]) / (anc.length * bw) : 0;
+      if (dens[b] > peak) peak = dens[b];
+    }
+    const N = 301;
+    let pdfPeak = 0;
+    const xs = Array.from({ length: N }, (_, i) => XLO + ((XHI - XLO) * i) / (N - 1));
+    const pd = xs.map(mixPdf);
+    pdfPeak = Math.max(...pd);
+    peak = Math.min(Math.max(peak, pdfPeak), 4);
+    const yToPx = (d) => h - anc_pad.b - Math.min(d / peak, 1) * (h - anc_pad.t - anc_pad.b) * 0.92;
+
+    for (let b = 0; b < BINS; b++) {
+      if (!c1[b] && !c2[b]) continue;
+      const x0 = xToPx(XLO + b * bw), x1 = xToPx(XLO + (b + 1) * bw);
+      const total = (c1[b] + c2[b]) / (anc.length * bw);
+      const h1 = (c1[b] / (anc.length * bw)) / total;   // fraction of bar from comp 1
+      const yTop = yToPx(Math.min(total, peak));
+      const yBase = h - anc_pad.b;
+      const split = yBase - (yBase - yTop) * h1;
+      ctx.fillStyle = css("--data-soft");
+      ctx.fillRect(x0 + 1, split, x1 - x0 - 2, yBase - split);            // comp 1 at bottom
+      ctx.fillStyle = css("--comp2-soft");
+      ctx.fillRect(x0 + 1, yTop, x1 - x0 - 2, split - yTop);              // comp 2 stacked
+    }
+
+    // mixture pdf + weighted components
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = css("--data");
+    ctx.beginPath();
+    xs.forEach((x, i) => {
+      const py = yToPx(PI_ * nPdf(x, MU1, SIG));
+      i === 0 ? ctx.moveTo(xToPx(x), py) : ctx.lineTo(xToPx(x), py);
+    });
+    ctx.stroke();
+    ctx.strokeStyle = css("--comp2");
+    ctx.beginPath();
+    xs.forEach((x, i) => {
+      const py = yToPx((1 - PI_) * nPdf(x, MU2, SIG));
+      i === 0 ? ctx.moveTo(xToPx(x), py) : ctx.lineTo(xToPx(x), py);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = css("--ink");
+    ctx.lineWidth = 1.8;
+    ctx.globalAlpha = 0.75;
+    ctx.beginPath();
+    xs.forEach((x, i) => {
+      const py = yToPx(mixPdf(x));
+      i === 0 ? ctx.moveTo(xToPx(x), py) : ctx.lineTo(xToPx(x), py);
+    });
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // coin banner for the latest single sample
+    if (ancFlash) {
+      ctx.font = "600 12px system-ui, sans-serif";
+      ctx.textAlign = "left"; ctx.textBaseline = "top";
+      ctx.fillStyle = ancFlash.z === 1 ? css("--data") : css("--comp2");
+      ctx.fillText("coin: z = " + ancFlash.z + "  \u2192  x | z \u223c N(\u03bc" +
+        (ancFlash.z === 1 ? "\u2081" : "\u2082") + ", \u03c3\u00b2)  \u2192  x = " + ancFlash.x.toFixed(2),
+        anc_pad.l + 2, 10);
+      ctx.beginPath();
+      ctx.arc(xToPx(ancFlash.x), h - anc_pad.b, 5, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.strokeStyle = css("--surface"); ctx.lineWidth = 2; ctx.stroke();
+    }
+  });
+
+  const ancReadout = document.getElementById("anc-readout");
+  function ancUpdate() {
+    if (!anc.length) return;
+    const n1 = anc.filter((s) => s.z === 1).length;
+    ancReadout.innerHTML = "n = " + anc.length + " \u00b7 share of z = 1: <b>" +
+      (n1 / anc.length).toFixed(2) + "</b> (\u03c0 = " + PI_.toFixed(2) + ")";
+  }
+  function ancSample() {
+    const z = Math.random() < PI_ ? 1 : 2;
+    const x = (z === 1 ? MU1 : MU2) + SIG * randn();
+    anc.push({ x, z });
+    return { x, z };
+  }
+  document.getElementById("anc-one").addEventListener("click", () => {
+    ancFlash = ancSample();
+    ancUpdate(); ancView.redraw();
+  });
+  document.getElementById("anc-many").addEventListener("click", () => {
+    ancFlash = null;
+    for (let i = 0; i < 500; i++) ancSample();
+    ancUpdate(); ancView.redraw();
+  });
+  document.getElementById("anc-clear").addEventListener("click", () => {
+    anc = []; ancFlash = null;
+    ancReadout.innerHTML = "Press <b>Sample one</b> a few times \u2014 watch the coin, then the draw.";
+    ancView.redraw();
+  });
+
+  // ---------------- Act II: the inverse-CDF map ----------------
+  let mapped = [];            // landed x values
+  let flight = null;          // animated {u, x, phase 0..2, t}
+  let mapAnim = null;
+
+  const HIST = 74;            // histogram strip height at the bottom
+  const map_pad = { l: 40, r: 14, t: 12, b: 26 + HIST };
+  const mapView = setupCanvas("c-map", (st) => {
+    const { ctx, w, h } = st;
+    ctx.clearRect(0, 0, w, h);
+    const xToPx = (x) => map_pad.l + ((x - XLO) / (XHI - XLO)) * (w - map_pad.l - map_pad.r);
+    const uToPx = (u) => map_pad.t + (1 - u) * (h - map_pad.t - map_pad.b);
+    const yBottom = h - map_pad.b;
+
+    // frame + labels
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.fillStyle = css("--muted");
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (const t of [-4, -2, 0, 2, 4]) {
+      ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(xToPx(t), map_pad.t); ctx.lineTo(xToPx(t), yBottom); ctx.stroke();
+      ctx.fillText(String(t), xToPx(t), h - 26 + 5);
+    }
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (const u of [0, 0.5, 1]) {
+      ctx.strokeStyle = css("--grid");
+      ctx.beginPath(); ctx.moveTo(map_pad.l, uToPx(u)); ctx.lineTo(w - map_pad.r, uToPx(u)); ctx.stroke();
+      ctx.fillStyle = css("--muted");
+      ctx.fillText(u.toFixed(1), map_pad.l - 6, uToPx(u));
+    }
+    // pi marker on the u axis
+    ctx.fillStyle = css("--ink-2");
+    ctx.fillText("\u03c0", map_pad.l - 22, uToPx(PI_));
+    ctx.strokeStyle = css("--axis");
+    ctx.strokeRect(map_pad.l, map_pad.t, w - map_pad.l - map_pad.r, yBottom - map_pad.t);
+    ctx.save();
+    ctx.translate(12, (map_pad.t + yBottom) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = css("--muted");
+    ctx.fillText("u \u223c Uniform(0, 1)", 0, 0);
+    ctx.restore();
+
+    // CDF curve
+    const N = 401;
+    ctx.strokeStyle = css("--data");
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    for (let i = 0; i < N; i++) {
+      const x = XLO + ((XHI - XLO) * i) / (N - 1);
+      const px = xToPx(x), py = uToPx(mixCdf(x));
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    // plateau annotation when well separated
+    const gapCdf = mixCdf((MU1 + MU2) / 2);
+    if (Math.abs(gapCdf - PI_) < 0.02 && (MU2 - MU1) > 4 * SIG) {
+      ctx.fillStyle = css("--muted");
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      ctx.fillText("plateau at height \u03c0 \u2014 the empty region", xToPx((MU1 + MU2) / 2), uToPx(PI_) - 5);
+    }
+
+    // in-flight sample path
+    if (flight) {
+      const ux = xToPx(flight.x), uy = uToPx(flight.u);
+      ctx.strokeStyle = css("--uni");
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(map_pad.l, uy);
+      if (flight.phase >= 1) ctx.lineTo(ux, uy);
+      if (flight.phase >= 2) { ctx.moveTo(ux, uy); ctx.lineTo(ux, yBottom); }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = css("--uni");
+      ctx.beginPath(); ctx.arc(map_pad.l, uy, 4.5, 0, 2 * Math.PI); ctx.fill();
+      if (flight.phase >= 1) { ctx.beginPath(); ctx.arc(ux, uy, 4.5, 0, 2 * Math.PI); ctx.fill(); }
+      if (flight.phase >= 2) { ctx.beginPath(); ctx.arc(ux, yBottom, 4.5, 0, 2 * Math.PI); ctx.fill(); }
+    }
+
+    // histogram strip of landed samples
+    ctx.strokeStyle = css("--axis");
+    ctx.beginPath(); ctx.moveTo(map_pad.l, yBottom); ctx.lineTo(w - map_pad.r, yBottom); ctx.stroke();
+    if (mapped.length) {
+      const BINS = 50, bw = (XHI - XLO) / BINS;
+      const cnt = new Float64Array(BINS);
+      for (const v of mapped) {
+        const b = Math.floor((v - XLO) / bw);
+        if (b >= 0 && b < BINS) cnt[b]++;
+      }
+      let peak = 0;
+      for (let b = 0; b < BINS; b++) { cnt[b] /= mapped.length * bw; if (cnt[b] > peak) peak = cnt[b]; }
+      const stripTop = yBottom + 8, stripH = HIST - 14;
+      ctx.fillStyle = css("--data-soft");
+      for (let b = 0; b < BINS; b++) {
+        if (!cnt[b]) continue;
+        const x0 = xToPx(XLO + b * bw), x1 = xToPx(XLO + (b + 1) * bw);
+        const bh = (cnt[b] / peak) * stripH;
+        ctx.fillRect(x0 + 1, h - 26 - bh + 0, x1 - x0 - 2, bh);
+      }
+      // target pdf over the strip
+      ctx.strokeStyle = css("--data");
+      ctx.lineWidth = 1.4;
+      let pdfPeak = 0;
+      const xs2 = Array.from({ length: 201 }, (_, i) => XLO + ((XHI - XLO) * i) / 200);
+      const pd2 = xs2.map(mixPdf);
+      pdfPeak = Math.max(...pd2, peak);
+      ctx.beginPath();
+      xs2.forEach((x, i) => {
+        const py = h - 26 - (mixPdf(x) / pdfPeak) * stripH;
+        i === 0 ? ctx.moveTo(xToPx(x), py) : ctx.lineTo(xToPx(x), py);
+      });
+      ctx.stroke();
+    }
+  });
+
+  function mapOne(animated) {
+    const u = Math.random();
+    const x = mixInv(u);
+    if (!animated || reduced()) {
+      mapped.push(x);
+      flight = { u, x, phase: 2 };
+      mapView.redraw();
+      return;
+    }
+    flight = { u, x, phase: 0 };
+    let step = 0;
+    const tick = () => {
+      step++;
+      if (step === 12) flight.phase = 1;
+      if (step === 24) { flight.phase = 2; mapped.push(x); }
+      mapView.redraw();
+      if (step < 30) mapAnim = requestAnimationFrame(tick);
+      else mapAnim = null;
+    };
+    if (mapAnim) cancelAnimationFrame(mapAnim);
+    mapAnim = requestAnimationFrame(tick);
+  }
+  document.getElementById("map-one").addEventListener("click", () => mapOne(true));
+  document.getElementById("map-many").addEventListener("click", () => {
+    for (let i = 0; i < 200; i++) { mapped.push(mixInv(Math.random())); }
+    flight = null;
+    mapView.redraw();
+  });
+  document.getElementById("map-clear").addEventListener("click", () => {
+    mapped = []; flight = null;
+    if (mapAnim) { cancelAnimationFrame(mapAnim); mapAnim = null; }
+    mapView.redraw();
+  });
+
+  // ---------------- shared sliders ----------------
+  function bind(id, vid, set, fmt) {
+    const el = document.getElementById(id), v = document.getElementById(vid);
+    el.addEventListener("input", () => {
+      set(+el.value);
+      v.textContent = fmt(+el.value);
+      ancView.redraw(); mapView.redraw(); ancUpdate();
+    });
+  }
+  bind("p-pi", "v-pi", (v) => { PI_ = v; }, (v) => v.toFixed(2));
+  bind("p-m1", "v-m1", (v) => { MU1 = v; }, (v) => v.toFixed(1));
+  bind("p-m2", "v-m2", (v) => { MU2 = v; }, (v) => v.toFixed(1));
+  bind("p-s", "v-s", (v) => { SIG = v; }, (v) => v.toFixed(2));
+
+  // ---------------- theme ----------------
+  const redrawAll = () => { ancView.redraw(); mapView.redraw(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
+  new MutationObserver(redrawAll).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

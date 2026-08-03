@@ -1,0 +1,470 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Distribution Playground</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --fit: #eb6834; --fit-soft: rgba(235,104,52,0.5);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --fit: #d95926; --fit-soft: rgba(217,89,38,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --fit: #d95926; --fit-soft: rgba(217,89,38,0.55);
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --fit: #eb6834; --fit-soft: rgba(235,104,52,0.5);
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout, select {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  .math { font-style: italic; white-space: nowrap; }
+  sub, sup { line-height: 0; font-size: 0.68em; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  .legend { display: flex; gap: 1.1rem; font-size: 0.74rem; color: var(--ink-2);
+    text-transform: none; letter-spacing: 0; }
+  .legend .key { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend .swatch { width: 14px; height: 0; border-top: 2.5px solid var(--data); border-radius: 2px; }
+  .legend .swatch.fit { border-top-style: dashed; border-top-color: var(--fit); }
+  .legend .swatch.hist { border-top-width: 8px; border-top-color: var(--data-soft); border-radius: 3px; }
+  canvas { display: block; width: 100%; height: 320px; touch-action: pan-y; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.4rem; }
+  input[type="range"] { width: 120px; accent-color: var(--data); }
+  input[type="radio"] { accent-color: var(--data); margin: 0 0.15rem 0 0; }
+  select { font-size: 0.82rem; padding: 0.25rem 0.4rem; border: 1px solid var(--axis);
+    border-radius: 6px; background: var(--surface); color: var(--ink); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 2.6em; display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.85rem; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--data); outline-offset: 2px; }
+  button.primary { background: var(--data); border-color: var(--data); color: #fff; }
+  button:disabled { opacity: 0.45; cursor: default; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); min-height: 1.4em; }
+  .readout b { color: var(--ink); }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid); padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; W02 demo</p>
+    <h1>The Distribution Playground</h1>
+    <p class="dek">One loop, walked with your own hands: see a distribution, draw samples from it,
+    fit the distribution back from the samples, then sample from the fit.</p>
+  </header>
+
+  <figure>
+    <div class="figlabel">
+      <span>Density, samples, and fit</span>
+      <span class="legend">
+        <span class="key"><span class="swatch"></span> true pdf</span>
+        <span class="key"><span class="swatch hist"></span> data histogram</span>
+        <span class="key"><span class="swatch fit"></span> fitted pdf</span>
+      </span>
+    </div>
+    <canvas id="cv" role="img" aria-label="Probability density curve with sample histogram and fitted density overlay."></canvas>
+    <div class="controls" id="family-row">
+      <label>family
+        <select id="family">
+          <option value="normal">Normal(&#956;, &#963;)</option>
+          <option value="uniform">Uniform(a, b)</option>
+          <option value="gamma">Gamma(k, &#952;)</option>
+          <option value="beta">Beta(&#945;, &#946;)</option>
+          <option value="mixture">Mixture of two Normals</option>
+        </select>
+      </label>
+      <span id="sliders"></span>
+    </div>
+    <div class="controls">
+      <span>n:</span>
+      <label><input type="radio" name="n" value="30"> 30</label>
+      <label><input type="radio" name="n" value="300" checked> 300</label>
+      <label><input type="radio" name="n" value="3000"> 3000</label>
+      <button id="draw" class="primary" type="button">Draw samples</button>
+      <button id="fit" type="button" disabled>Fit</button>
+      <button id="resample" type="button" disabled>Sample from fit</button>
+      <button id="clear" type="button">Clear</button>
+    </div>
+    <div class="readout" id="readout">Pick a family, then <b>Draw samples</b>.</div>
+    <figcaption id="cap">The histogram is density-normalized, so as n grows it hugs the pdf.
+    Fits use maximum likelihood where it has a closed form (Normal, Uniform) and the
+    <em>method of moments</em> for Gamma and Beta &#8212; labeled in the readout.</figcaption>
+  </figure>
+
+  <section>
+    <p class="takeaway"><strong>The trap to try.</strong> Choose the mixture, draw 3000 samples,
+    and press Fit: the fit is a <em>single</em> Normal (the best one, by maximum likelihood) &#8212;
+    and it puts its peak exactly where the data is emptiest. The family you fit matters as much
+    as the fitting. How to <em>measure</em> how wrong this fit is &#8212; that is KL divergence,
+    next lecture.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion notes on the <a href="https://acads-iit-jammu.github.io/ID-5-02-TO-F26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  let spare = null;
+  function randn() {
+    if (spare !== null) { const v = spare; spare = null; return v; }
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    const r = Math.sqrt(-2 * Math.log(u));
+    spare = r * Math.sin(2 * Math.PI * v);
+    return r * Math.cos(2 * Math.PI * v);
+  }
+  // Lanczos log-gamma
+  const LG = [676.5203681218851, -1259.1392167224028, 771.32342877765313,
+    -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+    9.9843695780195716e-6, 1.5056327351493116e-7];
+  function lnGamma(z) {
+    if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lnGamma(1 - z);
+    z -= 1;
+    let a = 0.99999999999980993;
+    for (let i = 0; i < 8; i++) a += LG[i] / (z + i + 1);
+    const t = z + 7.5;
+    return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(a);
+  }
+  function sampleGamma(k) {           // Marsaglia-Tsang, unit scale
+    if (k < 1) return sampleGamma(k + 1) * Math.pow(Math.random(), 1 / k);
+    const d = k - 1 / 3, c = 1 / Math.sqrt(9 * d);
+    for (;;) {
+      let x, v;
+      do { x = randn(); v = 1 + c * x; } while (v <= 0);
+      v = v * v * v;
+      const u = Math.random();
+      if (Math.log(u) < 0.5 * x * x + d - d * v + d * Math.log(v)) return d * v;
+    }
+  }
+  const nPdf = (x, m, s) => Math.exp(-((x - m) ** 2) / (2 * s * s)) / (s * Math.sqrt(2 * Math.PI));
+
+  // ---- family definitions -------------------------------------------------
+  const FAM = {
+    normal: {
+      params: [{ k: "\u03bc", min: -4, max: 4, step: 0.05, v: 0 },
+               { k: "\u03c3", min: 0.3, max: 2.5, step: 0.05, v: 1 }],
+      range: (p) => [-6, 6],
+      pdf: (x, p) => nPdf(x, p[0], p[1]),
+      sample: (p) => p[0] + p[1] * randn(),
+      fit: (d) => {
+        const m = d.reduce((a, b) => a + b, 0) / d.length;
+        const s = Math.sqrt(d.reduce((a, b) => a + (b - m) ** 2, 0) / d.length);
+        return { label: "Normal, maximum likelihood", text: "\u03bc\u0302 = " + m.toFixed(3) + ", \u03c3\u0302 = " + s.toFixed(3),
+                 pdf: (x) => nPdf(x, m, s), sample: () => m + s * randn() };
+      },
+    },
+    uniform: {
+      params: [{ k: "a", min: -5, max: 0, step: 0.1, v: -2 },
+               { k: "width", min: 1, max: 8, step: 0.1, v: 4 }],
+      range: (p) => [-6, 6],
+      pdf: (x, p) => (x >= p[0] && x <= p[0] + p[1] ? 1 / p[1] : 0),
+      sample: (p) => p[0] + p[1] * Math.random(),
+      fit: (d) => {
+        const a = Math.min(...d), b = Math.max(...d);
+        return { label: "Uniform, maximum likelihood", text: "\u00e2 = min = " + a.toFixed(3) + ", b\u0302 = max = " + b.toFixed(3),
+                 pdf: (x) => (x >= a && x <= b ? 1 / (b - a) : 0), sample: () => a + (b - a) * Math.random() };
+      },
+    },
+    gamma: {
+      params: [{ k: "k", min: 0.5, max: 9, step: 0.1, v: 2.5 },
+               { k: "\u03b8", min: 0.2, max: 2, step: 0.05, v: 1 }],
+      range: (p) => [0, 14],
+      pdf: (x, p) => x <= 0 ? 0 :
+        Math.exp((p[0] - 1) * Math.log(x) - x / p[1] - lnGamma(p[0]) - p[0] * Math.log(p[1])),
+      sample: (p) => sampleGamma(p[0]) * p[1],
+      fit: (d) => {
+        const m = d.reduce((a, b) => a + b, 0) / d.length;
+        const v = d.reduce((a, b) => a + (b - m) ** 2, 0) / d.length;
+        const k = m * m / v, th = v / m;
+        return { label: "Gamma, method of moments (no closed-form MLE)",
+                 text: "k\u0302 = x\u0304\u00b2/s\u00b2 = " + k.toFixed(3) + ", \u03b8\u0302 = s\u00b2/x\u0304 = " + th.toFixed(3),
+                 pdf: (x) => x <= 0 ? 0 : Math.exp((k - 1) * Math.log(x) - x / th - lnGamma(k) - k * Math.log(th)),
+                 sample: () => sampleGamma(k) * th };
+      },
+    },
+    beta: {
+      params: [{ k: "\u03b1", min: 0.5, max: 8, step: 0.1, v: 2 },
+               { k: "\u03b2", min: 0.5, max: 8, step: 0.1, v: 5 }],
+      range: (p) => [-0.04, 1.04],
+      pdf: (x, p) => (x <= 0 || x >= 1) ? 0 :
+        Math.exp((p[0] - 1) * Math.log(x) + (p[1] - 1) * Math.log(1 - x)
+          + lnGamma(p[0] + p[1]) - lnGamma(p[0]) - lnGamma(p[1])),
+      sample: (p) => { const g1 = sampleGamma(p[0]), g2 = sampleGamma(p[1]); return g1 / (g1 + g2); },
+      fit: (d) => {
+        const m = d.reduce((a, b) => a + b, 0) / d.length;
+        const v = Math.max(1e-6, d.reduce((a, b) => a + (b - m) ** 2, 0) / d.length);
+        const c = Math.max(0.01, m * (1 - m) / v - 1);
+        const al = m * c, be = (1 - m) * c;
+        return { label: "Beta, method of moments (no closed-form MLE)",
+                 text: "\u03b1\u0302 = " + al.toFixed(3) + ", \u03b2\u0302 = " + be.toFixed(3),
+                 pdf: (x) => (x <= 0 || x >= 1) ? 0 :
+                   Math.exp((al - 1) * Math.log(x) + (be - 1) * Math.log(1 - x)
+                     + lnGamma(al + be) - lnGamma(al) - lnGamma(be)),
+                 sample: () => { const g1 = sampleGamma(al), g2 = sampleGamma(be); return g1 / (g1 + g2); } };
+      },
+    },
+    mixture: {
+      params: [{ k: "\u03c0", min: 0.05, max: 0.95, step: 0.05, v: 0.5 },
+               { k: "\u03bc\u2081", min: -4, max: 0, step: 0.1, v: -2 },
+               { k: "\u03bc\u2082", min: 0, max: 4, step: 0.1, v: 2 },
+               { k: "\u03c3", min: 0.3, max: 1.5, step: 0.05, v: 0.6 }],
+      range: (p) => [-6, 6],
+      pdf: (x, p) => p[0] * nPdf(x, p[1], p[3]) + (1 - p[0]) * nPdf(x, p[2], p[3]),
+      sample: (p) => (Math.random() < p[0] ? p[1] : p[2]) + p[3] * randn(),
+      fit: (d) => {
+        const m = d.reduce((a, b) => a + b, 0) / d.length;
+        const s = Math.sqrt(d.reduce((a, b) => a + (b - m) ** 2, 0) / d.length);
+        return { label: "Deliberately fitted a SINGLE Normal by maximum likelihood",
+                 text: "\u03bc\u0302 = " + m.toFixed(3) + ", \u03c3\u0302 = " + s.toFixed(3) + " \u2014 its peak sits where the data is emptiest",
+                 pdf: (x) => nPdf(x, m, s), sample: () => m + s * randn() };
+      },
+    },
+  };
+
+  // ---- state ---------------------------------------------------------------
+  let family = "normal";
+  let params = FAM.normal.params.map((p) => p.v);
+  let data = [];
+  let fitted = null;
+  let fitData = [];
+
+  // ---- controls ------------------------------------------------------------
+  const slidersEl = document.getElementById("sliders");
+  const readout = document.getElementById("readout");
+  function buildSliders() {
+    slidersEl.innerHTML = "";
+    FAM[family].params.forEach((p, i) => {
+      const label = document.createElement("label");
+      const val = document.createElement("span");
+      val.className = "val";
+      val.textContent = (+params[i]).toFixed(2).replace(/\.00$/, "");
+      const input = document.createElement("input");
+      input.type = "range";
+      input.min = p.min; input.max = p.max; input.step = p.step; input.value = params[i];
+      input.addEventListener("input", () => {
+        params[i] = +input.value;
+        val.textContent = (+params[i]).toFixed(2).replace(/\.00$/, "");
+        draw();
+      });
+      label.append(p.k + " ", input, val);
+      slidersEl.append(label);
+    });
+  }
+  document.getElementById("family").addEventListener("change", (ev) => {
+    family = ev.target.value;
+    params = FAM[family].params.map((p) => p.v);
+    clearAll();
+    buildSliders();
+    draw();
+  });
+
+  const btnFit = document.getElementById("fit");
+  const btnRe = document.getElementById("resample");
+  function clearAll() {
+    data = []; fitted = null; fitData = [];
+    btnFit.disabled = true; btnRe.disabled = true;
+    readout.innerHTML = "Pick a family, then <b>Draw samples</b>.";
+  }
+  document.getElementById("clear").addEventListener("click", () => { clearAll(); draw(); });
+  document.getElementById("draw").addEventListener("click", () => {
+    const n = +document.querySelector('input[name="n"]:checked').value;
+    const f = FAM[family];
+    data = Array.from({ length: n }, () => f.sample(params));
+    fitted = null; fitData = [];
+    btnFit.disabled = false; btnRe.disabled = true;
+    readout.innerHTML = "n = " + n + " samples drawn. Now press <b>Fit</b>.";
+    draw();
+  });
+  btnFit.addEventListener("click", () => {
+    if (!data.length) return;
+    fitted = FAM[family].fit(data);
+    fitData = [];
+    btnRe.disabled = false;
+    readout.innerHTML = "<b>" + fitted.label + ":</b> " + fitted.text;
+    draw();
+  });
+  btnRe.addEventListener("click", () => {
+    if (!fitted) return;
+    const n = +document.querySelector('input[name="n"]:checked').value;
+    fitData = Array.from({ length: n }, () => fitted.sample());
+    readout.innerHTML = "<b>" + fitted.label + ":</b> " + fitted.text +
+      " \u2014 orange outline: " + n + " fresh samples from the fit.";
+    draw();
+  });
+
+  // ---- canvas ---------------------------------------------------------------
+  const el = document.getElementById("cv");
+  const ctx = el.getContext("2d");
+  let W = 0, H = 0;
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = el.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    el.width = Math.round(W * dpr); el.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  new ResizeObserver(resize).observe(el);
+
+  function histogram(vals, lo, hi, bins) {
+    const c = new Float64Array(bins);
+    const bw = (hi - lo) / bins;
+    for (const v of vals) {
+      const b = Math.floor((v - lo) / bw);
+      if (b >= 0 && b < bins) c[b]++;
+    }
+    for (let b = 0; b < bins; b++) c[b] /= vals.length * bw;   // density scale
+    return c;
+  }
+
+  function draw() {
+    const pad = { l: 14, r: 14, t: 16, b: 26 };
+    ctx.clearRect(0, 0, W, H);
+    const f = FAM[family];
+    const [lo, hi] = f.range(params);
+    const xToPx = (x) => pad.l + ((x - lo) / (hi - lo)) * (W - pad.l - pad.r);
+
+    // grid + axis
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    const ticks = family === "beta" ? [0, 0.25, 0.5, 0.75, 1] :
+      family === "gamma" ? [0, 2, 4, 6, 8, 10, 12, 14] : [-6, -4, -2, 0, 2, 4, 6];
+    for (const t of ticks) {
+      if (t < lo || t > hi) continue;
+      ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(xToPx(t), pad.t); ctx.lineTo(xToPx(t), H - pad.b); ctx.stroke();
+      ctx.fillStyle = css("--muted");
+      ctx.fillText(String(t), xToPx(t), H - pad.b + 5);
+    }
+    ctx.strokeStyle = css("--axis");
+    ctx.beginPath(); ctx.moveTo(pad.l, H - pad.b); ctx.lineTo(W - pad.r, H - pad.b); ctx.stroke();
+
+    // shared y scale: max of true pdf, fitted pdf, histogram
+    const N = 321;
+    const xs = Array.from({ length: N }, (_, i) => lo + ((hi - lo) * i) / (N - 1));
+    let peak = 0;
+    const truePdf = xs.map((x) => f.pdf(x, params));
+    peak = Math.max(peak, ...truePdf);
+    const BINS = 46;
+    const histD = data.length ? histogram(data, lo, hi, BINS) : null;
+    if (histD) peak = Math.max(peak, ...histD);
+    const fitPdf = fitted ? xs.map((x) => fitted.pdf(x)) : null;
+    if (fitPdf) peak = Math.max(peak, ...fitPdf);
+    const histF = fitData.length ? histogram(fitData, lo, hi, BINS) : null;
+    if (histF) peak = Math.max(peak, ...histF);
+    peak = Math.min(peak, 4);           // spikes (tiny sigma / uniform min-max) get clipped, not squashed
+    const yToPx = (d) => H - pad.b - Math.min(d / peak, 1) * (H - pad.t - pad.b) * 0.92;
+
+    const bw = (hi - lo) / BINS;
+    // data histogram (filled)
+    if (histD) {
+      ctx.fillStyle = css("--data-soft");
+      for (let b = 0; b < BINS; b++) {
+        if (!histD[b]) continue;
+        const x0 = xToPx(lo + b * bw), x1 = xToPx(lo + (b + 1) * bw);
+        ctx.fillRect(x0 + 1, yToPx(histD[b]), x1 - x0 - 2, H - pad.b - yToPx(histD[b]));
+      }
+    }
+    // fit-sample histogram (outline)
+    if (histF) {
+      ctx.strokeStyle = css("--fit-soft");
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(xToPx(lo), H - pad.b);
+      for (let b = 0; b < BINS; b++) {
+        const y = yToPx(histF[b]);
+        ctx.lineTo(xToPx(lo + b * bw), y);
+        ctx.lineTo(xToPx(lo + (b + 1) * bw), y);
+      }
+      ctx.lineTo(xToPx(hi), H - pad.b);
+      ctx.stroke();
+    }
+    // rug of data points
+    if (data.length && data.length <= 300) {
+      ctx.fillStyle = css("--data");
+      ctx.globalAlpha = 0.5;
+      for (const v of data) {
+        if (v < lo || v > hi) continue;
+        ctx.fillRect(xToPx(v) - 0.5, H - pad.b - 8, 1, 8);
+      }
+      ctx.globalAlpha = 1;
+    }
+    // true pdf
+    ctx.strokeStyle = css("--data");
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    xs.forEach((x, i) => {
+      const px = xToPx(x), py = yToPx(truePdf[i]);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+    // fitted pdf
+    if (fitPdf) {
+      ctx.strokeStyle = css("--fit");
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath();
+      xs.forEach((x, i) => {
+        const px = xToPx(x), py = yToPx(fitPdf[i]);
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  buildSliders();
+  const redraw = () => draw();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redraw);
+  new MutationObserver(redraw).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

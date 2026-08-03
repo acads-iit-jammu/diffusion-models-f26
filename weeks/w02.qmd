@@ -12,7 +12,591 @@
 
 ## In Class
 
+**Slides** (two parts; &#8592; &#8594; arrows or click the edges to navigate):
+
+*Part 1 — Distributions and Maximum Likelihood* ([open fullscreen](../materials/w02-deck-01-distributions-mle.html){target="_blank"}):
+
+<iframe src="../materials/w02-deck-01-distributions-mle.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 1: distributions and MLE"></iframe>
+
+*Part 2 — Generative AI, in Its Simplest Form* ([open fullscreen](../materials/w02-deck-02-genai-maps.html){target="_blank"}):
+
+<iframe src="../materials/w02-deck-02-genai-maps.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 2: generative AI in its simplest form"></iframe>
+
+**Companion notes** — Notes 0 (probability refresher), I, and II, below on this page.
+
+**Interactive demos**
+
+- [The Distribution Playground](../materials/distributions-playground.html) — see, sample, fit, sample from the fit (and the single-Gaussian-on-mixture trap).
+- [The Likelihood Lens](../materials/likelihood-lens.html) — pdf and likelihood as two slices of one surface; draggable data with a live MLE.
+- [Sampling as a Map](../materials/sampling-as-a-map.html) — ancestral sampling, then the same generator as one deterministic map; slide σ → 0 for the two-point staircase.
+
 *Lecture notes/board scans will be posted here.*
+
+## Notes 0: Probability 101 — a refresher
+
+*This section is a self-contained refresher on the probability prerequisites of the
+course: sample spaces, random variables, joint and marginal distributions,
+conditioning, and expectation. Readers comfortable with these notions may proceed
+directly to Notes I.*
+
+Probability theory is built on two distinct maps: the probability measure, which
+assigns numbers to events, and the random variable, which assigns numbers to
+outcomes. Distinguishing the two carefully at the outset prevents most of the common
+confusions, and this refresher is organized accordingly.
+
+### The sample space, events, and the probability measure
+
+A random experiment is modeled by three objects.
+
+- The **sample space** $\Omega$ is the set of all possible outcomes of the
+  experiment, with one element $\omega \in \Omega$ per complete outcome. For a
+  single die, $\Omega = \{1, \dots, 6\}$. For two coin tosses,
+  $\Omega = \{HH, HT, TH, TT\}$; note that an outcome specifies the result of the
+  entire experiment, i.e. both tosses. For a point drawn from the interval $[0,1]$,
+  $\Omega = [0,1]$, an uncountable set.
+- An **event** is a subset $A \subseteq \Omega$; events are the objects to which
+  probabilities are assigned. "The die shows an even number" is the event
+  $\{2, 4, 6\}$; "at least one head" is the event $\{HH, HT, TH\}$. An event is a
+  collection of outcomes, not an outcome.
+- The **probability measure** is the first of the two maps:
+
+  $$
+  P : \text{events} \longrightarrow [0, 1],
+  $$
+
+  required to satisfy Kolmogorov's axioms: (i) $P(A) \ge 0$ for every event $A$;
+  (ii) $P(\Omega) = 1$; (iii) for mutually exclusive events $A_1, A_2, \dots$,
+  $P\big(\bigcup_i A_i\big) = \sum_i P(A_i)$ (countable additivity).
+
+All further rules are consequences of the axioms; two used constantly are
+$P(A^c) = 1 - P(A)$ and $P(A \cup B) = P(A) + P(B) - P(A \cap B)$.
+
+A remark on the continuous case. For $\Omega = [0,1]$ with the uniform measure,
+every singleton event $\{\omega\}$ has probability zero, although some outcome
+certainly occurs. Probability zero therefore does not mean impossibility; it means a
+vanishing fraction of the possibilities. This is also the reason $P$ is defined on
+events rather than on individual outcomes: in the continuous case, individual
+outcomes are too small to carry probability.
+
+### Random variables
+
+The second map is the random variable. A **random variable** is a function
+
+$$
+X : \Omega \longrightarrow \mathbb{R}
+$$
+
+that assigns a numerical value to each outcome. For the two-coin experiment with
+$X$ the number of heads: $X(HH) = 2$, $X(HT) = X(TH) = 1$, $X(TT) = 0$. Despite the
+name, $X$ is a fixed, deterministic function; the randomness resides entirely in
+which outcome $\omega$ the experiment produces.
+
+The two maps combine as follows. A statement such as $\mathbb{P}(X = 1)$ is
+evaluated by first identifying the event determined by the condition and then
+applying $P$ to it:
+
+$$
+\mathbb{P}(X = 1)
+\;=\; P\big(\{\omega \in \Omega : X(\omega) = 1\}\big)
+\;=\; P(\{HT, TH\}) = \tfrac{2}{4}.
+$$
+
+Carrying this out for every value (or set of values) of $X$ yields the
+**distribution** of $X$, a probability assignment on the real line. Once the
+distribution is available, the underlying sample space is usually suppressed and one
+works with the distribution directly; this is standard practice, and the remainder of
+the course follows it. The present section records what that convention leaves
+implicit.
+
+A **discrete** random variable is described by its probability mass function (pmf)
+$p(x) = \mathbb{P}(X = x)$, with $\sum_x p(x) = 1$. A **continuous** random
+variable is described by its probability density function (pdf) $f(x) \ge 0$, with
+$\int_{-\infty}^{\infty} f(x)\, dx = 1$; probabilities are obtained as areas
+under the density,
+
+$$
+\mathbb{P}(a \le X \le b) = \int_a^b f(x)\, dx .
+$$
+
+Three properties of densities deserve emphasis.
+
+- A density value is not a probability and may exceed 1; the Uniform distribution on
+  $[0, \tfrac12]$ has $f \equiv 2$. Only areas under the density are probabilities.
+- $\mathbb{P}(X = x) = 0$ for every individual $x$, by the singleton remark above.
+  The informal reading of a density is $f(x)\,dx \approx$ the probability of an
+  outcome within $dx$ of $x$; densities compare the relative plausibility of
+  neighborhoods.
+- The cumulative distribution function (CDF) $F(x) = \mathbb{P}(X \le x)$ applies
+  to discrete and continuous variables alike, and its derivative, where it exists,
+  is the pdf. The CDF appeared in Notes II as the sampling map $F^{-1}$.
+
+### Joint distributions
+
+Let $X$ and $Y$ be two random variables defined on the same sample space — two
+numerical features of the same outcome. Their **joint distribution** specifies
+$p(x, y) = \mathbb{P}(X = x \text{ and } Y = y)$ in the discrete case, or a joint
+density $f(x, y)$ whose volumes are probabilities in the continuous case. The joint
+distribution is a complete description of the pair: every probabilistic statement
+about $(X, Y)$ can be computed from it.
+
+The following discrete joint distribution serves as the running example (the state
+of a morning sky and the occurrence of rain):
+
+| $p(x,y)$ | $Y{=}$ rain | $Y{=}$ no rain | row sum |
+|---|:---:|:---:|:---:|
+| $X{=}$ cloudy | 0.20 | 0.25 | **0.45** |
+| $X{=}$ clear | 0.05 | 0.50 | **0.55** |
+| column sum | **0.25** | **0.75** | 1 |
+
+: {tbl-colwidths="[34,22,22,22]"}
+
+### Marginal distributions
+
+The **marginal** distribution of $X$ describes $X$ alone, with $Y$ disregarded. It
+is obtained by summing (or, for densities, integrating) the joint distribution over
+the other variable:
+
+$$
+p(x) = \sum_y p(x, y),
+\qquad\text{or}\qquad
+f(x) = \int f(x, y)\, dy .
+$$
+
+In the table these are the row and column sums — the margins of the table, which is
+the origin of the term: $\mathbb{P}(\text{cloudy}) = 0.45$ and
+$\mathbb{P}(\text{rain}) = 0.25$. The operation is justified directly by the
+additivity axiom: the event "cloudy" is the disjoint union of "cloudy and rain" and
+"cloudy and no rain". Marginalization recurs throughout the course; in the mixture
+model of Notes II, the observed density
+$p(x) = \sum_z p(z)\, p(x \mid z)$ is precisely the joint distribution of
+$(x, z)$ with the latent variable summed out.
+
+### Conditional distributions and Bayes' rule
+
+The **conditional** distribution of $Y$ given $X = x$ is defined, whenever
+$p(x) > 0$, by
+
+$$
+p(y \mid x) = \frac{p(x, y)}{p(x)} .
+$$
+
+The definition restricts attention to the outcomes consistent with $X = x$ and
+renormalizes their probabilities to total 1. In the running example,
+$\mathbb{P}(\text{rain} \mid \text{cloudy}) = 0.20 / 0.45 \approx 0.44$,
+compared with the unconditional $\mathbb{P}(\text{rain}) = 0.25$.
+
+Applying the definition in both directions and eliminating the joint yields
+**Bayes' rule**,
+
+$$
+\boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
+$$
+
+which converts a conditional in one direction into the conditional in the other.
+The tanh denoiser of W01 is an application of this identity, with $x$ the clean
+data point and $y$ the noisy observation.
+
+$X$ and $Y$ are **independent** if $p(x, y) = p(x)\, p(y)$ for all $x, y$ —
+equivalently, if $p(y \mid x) = p(y)$, so that conditioning on $X$ conveys no
+information about $Y$. In the table, $0.20 \ne 0.45 \times 0.25$, so the two
+variables are dependent. The i.i.d. assumption underlying the likelihoods of Notes I
+is an independence statement applied to repeated observations.
+
+### Expectation
+
+The **expectation** of a random variable is the probability-weighted average of its
+values,
+
+$$
+\mathbb{E}[X] = \sum_x x\, p(x)
+\qquad\text{or}\qquad
+\mathbb{E}[X] = \int x\, f(x)\, dx ,
+$$
+
+the center of mass of the distribution. The expectation need not be an attainable
+value; a fair die has $\mathbb{E}[X] = 3.5$. More generally, for a function $g$,
+
+$$
+\mathbb{E}[g(X)] = \sum_x g(x)\, p(x)
+\qquad\text{or}\qquad
+\int g(x)\, f(x)\, dx ,
+$$
+
+so that the distribution of $g(X)$ itself need never be computed (a fact sometimes
+called the law of the unconscious statistician).
+
+Two properties carry most of the weight in this course.
+
+- **Linearity.** $\mathbb{E}[aX + bY] = a\,\mathbb{E}[X] + b\,\mathbb{E}[Y]$
+  holds for all random variables on a common sample space, with no independence
+  assumption. (Independence is required for the separate statement
+  $\mathbb{E}[XY] = \mathbb{E}[X]\,\mathbb{E}[Y]$.)
+- **Variance.** $\operatorname{Var}(X) =
+  \mathbb{E}\big[(X - \mathbb{E}X)^2\big] =
+  \mathbb{E}[X^2] - (\mathbb{E}X)^2$ measures spread about the mean, and for
+  independent random variables variances add. The identity
+  $\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2$ of W01 is an instance.
+
+Finally, the **conditional expectation** $\mathbb{E}[X \mid Y = y]$ is the mean of
+the conditional distribution of $X$ given $Y = y$, regarded as a function of $y$. It
+is the minimum-mean-squared-error prediction of $X$ from the observation $Y = y$
+(proved in the setting of Notes I), and the denoiser
+$\mathbb{E}[x_0 \mid x_\sigma]$ of W01 is precisely a conditional expectation.
+
+### Correspondence with this course
+
+| Probability 101 object | Where it appears in this course |
+|---|---|
+| Sample space $\Omega$, outcome $\omega$ | the randomness underlying every "sample" |
+| $P$: events $\to [0,1]$ | the data distribution $p_{\text{data}}$ |
+| Random variable $X: \Omega \to \mathbb{R}$ | data $x$, noise $z$, latent $z$ |
+| pmf / pdf | every curve in the Distribution Playground |
+| Joint $p(x, z)$ | mixture model: latent variable and observation |
+| Marginalization $\sum_z p(x, z)$ | the mixture density; later, the ELBO (M3) |
+| Conditioning and Bayes' rule | posteriors; W01's tanh denoiser |
+| Independence | i.i.d. data; likelihoods factorize |
+| $\mathbb{E}$, linearity, variance | losses, noise accumulation, $1 + \sigma^2$ |
+| $\mathbb{E}[X \mid Y]$ | the denoiser — the central object of the course |
+
+: {tbl-colwidths="[40,60]"}
+
+### Exercises
+
+1. For two fair coin tosses with $X$ the number of heads: write out $\Omega$, the
+   values $X(\omega)$ for all four outcomes, and the pmf of $X$; verify that the
+   pmf sums to 1 using the additivity axiom.
+2. For the sky-and-rain table, compute
+   $\mathbb{P}(\text{cloudy} \mid \text{rain})$ by Bayes' rule from
+   $\mathbb{P}(\text{rain} \mid \text{cloudy})$ and the marginals, and confirm
+   the result by direct computation from the table.
+3. Exhibit (a) a pdf exceeding 3 at some point; (b) a random variable whose
+   expectation is not an attainable value; (c) two dependent random variables for
+   which $\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$ nevertheless holds,
+   illustrating that linearity requires no independence.
+4. Let $U \sim \text{Uniform}(0,1)$ and $X = U^2$. Compute $\mathbb{E}[X]$ twice:
+   directly via $\mathbb{E}[g(U)]$, and by first deriving the CDF and pdf of $X$.
+   Compare the effort required.
+5. In the mixture model $z \sim \text{Bernoulli}(\pi)$,
+   $x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)$: identify the joint
+   $p(x, z)$, both marginals, and both conditionals. State which of these objects
+   W01's denoiser computes, and which the ancestral sampler of Notes II uses.
+
+## Notes I: Distributions and Maximum Likelihood
+
+*Companion note to W02, lecture 1. Interactive versions:
+[the Distribution Playground](../materials/distributions-playground.html) and
+[the Likelihood Lens](../materials/likelihood-lens.html).*
+
+This note walks one loop twice: **distribution → samples → fitted distribution → new
+samples**. First visually (the playground), then analytically (maximum likelihood for
+the Gaussian, derived in full). It doubles as a compact reference for the distribution
+families used throughout the course.
+
+### The cast of distributions
+
+| Family | pdf $f(x)$ | Support | Mean | Variance |
+|---|---|---|---|---|
+| Uniform$(a,b)$ | $\frac{1}{b-a}$ | $[a,b]$ | $\frac{a+b}{2}$ | $\frac{(b-a)^2}{12}$ |
+| Normal$(\mu,\sigma^2)$ | $\frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$ | $\mathbb{R}$ | $\mu$ | $\sigma^2$ |
+| Gamma$(k,\theta)$ | $\frac{x^{k-1} e^{-x/\theta}}{\Gamma(k)\,\theta^{k}}$ | $(0,\infty)$ | $k\theta$ | $k\theta^2$ |
+| Beta$(\alpha,\beta)$ | $\frac{x^{\alpha-1}(1-x)^{\beta-1}}{B(\alpha,\beta)}$ | $(0,1)$ | $\frac{\alpha}{\alpha+\beta}$ | $\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}$ |
+| Mixture | $\sum_i \pi_i\, f_i(x)$ | union | $\sum_i \pi_i \mu_i$ | see Exercise 5 |
+
+: {tbl-colwidths="[22,30,14,14,20]"}
+
+A sentence of habitat for each: the **Uniform** encodes total ignorance on an interval;
+the **Normal** is what sums of many small independent effects look like (W01's warm-up
+demo *is* this statement); the **Gamma** models positive, right-skewed quantities such
+as waiting times; the **Beta** lives on $(0,1)$ and models proportions and
+probabilities; a **mixture** models data with subpopulations — clusters — and is the
+recurring character of this course.
+
+### How sampling actually works
+
+Every sampler in the playground reduces to uniform random numbers:
+
+- **Inverse CDF.** If $F$ is a CDF and $U \sim \text{Uniform}(0,1)$, then
+  $X = F^{-1}(U)$ has CDF $F$ (proved in the companion note
+  *Generative AI, in Its Simplest Form* (Notes II, below)). This handles
+  Uniform ($x = a + (b-a)u$) and anything with a computable $F^{-1}$.
+- **Box–Muller** for the Normal: with $U_1, U_2$ independent uniforms,
+  $\sqrt{-2\log U_1}\,\cos(2\pi U_2)$ is exactly $\mathcal{N}(0,1)$. This is the
+  sampler inside every demo of this course.
+- **Pick-then-sample** for mixtures: draw the component index with probabilities
+  $\pi_i$, then sample that component — ancestral sampling, the subject of the
+  companion note.
+- Gamma and Beta use clever rejection samplers (the playground uses Marsaglia–Tsang);
+  we treat them as black boxes.
+
+### Likelihood
+
+Fix a family $f(x;\theta)$ and observe an i.i.d. dataset $x_1, \dots, x_n$. The
+**likelihood** and **log-likelihood** are
+
+$$
+L(\theta) = \prod_{i=1}^n f(x_i; \theta),
+\qquad
+\ell(\theta) = \sum_{i=1}^n \log f(x_i; \theta),
+$$
+
+and the **maximum likelihood estimator (MLE)** is
+$\hat\theta = \arg\max_\theta \ell(\theta)$. The log changes nothing about the argmax
+(monotonicity) and everything about the algebra and the numerics: a product of 3000
+numbers of size $10^{-2}$ underflows; a sum of their logs is a perfectly pleasant
+$\approx -13{,}800$.
+
+### PDF vs likelihood: the same function, two readings
+
+The chronic confusion, settled: $f(x;\theta)$ is **one formula with two arguments**.
+
+| Fix | Vary | You get | Area under the curve |
+|---|---|---|---|
+| parameters $\theta$ | data $x$ | the **pdf** — a distribution over data | $= 1$, always |
+| observed data $x$ | parameters $\theta$ | the **likelihood** — a score for fitting | meaningless |
+
+: {tbl-colwidths="[22,22,36,20]"}
+
+The [Likelihood Lens](../materials/likelihood-lens.html) shows both as slices of the same surface
+$f(x;\mu) = \mathcal{N}(x; \mu, \sigma^2)$: the horizontal slice (fix $\mu$) is a
+density in $x$; the vertical slice (fix $x$) is a likelihood in $\mu$. For the
+Gaussian the two slices happen to have the same bell shape, because
+$f(x;\mu) = f(\mu;x)$ — a symmetry of this family, *not* a general fact (repeat the
+exercise mentally with a Gamma in $\theta$). What is general: **the likelihood is not
+a probability distribution over $\theta$** — it need not integrate to 1, and only its
+argmax and local shape carry meaning.
+
+### The Gaussian MLE, in full
+
+$$
+\ell(\mu, \sigma^2)
+= -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^n (x_i - \mu)^2 .
+$$
+
+**Maximize over $\mu$.** Only the second term involves $\mu$:
+
+$$
+\frac{\partial \ell}{\partial \mu}
+= \frac{1}{\sigma^2}\sum_{i=1}^n (x_i - \mu)
+= \frac{n}{\sigma^2}(\bar{x} - \mu)
+\;\stackrel{!}{=}\; 0
+\quad\Longrightarrow\quad
+\boxed{\ \hat\mu = \bar{x}\ }
+$$
+
+for **every** $\sigma$ — which is why, in the Lens, changing $\sigma$ sharpens the
+log-likelihood parabola but never moves its peak.
+
+**Maximize over $\sigma^2$** (treat $v = \sigma^2$ as the variable):
+
+$$
+\frac{\partial \ell}{\partial v}
+= -\frac{n}{2v} + \frac{1}{2v^2}\sum_i (x_i - \hat\mu)^2
+\;\stackrel{!}{=}\; 0
+\quad\Longrightarrow\quad
+\boxed{\ \hat\sigma^2 = \frac{1}{n}\sum_{i=1}^n (x_i - \bar{x})^2\ }
+$$
+
+(One should check this is a maximum, not merely critical: $\ell \to -\infty$ as
+$v \to 0^+$ and as $v \to \infty$, and this is the only critical point.) Note the
+divisor $n$: the MLE of the variance is *biased* — $\mathbb{E}[\hat\sigma^2] =
+\frac{n-1}{n}\sigma^2$ — which is where the familiar $n-1$ estimator comes from. For
+this course the distinction is a footnote; the MLE is what the theory produces.
+
+### Fitting the other families — honestly
+
+- **Uniform.** The likelihood is $(b-a)^{-n}$ if all points lie in $[a,b]$ and $0$
+  otherwise: to maximize, squeeze the interval as tight as the data allows —
+  $\hat a = \min_i x_i$, $\hat b = \max_i x_i$. (No calculus; the maximum is on the
+  boundary of the constraint. That is Exercise 2.)
+- **Gamma and Beta have no closed-form MLE.** Setting the derivatives to zero produces
+  equations involving the digamma function, solvable only numerically. The playground
+  therefore uses the **method of moments (MoM)**: equate the family's mean and
+  variance to the sample's $\bar x$ and $s^2$ and solve —
+
+  $$
+  \text{Gamma: } \hat k = \frac{\bar{x}^2}{s^2},\ \ \hat\theta = \frac{s^2}{\bar{x}};
+  \qquad
+  \text{Beta: } c = \frac{\bar{x}(1-\bar{x})}{s^2} - 1,\ \
+  \hat\alpha = \bar{x}\,c,\ \ \hat\beta = (1-\bar{x})\,c .
+  $$
+
+  MoM is a respectable estimator in its own right (consistent, and a standard warm
+  start for numerical MLE); the honest label matters because "just maximize the
+  likelihood" quietly assumes machinery we haven't built.
+- **Mixtures.** Even MoM gets awkward; the right tool is expectation–maximization
+  (EM), which belongs to a later conversation. Today the mixture plays a different
+  role — see below.
+
+### The trap: right method, wrong family
+
+In the playground: generate 3000 samples from the two-bump mixture, then fit a
+**single Normal** by maximum likelihood. The fit is *optimal within its family* — and
+its peak sits exactly in the empty valley between the clusters, because the best
+single Gaussian matches the overall mean and variance, not the shape.
+
+Two lessons. First, MLE optimizes *within the family you chose*; the choice of family
+is a modeling decision the likelihood cannot rescue. Second, we currently have no
+number that says *how wrong* this fit is. Constructing that number — the KL
+divergence, and its identity with maximum likelihood — is the next lecture.
+
+### Exercises
+
+1. Re-derive $\hat\sigma^2$ for the Gaussian, including the argument that the critical
+   point is a maximum.
+2. Show that the Uniform MLE is $(\hat a, \hat b) = (\min_i x_i, \max_i x_i)$, and
+   explain why calculus alone would miss it.
+3. Derive the Gamma method-of-moments estimators from $\mathbb{E}X = k\theta$ and
+   $\operatorname{Var} X = k\theta^2$.
+4. For a single observation $x$ from $\mathcal{N}(\mu, \sigma^2)$ with $\sigma$
+   known, sketch the likelihood in $\mu$. Now hold $\mu$ known and sketch the
+   likelihood in $\sigma$ — is it bell-shaped? Symmetric? (This kills the "likelihood
+   looks like a pdf" illusion outside the Gaussian-mean case.)
+5. For a mixture $\sum_i \pi_i f_i$ with component means $\mu_i$ and variances
+   $\sigma_i^2$, show
+   $\operatorname{Var}(X) = \sum_i \pi_i \sigma_i^2 + \sum_i \pi_i (\mu_i - \bar\mu)^2$
+   with $\bar\mu = \sum_i \pi_i \mu_i$ — within-component plus between-component
+   spread. Use it to predict what $\hat\sigma$ the single-Gaussian fit in the trap
+   will report.
+
+## Notes II: Generative AI, in Its Simplest Form
+
+*Companion note to W02, lecture 2. Interactive version:
+[Sampling as a Map](../materials/sampling-as-a-map.html).*
+
+This note presents the same tiny generator twice — first as a **hierarchy you sample
+conditionally** (a Bayesian model), then as a **deterministic map applied to uniform
+randomness** — and then makes the claim that carries the rest of the course: every
+modern generative model, diffusion included, is the second picture with a *learned*
+map.
+
+### View 1: conditional generation (a hierarchical model)
+
+The simplest latent-variable model:
+
+$$
+z \sim \text{Bernoulli}(\pi), \qquad
+x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2),
+\qquad z \in \{1, 2\}.
+$$
+
+**Ancestral sampling** generates by following the arrows: draw the latent coin $z$,
+then draw $x$ from the selected component. The observed marginal is obtained by
+summing out the latent:
+
+$$
+p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
+\;=\; \pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)
+$$
+
+— exactly the two-component mixture from the playground. A mixture is not just a
+formula; it is a *generative story*: population $\to$ subpopulation $\to$ individual.
+
+**Inference is the same hierarchy, run backwards.** Given an observed $x$, Bayes'
+rule gives the posterior over the hidden coin:
+
+$$
+\mathbb{P}(z = 1 \mid x)
+= \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
+       {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
+$$
+
+For $\mu_{1,2} = \mp 1$ and $\pi = \tfrac12$ this is the sigmoid from W01, and the
+posterior mean of $\mu_z$ is the tanh denoiser: **W01's denoising step was latent-variable
+inference all along.** Generation and inference are the two directions of one arrow.
+
+### View 2: the coin disappears into a map
+
+**Theorem (inverse-CDF / probability integral transform).** Let $F$ be a CDF with
+generalized inverse $F^{-1}(u) = \inf\{x : F(x) \ge u\}$, and let
+$U \sim \text{Uniform}(0,1)$. Then $X = F^{-1}(U)$ has CDF $F$.
+
+*Proof.* $\mathbb{P}(F^{-1}(U) \le x) = \mathbb{P}(U \le F(x)) = F(x)$, since
+$F^{-1}(u) \le x \iff u \le F(x)$ by monotonicity. $\square$
+
+For our mixture, $F(x) = \pi\,\Phi\!\big(\tfrac{x-\mu_1}{\sigma}\big) +
+(1-\pi)\,\Phi\!\big(\tfrac{x-\mu_2}{\sigma}\big)$ is continuous and strictly
+increasing, so $F^{-1}$ is an honest function, and
+
+$$
+u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
+$$
+
+generates the mixture **with no coin anywhere**. Where did the coin go? Into the
+uniform: since $F(x) \le \pi$ precisely on the lower component's territory, the event
+$u < \pi$ *is* the event $z = 1$. One uniform number carries both the component choice
+and the position within the component — randomness in, structure out, everything in
+between deterministic.
+
+### The two-point limit
+
+Send $\sigma \to 0$ with $\mu_{1,2} = \mp 1$. The CDF collapses to a staircase: a jump
+of height $\pi$ at $-1$, a flat **plateau** at height $\pi$ across the empty middle, a
+jump to $1$ at $+1$. The map becomes
+
+$$
+x = \begin{cases} -1, & u < \pi \\ +1, & u > \pi \end{cases}
+\qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
+$$
+
+W01's dataset, generated by thresholding a uniform. The plateau is the geometric image
+of the empty region: no value of $u$ lands there. (In the demo, slide $\sigma$ down
+and watch the staircase form.)
+
+### Maps are not unique
+
+$F^{-1}$ is the *monotone* map pushing $\text{Uniform}(0,1)$ to $p$, but not the only
+map. The "packed" two-stage construction
+
+$$
+x = \begin{cases}
+\mu_1 + \sigma\, \Phi^{-1}\!\big(u/\pi\big), & u < \pi,\\[2pt]
+\mu_2 + \sigma\, \Phi^{-1}\!\big(\tfrac{u-\pi}{1-\pi}\big), & u \ge \pi,
+\end{cases}
+$$
+
+also pushes uniform to the mixture (each branch rescales its segment of $[0,1]$ back
+to a full uniform — Exercise 3), and it is *literally* ancestral sampling written as
+one formula. Different map, same distribution: what is canonical is the
+*distribution*, not the transport. (In higher dimensions, choosing among the many
+maps is its own subject — optimal transport — which we will brush against later.)
+
+### The claim that organizes everything
+
+> **A generative model is a deterministic map applied to simple randomness.**
+
+| Model | Simple noise | The map | How obtained |
+|---|---|---|---|
+| This note | $u \sim \text{U}(0,1)$ | $F^{-1}$, analytic | the density is known |
+| GAN | $z \sim \mathcal{N}(0, I)$ | neural network | adversarial training |
+| VAE | $z \sim \mathcal{N}(0, I)$ | neural network | variational inference |
+| Normalizing flow | $z \sim \mathcal{N}(0, I)$ | invertible network | exact likelihood |
+| **Diffusion** | $z \sim \mathcal{N}(0, I)$ | **reverse ODE/SDE** | **learned denoiser** |
+
+: {tbl-colwidths="[22,20,26,32]"}
+
+In one dimension with a known density, the map is a formula. For images, neither the
+density nor the CDF exists in usable form — so deep generative models *learn* the map.
+And you have already run one: W01's probability-flow ODE deterministically transported
+$\mathcal{N}(0, 1+\sigma_{\max}^2)$ to the two-point data — an $F^{-1}$ built not from
+the CDF but from the **score**, which is exactly the object a neural network can learn
+in high dimension. That construction, done properly, is Modules 4–6.
+
+### Exercises
+
+1. Complete the inverse-CDF proof for a general (possibly non-strictly-increasing)
+   $F$ using the generalized inverse.
+2. Derive $\mathbb{P}(z = 1 \mid x)$ above and show that for $\mu_{1,2} = \mp 1$,
+   $\sigma = 1$, $\pi = \tfrac12$ it reduces to W01's
+   $\operatorname{sigmoid}(2x)$-type posterior; compute the posterior mean of
+   $\mu_z$.
+3. Verify the packed map: show that conditional on $u < \pi$, the rescaled variable
+   $u/\pi$ is $\text{Uniform}(0,1)$, and conclude that the branch produces
+   $\mathcal{N}(\mu_1, \sigma^2)$ with the correct probability.
+4. Construct the inverse-CDF map for a **three**-component mixture and describe its
+   staircase limit as $\sigma \to 0$. How many plateaus, at what heights?
+5. The map $x = F^{-1}(u)$ is monotone increasing. Exhibit a *decreasing* map with
+   the same pushforward, and a map that is neither monotone nor continuous. (Hint:
+   $1 - u$ is also uniform.)
 
 ## After Class
 

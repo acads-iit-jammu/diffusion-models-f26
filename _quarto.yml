@@ -4,12 +4,14 @@ project:
   resources:
     - materials/two-point-diffusion-demo.html
     - materials/one-point-noise-demo.html
-    - materials/w01-slides-mechanics.html
-    - materials/w01-slides-mechanics_files/**
-    - materials/w01-slides-motivation.html
-    - materials/w01-slides-motivation_files/**
-    - materials/w01-slides-toy.html
-    - materials/w01-slides-toy_files/**
+    - materials/w01-deck-01-mechanics.html
+    - materials/w01-deck-02-motivation.html
+    - materials/w01-deck-03-toy-example.html
+    - materials/w02-deck-01-distributions-mle.html
+    - materials/w02-deck-02-genai-maps.html
+    - materials/distributions-playground.html
+    - materials/likelihood-lens.html
+    - materials/sampling-as-a-map.html
     - materials/img/**
 
 book:
@@ -55,9 +57,6 @@ book:
         - weeks/w16.qmd
         - weeks/w17.qmd
     - resources.qmd
-
-  appendices:
-    - materials/two-point-diffusion.qmd
 
 format:
   html:

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W02 · Deck 01 · Distributions and Maximum Likelihood · ID-5-02 (TO) · IIT Jammu</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#003f87; --blue-dark:#002d63; --blue-mid:#0056b8; --blue-sky:#4da3ff; --blue-pale:#eaf3ff;
+    --ink:#22262a; --star:#f4b400;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#0b1e3a;font-family:Roboto,system-ui,sans-serif;color:var(--ink)}
+  #root{height:100%}
+  .deck{height:100%;display:flex;flex-direction:column;overflow:hidden}
+  .slide{flex:1;display:flex;flex-direction:column;justify-content:center;padding:5vh 8vw;
+         background:#fff;overflow:auto}
+  .slide.title{background:linear-gradient(160deg,var(--blue-dark) 0%,var(--blue) 70%,var(--blue-mid) 100%);color:#fff}
+  .slide.accent{background:linear-gradient(160deg,#f6faff,var(--blue-pale))}
+  h1{font-family:"Roboto Slab",serif;font-size:clamp(1.8rem,4.5vw,3.2rem);margin:.2em 0;line-height:1.15}
+  h2{font-family:"Roboto Slab",serif;font-size:clamp(1.4rem,3vw,2.2rem);color:var(--blue-dark);margin:.2em 0 .6em;
+     border-bottom:3px solid var(--blue-pale);padding-bottom:.25em}
+  .title h2{color:#cfe3ff;border:none;font-weight:400;font-size:clamp(1rem,2vw,1.5rem)}
+  .kicker{font-size:clamp(.8rem,1.4vw,1rem);letter-spacing:.14em;text-transform:uppercase;color:var(--blue-sky)}
+  p,li{font-size:clamp(1rem,1.9vw,1.35rem);line-height:1.55}
+  li{margin:.35em 0}
+  .big{font-size:clamp(1.3rem,2.6vw,1.9rem);font-weight:500;color:var(--blue-dark)}
+  table{border-collapse:collapse;font-size:clamp(.95rem,1.7vw,1.25rem);margin:.4em 0;width:100%}
+  th{background:var(--blue);color:#fff;text-align:left}
+  th,td{border:1px solid #cfdcec;padding:.35em .7em}
+  tr:nth-child(even) td{background:#f4f8fd}
+  code,.mono{font-family:"Roboto Mono",monospace;color:var(--blue-mid)}
+  .cols{display:flex;gap:4vw;flex-wrap:wrap}
+  .cols>div{flex:1;min-width:260px}
+  .note{background:var(--blue-pale);border-left:5px solid var(--blue);padding:.5em 1em;border-radius:0 8px 8px 0;
+        font-size:clamp(.95rem,1.7vw,1.2rem)}
+  .quote{font-family:"Roboto Slab",serif;font-size:clamp(1.4rem,3.4vw,2.4rem);color:var(--blue-dark);
+         text-align:center;line-height:1.4;margin:auto 0}
+  .quote small{display:block;font-family:Roboto,sans-serif;font-size:.55em;color:#667;margin-top:1em}
+  /* chrome */
+  .bar{height:5px;background:#12305c}
+  .bar>div{height:100%;background:var(--blue-sky);transition:width .25s}
+  .foot{display:flex;justify-content:space-between;align-items:center;background:#0b1e3a;color:#8fb4e8;
+        font-size:.75rem;padding:6px 14px;font-family:"Roboto Mono",monospace}
+  .foot b{color:#cfe3ff;font-weight:500}
+  .navhint{opacity:.7}
+  .clickzone{position:fixed;top:0;bottom:30px;width:18vw;cursor:pointer;z-index:5}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+"use strict";
+const e = React.createElement;
+const F = React.Fragment;
+
+/* ---------- content ---------- */
+const li = (...items)=> e("ul",null, ...items.map(t=> e("li",{dangerouslySetInnerHTML:{__html:t}})));
+const html = (tag,s)=> e(tag,{dangerouslySetInnerHTML:{__html:s}});
+const table = (head,rows)=> e("table",null,
+  e("thead",null, e("tr",null, ...head.map(hh=>e("th",null,hh)))),
+  e("tbody",null, ...rows.map(r=> e("tr",null, ...r.map(c=> html("td",c))))));
+
+const SLIDES = [
+
+{cls:"title", body:()=> e(F,null,
+  e("div",{className:"kicker"},"ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"),
+  e("h1",null,"Distributions and Maximum Likelihood"),
+  e("h2",null,"W02 · Part 1 — see it, sample it, fit it, sample from the fit"),
+  e("p",{style:{marginTop:"2em",color:"#cfe3ff"}},"Uma Satyaranjan · Soma S Dhavala"),
+  e("p",{style:{color:"#8fb4e8",fontSize:"1rem"}},"→ arrow keys or click the right edge to advance"))},
+
+{title:"Where we are", body:()=> e(F,null,
+  li("W01: a generative model <b>produces samples</b> — and we saw a complete one on two data points",
+     "The loop of this module: <b>distribution → samples → fitted distribution → new samples</b>",
+     "Today we make the word <b>fit</b> precise: maximum likelihood"),
+  html("div",'<div class="note">Tomorrow: KL divergence (how wrong is a fit?). Wednesday: empirical risk minimization.</div>'))},
+
+{title:"The cast of distributions", body:()=> e(F,null,
+  table(["Family","Support","Knobs","Natural habitat"],[
+    ["Uniform(a, b)","[a, b]","endpoints","total ignorance on an interval"],
+    ["Normal(μ, σ²)","ℝ","center, width","noise, sums of small effects"],
+    ["Gamma(k, θ)","(0, ∞)","shape, scale","waiting times, positive skew"],
+    ["Beta(α, β)","(0, 1)","two shapes","proportions, probabilities"],
+    ["Mixture","ℝ","weights + components","multimodal data — clusters"]]),
+  html("p",'Five shapes cover most of what this course needs — and the mixture is the star of the semester.'))},
+
+{title:"Playground: see it, sample it, fit it", body:()=> e(F,null,
+  html("div",'<iframe src="./distributions-playground.html" style="width:100%;height:62vh;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="Distribution playground"></iframe>'))},
+
+{title:"What the histogram is telling you", body:()=> e(F,null,
+  li("Density-normalized histogram → as n grows it <b>hugs the pdf</b>: samples carry the distribution",
+     "n = 30 is ragged, n = 3000 is faithful — <i>estimation error shrinks like 1/√n</i> (Module 1 will say this properly)",
+     "Fitting = choosing the family member that makes the observed samples <b>most probable</b>"))},
+
+{title:"PDF vs likelihood — the confusion, dissolved", body:()=> e(F,null,
+  html("div",'<iframe src="./likelihood-lens.html" style="width:100%;height:62vh;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="Likelihood lens"></iframe>'))},
+
+{title:"One function, two readings", body:()=> e(F,null,
+  html("p",'<span class="big" style="display:block;text-align:center">f(x; θ)</span>'),
+  table(["Fix","Vary","You get","Area under curve"],[
+    ["parameters θ","data x","<b>pdf</b> — a distribution over data","= 1, always"],
+    ["observed data x","parameters θ","<b>likelihood</b> — a score for fitting","meaningless"]]),
+  html("div",'<div class="note">The likelihood is <b>not</b> a probability distribution over θ. Only its argmax — and its shape near the argmax — carries information.</div>'))},
+
+{title:"Likelihood of a dataset", body:()=> e(F,null,
+  html("p",'Independent observations multiply; logs turn products into sums:'),
+  html("p",'<span class="big" style="display:block;text-align:center">L(θ) = ∏<sub>i</sub> f(x<sub>i</sub>; θ) &nbsp;&nbsp;⟶&nbsp;&nbsp; ℓ(θ) = Σ<sub>i</sub> log f(x<sub>i</sub>; θ)</span>'),
+  li("The log changes nothing about <i>where</i> the maximum is (log is monotone)",
+     "…and everything about how pleasant the algebra is",
+     "Numerically: products of 3000 small numbers underflow; sums of logs do not"))},
+
+{title:"To the board: the Gaussian MLE", body:()=> e(F,null,
+  html("p",'Maximize &nbsp;<span class="mono">ℓ(μ, σ²) = −(n/2) log(2πσ²) − Σ(x<sub>i</sub>−μ)²/(2σ²)</span>'),
+  li("∂ℓ/∂μ = 0 &nbsp;⟹&nbsp; <b>μ̂ = x̄</b> (the sample mean — for every σ)",
+     "∂ℓ/∂σ² = 0 &nbsp;⟹&nbsp; <b>σ̂² = (1/n) Σ (x<sub>i</sub> − x̄)²</b>"),
+  html("div",'<div class="note">Derivation on the board now — it is tonight’s Exercise if you want to redo it alone. Note the divisor n, not n−1: the MLE is (slightly) biased.</div>'))},
+
+{title:"Honesty about the other families", body:()=> e(F,null,
+  table(["Family","How we fit it","Why"],[
+    ["Normal","maximum likelihood","closed form — you just derived it"],
+    ["Uniform","maximum likelihood","closed form: â = min, b̂ = max (cute proof — exercise)"],
+    ["Gamma","<b>method of moments</b>","MLE has <i>no closed form</i>: match x̄ and s² instead"],
+    ["Beta","<b>method of moments</b>","same story"],
+    ["Mixture","…?","stay tuned — this one needs real machinery (EM, later)"]]),
+  html("p",'Method of moments: set the family’s mean and variance equal to the sample’s. Simple, honest, and a good estimator to know by itself.'))},
+
+{title:"The trap: right method, wrong family", body:()=> e(F,null,
+  li("In the playground: mixture data, 3000 samples, press Fit",
+     "The single best Normal — by <i>maximum likelihood, done perfectly</i> — puts its peak <b>where the data is emptiest</b>",
+     "Fitting well within the wrong family is still wrong"),
+  html("div",'<div class="note">Needed: a way to <b>measure</b> the gap between the data distribution and the model. That measure is KL divergence — tomorrow.</div>'))},
+
+{cls:"accent", body:()=> e(F,null,
+  e("div",{className:"quote"},"The pdf and the likelihood are the same curve — you just walk along it in different directions.",
+    e("small",null,"Tonight: derive σ̂², prove Uniform’s MLE is (min, max), and play the mixture trap yourself.")))},
+
+];
+
+/* ---------- deck engine ---------- */
+function Deck(){
+  const [i,setI] = React.useState(()=>{
+    const n=parseInt(location.hash.slice(1)); return Number.isInteger(n)&&n>=0&&n<SLIDES.length? n:0; });
+  const go = React.useCallback(d=>{
+    setI(cur=>{ const n=Math.min(SLIDES.length-1, Math.max(0, cur+d)); location.hash="#"+n; return n; });
+  },[]);
+  React.useEffect(()=>{
+    const k=ev=>{ if(["ArrowRight","PageDown"," "].includes(ev.key)) go(1);
+                  else if(["ArrowLeft","PageUp"].includes(ev.key)) go(-1);
+                  else if(ev.key==="Home"){ setI(0); location.hash="#0"; } };
+    window.addEventListener("keydown",k); return ()=>window.removeEventListener("keydown",k);
+  },[go]);
+  const s=SLIDES[i];
+  return e("div",{className:"deck"},
+    e("div",{className:"clickzone",style:{left:0},onClick:()=>go(-1)}),
+    e("div",{className:"clickzone",style:{right:0},onClick:()=>go(1)}),
+    e("div",{className:"slide "+(s.cls||"")},
+      s.title? e("h2",null,s.title):null,
+      s.body()),
+    e("div",{className:"bar"}, e("div",{style:{width:((i+1)/SLIDES.length*100)+"%"}})),
+    e("div",{className:"foot"},
+      e("span",null, e("b",null,"ID-5-02 (TO)")," · W02 · Deck 01 · Distributions & MLE"),
+      e("span",{className:"navhint"},"← → to navigate"),
+      e("span",null, (i+1)+" / "+SLIDES.length)));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(e(Deck));
+</script>
+</body>
+</html>
