@@ -22,7 +22,11 @@
 
 <iframe src="../materials/w02-deck-02-genai-maps.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 2: generative AI in its simplest form"></iframe>
 
-**Companion notes** — Notes 0 (probability refresher), I, and II, below on this page.
+*Part 3 — The Map, Proved* ([open fullscreen](../materials/w02-deck-03-map-limit.html){target="_blank"}):
+
+<iframe src="../materials/w02-deck-03-map-limit.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 3: the map, proved"></iframe>
+
+**Companion notes** — Notes 0 (probability refresher), I, II, and III, below on this page.
 
 **Interactive demos**
 
@@ -402,6 +406,61 @@ divisor $n$: the MLE of the variance is *biased* — $\mathbb{E}[\hat\sigma^2] =
 \frac{n-1}{n}\sigma^2$ — which is where the familiar $n-1$ estimator comes from. For
 this course the distinction is a footnote; the MLE is what the theory produces.
 
+### Aside: binary cross-entropy is a likelihood
+
+The most familiar loss in machine learning is a maximum-likelihood problem in
+disguise, and the disguise falls away the moment classification is read as a
+(conditional) generative model.
+
+**The model.** For the $i$-th sample with features $x_i$, model the binary label as
+a Bernoulli trial,
+
+$$
+y_i \mid x_i \;\sim\; \text{Bernoulli}(\pi_i), \qquad y_i \in \{0, 1\},
+$$
+
+and let a neural network supply the **logit** — the log-*odds*, not the
+log-probability:
+
+$$
+s_i = f_\theta(x_i) = \log \frac{\pi_i}{1 - \pi_i}
+\quad\Longleftrightarrow\quad
+\pi_i = \operatorname{sigmoid}(s_i).
+$$
+
+**The likelihood.** The Bernoulli pmf can be written in one line as
+$p(y \mid \pi) = \pi^{y} (1-\pi)^{1-y}$, so for independent samples
+
+$$
+L(\theta) = \prod_{i=1}^n \pi_i^{\,y_i} (1 - \pi_i)^{1 - y_i},
+\qquad
+-\ell(\theta) = -\sum_{i=1}^n \Big[ y_i \log \pi_i + (1 - y_i)\log(1 - \pi_i) \Big].
+$$
+
+The right-hand side is **exactly binary cross-entropy**. Training a classifier with
+BCE is maximum likelihood for a conditional Bernoulli model whose log-odds are the
+network output — nothing more. (The name is also earned: $-\ell/n$ is the
+cross-entropy between the empirical distribution of each label and the model's
+Bernoulli.)
+
+**The $\pm 1$ convention.** With labels $y_i \in \{-1, +1\}$, the identity
+$\operatorname{sigmoid}(-s) = 1 - \operatorname{sigmoid}(s)$ collapses both cases
+into $p(y_i \mid s_i) = \operatorname{sigmoid}(y_i s_i)$, and the negative
+log-likelihood becomes the **logistic loss**,
+
+$$
+-\ell(\theta) = \sum_{i=1}^n \log\!\big(1 + e^{-y_i s_i}\big)
+$$
+
+— the same objective, rewritten.
+
+**The connection to this course.** W01's latent posterior
+$\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)$ is precisely this
+model with logit $s(x) = 2x/\sigma^2$: the optimal classifier of the hidden
+component is a Bernoulli model whose log-odds are linear in the observation.
+Classification, denoising, and latent inference are all the same likelihood
+computation wearing different clothes.
+
 ### Fitting the other families — honestly
 
 - **Uniform.** The likelihood is $(b-a)^{-n}$ if all points lie in $[a,b]$ and $0$
@@ -451,7 +510,12 @@ divergence, and its identity with maximum likelihood — is the next lecture.
    known, sketch the likelihood in $\mu$. Now hold $\mu$ known and sketch the
    likelihood in $\sigma$ — is it bell-shaped? Symmetric? (This kills the "likelihood
    looks like a pdf" illusion outside the Gaussian-mean case.)
-5. For a mixture $\sum_i \pi_i f_i$ with component means $\mu_i$ and variances
+5. **BCE gradient.** For the Bernoulli model of the aside with a linear logit
+   $s_i = \theta^\top x_i$, show that
+   $\nabla_\theta(-\ell) = \sum_i (\pi_i - y_i)\, x_i$ — prediction error times
+   input, the cleanest gradient in machine learning. Verify that the $\pm 1$
+   logistic form gives the same gradient.
+6. For a mixture $\sum_i \pi_i f_i$ with component means $\mu_i$ and variances
    $\sigma_i^2$, show
    $\operatorname{Var}(X) = \sum_i \pi_i \sigma_i^2 + \sum_i \pi_i (\mu_i - \bar\mu)^2$
    with $\bar\mu = \sum_i \pi_i \mu_i$ — within-component plus between-component
@@ -465,18 +529,17 @@ divergence, and its identity with maximum likelihood — is the next lecture.
 
 This note presents the same tiny generator twice — first as a **hierarchy you sample
 conditionally** (a Bayesian model), then as a **deterministic map applied to uniform
-randomness** — and then makes the claim that carries the rest of the course: every
-modern generative model, diffusion included, is the second picture with a *learned*
-map.
+randomness** — and then makes the claim that carries the rest of the course: every modern
+generative sampler, diffusion included, is the second picture — once all of its
+random inputs are exposed — with a learned ingredient in place of the formula.
 
 ### View 1: conditional generation (a hierarchical model)
 
 The simplest latent-variable model:
 
 $$
-z \sim \text{Bernoulli}(\pi), \qquad
-x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2),
-\qquad z \in \{1, 2\}.
+\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
+x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
 $$
 
 **Ancestral sampling** generates by following the arrows: draw the latent coin $z$,
@@ -500,9 +563,12 @@ $$
        {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
 $$
 
-For $\mu_{1,2} = \mp 1$ and $\pi = \tfrac12$ this is the sigmoid from W01, and the
-posterior mean of $\mu_z$ is the tanh denoiser: **W01's denoising step was latent-variable
-inference all along.** Generation and inference are the two directions of one arrow.
+For $\mu_{1,2} = \mp 1$ and $\pi = \tfrac12$ this equals
+$\operatorname{sigmoid}(-2x/\sigma^2)$; its companion
+$\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)$ is exactly the
+posterior W01 computed for the $+1$ component, and the posterior mean of $\mu_z$ is
+the tanh denoiser: **W01's denoising step was latent-variable inference all along.**
+Generation and inference are the two directions of one arrow.
 
 ### View 2: the coin disappears into a map
 
@@ -521,11 +587,14 @@ $$
 u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
 $$
 
-generates the mixture **with no coin anywhere**. Where did the coin go? Into the
-uniform: since $F(x) \le \pi$ precisely on the lower component's territory, the event
-$u < \pi$ *is* the event $z = 1$. One uniform number carries both the component choice
-and the position within the component — randomness in, structure out, everything in
-between deterministic.
+generates the mixture **with no coin anywhere** — the explicit coin has been
+marginalized out. One caution about where it went: under this map, the event
+$u < \pi$ selects the lowest $\pi$-fraction of the *mixture* distribution, which is
+**not** the same as the ancestral label $z = 1$ when the components overlap — both
+Gaussians have full support, so each contributes on both sides of any quantile. (In
+the well-separated limit $\sigma \to 0$ the two events do coincide, and the *packed*
+map below is the construction in which $u < \pi$ genuinely encodes the coin.)
+Randomness in, structure out, everything in between deterministic.
 
 ### The two-point limit
 
@@ -538,8 +607,9 @@ x = \begin{cases} -1, & u < \pi \\ +1, & u > \pi \end{cases}
 \qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
 $$
 
-W01's dataset, generated by thresholding a uniform. The plateau is the geometric image
-of the empty region: no value of $u$ lands there. (In the demo, slide $\sigma$ down
+W01's dataset, generated by thresholding a uniform (almost surely: the single point
+$u = \pi$ has probability zero). The plateau is the geometric image of the empty
+region: no value of $u$ lands there. Notes III proves this limit. (In the demo, slide $\sigma$ down
 and watch the staircase form.)
 
 ### Maps are not unique
@@ -562,32 +632,44 @@ maps is its own subject — optimal transport — which we will brush against la
 
 ### The claim that organizes everything
 
-> **A generative model is a deterministic map applied to simple randomness.**
+> **Once all of its random draws are exposed, a generative sampler is a
+> deterministic map from base randomness to a sample.**
 
-| Model | Simple noise | The map | How obtained |
+| Model | Random input(s) | Sampling mechanism | Typical fitting |
 |---|---|---|---|
-| This note | $u \sim \text{U}(0,1)$ | $F^{-1}$, analytic | the density is known |
-| GAN | $z \sim \mathcal{N}(0, I)$ | neural network | adversarial training |
-| VAE | $z \sim \mathcal{N}(0, I)$ | neural network | variational inference |
-| Normalizing flow | $z \sim \mathcal{N}(0, I)$ | invertible network | exact likelihood |
-| **Diffusion** | $z \sim \mathcal{N}(0, I)$ | **reverse ODE/SDE** | **learned denoiser** |
+| This note | $u \sim \text{U}(0,1)$ | quantile $F^{-1}(u)$ (numerical in the demo) | the CDF is known |
+| GAN | $z \sim \mathcal{N}(0, I)$ | $G_\theta(z)$, a network | adversarial objective |
+| VAE | $z$, plus decoder noise $\varepsilon$ | sample $p_\theta(x \mid z)$, i.e. $T_\theta(z, \varepsilon)$ | ELBO / variational learning |
+| Normalizing flow | $z \sim \mathcal{N}(0, I)$ | invertible $f_\theta(z)$ | exact likelihood (change of variables) |
+| **Diffusion** | $x_T \sim \mathcal{N}$; step noise if stochastic | **probability-flow ODE** (deterministic) or reverse SDE | **score/denoising objectives, ELBO** |
 
-: {tbl-colwidths="[22,20,26,32]"}
+: {tbl-colwidths="[18,24,32,26]"}
 
-In one dimension with a known density, the map is a formula. For images, neither the
-density nor the CDF exists in usable form — so deep generative models *learn* the map.
-And you have already run one: W01's probability-flow ODE deterministically transported
-$\mathcal{N}(0, 1+\sigma_{\max}^2)$ to the two-point data — an $F^{-1}$ built not from
-the CDF but from the **score**, which is exactly the object a neural network can learn
-in high dimension. That construction, done properly, is Modules 4–6.
+The outer skeleton is shared — simple randomness, a sampling mechanism, data — while
+the learned object, the structural constraints, and the sampler differ. For diffusion
+in particular, determinism is a *sampler choice*: the probability-flow ODE is a
+deterministic map from $x_T$; the reverse SDE consumes fresh noise at every step and
+is a deterministic function only of $(x_T, \text{all step noises})$.
+
+In one dimension with a known CDF, the map is a formula. For images, the population
+law is unknown and no tractable multivariate inverse-CDF construction exists — so deep
+generative models learn a *transport, density, score, or other ingredient* of a
+sampler rather than writing the map down. And you have already run one: W01's
+probability-flow ODE numerically transported a moment-matched Gaussian to within
+$\approx \sigma_{\min}$ of the two-point data (W01 lists the approximations
+involved); with the exact terminal law, score, and integration, it is an exact
+deterministic transport — an inverse-CDF-like map built not from the CDF but from the
+**score**, which is exactly the object a neural network can learn in high dimension.
+That construction, done properly, is Modules 4–6.
 
 ### Exercises
 
 1. Complete the inverse-CDF proof for a general (possibly non-strictly-increasing)
    $F$ using the generalized inverse.
-2. Derive $\mathbb{P}(z = 1 \mid x)$ above and show that for $\mu_{1,2} = \mp 1$,
-   $\sigma = 1$, $\pi = \tfrac12$ it reduces to W01's
-   $\operatorname{sigmoid}(2x)$-type posterior; compute the posterior mean of
+2. Derive $\mathbb{P}(z = 1 \mid x)$ above, and show that for
+   $\mu_{1,2} = \mp 1$, $\sigma = 1$, $\pi = \tfrac12$ its companion
+   $\mathbb{P}(z = 2 \mid x)$ equals W01's $\operatorname{sigmoid}(2x)$ posterior
+   (mind which component carries the $+$ sign); compute the posterior mean of
    $\mu_z$.
 3. Verify the packed map: show that conditional on $u < \pi$, the rescaled variable
    $u/\pi$ is $\text{Uniform}(0,1)$, and conclude that the branch produces
@@ -597,6 +679,313 @@ in high dimension. That construction, done properly, is Modules 4–6.
 5. The map $x = F^{-1}(u)$ is monotone increasing. Exhibit a *decreasing* map with
    the same pushforward, and a map that is neither monotone nor continuous. (Hint:
    $1 - u$ is also uniform.)
+
+## Notes III: The Deterministic Map, Proved
+
+*Companion note to W02, lecture 3. Notes II asserted that sampling can be realized as
+a deterministic map applied to uniform randomness, and the demo showed the map
+degenerating into a staircase. This section proves both statements for the symmetric
+two-component mixture, in full.*
+
+### Setting
+
+Fix $\sigma > 0$ and consider the target family of Notes II with $\pi = \tfrac12$ and
+$\mu = \pm 1$:
+
+$$
+p_\sigma(x) = \tfrac12\,\mathcal{N}(x; -1, \sigma^2) + \tfrac12\,\mathcal{N}(x; +1, \sigma^2),
+\qquad
+F_\sigma(x) = \tfrac12\,\Phi\!\Big(\frac{x+1}{\sigma}\Big) + \tfrac12\,\Phi\!\Big(\frac{x-1}{\sigma}\Big),
+$$
+
+where $\Phi$ is the standard normal CDF. Two statements are to be proved:
+
+1. There exists a smooth, strictly increasing map $T_\sigma$ with
+   $T_\sigma(U) \sim p_\sigma$ for $U \sim \text{Uniform}(0,1)$.
+2. As $\sigma \downarrow 0$, $T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)$ for
+   every fixed $u \in (0,1) \setminus \{\tfrac12\}$ — the generator of W01's
+   two-point dataset.
+
+### Theorem 1 (probability integral transform)
+
+**Theorem.** Let $F$ be a continuous, strictly increasing CDF mapping $\mathbb{R}$
+onto $(0,1)$, and let $U \sim \text{Uniform}(0,1)$. Then $X = F^{-1}(U)$ has CDF $F$.
+
+*Proof.* Monotonicity of $F$ gives the equivalence
+$F^{-1}(u) \le x \iff u \le F(x)$. Hence
+
+$$
+\mathbb{P}\big(F^{-1}(U) \le x\big) = \mathbb{P}\big(U \le F(x)\big) = F(x). \qquad\square
+$$
+
+(For CDFs that are not strictly increasing or not continuous, the same conclusion
+holds with the generalized inverse $F^{-1}(u) = \inf\{x : F(x) \ge u\}$; Exercise 1.)
+
+### Proposition 2 (existence and smoothness of the map)
+
+**Proposition.** $F_\sigma$ is a smooth, strictly increasing bijection of
+$\mathbb{R}$ onto $(0,1)$. Consequently $T_\sigma := F_\sigma^{-1}$ exists, is
+smooth, and satisfies
+
+$$
+T_\sigma'(u) \;=\; \frac{1}{p_\sigma\big(T_\sigma(u)\big)} \;>\; 0 .
+$$
+
+*Proof.* $F_\sigma' = p_\sigma$, which is everywhere positive; hence $F_\sigma$ is
+strictly increasing. Both $\Phi$ terms tend to $0$ as $x \to -\infty$ and to $1$ as
+$x \to +\infty$, so $F_\sigma$ maps onto $(0,1)$ and is a bijection. Smoothness of
+$T_\sigma$ and the derivative formula follow from the inverse function theorem.
+$\square$
+
+The derivative formula deserves a comment: $T_\sigma$ is *steepest exactly where the
+density is smallest*. The plateau of $F_\sigma$ over the empty region between the
+bumps is, after inversion, the near-vertical segment of $T_\sigma$ — the staircase
+visible in the demo is this formula, not an artifact.
+
+### Lemma 3 (symmetry)
+
+**Lemma.** $F_\sigma(-x) = 1 - F_\sigma(x)$ for all $x$; consequently
+$T_\sigma(1-u) = -T_\sigma(u)$ for all $u \in (0,1)$, and $T_\sigma(\tfrac12) = 0$.
+
+*Proof.* Using $\Phi(-t) = 1 - \Phi(t)$ on each term,
+
+$$
+F_\sigma(-x)
+= \tfrac12\,\Phi\!\Big(\frac{1-x}{\sigma}\Big) + \tfrac12\,\Phi\!\Big(\frac{-1-x}{\sigma}\Big)
+= \tfrac12\Big[1 - \Phi\!\Big(\frac{x-1}{\sigma}\Big)\Big]
++ \tfrac12\Big[1 - \Phi\!\Big(\frac{x+1}{\sigma}\Big)\Big]
+= 1 - F_\sigma(x).
+$$
+
+Applying $T_\sigma$ to both sides of $F_\sigma(-x) = 1 - F_\sigma(x)$ with
+$u = F_\sigma(x)$ yields $T_\sigma(1-u) = -T_\sigma(u)$; setting $u = \tfrac12$
+gives $T_\sigma(\tfrac12) = -T_\sigma(\tfrac12) = 0$. $\square$
+
+By the lemma, it suffices to analyze $u < \tfrac12$.
+
+### Theorem 4 (the limit is the sign function)
+
+**Theorem.** For every fixed $u \in (0,1)$ with $u \ne \tfrac12$,
+
+$$
+\lim_{\sigma \downarrow 0} T_\sigma(u) \;=\; \operatorname{sign}\big(u - \tfrac12\big).
+$$
+
+*Proof.* By Lemma 3 it suffices to treat $u < \tfrac12$ and show
+$T_\sigma(u) \to -1$. Fix $\varepsilon \in (0,1)$. Evaluate $F_\sigma$ at the two
+points $-1 \pm \varepsilon$ and let $\sigma \downarrow 0$:
+
+$$
+F_\sigma(-1+\varepsilon)
+= \tfrac12\,\Phi\!\Big(\frac{\varepsilon}{\sigma}\Big)
++ \tfrac12\,\Phi\!\Big(\frac{\varepsilon - 2}{\sigma}\Big)
+\;\longrightarrow\; \tfrac12 \cdot 1 + \tfrac12 \cdot 0 = \tfrac12,
+$$
+
+since $\varepsilon > 0$ and $\varepsilon - 2 < 0$. Because $u < \tfrac12$, there is a
+$\sigma_1 > 0$ with $F_\sigma(-1+\varepsilon) > u$ for all $\sigma < \sigma_1$; by
+strict monotonicity of $F_\sigma$ this gives $T_\sigma(u) < -1 + \varepsilon$.
+Similarly,
+
+$$
+F_\sigma(-1-\varepsilon)
+= \tfrac12\,\Phi\!\Big(\frac{-\varepsilon}{\sigma}\Big)
++ \tfrac12\,\Phi\!\Big(\frac{-2-\varepsilon}{\sigma}\Big)
+\;\longrightarrow\; 0,
+$$
+
+so there is a $\sigma_2 > 0$ with $F_\sigma(-1-\varepsilon) < u$ for
+$\sigma < \sigma_2$, whence $T_\sigma(u) > -1 - \varepsilon$. For
+$\sigma < \min(\sigma_1, \sigma_2)$ we conclude
+$|T_\sigma(u) - (-1)| < \varepsilon$. $\square$
+
+At the single point $u = \tfrac12$, Lemma 3 gives $T_\sigma(\tfrac12) = 0$ for every
+$\sigma$; since $\mathbb{P}(U = \tfrac12) = 0$, this point is irrelevant to the
+distributional statement below.
+
+### Corollary 5 (modes of convergence)
+
+Let $S(u) = \operatorname{sign}(u - \tfrac12)$. Theorem 4 states
+$T_\sigma(U) \to S(U)$ **almost surely**. Almost-sure convergence implies
+convergence in distribution, and $S(U)$ takes the values $\pm 1$ with probability
+$\tfrac12$ each; hence
+
+$$
+p_\sigma \;\Longrightarrow\; \tfrac12\,\delta_{-1} + \tfrac12\,\delta_{+1}
+\qquad (\sigma \downarrow 0),
+$$
+
+recovering W01's two-point data distribution as the weak limit of the mixtures. The
+discrete generator $x = S(u)$ — thresholding a uniform — is thereby exhibited as the
+pointwise limit of smooth generators.
+
+### The quantitative picture: how the stairs form
+
+Two refinements sharpen the qualitative theorem.
+
+**The shape of each stair.** Fix $u < \tfrac12$ and write $x = T_\sigma(u)$, which
+by Theorem 4 lies near $-1$ for small $\sigma$; in particular $x \le 0$ eventually,
+so the far component satisfies
+$0 < \tfrac12\Phi\big(\tfrac{x-1}{\sigma}\big) \le \tfrac12\Phi(-1/\sigma)$,
+exponentially small. From $u = F_\sigma(x)$,
+
+$$
+\Phi\!\Big(\frac{x+1}{\sigma}\Big) = 2u - 2\eta_\sigma,
+\qquad 0 < \eta_\sigma \le \tfrac12\,\Phi(-1/\sigma),
+$$
+
+and therefore
+
+$$
+T_\sigma(u) \;=\; -1 + \sigma\,\Phi^{-1}\!\big(2u - 2\eta_\sigma\big)
+\;\approx\; -1 + \sigma\,\Phi^{-1}(2u).
+$$
+
+Each stair of the limiting staircase carries a copy of the Gaussian quantile
+function, compressed by the factor $\sigma$ — asymptotically, the inverse-CDF map
+coincides with the "packed" two-stage map of Notes II (choose the component from
+$u$, then apply that component's own quantile).
+
+**The forming jump.** At the center, Proposition 2 gives
+
+$$
+T_\sigma'(\tfrac12) = \frac{1}{p_\sigma(0)} = \sigma\sqrt{2\pi}\; e^{1/(2\sigma^2)}
+\;\longrightarrow\; \infty ,
+$$
+
+so the slope at $u = \tfrac12$ blows up as the jump forms. Convergence in Theorem 4
+is uniform on compact subsets of $(0,1) \setminus \{\tfrac12\}$ but not across
+$u = \tfrac12$: a boundary layer of width shrinking with $\sigma$ always remains, in
+exact analogy with the non-uniform convergence $\tanh(x/\sigma^2) \to
+\operatorname{sign}(x)$ of the W01 denoiser.
+
+### The score-based flow is the same map
+
+W01 built its sampler differently — not from the CDF, but by flowing particles along
+the score with the tanh denoiser as a smooth attractor. It is natural to ask whether
+that construction converges to the same deterministic map. In one dimension the
+answer is affirmative, and exact at every noise level, by the following two
+observations.
+
+**Proposition 6 (flows do not cross).** For $\sigma_{\min} > 0$, let $\Psi$ denote
+the exact probability-flow ODE map carrying noise level $\sigma_{\max}$ down to
+$\sigma_{\min}$ (velocity $\tfrac12\,\partial_x \log p_\sigma$ in the descending
+variance clock, exact score). Then $\Psi$ is continuous and strictly increasing.
+
+*Proof sketch.* The velocity field is smooth and locally Lipschitz in $x$ for
+$\sigma \ge \sigma_{\min} > 0$, so solutions are unique. If two trajectories starting
+at $x < x'$ met at some time, running the ODE backwards from the meeting point would
+violate uniqueness; hence trajectories preserve order, and $\Psi$ is strictly
+increasing. Continuity of the flow map in the initial condition is standard ODE
+theory. $\square$
+
+**Proposition 7 (monotone transport is rigid).** Let $T$ be continuous and strictly
+increasing with $T_\# \mu = \nu$, where $\mu, \nu$ have continuous, strictly
+increasing CDFs $F_\mu, F_\nu$. Then $T = F_\nu^{-1} \circ F_\mu$.
+
+*Proof.* $F_\nu(T(x)) = \nu\big((-\infty, T(x)]\big)
+= \mu\big(T^{-1}(-\infty, T(x)]\big) = \mu\big((-\infty, x]\big) = F_\mu(x)$,
+using monotonicity in the middle step. Apply $F_\nu^{-1}$. $\square$
+
+**Corollary 8.** The exact score flow satisfies
+$\Psi = F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}$: the probability-flow ODE
+*is* the quantile transport, at every positive noise level. Composing with a uniform
+parametrization of the source, $x_T = F_{\sigma_{\max}}^{-1}(u)$, the complete
+score-based sampler is exactly the map $u \mapsto T_{\sigma_{\min}}(u)$ of this
+note. Theorem 4 therefore applies verbatim: as $\sigma_{\min} \downarrow 0$,
+
+$$
+\Psi(x_T) \;\longrightarrow\; \operatorname{sign}(x_T)
+\qquad \text{for every } x_T \ne 0,
+$$
+
+since $F_{\sigma_{\max}}(0) = \tfrac12$ by symmetry. The tanh-driven flow converges
+pointwise to the deterministic two-point generator, and its separatrix $x_T = 0$ is
+precisely the unstable equilibrium identified in W01.
+
+*Numerical confirmation.* Integrating the exact-score probability-flow ODE with
+$20{,}000$ Euler steps from $\sigma_{\max} = 3$ to $\sigma_{\min} = 10^{-2}$ and
+comparing against $F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}$ on a grid of
+initial points: the two maps agree to about $10^{-5}$ everywhere except at the
+separatrix itself (where the CDF's plateau is flat to machine precision and the
+quantile is defined by symmetry).
+
+**One shot versus increments: the factorization view.** Corollary 8 supports a
+sharper reading of the relationship between the two constructions. The quantile
+transport telescopes across any ladder of noise levels
+$\sigma_{\max} = s_0 > s_1 > \cdots > s_K = \sigma_{\min}$:
+
+$$
+F_{s_K}^{-1} \circ F_{s_0}
+\;=\;
+\big(F_{s_K}^{-1} \circ F_{s_{K-1}}\big) \circ \cdots \circ
+\big(F_{s_1}^{-1} \circ F_{s_0}\big),
+$$
+
+and each factor is, by Corollary 8 applied between adjacent levels, exactly the
+probability-flow step from $s_{k}$ to $s_{k+1}$. The exact reverse flow is therefore
+not an approximation of the one-shot map but a **factorization** of it into
+near-identity maps, one per noise increment; the practical $K$-step sampler is then
+explicit Euler applied to each factor — a genuine numerical method, with error
+vanishing as $K \to \infty$. In this precise sense, reverse diffusion is a numerical
+solution of the one-shot transport problem.
+
+The decomposition also explains why the incremental route is the one that scales.
+The one-shot map is globally wild — in the $\sigma \to 0$ limit, discontinuous — and
+is built from the CDF, a global object unavailable in high dimension. Each factor is
+locally tame and requires only the score at a single noise level, which is a
+regression target (denoising). A composition of many learnable maps realizes one
+unlearnable map. Structurally, this is a homotopy (continuation) method for
+sampling: embed the intractable target in a family $\{p_\sigma\}$ terminating at a
+trivial Gaussian, and track the solution path one level at a time.
+
+Two caveats frame the result. First, the identification of the flow with the
+quantile transport is special to one dimension, where "monotone" pins the transport
+down uniquely; in higher dimensions the probability-flow ODE defines a valid
+transport that is in general *not* the monotone (optimal-transport) map. Second, the
+statement concerns the exact score, exact terminal law, and exact integration; and
+the Lipschitz constant of the velocity grows like $\sigma^{-2}$ as
+$\sigma_{\min} \downarrow 0$ — the flow is smooth at every positive noise level even
+though its limit is discontinuous, which is the dynamical face of the boundary layer
+of Theorem 4.
+
+### Interpretation
+
+The same step function has now appeared on both sides of the generative pipeline:
+the denoiser $\tanh(x/\sigma^2) \to \operatorname{sign}(x)$ in data space, and the
+generator $T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)$ in noise space. In
+both cases a smooth object degenerates into a discontinuous one precisely as the
+noise scale vanishes. This is the one-dimensional instance of a general phenomenon:
+discrete or lower-dimensional data distributions are reached as limits of smooth
+transports, and learnable models operate at small positive noise scales exactly
+because smooth maps can be represented and trained while their discontinuous limits
+cannot. Diffusion models anneal $\sigma$ toward zero rather than starting there for
+this reason.
+
+### Exercises
+
+1. Prove Theorem 1 for a general CDF $F$ (not necessarily continuous or strictly
+   increasing) using the generalized inverse
+   $F^{-1}(u) = \inf\{x : F(x) \ge u\}$.
+2. Write out the case $u > \tfrac12$ of Theorem 4 directly (without invoking
+   Lemma 3), and verify that the two squeeze evaluations become
+   $F_\sigma(1-\varepsilon) \to \tfrac12$ and $F_\sigma(1+\varepsilon) \to 1$.
+3. **Unequal weights.** For the mixture
+   $\pi\,\mathcal{N}(-1,\sigma^2) + (1-\pi)\,\mathcal{N}(+1,\sigma^2)$ with
+   $0 < \pi < 1$, show $T_\sigma(u) \to -1$ for $u < \pi$ and $T_\sigma(u) \to +1$
+   for $u > \pi$: the location of the jump is the component weight.
+4. Verify the derivative computation $T_\sigma'(\tfrac12) = \sigma \sqrt{2\pi}\,
+   e^{1/(2\sigma^2)}$ and evaluate it numerically for $\sigma = 0.5, 0.2, 0.1$.
+5. **Three components.** For a symmetric three-component mixture with means
+   $-1, 0, +1$ and equal weights, describe the limit of $T_\sigma$: the number of
+   jumps, their locations in $u$, and the limiting values between them.
+6. Prove Proposition 7 in detail, identifying exactly where continuity and strict
+   monotonicity of $T$ are used.
+7. Reproduce the numerical confirmation: integrate the exact-score probability-flow
+   ODE (W01's sampler with a fine grid) from a grid of initial points and compare
+   with $F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}$ computed by bisection.
+   Where is the agreement worst, and why?
+
 
 ## After Class
 

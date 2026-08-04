@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W02 · Deck 03 · The Map, Proved · ID-5-02 (TO) · IIT Jammu</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#003f87; --blue-dark:#002d63; --blue-mid:#0056b8; --blue-sky:#4da3ff; --blue-pale:#eaf3ff;
+    --ink:#22262a; --star:#f4b400;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#0b1e3a;font-family:Roboto,system-ui,sans-serif;color:var(--ink)}
+  #root{height:100%}
+  .deck{height:100%;display:flex;flex-direction:column;overflow:hidden}
+  .slide{flex:1;display:flex;flex-direction:column;justify-content:center;padding:5vh 8vw;
+         background:#fff;overflow:auto}
+  .slide.title{background:linear-gradient(160deg,var(--blue-dark) 0%,var(--blue) 70%,var(--blue-mid) 100%);color:#fff}
+  .slide.accent{background:linear-gradient(160deg,#f6faff,var(--blue-pale))}
+  h1{font-family:"Roboto Slab",serif;font-size:clamp(1.8rem,4.5vw,3.2rem);margin:.2em 0;line-height:1.15}
+  h2{font-family:"Roboto Slab",serif;font-size:clamp(1.4rem,3vw,2.2rem);color:var(--blue-dark);margin:.2em 0 .6em;
+     border-bottom:3px solid var(--blue-pale);padding-bottom:.25em}
+  .title h2{color:#cfe3ff;border:none;font-weight:400;font-size:clamp(1rem,2vw,1.5rem)}
+  .kicker{font-size:clamp(.8rem,1.4vw,1rem);letter-spacing:.14em;text-transform:uppercase;color:var(--blue-sky)}
+  p,li{font-size:clamp(1rem,1.9vw,1.35rem);line-height:1.55}
+  li{margin:.35em 0}
+  .big{font-size:clamp(1.3rem,2.6vw,1.9rem);font-weight:500;color:var(--blue-dark)}
+  table{border-collapse:collapse;font-size:clamp(.95rem,1.7vw,1.25rem);margin:.4em 0;width:100%}
+  th{background:var(--blue);color:#fff;text-align:left}
+  th,td{border:1px solid #cfdcec;padding:.35em .7em}
+  tr:nth-child(even) td{background:#f4f8fd}
+  code,.mono{font-family:"Roboto Mono",monospace;color:var(--blue-mid)}
+  .cols{display:flex;gap:4vw;flex-wrap:wrap}
+  .cols>div{flex:1;min-width:260px}
+  .note{background:var(--blue-pale);border-left:5px solid var(--blue);padding:.5em 1em;border-radius:0 8px 8px 0;
+        font-size:clamp(.95rem,1.7vw,1.2rem)}
+  .quote{font-family:"Roboto Slab",serif;font-size:clamp(1.4rem,3.4vw,2.4rem);color:var(--blue-dark);
+         text-align:center;line-height:1.4;margin:auto 0}
+  .quote small{display:block;font-family:Roboto,sans-serif;font-size:.55em;color:#667;margin-top:1em}
+  /* chrome */
+  .bar{height:5px;background:#12305c}
+  .bar>div{height:100%;background:var(--blue-sky);transition:width .25s}
+  .foot{display:flex;justify-content:space-between;align-items:center;background:#0b1e3a;color:#8fb4e8;
+        font-size:.75rem;padding:6px 14px;font-family:"Roboto Mono",monospace}
+  .foot b{color:#cfe3ff;font-weight:500}
+  .navhint{opacity:.7}
+  .clickzone{position:fixed;top:0;bottom:30px;width:18vw;cursor:pointer;z-index:5}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+"use strict";
+const e = React.createElement;
+const F = React.Fragment;
+
+/* ---------- content ---------- */
+const li = (...items)=> e("ul",null, ...items.map(t=> e("li",{dangerouslySetInnerHTML:{__html:t}})));
+const html = (tag,s)=> e(tag,{dangerouslySetInnerHTML:{__html:s}});
+const table = (head,rows)=> e("table",null,
+  e("thead",null, e("tr",null, ...head.map(hh=>e("th",null,hh)))),
+  e("tbody",null, ...rows.map(r=> e("tr",null, ...r.map(c=> html("td",c))))));
+
+const SLIDES = [
+
+{cls:"title", body:()=> e(F,null,
+  e("div",{className:"kicker"},"ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"),
+  e("h1",null,"The Map, Proved"),
+  e("h2",null,"W02 · Part 3 — uniform noise to the two-point mixture, and the sign function in the limit"),
+  e("p",{style:{marginTop:"2em",color:"#cfe3ff"}},"Uma Satyaranjan · Soma S Dhavala"),
+  e("p",{style:{color:"#8fb4e8",fontSize:"1rem"}},"→ arrow keys or click the right edge to advance"))},
+
+{title:"What we are proving today", body:()=> e(F,null,
+  html("p",'Last time we <i>claimed</i>: a generative model is a deterministic map applied to simple randomness. Today we <b>prove</b> it, end to end, for one family:'),
+  html("p",'<span class="big" style="display:block;text-align:center">p<sub>σ</sub>(x) = ½ N(x; −1, σ²) + ½ N(x; +1, σ²)</span>'),
+  li("<b>Step 1:</b> a deterministic map T<sub>σ</sub> with T<sub>σ</sub>(U) ∼ p<sub>σ</sub> exists and is smooth",
+     "<b>Step 2:</b> as σ → 0, &nbsp;<span class='mono'>T<sub>σ</sub>(u) → sign(u − ½)</span> — the two-point generator of W01",
+     "Everything is elementary: monotone functions and a squeeze argument"))},
+
+{title:"Theorem 1 — the probability integral transform", body:()=> e(F,null,
+  html("div",'<div class="note"><b>Theorem.</b> Let F be a continuous, strictly increasing CDF mapping ℝ onto (0,1), and U ∼ Uniform(0,1). Then X = F⁻¹(U) has CDF F.</div>'),
+  html("p",'<b>Proof.</b> Since F is increasing, F⁻¹(u) ≤ x &nbsp;⟺&nbsp; u ≤ F(x). Therefore'),
+  html("p",'<span class="big" style="display:block;text-align:center">P(F⁻¹(U) ≤ x) = P(U ≤ F(x)) = F(x). ∎</span>'),
+  html("p",'One line. The entire "sampling = a map" claim rests on this line.'))},
+
+{title:"Step 1: the map exists and is smooth", body:()=> e(F,null,
+  html("p",'The mixture CDF is &nbsp;<span class="mono">F<sub>σ</sub>(x) = ½ Φ((x+1)/σ) + ½ Φ((x−1)/σ)</span>.'),
+  li("F<sub>σ</sub>′ = p<sub>σ</sub> &gt; 0 everywhere ⟹ strictly increasing; limits 0 and 1 at ∓∞ ⟹ a bijection ℝ → (0,1)",
+     "So <b>T<sub>σ</sub> := F<sub>σ</sub>⁻¹ exists</b>, and by the inverse function theorem it is smooth, with",
+     "<span class='mono'>T<sub>σ</sub>′(u) = 1 / p<sub>σ</sub>(T<sub>σ</sub>(u))</span> — steepest exactly where the density is smallest"),
+  html("div",'<div class="note">Read that derivative: the <b>plateau</b> of F (the empty region between the bumps) is the <b>cliff</b> of T. The staircase in the demo is this formula at work.</div>'))},
+
+{title:"A symmetry we get for free", body:()=> e(F,null,
+  html("p",'From Φ(−t) = 1 − Φ(t), swapping the two components:'),
+  html("p",'<span class="big" style="display:block;text-align:center">F<sub>σ</sub>(−x) = 1 − F<sub>σ</sub>(x) &nbsp;&nbsp;⟹&nbsp;&nbsp; T<sub>σ</sub>(1 − u) = −T<sub>σ</sub>(u), &nbsp; T<sub>σ</sub>(½) = 0</span>'),
+  li("The map is odd about the center — so it suffices to prove the limit for u &lt; ½",
+     "T<sub>σ</sub>(½) = 0 for <i>every</i> σ: the tie point never moves"))},
+
+{title:"Step 2: the limit — statement", body:()=> e(F,null,
+  html("div",'<div class="note"><b>Theorem.</b> For every fixed u ∈ (0,1) with u ≠ ½,&nbsp; <span class="mono">T<sub>σ</sub>(u) → sign(u − ½)</span> as σ → 0.</div>'),
+  html("p",'By symmetry, take u &lt; ½ and show T<sub>σ</sub>(u) → −1. The tool: <b>squeeze T<sub>σ</sub>(u) between −1−ε and −1+ε</b> by evaluating F<sub>σ</sub> at those two points and using monotonicity.'))},
+
+{title:"The squeeze, in two evaluations", body:()=> e(F,null,
+  html("p",'Fix ε ∈ (0,1). As σ → 0:'),
+  table(["Evaluate","Value","Limit","Conclusion (u < ½, monotonicity)"],[
+    ["F<sub>σ</sub>(−1+ε)","½ Φ(ε/σ) + ½ Φ((ε−2)/σ)","→ ½ · 1 + ½ · 0 = <b>½</b>","eventually &gt; u ⟹ T<sub>σ</sub>(u) &lt; −1+ε"],
+    ["F<sub>σ</sub>(−1−ε)","½ Φ(−ε/σ) + ½ Φ((−2−ε)/σ)","→ ½ · 0 + ½ · 0 = <b>0</b>","eventually &lt; u ⟹ T<sub>σ</sub>(u) &gt; −1−ε"]]),
+  html("p",'Hence |T<sub>σ</sub>(u) + 1| &lt; ε for all small σ: &nbsp;<span class="big">T<sub>σ</sub>(u) → −1. ∎</span>'),
+  html("p",'At u = ½ exactly: T<sub>σ</sub>(½) = 0 always — a single point, probability zero for U.'))},
+
+{title:"Watch the theorem happen", body:()=> e(F,null,
+  html("div",'<iframe src="./sampling-as-a-map.html" style="width:100%;height:62vh;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="Sampling as a map demo"></iframe>'))},
+
+{title:"How the stairs form: the quantitative picture", body:()=> e(F,null,
+  li("For u &lt; ½, the far component contributes at most ½ Φ(−1/σ) — <i>exponentially</i> small",
+     "Dropping it: &nbsp;<span class='mono'>T<sub>σ</sub>(u) ≈ −1 + σ Φ⁻¹(2u)</span> — each stair is a <b>Gaussian quantile, compressed by σ</b>",
+     "Slope at the center: <span class='mono'>T<sub>σ</sub>′(½) = 1/p<sub>σ</sub>(0) = σ√(2π) · e<sup>1/(2σ²)</sup> → ∞</span> — the jump forming",
+     "Convergence is uniform away from u = ½, but never uniform across it — a boundary layer, exactly like tanh(x/σ²) in W01"))},
+
+{title:"What the theorem buys us", body:()=> e(F,null,
+  li("T<sub>σ</sub>(U) → sign(U − ½) <b>almost surely</b> ⟹ also in distribution: the two-point dataset is the σ → 0 <i>limit of smooth generators</i>",
+     "The same step function appeared twice now: <span class='mono'>tanh(x/σ²) → sign(x)</span> (the denoiser) and <span class='mono'>T<sub>σ</sub>(u) → sign(u−½)</span> (the generator)",
+     "Deep generative models live at small-but-positive σ <i>on purpose</i>: smooth maps are learnable; steps are not"),
+  html("div",'<div class="note">This is the one-dimensional shadow of a general principle: discrete or manifold-supported data is reached as a limit of smooth transports — which is why diffusion models anneal σ instead of jumping to 0.</div>'))},
+
+
+{title:"And the score flow? Same map — a theorem", body:()=> e(F,null,
+  li("<b>No crossing:</b> a 1-D ODE flow with unique solutions preserves order ⟹ the probability-flow map Ψ is continuous and strictly increasing",
+     "<b>Rigidity:</b> a strictly increasing map pushing p<sub>σmax</sub> to p<sub>σmin</sub> is unique: F<sub>σmin</sub>⁻¹ ∘ F<sub>σmax</sub>",
+     "<b>Therefore:</b> W01’s tanh-driven flow <i>is</i> the quantile transport — and by today’s theorem, Ψ(x<sub>T</sub>) → sign(x<sub>T</sub>) as σ<sub>min</sub> → 0"),
+  html("div",'<div class="note">Numerically: 20,000-step exact-score Euler vs F⁻¹∘F on a grid — agreement ≈ 10⁻⁵ everywhere except the separatrix x<sub>T</sub> = 0 (W01’s unstable equilibrium). Caveat: this identification is special to 1-D; in higher dimensions the flow is a transport, but not <i>the</i> monotone one.</div>'))},
+
+{cls:"accent", body:()=> e(F,null,
+  e("div",{className:"quote"},"A claim became a theorem: the generator is a map, and the two-point world is its limit.",
+    e("small",null,"Exercises: the ε-argument for u > ½; unequal weights (the stair moves to u = π); three components.")))},
+
+];
+
+/* ---------- deck engine ---------- */
+function Deck(){
+  const [i,setI] = React.useState(()=>{
+    const n=parseInt(location.hash.slice(1)); return Number.isInteger(n)&&n>=0&&n<SLIDES.length? n:0; });
+  const go = React.useCallback(d=>{
+    setI(cur=>{ const n=Math.min(SLIDES.length-1, Math.max(0, cur+d)); location.hash="#"+n; return n; });
+  },[]);
+  React.useEffect(()=>{
+    const k=ev=>{ if(["ArrowRight","PageDown"," "].includes(ev.key)) go(1);
+                  else if(["ArrowLeft","PageUp"].includes(ev.key)) go(-1);
+                  else if(ev.key==="Home"){ setI(0); location.hash="#0"; } };
+    window.addEventListener("keydown",k); return ()=>window.removeEventListener("keydown",k);
+  },[go]);
+  const s=SLIDES[i];
+  return e("div",{className:"deck"},
+    e("div",{className:"clickzone",style:{left:0},onClick:()=>go(-1)}),
+    e("div",{className:"clickzone",style:{right:0},onClick:()=>go(1)}),
+    e("div",{className:"slide "+(s.cls||"")},
+      s.title? e("h2",null,s.title):null,
+      s.body()),
+    e("div",{className:"bar"}, e("div",{style:{width:((i+1)/SLIDES.length*100)+"%"}})),
+    e("div",{className:"foot"},
+      e("span",null, e("b",null,"ID-5-02 (TO)")," · W02 · Deck 03 · The Map, Proved"),
+      e("span",{className:"navhint"},"← → to navigate"),
+      e("span",null, (i+1)+" / "+SLIDES.length)));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(e(Deck));
+</script>
+</body>
+</html>
