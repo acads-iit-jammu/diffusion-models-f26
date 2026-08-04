@@ -104,8 +104,8 @@
 
   <section>
     <h2><span class="act">Act I &#183; Hierarchy</span>Conditional generation: coin first, Gaussian second</h2>
-    <p>A hierarchical (Bayesian) model, and the simplest conditional generator:</p>
-    <p class="mathblock"><span class="math">z &#8764; Bernoulli(&#960;),&#8195; x | z &#8764; N(&#956;<sub>z</sub>, &#963;&#178;)</span></p>
+    <p>A hierarchical latent-variable model &#8212; the simplest conditional generator:</p>
+    <p class="mathblock"><span class="math">P(z = 1) = &#960;, &#8195; P(z = 2) = 1 &#8722; &#960;, &#8195; x | z &#8764; N(&#956;<sub>z</sub>, &#963;&#178;)</span></p>
     <p>Sample the latent coin <span class="math">z</span>, then sample <span class="math">x</span>
     from the chosen component. The colors below remember each sample's ancestry &#8212; and the
     marginal that emerges is exactly the two-component mixture
@@ -131,8 +131,8 @@
       </div>
       <div class="readout" id="anc-readout">Press <b>Sample one</b> a few times &#8212; watch the coin, then the draw.</div>
       <figcaption>Generation runs the hierarchy <em>forward</em>: z &#8594; x. Inference runs it
-      <em>backward</em>: given x, the posterior P(z | x) &#8212; for &#956; = &#177;1 that posterior mean was
-      exactly W01's tanh denoiser.</figcaption>
+      <em>backward</em>: given x, the posterior P(z | x) &#8212; for &#956; = &#177;1 and &#960; = &#189; that
+      posterior mean was exactly W01's tanh denoiser.</figcaption>
     </figure>
   </section>
 
@@ -171,13 +171,14 @@
   </section>
 
   <section>
-    <p class="takeaway"><strong>The definition hiding in this demo.</strong> A generative model
-    <em>is</em> a map that transforms simple randomness into data. Here the map is analytic
-    because the distribution is one-dimensional and known. Deep generative models keep the
-    recipe and <em>learn</em> the map: GANs and VAEs map Gaussian noise through a network;
-    normalizing flows make the map invertible; and W01's reverse
-    probability-flow ODE is exactly such a map &#8212; from a Gaussian to the data &#8212; built from a
-    learned denoiser. That family is where this course is headed.</p>
+    <p class="takeaway"><strong>The idea hiding in this demo.</strong> Once all of its random
+    draws are exposed, a generative sampler <em>is</em> a deterministic map from base
+    randomness to a sample. Here the map is explicit because the CDF is known (this page
+    inverts it numerically). Deep generative models learn an <em>ingredient</em> of the map:
+    GANs push Gaussian noise through a network; VAEs add decoder noise; normalizing flows
+    make the map invertible; and W01's probability-flow ODE is exactly such a map &#8212; from a
+    Gaussian to the data &#8212; built from a learned denoiser. That family is where this course
+    is headed.</p>
   </section>
 
   <footer>

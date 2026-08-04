@@ -316,6 +316,7 @@ window.Quarto = {
   <li><a href="#likelihood" id="toc-likelihood" class="nav-link" data-scroll-target="#likelihood">Likelihood</a></li>
   <li><a href="#pdf-vs-likelihood-the-same-function-two-readings" id="toc-pdf-vs-likelihood-the-same-function-two-readings" class="nav-link" data-scroll-target="#pdf-vs-likelihood-the-same-function-two-readings">PDF vs likelihood: the same function, two readings</a></li>
   <li><a href="#the-gaussian-mle-in-full" id="toc-the-gaussian-mle-in-full" class="nav-link" data-scroll-target="#the-gaussian-mle-in-full">The Gaussian MLE, in full</a></li>
+  <li><a href="#aside-binary-cross-entropy-is-a-likelihood" id="toc-aside-binary-cross-entropy-is-a-likelihood" class="nav-link" data-scroll-target="#aside-binary-cross-entropy-is-a-likelihood">Aside: binary cross-entropy is a likelihood</a></li>
   <li><a href="#fitting-the-other-families-honestly" id="toc-fitting-the-other-families-honestly" class="nav-link" data-scroll-target="#fitting-the-other-families-honestly">Fitting the other families — honestly</a></li>
   <li><a href="#the-trap-right-method-wrong-family" id="toc-the-trap-right-method-wrong-family" class="nav-link" data-scroll-target="#the-trap-right-method-wrong-family">The trap: right method, wrong family</a></li>
   <li><a href="#exercises-1" id="toc-exercises-1" class="nav-link" data-scroll-target="#exercises-1">Exercises</a></li>
@@ -328,6 +329,19 @@ window.Quarto = {
   <li><a href="#maps-are-not-unique" id="toc-maps-are-not-unique" class="nav-link" data-scroll-target="#maps-are-not-unique">Maps are not unique</a></li>
   <li><a href="#the-claim-that-organizes-everything" id="toc-the-claim-that-organizes-everything" class="nav-link" data-scroll-target="#the-claim-that-organizes-everything">The claim that organizes everything</a></li>
   <li><a href="#exercises-2" id="toc-exercises-2" class="nav-link" data-scroll-target="#exercises-2">Exercises</a></li>
+  </ul></li>
+  <li><a href="#notes-iii-the-deterministic-map-proved" id="toc-notes-iii-the-deterministic-map-proved" class="nav-link" data-scroll-target="#notes-iii-the-deterministic-map-proved">Notes III: The Deterministic Map, Proved</a>
+  <ul class="collapse">
+  <li><a href="#setting" id="toc-setting" class="nav-link" data-scroll-target="#setting">Setting</a></li>
+  <li><a href="#theorem-1-probability-integral-transform" id="toc-theorem-1-probability-integral-transform" class="nav-link" data-scroll-target="#theorem-1-probability-integral-transform">Theorem 1 (probability integral transform)</a></li>
+  <li><a href="#proposition-2-existence-and-smoothness-of-the-map" id="toc-proposition-2-existence-and-smoothness-of-the-map" class="nav-link" data-scroll-target="#proposition-2-existence-and-smoothness-of-the-map">Proposition 2 (existence and smoothness of the map)</a></li>
+  <li><a href="#lemma-3-symmetry" id="toc-lemma-3-symmetry" class="nav-link" data-scroll-target="#lemma-3-symmetry">Lemma 3 (symmetry)</a></li>
+  <li><a href="#theorem-4-the-limit-is-the-sign-function" id="toc-theorem-4-the-limit-is-the-sign-function" class="nav-link" data-scroll-target="#theorem-4-the-limit-is-the-sign-function">Theorem 4 (the limit is the sign function)</a></li>
+  <li><a href="#corollary-5-modes-of-convergence" id="toc-corollary-5-modes-of-convergence" class="nav-link" data-scroll-target="#corollary-5-modes-of-convergence">Corollary 5 (modes of convergence)</a></li>
+  <li><a href="#the-quantitative-picture-how-the-stairs-form" id="toc-the-quantitative-picture-how-the-stairs-form" class="nav-link" data-scroll-target="#the-quantitative-picture-how-the-stairs-form">The quantitative picture: how the stairs form</a></li>
+  <li><a href="#the-score-based-flow-is-the-same-map" id="toc-the-score-based-flow-is-the-same-map" class="nav-link" data-scroll-target="#the-score-based-flow-is-the-same-map">The score-based flow is the same map</a></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  <li><a href="#exercises-3" id="toc-exercises-3" class="nav-link" data-scroll-target="#exercises-3">Exercises</a></li>
   </ul></li>
   <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After Class</a></li>
   </ul>
@@ -371,7 +385,10 @@ window.Quarto = {
 <p><em>Part 2 — Generative AI, in Its Simplest Form</em> (<a href="../materials/w02-deck-02-genai-maps.html" target="_blank">open fullscreen</a>):</p>
 <iframe src="../materials/w02-deck-02-genai-maps.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 2: generative AI in its simplest form">
 </iframe>
-<p><strong>Companion notes</strong> — Notes 0 (probability refresher), I, and II, below on this page.</p>
+<p><em>Part 3 — The Map, Proved</em> (<a href="../materials/w02-deck-03-map-limit.html" target="_blank">open fullscreen</a>):</p>
+<iframe src="../materials/w02-deck-03-map-limit.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 3: the map, proved">
+</iframe>
+<p><strong>Companion notes</strong> — Notes 0 (probability refresher), I, II, and III, below on this page.</p>
 <p><strong>Interactive demos</strong></p>
 <ul>
 <li><a href="../materials/distributions-playground.html">The Distribution Playground</a> — see, sample, fit, sample from the fit (and the single-Gaussian-on-mixture trap).</li>
@@ -729,6 +746,33 @@ L(\theta) = \prod_{i=1}^n f(x_i; \theta),
 <p>(One should check this is a maximum, not merely critical: <span class="math inline">\(\ell \to -\infty\)</span> as <span class="math inline">\(v \to 0^+\)</span> and as <span class="math inline">\(v \to \infty\)</span>, and this is the only critical point.) Note the divisor <span class="math inline">\(n\)</span>: the MLE of the variance is <em>biased</em> — <span class="math inline">\(\mathbb{E}[\hat\sigma^2] =
 \frac{n-1}{n}\sigma^2\)</span> — which is where the familiar <span class="math inline">\(n-1\)</span> estimator comes from. For this course the distinction is a footnote; the MLE is what the theory produces.</p>
 </section>
+<section id="aside-binary-cross-entropy-is-a-likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="aside-binary-cross-entropy-is-a-likelihood">Aside: binary cross-entropy is a likelihood</h3>
+<p>The most familiar loss in machine learning is a maximum-likelihood problem in disguise, and the disguise falls away the moment classification is read as a (conditional) generative model.</p>
+<p><strong>The model.</strong> For the <span class="math inline">\(i\)</span>-th sample with features <span class="math inline">\(x_i\)</span>, model the binary label as a Bernoulli trial,</p>
+<p><span class="math display">\[
+y_i \mid x_i \;\sim\; \text{Bernoulli}(\pi_i), \qquad y_i \in \{0, 1\},
+\]</span></p>
+<p>and let a neural network supply the <strong>logit</strong> — the log-<em>odds</em>, not the log-probability:</p>
+<p><span class="math display">\[
+s_i = f_\theta(x_i) = \log \frac{\pi_i}{1 - \pi_i}
+\quad\Longleftrightarrow\quad
+\pi_i = \operatorname{sigmoid}(s_i).
+\]</span></p>
+<p><strong>The likelihood.</strong> The Bernoulli pmf can be written in one line as <span class="math inline">\(p(y \mid \pi) = \pi^{y} (1-\pi)^{1-y}\)</span>, so for independent samples</p>
+<p><span class="math display">\[
+L(\theta) = \prod_{i=1}^n \pi_i^{\,y_i} (1 - \pi_i)^{1 - y_i},
+\qquad
+-\ell(\theta) = -\sum_{i=1}^n \Big[ y_i \log \pi_i + (1 - y_i)\log(1 - \pi_i) \Big].
+\]</span></p>
+<p>The right-hand side is <strong>exactly binary cross-entropy</strong>. Training a classifier with BCE is maximum likelihood for a conditional Bernoulli model whose log-odds are the network output — nothing more. (The name is also earned: <span class="math inline">\(-\ell/n\)</span> is the cross-entropy between the empirical distribution of each label and the model’s Bernoulli.)</p>
+<p><strong>The <span class="math inline">\(\pm 1\)</span> convention.</strong> With labels <span class="math inline">\(y_i \in \{-1, +1\}\)</span>, the identity <span class="math inline">\(\operatorname{sigmoid}(-s) = 1 - \operatorname{sigmoid}(s)\)</span> collapses both cases into <span class="math inline">\(p(y_i \mid s_i) = \operatorname{sigmoid}(y_i s_i)\)</span>, and the negative log-likelihood becomes the <strong>logistic loss</strong>,</p>
+<p><span class="math display">\[
+-\ell(\theta) = \sum_{i=1}^n \log\!\big(1 + e^{-y_i s_i}\big)
+\]</span></p>
+<p>— the same objective, rewritten.</p>
+<p><strong>The connection to this course.</strong> W01’s latent posterior <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is precisely this model with logit <span class="math inline">\(s(x) = 2x/\sigma^2\)</span>: the optimal classifier of the hidden component is a Bernoulli model whose log-odds are linear in the observation. Classification, denoising, and latent inference are all the same likelihood computation wearing different clothes.</p>
+</section>
 <section id="fitting-the-other-families-honestly" class="level3">
 <h3 class="anchored" data-anchor-id="fitting-the-other-families-honestly">Fitting the other families — honestly</h3>
 <ul>
@@ -756,6 +800,7 @@ L(\theta) = \prod_{i=1}^n f(x_i; \theta),
 <li>Show that the Uniform MLE is <span class="math inline">\((\hat a, \hat b) = (\min_i x_i, \max_i x_i)\)</span>, and explain why calculus alone would miss it.</li>
 <li>Derive the Gamma method-of-moments estimators from <span class="math inline">\(\mathbb{E}X = k\theta\)</span> and <span class="math inline">\(\operatorname{Var} X = k\theta^2\)</span>.</li>
 <li>For a single observation <span class="math inline">\(x\)</span> from <span class="math inline">\(\mathcal{N}(\mu, \sigma^2)\)</span> with <span class="math inline">\(\sigma\)</span> known, sketch the likelihood in <span class="math inline">\(\mu\)</span>. Now hold <span class="math inline">\(\mu\)</span> known and sketch the likelihood in <span class="math inline">\(\sigma\)</span> — is it bell-shaped? Symmetric? (This kills the “likelihood looks like a pdf” illusion outside the Gaussian-mean case.)</li>
+<li><strong>BCE gradient.</strong> For the Bernoulli model of the aside with a linear logit <span class="math inline">\(s_i = \theta^\top x_i\)</span>, show that <span class="math inline">\(\nabla_\theta(-\ell) = \sum_i (\pi_i - y_i)\, x_i\)</span> — prediction error times input, the cleanest gradient in machine learning. Verify that the <span class="math inline">\(\pm 1\)</span> logistic form gives the same gradient.</li>
 <li>For a mixture <span class="math inline">\(\sum_i \pi_i f_i\)</span> with component means <span class="math inline">\(\mu_i\)</span> and variances <span class="math inline">\(\sigma_i^2\)</span>, show <span class="math inline">\(\operatorname{Var}(X) = \sum_i \pi_i \sigma_i^2 + \sum_i \pi_i (\mu_i - \bar\mu)^2\)</span> with <span class="math inline">\(\bar\mu = \sum_i \pi_i \mu_i\)</span> — within-component plus between-component spread. Use it to predict what <span class="math inline">\(\hat\sigma\)</span> the single-Gaussian fit in the trap will report.</li>
 </ol>
 </section>
@@ -763,14 +808,13 @@ L(\theta) = \prod_{i=1}^n f(x_i; \theta),
 <section id="notes-ii-generative-ai-in-its-simplest-form" class="level2">
 <h2 class="anchored" data-anchor-id="notes-ii-generative-ai-in-its-simplest-form">Notes II: Generative AI, in Its Simplest Form</h2>
 <p><em>Companion note to W02, lecture 2. Interactive version: <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>.</em></p>
-<p>This note presents the same tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative model, diffusion included, is the second picture with a <em>learned</em> map.</p>
+<p>This note presents the same tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative sampler, diffusion included, is the second picture — once all of its random inputs are exposed — with a learned ingredient in place of the formula.</p>
 <section id="view-1-conditional-generation-a-hierarchical-model" class="level3">
 <h3 class="anchored" data-anchor-id="view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</h3>
 <p>The simplest latent-variable model:</p>
 <p><span class="math display">\[
-z \sim \text{Bernoulli}(\pi), \qquad
-x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2),
-\qquad z \in \{1, 2\}.
+\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
+x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
 \]</span></p>
 <p><strong>Ancestral sampling</strong> generates by following the arrows: draw the latent coin <span class="math inline">\(z\)</span>, then draw <span class="math inline">\(x\)</span> from the selected component. The observed marginal is obtained by summing out the latent:</p>
 <p><span class="math display">\[
@@ -784,7 +828,7 @@ p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
 = \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
        {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
 \]</span></p>
-<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this is the sigmoid from W01, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
+<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this equals <span class="math inline">\(\operatorname{sigmoid}(-2x/\sigma^2)\)</span>; its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is exactly the posterior W01 computed for the <span class="math inline">\(+1\)</span> component, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
 </section>
 <section id="view-2-the-coin-disappears-into-a-map" class="level3">
 <h3 class="anchored" data-anchor-id="view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</h3>
@@ -795,7 +839,7 @@ p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
 <p><span class="math display">\[
 u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
 \]</span></p>
-<p>generates the mixture <strong>with no coin anywhere</strong>. Where did the coin go? Into the uniform: since <span class="math inline">\(F(x) \le \pi\)</span> precisely on the lower component’s territory, the event <span class="math inline">\(u &lt; \pi\)</span> <em>is</em> the event <span class="math inline">\(z = 1\)</span>. One uniform number carries both the component choice and the position within the component — randomness in, structure out, everything in between deterministic.</p>
+<p>generates the mixture <strong>with no coin anywhere</strong> — the explicit coin has been marginalized out. One caution about where it went: under this map, the event <span class="math inline">\(u &lt; \pi\)</span> selects the lowest <span class="math inline">\(\pi\)</span>-fraction of the <em>mixture</em> distribution, which is <strong>not</strong> the same as the ancestral label <span class="math inline">\(z = 1\)</span> when the components overlap — both Gaussians have full support, so each contributes on both sides of any quantile. (In the well-separated limit <span class="math inline">\(\sigma \to 0\)</span> the two events do coincide, and the <em>packed</em> map below is the construction in which <span class="math inline">\(u &lt; \pi\)</span> genuinely encodes the coin.) Randomness in, structure out, everything in between deterministic.</p>
 </section>
 <section id="the-two-point-limit" class="level3">
 <h3 class="anchored" data-anchor-id="the-two-point-limit">The two-point limit</h3>
@@ -804,7 +848,7 @@ u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
 x = \begin{cases} -1, &amp; u &lt; \pi \\ +1, &amp; u &gt; \pi \end{cases}
 \qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
 \]</span></p>
-<p>W01’s dataset, generated by thresholding a uniform. The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
+<p>W01’s dataset, generated by thresholding a uniform (almost surely: the single point <span class="math inline">\(u = \pi\)</span> has probability zero). The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. Notes III proves this limit. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
 </section>
 <section id="maps-are-not-unique" class="level3">
 <h3 class="anchored" data-anchor-id="maps-are-not-unique">Maps are not unique</h3>
@@ -820,66 +864,214 @@ x = \begin{cases}
 <section id="the-claim-that-organizes-everything" class="level3">
 <h3 class="anchored" data-anchor-id="the-claim-that-organizes-everything">The claim that organizes everything</h3>
 <blockquote class="blockquote">
-<p><strong>A generative model is a deterministic map applied to simple randomness.</strong></p>
+<p><strong>Once all of its random draws are exposed, a generative sampler is a deterministic map from base randomness to a sample.</strong></p>
 </blockquote>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 22%">
-<col style="width: 20%">
-<col style="width: 26%">
+<col style="width: 18%">
+<col style="width: 24%">
 <col style="width: 32%">
+<col style="width: 26%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Model</th>
-<th>Simple noise</th>
-<th>The map</th>
-<th>How obtained</th>
+<th>Random input(s)</th>
+<th>Sampling mechanism</th>
+<th>Typical fitting</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>This note</td>
 <td><span class="math inline">\(u \sim \text{U}(0,1)\)</span></td>
-<td><span class="math inline">\(F^{-1}\)</span>, analytic</td>
-<td>the density is known</td>
+<td>quantile <span class="math inline">\(F^{-1}(u)\)</span> (numerical in the demo)</td>
+<td>the CDF is known</td>
 </tr>
 <tr class="even">
 <td>GAN</td>
 <td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td>neural network</td>
-<td>adversarial training</td>
+<td><span class="math inline">\(G_\theta(z)\)</span>, a network</td>
+<td>adversarial objective</td>
 </tr>
 <tr class="odd">
 <td>VAE</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td>neural network</td>
-<td>variational inference</td>
+<td><span class="math inline">\(z\)</span>, plus decoder noise <span class="math inline">\(\varepsilon\)</span></td>
+<td>sample <span class="math inline">\(p_\theta(x \mid z)\)</span>, i.e.&nbsp;<span class="math inline">\(T_\theta(z, \varepsilon)\)</span></td>
+<td>ELBO / variational learning</td>
 </tr>
 <tr class="even">
 <td>Normalizing flow</td>
 <td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td>invertible network</td>
-<td>exact likelihood</td>
+<td>invertible <span class="math inline">\(f_\theta(z)\)</span></td>
+<td>exact likelihood (change of variables)</td>
 </tr>
 <tr class="odd">
 <td><strong>Diffusion</strong></td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td><strong>reverse ODE/SDE</strong></td>
-<td><strong>learned denoiser</strong></td>
+<td><span class="math inline">\(x_T \sim \mathcal{N}\)</span>; step noise if stochastic</td>
+<td><strong>probability-flow ODE</strong> (deterministic) or reverse SDE</td>
+<td><strong>score/denoising objectives, ELBO</strong></td>
 </tr>
 </tbody>
 </table>
-<p>In one dimension with a known density, the map is a formula. For images, neither the density nor the CDF exists in usable form — so deep generative models <em>learn</em> the map. And you have already run one: W01’s probability-flow ODE deterministically transported <span class="math inline">\(\mathcal{N}(0, 1+\sigma_{\max}^2)\)</span> to the two-point data — an <span class="math inline">\(F^{-1}\)</span> built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
+<p>The outer skeleton is shared — simple randomness, a sampling mechanism, data — while the learned object, the structural constraints, and the sampler differ. For diffusion in particular, determinism is a <em>sampler choice</em>: the probability-flow ODE is a deterministic map from <span class="math inline">\(x_T\)</span>; the reverse SDE consumes fresh noise at every step and is a deterministic function only of <span class="math inline">\((x_T, \text{all step noises})\)</span>.</p>
+<p>In one dimension with a known CDF, the map is a formula. For images, the population law is unknown and no tractable multivariate inverse-CDF construction exists — so deep generative models learn a <em>transport, density, score, or other ingredient</em> of a sampler rather than writing the map down. And you have already run one: W01’s probability-flow ODE numerically transported a moment-matched Gaussian to within <span class="math inline">\(\approx \sigma_{\min}\)</span> of the two-point data (W01 lists the approximations involved); with the exact terminal law, score, and integration, it is an exact deterministic transport — an inverse-CDF-like map built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
 </section>
 <section id="exercises-2" class="level3">
 <h3 class="anchored" data-anchor-id="exercises-2">Exercises</h3>
 <ol type="1">
 <li>Complete the inverse-CDF proof for a general (possibly non-strictly-increasing) <span class="math inline">\(F\)</span> using the generalized inverse.</li>
-<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> it reduces to W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span>-type posterior; compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
+<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above, and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x)\)</span> equals W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span> posterior (mind which component carries the <span class="math inline">\(+\)</span> sign); compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
 <li>Verify the packed map: show that conditional on <span class="math inline">\(u &lt; \pi\)</span>, the rescaled variable <span class="math inline">\(u/\pi\)</span> is <span class="math inline">\(\text{Uniform}(0,1)\)</span>, and conclude that the branch produces <span class="math inline">\(\mathcal{N}(\mu_1, \sigma^2)\)</span> with the correct probability.</li>
 <li>Construct the inverse-CDF map for a <strong>three</strong>-component mixture and describe its staircase limit as <span class="math inline">\(\sigma \to 0\)</span>. How many plateaus, at what heights?</li>
 <li>The map <span class="math inline">\(x = F^{-1}(u)\)</span> is monotone increasing. Exhibit a <em>decreasing</em> map with the same pushforward, and a map that is neither monotone nor continuous. (Hint: <span class="math inline">\(1 - u\)</span> is also uniform.)</li>
+</ol>
+</section>
+</section>
+<section id="notes-iii-the-deterministic-map-proved" class="level2">
+<h2 class="anchored" data-anchor-id="notes-iii-the-deterministic-map-proved">Notes III: The Deterministic Map, Proved</h2>
+<p><em>Companion note to W02, lecture 3. Notes II asserted that sampling can be realized as a deterministic map applied to uniform randomness, and the demo showed the map degenerating into a staircase. This section proves both statements for the symmetric two-component mixture, in full.</em></p>
+<section id="setting" class="level3">
+<h3 class="anchored" data-anchor-id="setting">Setting</h3>
+<p>Fix <span class="math inline">\(\sigma &gt; 0\)</span> and consider the target family of Notes II with <span class="math inline">\(\pi = \tfrac12\)</span> and <span class="math inline">\(\mu = \pm 1\)</span>:</p>
+<p><span class="math display">\[
+p_\sigma(x) = \tfrac12\,\mathcal{N}(x; -1, \sigma^2) + \tfrac12\,\mathcal{N}(x; +1, \sigma^2),
+\qquad
+F_\sigma(x) = \tfrac12\,\Phi\!\Big(\frac{x+1}{\sigma}\Big) + \tfrac12\,\Phi\!\Big(\frac{x-1}{\sigma}\Big),
+\]</span></p>
+<p>where <span class="math inline">\(\Phi\)</span> is the standard normal CDF. Two statements are to be proved:</p>
+<ol type="1">
+<li>There exists a smooth, strictly increasing map <span class="math inline">\(T_\sigma\)</span> with <span class="math inline">\(T_\sigma(U) \sim p_\sigma\)</span> for <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>.</li>
+<li>As <span class="math inline">\(\sigma \downarrow 0\)</span>, <span class="math inline">\(T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)\)</span> for every fixed <span class="math inline">\(u \in (0,1) \setminus \{\tfrac12\}\)</span> — the generator of W01’s two-point dataset.</li>
+</ol>
+</section>
+<section id="theorem-1-probability-integral-transform" class="level3">
+<h3 class="anchored" data-anchor-id="theorem-1-probability-integral-transform">Theorem 1 (probability integral transform)</h3>
+<p><strong>Theorem.</strong> Let <span class="math inline">\(F\)</span> be a continuous, strictly increasing CDF mapping <span class="math inline">\(\mathbb{R}\)</span> onto <span class="math inline">\((0,1)\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
+<p><em>Proof.</em> Monotonicity of <span class="math inline">\(F\)</span> gives the equivalence <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span>. Hence</p>
+<p><span class="math display">\[
+\mathbb{P}\big(F^{-1}(U) \le x\big) = \mathbb{P}\big(U \le F(x)\big) = F(x). \qquad\square
+\]</span></p>
+<p>(For CDFs that are not strictly increasing or not continuous, the same conclusion holds with the generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>; Exercise 1.)</p>
+</section>
+<section id="proposition-2-existence-and-smoothness-of-the-map" class="level3">
+<h3 class="anchored" data-anchor-id="proposition-2-existence-and-smoothness-of-the-map">Proposition 2 (existence and smoothness of the map)</h3>
+<p><strong>Proposition.</strong> <span class="math inline">\(F_\sigma\)</span> is a smooth, strictly increasing bijection of <span class="math inline">\(\mathbb{R}\)</span> onto <span class="math inline">\((0,1)\)</span>. Consequently <span class="math inline">\(T_\sigma := F_\sigma^{-1}\)</span> exists, is smooth, and satisfies</p>
+<p><span class="math display">\[
+T_\sigma'(u) \;=\; \frac{1}{p_\sigma\big(T_\sigma(u)\big)} \;&gt;\; 0 .
+\]</span></p>
+<p><em>Proof.</em> <span class="math inline">\(F_\sigma' = p_\sigma\)</span>, which is everywhere positive; hence <span class="math inline">\(F_\sigma\)</span> is strictly increasing. Both <span class="math inline">\(\Phi\)</span> terms tend to <span class="math inline">\(0\)</span> as <span class="math inline">\(x \to -\infty\)</span> and to <span class="math inline">\(1\)</span> as <span class="math inline">\(x \to +\infty\)</span>, so <span class="math inline">\(F_\sigma\)</span> maps onto <span class="math inline">\((0,1)\)</span> and is a bijection. Smoothness of <span class="math inline">\(T_\sigma\)</span> and the derivative formula follow from the inverse function theorem. <span class="math inline">\(\square\)</span></p>
+<p>The derivative formula deserves a comment: <span class="math inline">\(T_\sigma\)</span> is <em>steepest exactly where the density is smallest</em>. The plateau of <span class="math inline">\(F_\sigma\)</span> over the empty region between the bumps is, after inversion, the near-vertical segment of <span class="math inline">\(T_\sigma\)</span> — the staircase visible in the demo is this formula, not an artifact.</p>
+</section>
+<section id="lemma-3-symmetry" class="level3">
+<h3 class="anchored" data-anchor-id="lemma-3-symmetry">Lemma 3 (symmetry)</h3>
+<p><strong>Lemma.</strong> <span class="math inline">\(F_\sigma(-x) = 1 - F_\sigma(x)\)</span> for all <span class="math inline">\(x\)</span>; consequently <span class="math inline">\(T_\sigma(1-u) = -T_\sigma(u)\)</span> for all <span class="math inline">\(u \in (0,1)\)</span>, and <span class="math inline">\(T_\sigma(\tfrac12) = 0\)</span>.</p>
+<p><em>Proof.</em> Using <span class="math inline">\(\Phi(-t) = 1 - \Phi(t)\)</span> on each term,</p>
+<p><span class="math display">\[
+F_\sigma(-x)
+= \tfrac12\,\Phi\!\Big(\frac{1-x}{\sigma}\Big) + \tfrac12\,\Phi\!\Big(\frac{-1-x}{\sigma}\Big)
+= \tfrac12\Big[1 - \Phi\!\Big(\frac{x-1}{\sigma}\Big)\Big]
++ \tfrac12\Big[1 - \Phi\!\Big(\frac{x+1}{\sigma}\Big)\Big]
+= 1 - F_\sigma(x).
+\]</span></p>
+<p>Applying <span class="math inline">\(T_\sigma\)</span> to both sides of <span class="math inline">\(F_\sigma(-x) = 1 - F_\sigma(x)\)</span> with <span class="math inline">\(u = F_\sigma(x)\)</span> yields <span class="math inline">\(T_\sigma(1-u) = -T_\sigma(u)\)</span>; setting <span class="math inline">\(u = \tfrac12\)</span> gives <span class="math inline">\(T_\sigma(\tfrac12) = -T_\sigma(\tfrac12) = 0\)</span>. <span class="math inline">\(\square\)</span></p>
+<p>By the lemma, it suffices to analyze <span class="math inline">\(u &lt; \tfrac12\)</span>.</p>
+</section>
+<section id="theorem-4-the-limit-is-the-sign-function" class="level3">
+<h3 class="anchored" data-anchor-id="theorem-4-the-limit-is-the-sign-function">Theorem 4 (the limit is the sign function)</h3>
+<p><strong>Theorem.</strong> For every fixed <span class="math inline">\(u \in (0,1)\)</span> with <span class="math inline">\(u \ne \tfrac12\)</span>,</p>
+<p><span class="math display">\[
+\lim_{\sigma \downarrow 0} T_\sigma(u) \;=\; \operatorname{sign}\big(u - \tfrac12\big).
+\]</span></p>
+<p><em>Proof.</em> By Lemma 3 it suffices to treat <span class="math inline">\(u &lt; \tfrac12\)</span> and show <span class="math inline">\(T_\sigma(u) \to -1\)</span>. Fix <span class="math inline">\(\varepsilon \in (0,1)\)</span>. Evaluate <span class="math inline">\(F_\sigma\)</span> at the two points <span class="math inline">\(-1 \pm \varepsilon\)</span> and let <span class="math inline">\(\sigma \downarrow 0\)</span>:</p>
+<p><span class="math display">\[
+F_\sigma(-1+\varepsilon)
+= \tfrac12\,\Phi\!\Big(\frac{\varepsilon}{\sigma}\Big)
++ \tfrac12\,\Phi\!\Big(\frac{\varepsilon - 2}{\sigma}\Big)
+\;\longrightarrow\; \tfrac12 \cdot 1 + \tfrac12 \cdot 0 = \tfrac12,
+\]</span></p>
+<p>since <span class="math inline">\(\varepsilon &gt; 0\)</span> and <span class="math inline">\(\varepsilon - 2 &lt; 0\)</span>. Because <span class="math inline">\(u &lt; \tfrac12\)</span>, there is a <span class="math inline">\(\sigma_1 &gt; 0\)</span> with <span class="math inline">\(F_\sigma(-1+\varepsilon) &gt; u\)</span> for all <span class="math inline">\(\sigma &lt; \sigma_1\)</span>; by strict monotonicity of <span class="math inline">\(F_\sigma\)</span> this gives <span class="math inline">\(T_\sigma(u) &lt; -1 + \varepsilon\)</span>. Similarly,</p>
+<p><span class="math display">\[
+F_\sigma(-1-\varepsilon)
+= \tfrac12\,\Phi\!\Big(\frac{-\varepsilon}{\sigma}\Big)
++ \tfrac12\,\Phi\!\Big(\frac{-2-\varepsilon}{\sigma}\Big)
+\;\longrightarrow\; 0,
+\]</span></p>
+<p>so there is a <span class="math inline">\(\sigma_2 &gt; 0\)</span> with <span class="math inline">\(F_\sigma(-1-\varepsilon) &lt; u\)</span> for <span class="math inline">\(\sigma &lt; \sigma_2\)</span>, whence <span class="math inline">\(T_\sigma(u) &gt; -1 - \varepsilon\)</span>. For <span class="math inline">\(\sigma &lt; \min(\sigma_1, \sigma_2)\)</span> we conclude <span class="math inline">\(|T_\sigma(u) - (-1)| &lt; \varepsilon\)</span>. <span class="math inline">\(\square\)</span></p>
+<p>At the single point <span class="math inline">\(u = \tfrac12\)</span>, Lemma 3 gives <span class="math inline">\(T_\sigma(\tfrac12) = 0\)</span> for every <span class="math inline">\(\sigma\)</span>; since <span class="math inline">\(\mathbb{P}(U = \tfrac12) = 0\)</span>, this point is irrelevant to the distributional statement below.</p>
+</section>
+<section id="corollary-5-modes-of-convergence" class="level3">
+<h3 class="anchored" data-anchor-id="corollary-5-modes-of-convergence">Corollary 5 (modes of convergence)</h3>
+<p>Let <span class="math inline">\(S(u) = \operatorname{sign}(u - \tfrac12)\)</span>. Theorem 4 states <span class="math inline">\(T_\sigma(U) \to S(U)\)</span> <strong>almost surely</strong>. Almost-sure convergence implies convergence in distribution, and <span class="math inline">\(S(U)\)</span> takes the values <span class="math inline">\(\pm 1\)</span> with probability <span class="math inline">\(\tfrac12\)</span> each; hence</p>
+<p><span class="math display">\[
+p_\sigma \;\Longrightarrow\; \tfrac12\,\delta_{-1} + \tfrac12\,\delta_{+1}
+\qquad (\sigma \downarrow 0),
+\]</span></p>
+<p>recovering W01’s two-point data distribution as the weak limit of the mixtures. The discrete generator <span class="math inline">\(x = S(u)\)</span> — thresholding a uniform — is thereby exhibited as the pointwise limit of smooth generators.</p>
+</section>
+<section id="the-quantitative-picture-how-the-stairs-form" class="level3">
+<h3 class="anchored" data-anchor-id="the-quantitative-picture-how-the-stairs-form">The quantitative picture: how the stairs form</h3>
+<p>Two refinements sharpen the qualitative theorem.</p>
+<p><strong>The shape of each stair.</strong> Fix <span class="math inline">\(u &lt; \tfrac12\)</span> and write <span class="math inline">\(x = T_\sigma(u)\)</span>, which by Theorem 4 lies near <span class="math inline">\(-1\)</span> for small <span class="math inline">\(\sigma\)</span>; in particular <span class="math inline">\(x \le 0\)</span> eventually, so the far component satisfies <span class="math inline">\(0 &lt; \tfrac12\Phi\big(\tfrac{x-1}{\sigma}\big) \le \tfrac12\Phi(-1/\sigma)\)</span>, exponentially small. From <span class="math inline">\(u = F_\sigma(x)\)</span>,</p>
+<p><span class="math display">\[
+\Phi\!\Big(\frac{x+1}{\sigma}\Big) = 2u - 2\eta_\sigma,
+\qquad 0 &lt; \eta_\sigma \le \tfrac12\,\Phi(-1/\sigma),
+\]</span></p>
+<p>and therefore</p>
+<p><span class="math display">\[
+T_\sigma(u) \;=\; -1 + \sigma\,\Phi^{-1}\!\big(2u - 2\eta_\sigma\big)
+\;\approx\; -1 + \sigma\,\Phi^{-1}(2u).
+\]</span></p>
+<p>Each stair of the limiting staircase carries a copy of the Gaussian quantile function, compressed by the factor <span class="math inline">\(\sigma\)</span> — asymptotically, the inverse-CDF map coincides with the “packed” two-stage map of Notes II (choose the component from <span class="math inline">\(u\)</span>, then apply that component’s own quantile).</p>
+<p><strong>The forming jump.</strong> At the center, Proposition 2 gives</p>
+<p><span class="math display">\[
+T_\sigma'(\tfrac12) = \frac{1}{p_\sigma(0)} = \sigma\sqrt{2\pi}\; e^{1/(2\sigma^2)}
+\;\longrightarrow\; \infty ,
+\]</span></p>
+<p>so the slope at <span class="math inline">\(u = \tfrac12\)</span> blows up as the jump forms. Convergence in Theorem 4 is uniform on compact subsets of <span class="math inline">\((0,1) \setminus \{\tfrac12\}\)</span> but not across <span class="math inline">\(u = \tfrac12\)</span>: a boundary layer of width shrinking with <span class="math inline">\(\sigma\)</span> always remains, in exact analogy with the non-uniform convergence <span class="math inline">\(\tanh(x/\sigma^2) \to
+\operatorname{sign}(x)\)</span> of the W01 denoiser.</p>
+</section>
+<section id="the-score-based-flow-is-the-same-map" class="level3">
+<h3 class="anchored" data-anchor-id="the-score-based-flow-is-the-same-map">The score-based flow is the same map</h3>
+<p>W01 built its sampler differently — not from the CDF, but by flowing particles along the score with the tanh denoiser as a smooth attractor. It is natural to ask whether that construction converges to the same deterministic map. In one dimension the answer is affirmative, and exact at every noise level, by the following two observations.</p>
+<p><strong>Proposition 6 (flows do not cross).</strong> For <span class="math inline">\(\sigma_{\min} &gt; 0\)</span>, let <span class="math inline">\(\Psi\)</span> denote the exact probability-flow ODE map carrying noise level <span class="math inline">\(\sigma_{\max}\)</span> down to <span class="math inline">\(\sigma_{\min}\)</span> (velocity <span class="math inline">\(\tfrac12\,\partial_x \log p_\sigma\)</span> in the descending variance clock, exact score). Then <span class="math inline">\(\Psi\)</span> is continuous and strictly increasing.</p>
+<p><em>Proof sketch.</em> The velocity field is smooth and locally Lipschitz in <span class="math inline">\(x\)</span> for <span class="math inline">\(\sigma \ge \sigma_{\min} &gt; 0\)</span>, so solutions are unique. If two trajectories starting at <span class="math inline">\(x &lt; x'\)</span> met at some time, running the ODE backwards from the meeting point would violate uniqueness; hence trajectories preserve order, and <span class="math inline">\(\Psi\)</span> is strictly increasing. Continuity of the flow map in the initial condition is standard ODE theory. <span class="math inline">\(\square\)</span></p>
+<p><strong>Proposition 7 (monotone transport is rigid).</strong> Let <span class="math inline">\(T\)</span> be continuous and strictly increasing with <span class="math inline">\(T_\# \mu = \nu\)</span>, where <span class="math inline">\(\mu, \nu\)</span> have continuous, strictly increasing CDFs <span class="math inline">\(F_\mu, F_\nu\)</span>. Then <span class="math inline">\(T = F_\nu^{-1} \circ F_\mu\)</span>.</p>
+<p><em>Proof.</em> <span class="math inline">\(F_\nu(T(x)) = \nu\big((-\infty, T(x)]\big)
+= \mu\big(T^{-1}(-\infty, T(x)]\big) = \mu\big((-\infty, x]\big) = F_\mu(x)\)</span>, using monotonicity in the middle step. Apply <span class="math inline">\(F_\nu^{-1}\)</span>. <span class="math inline">\(\square\)</span></p>
+<p><strong>Corollary 8.</strong> The exact score flow satisfies <span class="math inline">\(\Psi = F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}\)</span>: the probability-flow ODE <em>is</em> the quantile transport, at every positive noise level. Composing with a uniform parametrization of the source, <span class="math inline">\(x_T = F_{\sigma_{\max}}^{-1}(u)\)</span>, the complete score-based sampler is exactly the map <span class="math inline">\(u \mapsto T_{\sigma_{\min}}(u)\)</span> of this note. Theorem 4 therefore applies verbatim: as <span class="math inline">\(\sigma_{\min} \downarrow 0\)</span>,</p>
+<p><span class="math display">\[
+\Psi(x_T) \;\longrightarrow\; \operatorname{sign}(x_T)
+\qquad \text{for every } x_T \ne 0,
+\]</span></p>
+<p>since <span class="math inline">\(F_{\sigma_{\max}}(0) = \tfrac12\)</span> by symmetry. The tanh-driven flow converges pointwise to the deterministic two-point generator, and its separatrix <span class="math inline">\(x_T = 0\)</span> is precisely the unstable equilibrium identified in W01.</p>
+<p><em>Numerical confirmation.</em> Integrating the exact-score probability-flow ODE with <span class="math inline">\(20{,}000\)</span> Euler steps from <span class="math inline">\(\sigma_{\max} = 3\)</span> to <span class="math inline">\(\sigma_{\min} = 10^{-2}\)</span> and comparing against <span class="math inline">\(F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}\)</span> on a grid of initial points: the two maps agree to about <span class="math inline">\(10^{-5}\)</span> everywhere except at the separatrix itself (where the CDF’s plateau is flat to machine precision and the quantile is defined by symmetry).</p>
+<p><strong>One shot versus increments: the factorization view.</strong> Corollary 8 supports a sharper reading of the relationship between the two constructions. The quantile transport telescopes across any ladder of noise levels <span class="math inline">\(\sigma_{\max} = s_0 &gt; s_1 &gt; \cdots &gt; s_K = \sigma_{\min}\)</span>:</p>
+<p><span class="math display">\[
+F_{s_K}^{-1} \circ F_{s_0}
+\;=\;
+\big(F_{s_K}^{-1} \circ F_{s_{K-1}}\big) \circ \cdots \circ
+\big(F_{s_1}^{-1} \circ F_{s_0}\big),
+\]</span></p>
+<p>and each factor is, by Corollary 8 applied between adjacent levels, exactly the probability-flow step from <span class="math inline">\(s_{k}\)</span> to <span class="math inline">\(s_{k+1}\)</span>. The exact reverse flow is therefore not an approximation of the one-shot map but a <strong>factorization</strong> of it into near-identity maps, one per noise increment; the practical <span class="math inline">\(K\)</span>-step sampler is then explicit Euler applied to each factor — a genuine numerical method, with error vanishing as <span class="math inline">\(K \to \infty\)</span>. In this precise sense, reverse diffusion is a numerical solution of the one-shot transport problem.</p>
+<p>The decomposition also explains why the incremental route is the one that scales. The one-shot map is globally wild — in the <span class="math inline">\(\sigma \to 0\)</span> limit, discontinuous — and is built from the CDF, a global object unavailable in high dimension. Each factor is locally tame and requires only the score at a single noise level, which is a regression target (denoising). A composition of many learnable maps realizes one unlearnable map. Structurally, this is a homotopy (continuation) method for sampling: embed the intractable target in a family <span class="math inline">\(\{p_\sigma\}\)</span> terminating at a trivial Gaussian, and track the solution path one level at a time.</p>
+<p>Two caveats frame the result. First, the identification of the flow with the quantile transport is special to one dimension, where “monotone” pins the transport down uniquely; in higher dimensions the probability-flow ODE defines a valid transport that is in general <em>not</em> the monotone (optimal-transport) map. Second, the statement concerns the exact score, exact terminal law, and exact integration; and the Lipschitz constant of the velocity grows like <span class="math inline">\(\sigma^{-2}\)</span> as <span class="math inline">\(\sigma_{\min} \downarrow 0\)</span> — the flow is smooth at every positive noise level even though its limit is discontinuous, which is the dynamical face of the boundary layer of Theorem 4.</p>
+</section>
+<section id="interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation">Interpretation</h3>
+<p>The same step function has now appeared on both sides of the generative pipeline: the denoiser <span class="math inline">\(\tanh(x/\sigma^2) \to \operatorname{sign}(x)\)</span> in data space, and the generator <span class="math inline">\(T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)\)</span> in noise space. In both cases a smooth object degenerates into a discontinuous one precisely as the noise scale vanishes. This is the one-dimensional instance of a general phenomenon: discrete or lower-dimensional data distributions are reached as limits of smooth transports, and learnable models operate at small positive noise scales exactly because smooth maps can be represented and trained while their discontinuous limits cannot. Diffusion models anneal <span class="math inline">\(\sigma\)</span> toward zero rather than starting there for this reason.</p>
+</section>
+<section id="exercises-3" class="level3">
+<h3 class="anchored" data-anchor-id="exercises-3">Exercises</h3>
+<ol type="1">
+<li>Prove Theorem 1 for a general CDF <span class="math inline">\(F\)</span> (not necessarily continuous or strictly increasing) using the generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>.</li>
+<li>Write out the case <span class="math inline">\(u &gt; \tfrac12\)</span> of Theorem 4 directly (without invoking Lemma 3), and verify that the two squeeze evaluations become <span class="math inline">\(F_\sigma(1-\varepsilon) \to \tfrac12\)</span> and <span class="math inline">\(F_\sigma(1+\varepsilon) \to 1\)</span>.</li>
+<li><strong>Unequal weights.</strong> For the mixture <span class="math inline">\(\pi\,\mathcal{N}(-1,\sigma^2) + (1-\pi)\,\mathcal{N}(+1,\sigma^2)\)</span> with <span class="math inline">\(0 &lt; \pi &lt; 1\)</span>, show <span class="math inline">\(T_\sigma(u) \to -1\)</span> for <span class="math inline">\(u &lt; \pi\)</span> and <span class="math inline">\(T_\sigma(u) \to +1\)</span> for <span class="math inline">\(u &gt; \pi\)</span>: the location of the jump is the component weight.</li>
+<li>Verify the derivative computation <span class="math inline">\(T_\sigma'(\tfrac12) = \sigma \sqrt{2\pi}\,
+e^{1/(2\sigma^2)}\)</span> and evaluate it numerically for <span class="math inline">\(\sigma = 0.5, 0.2, 0.1\)</span>.</li>
+<li><strong>Three components.</strong> For a symmetric three-component mixture with means <span class="math inline">\(-1, 0, +1\)</span> and equal weights, describe the limit of <span class="math inline">\(T_\sigma\)</span>: the number of jumps, their locations in <span class="math inline">\(u\)</span>, and the limiting values between them.</li>
+<li>Prove Proposition 7 in detail, identifying exactly where continuity and strict monotonicity of <span class="math inline">\(T\)</span> are used.</li>
+<li>Reproduce the numerical confirmation: integrate the exact-score probability-flow ODE (W01’s sampler with a fine grid) from a grid of initial points and compare with <span class="math inline">\(F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}\)</span> computed by bisection. Where is the agreement worst, and why?</li>
 </ol>
 </section>
 </section>
