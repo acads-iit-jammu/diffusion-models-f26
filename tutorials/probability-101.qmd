@@ -1,0 +1,249 @@
+# Probability 101 — A Refresher {.unnumbered}
+
+*A standalone tutorial (used in [W02](../weeks/w02.qmd)): a self-contained refresher on the probability prerequisites of the
+course: sample spaces, random variables, joint and marginal distributions,
+conditioning, and expectation. Readers comfortable with these notions may proceed
+directly to [Distributions and Maximum Likelihood](./distributions-mle.qmd).*
+
+Probability theory is built on two distinct maps: the probability measure, which
+assigns numbers to events, and the random variable, which assigns numbers to
+outcomes. Distinguishing the two carefully at the outset prevents most of the common
+confusions, and this refresher is organized accordingly.
+
+## The sample space, events, and the probability measure
+
+A random experiment is modeled by three objects.
+
+- The **sample space** $\Omega$ is the set of all possible outcomes of the
+  experiment, with one element $\omega \in \Omega$ per complete outcome. For a
+  single die, $\Omega = \{1, \dots, 6\}$. For two coin tosses,
+  $\Omega = \{HH, HT, TH, TT\}$; note that an outcome specifies the result of the
+  entire experiment, i.e. both tosses. For a point drawn from the interval $[0,1]$,
+  $\Omega = [0,1]$, an uncountable set.
+- An **event** is a subset $A \subseteq \Omega$; events are the objects to which
+  probabilities are assigned. "The die shows an even number" is the event
+  $\{2, 4, 6\}$; "at least one head" is the event $\{HH, HT, TH\}$. An event is a
+  collection of outcomes, not an outcome.
+- The **probability measure** is the first of the two maps:
+
+  $$
+  P : \text{events} \longrightarrow [0, 1],
+  $$
+
+  required to satisfy Kolmogorov's axioms: (i) $P(A) \ge 0$ for every event $A$;
+  (ii) $P(\Omega) = 1$; (iii) for mutually exclusive events $A_1, A_2, \dots$,
+  $P\big(\bigcup_i A_i\big) = \sum_i P(A_i)$ (countable additivity).
+
+All further rules are consequences of the axioms; two used constantly are
+$P(A^c) = 1 - P(A)$ and $P(A \cup B) = P(A) + P(B) - P(A \cap B)$.
+
+A remark on the continuous case. For $\Omega = [0,1]$ with the uniform measure,
+every singleton event $\{\omega\}$ has probability zero, although some outcome
+certainly occurs. Probability zero therefore does not mean impossibility; it means a
+vanishing fraction of the possibilities. This is also the reason $P$ is defined on
+events rather than on individual outcomes: in the continuous case, individual
+outcomes are too small to carry probability.
+
+## Random variables
+
+The second map is the random variable. A **random variable** is a function
+
+$$
+X : \Omega \longrightarrow \mathbb{R}
+$$
+
+that assigns a numerical value to each outcome. For the two-coin experiment with
+$X$ the number of heads: $X(HH) = 2$, $X(HT) = X(TH) = 1$, $X(TT) = 0$. Despite the
+name, $X$ is a fixed, deterministic function; the randomness resides entirely in
+which outcome $\omega$ the experiment produces.
+
+The two maps combine as follows. A statement such as $\mathbb{P}(X = 1)$ is
+evaluated by first identifying the event determined by the condition and then
+applying $P$ to it:
+
+$$
+\mathbb{P}(X = 1)
+\;=\; P\big(\{\omega \in \Omega : X(\omega) = 1\}\big)
+\;=\; P(\{HT, TH\}) = \tfrac{2}{4}.
+$$
+
+Carrying this out for every value (or set of values) of $X$ yields the
+**distribution** of $X$, a probability assignment on the real line. Once the
+distribution is available, the underlying sample space is usually suppressed and one
+works with the distribution directly; this is standard practice, and the remainder of
+the course follows it. The present section records what that convention leaves
+implicit.
+
+A **discrete** random variable is described by its probability mass function (pmf)
+$p(x) = \mathbb{P}(X = x)$, with $\sum_x p(x) = 1$. A **continuous** random
+variable is described by its probability density function (pdf) $f(x) \ge 0$, with
+$\int_{-\infty}^{\infty} f(x)\, dx = 1$; probabilities are obtained as areas
+under the density,
+
+$$
+\mathbb{P}(a \le X \le b) = \int_a^b f(x)\, dx .
+$$
+
+Three properties of densities deserve emphasis.
+
+- A density value is not a probability and may exceed 1; the Uniform distribution on
+  $[0, \tfrac12]$ has $f \equiv 2$. Only areas under the density are probabilities.
+- $\mathbb{P}(X = x) = 0$ for every individual $x$, by the singleton remark above.
+  The informal reading of a density is $f(x)\,dx \approx$ the probability of an
+  outcome within $dx$ of $x$; densities compare the relative plausibility of
+  neighborhoods.
+- The cumulative distribution function (CDF) $F(x) = \mathbb{P}(X \le x)$ applies
+  to discrete and continuous variables alike, and its derivative, where it exists,
+  is the pdf. The CDF appears in [Generative AI, in Its Simplest Form](./genai-simplest-form.qmd) as the sampling map $F^{-1}$.
+
+## Joint distributions
+
+Let $X$ and $Y$ be two random variables defined on the same sample space — two
+numerical features of the same outcome. Their **joint distribution** specifies
+$p(x, y) = \mathbb{P}(X = x \text{ and } Y = y)$ in the discrete case, or a joint
+density $f(x, y)$ whose volumes are probabilities in the continuous case. The joint
+distribution is a complete description of the pair: every probabilistic statement
+about $(X, Y)$ can be computed from it.
+
+The following discrete joint distribution serves as the running example (the state
+of a morning sky and the occurrence of rain):
+
+| $p(x,y)$ | $Y{=}$ rain | $Y{=}$ no rain | row sum |
+|---|:---:|:---:|:---:|
+| $X{=}$ cloudy | 0.20 | 0.25 | **0.45** |
+| $X{=}$ clear | 0.05 | 0.50 | **0.55** |
+| column sum | **0.25** | **0.75** | 1 |
+
+: {tbl-colwidths="[34,22,22,22]"}
+
+## Marginal distributions
+
+The **marginal** distribution of $X$ describes $X$ alone, with $Y$ disregarded. It
+is obtained by summing (or, for densities, integrating) the joint distribution over
+the other variable:
+
+$$
+p(x) = \sum_y p(x, y),
+\qquad\text{or}\qquad
+f(x) = \int f(x, y)\, dy .
+$$
+
+In the table these are the row and column sums — the margins of the table, which is
+the origin of the term: $\mathbb{P}(\text{cloudy}) = 0.45$ and
+$\mathbb{P}(\text{rain}) = 0.25$. The operation is justified directly by the
+additivity axiom: the event "cloudy" is the disjoint union of "cloudy and rain" and
+"cloudy and no rain". Marginalization recurs throughout the course; in the mixture
+model of [Generative AI, in Its Simplest Form](./genai-simplest-form.qmd), the observed density
+$p(x) = \sum_z p(z)\, p(x \mid z)$ is precisely the joint distribution of
+$(x, z)$ with the latent variable summed out.
+
+## Conditional distributions and Bayes' rule
+
+The **conditional** distribution of $Y$ given $X = x$ is defined, whenever
+$p(x) > 0$, by
+
+$$
+p(y \mid x) = \frac{p(x, y)}{p(x)} .
+$$
+
+The definition restricts attention to the outcomes consistent with $X = x$ and
+renormalizes their probabilities to total 1. In the running example,
+$\mathbb{P}(\text{rain} \mid \text{cloudy}) = 0.20 / 0.45 \approx 0.44$,
+compared with the unconditional $\mathbb{P}(\text{rain}) = 0.25$.
+
+Applying the definition in both directions and eliminating the joint yields
+**Bayes' rule**,
+
+$$
+\boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
+$$
+
+which converts a conditional in one direction into the conditional in the other.
+The tanh denoiser of W01 is an application of this identity, with $x$ the clean
+data point and $y$ the noisy observation.
+
+$X$ and $Y$ are **independent** if $p(x, y) = p(x)\, p(y)$ for all $x, y$ —
+equivalently, if $p(y \mid x) = p(y)$, so that conditioning on $X$ conveys no
+information about $Y$. In the table, $0.20 \ne 0.45 \times 0.25$, so the two
+variables are dependent. The i.i.d. assumption underlying the likelihoods of [Distributions and Maximum Likelihood](./distributions-mle.qmd)
+are an independence statement applied to repeated observations.
+
+## Expectation
+
+The **expectation** of a random variable is the probability-weighted average of its
+values,
+
+$$
+\mathbb{E}[X] = \sum_x x\, p(x)
+\qquad\text{or}\qquad
+\mathbb{E}[X] = \int x\, f(x)\, dx ,
+$$
+
+the center of mass of the distribution. The expectation need not be an attainable
+value; a fair die has $\mathbb{E}[X] = 3.5$. More generally, for a function $g$,
+
+$$
+\mathbb{E}[g(X)] = \sum_x g(x)\, p(x)
+\qquad\text{or}\qquad
+\int g(x)\, f(x)\, dx ,
+$$
+
+so that the distribution of $g(X)$ itself need never be computed (a fact sometimes
+called the law of the unconscious statistician).
+
+Two properties carry most of the weight in this course.
+
+- **Linearity.** $\mathbb{E}[aX + bY] = a\,\mathbb{E}[X] + b\,\mathbb{E}[Y]$
+  holds for all random variables on a common sample space, with no independence
+  assumption. (Independence is required for the separate statement
+  $\mathbb{E}[XY] = \mathbb{E}[X]\,\mathbb{E}[Y]$.)
+- **Variance.** $\operatorname{Var}(X) =
+  \mathbb{E}\big[(X - \mathbb{E}X)^2\big] =
+  \mathbb{E}[X^2] - (\mathbb{E}X)^2$ measures spread about the mean, and for
+  independent random variables variances add. The identity
+  $\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2$ of W01 is an instance.
+
+Finally, the **conditional expectation** $\mathbb{E}[X \mid Y = y]$ is the mean of
+the conditional distribution of $X$ given $Y = y$, regarded as a function of $y$. It
+is the minimum-mean-squared-error prediction of $X$ from the observation $Y = y$
+(proved in [Distributions and Maximum Likelihood](./distributions-mle.qmd)), and the denoiser
+$\mathbb{E}[x_0 \mid x_\sigma]$ of W01 is precisely a conditional expectation.
+
+## Correspondence with this course
+
+| Probability 101 object | Where it appears in this course |
+|---|---|
+| Sample space $\Omega$, outcome $\omega$ | the randomness underlying every "sample" |
+| $P$: events $\to [0,1]$ | the data distribution $p_{\text{data}}$ |
+| Random variable $X: \Omega \to \mathbb{R}$ | data $x$, noise $z$, latent $z$ |
+| pmf / pdf | every curve in the Distribution Playground |
+| Joint $p(x, z)$ | mixture model: latent variable and observation |
+| Marginalization $\sum_z p(x, z)$ | the mixture density; later, the ELBO (M3) |
+| Conditioning and Bayes' rule | posteriors; W01's tanh denoiser |
+| Independence | i.i.d. data; likelihoods factorize |
+| $\mathbb{E}$, linearity, variance | losses, noise accumulation, $1 + \sigma^2$ |
+| $\mathbb{E}[X \mid Y]$ | the denoiser — the central object of the course |
+
+: {tbl-colwidths="[40,60]"}
+
+## Exercises
+
+1. For two fair coin tosses with $X$ the number of heads: write out $\Omega$, the
+   values $X(\omega)$ for all four outcomes, and the pmf of $X$; verify that the
+   pmf sums to 1 using the additivity axiom.
+2. For the sky-and-rain table, compute
+   $\mathbb{P}(\text{cloudy} \mid \text{rain})$ by Bayes' rule from
+   $\mathbb{P}(\text{rain} \mid \text{cloudy})$ and the marginals, and confirm
+   the result by direct computation from the table.
+3. Exhibit (a) a pdf exceeding 3 at some point; (b) a random variable whose
+   expectation is not an attainable value; (c) two dependent random variables for
+   which $\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$ nevertheless holds,
+   illustrating that linearity requires no independence.
+4. Let $U \sim \text{Uniform}(0,1)$ and $X = U^2$. Compute $\mathbb{E}[X]$ twice:
+   directly via $\mathbb{E}[g(U)]$, and by first deriving the CDF and pdf of $X$.
+   Compare the effort required.
+5. In the mixture model $z \sim \text{Bernoulli}(\pi)$,
+   $x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)$: identify the joint
+   $p(x, z)$, both marginals, and both conditionals. State which of these objects
+   W01's denoiser computes, and which the ancestral sampler of *Generative AI, in Its Simplest Form* uses.
+

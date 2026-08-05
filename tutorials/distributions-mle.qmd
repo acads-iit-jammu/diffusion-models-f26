@@ -1,0 +1,237 @@
+# Distributions and Maximum Likelihood {.unnumbered}
+
+*Standalone tutorial accompanying [W02](../weeks/w02.qmd). Interactive versions:
+[the Distribution Playground](../materials/distributions-playground.html) and
+[the Likelihood Lens](../materials/likelihood-lens.html).*
+
+This note walks one loop twice: **distribution → samples → fitted distribution → new
+samples**. First visually (the playground), then analytically (maximum likelihood for
+the Gaussian, derived in full). It doubles as a compact reference for the distribution
+families used throughout the course.
+
+## The cast of distributions
+
+| Family | pdf $f(x)$ | Support | Mean | Variance |
+|---|---|---|---|---|
+| Uniform$(a,b)$ | $\frac{1}{b-a}$ | $[a,b]$ | $\frac{a+b}{2}$ | $\frac{(b-a)^2}{12}$ |
+| Normal$(\mu,\sigma^2)$ | $\frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$ | $\mathbb{R}$ | $\mu$ | $\sigma^2$ |
+| Gamma$(k,\theta)$ | $\frac{x^{k-1} e^{-x/\theta}}{\Gamma(k)\,\theta^{k}}$ | $(0,\infty)$ | $k\theta$ | $k\theta^2$ |
+| Beta$(\alpha,\beta)$ | $\frac{x^{\alpha-1}(1-x)^{\beta-1}}{B(\alpha,\beta)}$ | $(0,1)$ | $\frac{\alpha}{\alpha+\beta}$ | $\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}$ |
+| Mixture | $\sum_i \pi_i\, f_i(x)$ | union | $\sum_i \pi_i \mu_i$ | see Exercise 5 |
+
+: {tbl-colwidths="[22,30,14,14,20]"}
+
+A sentence of habitat for each: the **Uniform** encodes total ignorance on an interval;
+the **Normal** is what sums of many small independent effects look like (W01's warm-up
+demo *is* this statement); the **Gamma** models positive, right-skewed quantities such
+as waiting times; the **Beta** lives on $(0,1)$ and models proportions and
+probabilities; a **mixture** models data with subpopulations — clusters — and is the
+recurring character of this course.
+
+## How sampling actually works
+
+Every sampler in the playground reduces to uniform random numbers:
+
+- **Inverse CDF.** If $F$ is a CDF and $U \sim \text{Uniform}(0,1)$, then
+  $X = F^{-1}(U)$ has CDF $F$ (proved in the companion note
+  [*Generative AI, in Its Simplest Form*](./genai-simplest-form.qmd)). This handles
+  Uniform ($x = a + (b-a)u$) and anything with a computable $F^{-1}$.
+- **Box–Muller** for the Normal: with $U_1, U_2$ independent uniforms,
+  $\sqrt{-2\log U_1}\,\cos(2\pi U_2)$ is exactly $\mathcal{N}(0,1)$. This is the
+  sampler inside every demo of this course.
+- **Pick-then-sample** for mixtures: draw the component index with probabilities
+  $\pi_i$, then sample that component — ancestral sampling, the subject of the
+  companion note.
+- Gamma and Beta use clever rejection samplers (the playground uses Marsaglia–Tsang);
+  we treat them as black boxes.
+
+## Likelihood
+
+Fix a family $f(x;\theta)$ and observe an i.i.d. dataset $x_1, \dots, x_n$. The
+**likelihood** and **log-likelihood** are
+
+$$
+L(\theta) = \prod_{i=1}^n f(x_i; \theta),
+\qquad
+\ell(\theta) = \sum_{i=1}^n \log f(x_i; \theta),
+$$
+
+and the **maximum likelihood estimator (MLE)** is
+$\hat\theta = \arg\max_\theta \ell(\theta)$. The log changes nothing about the argmax
+(monotonicity) and everything about the algebra and the numerics: a product of 3000
+numbers of size $10^{-2}$ underflows; a sum of their logs is a perfectly pleasant
+$\approx -13{,}800$.
+
+## PDF vs likelihood: the same function, two readings
+
+The chronic confusion, settled: $f(x;\theta)$ is **one formula with two arguments**.
+
+| Fix | Vary | You get | Area under the curve |
+|---|---|---|---|
+| parameters $\theta$ | data $x$ | the **pdf** — a distribution over data | $= 1$, always |
+| observed data $x$ | parameters $\theta$ | the **likelihood** — a score for fitting | meaningless |
+
+: {tbl-colwidths="[22,22,36,20]"}
+
+The [Likelihood Lens](../materials/likelihood-lens.html) shows both as slices of the same surface
+$f(x;\mu) = \mathcal{N}(x; \mu, \sigma^2)$: the horizontal slice (fix $\mu$) is a
+density in $x$; the vertical slice (fix $x$) is a likelihood in $\mu$. For the
+Gaussian the two slices happen to have the same bell shape, because
+$f(x;\mu) = f(\mu;x)$ — a symmetry of this family, *not* a general fact (repeat the
+exercise mentally with a Gamma in $\theta$). What is general: **the likelihood is not
+a probability distribution over $\theta$** — it need not integrate to 1, and only its
+argmax and local shape carry meaning.
+
+## The Gaussian MLE, in full
+
+$$
+\ell(\mu, \sigma^2)
+= -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^n (x_i - \mu)^2 .
+$$
+
+**Maximize over $\mu$.** Only the second term involves $\mu$:
+
+$$
+\frac{\partial \ell}{\partial \mu}
+= \frac{1}{\sigma^2}\sum_{i=1}^n (x_i - \mu)
+= \frac{n}{\sigma^2}(\bar{x} - \mu)
+\;\stackrel{!}{=}\; 0
+\quad\Longrightarrow\quad
+\boxed{\ \hat\mu = \bar{x}\ }
+$$
+
+for **every** $\sigma$ — which is why, in the Lens, changing $\sigma$ sharpens the
+log-likelihood parabola but never moves its peak.
+
+**Maximize over $\sigma^2$** (treat $v = \sigma^2$ as the variable):
+
+$$
+\frac{\partial \ell}{\partial v}
+= -\frac{n}{2v} + \frac{1}{2v^2}\sum_i (x_i - \hat\mu)^2
+\;\stackrel{!}{=}\; 0
+\quad\Longrightarrow\quad
+\boxed{\ \hat\sigma^2 = \frac{1}{n}\sum_{i=1}^n (x_i - \bar{x})^2\ }
+$$
+
+(One should check this is a maximum, not merely critical: $\ell \to -\infty$ as
+$v \to 0^+$ and as $v \to \infty$, and this is the only critical point.) Note the
+divisor $n$: the MLE of the variance is *biased* — $\mathbb{E}[\hat\sigma^2] =
+\frac{n-1}{n}\sigma^2$ — which is where the familiar $n-1$ estimator comes from. For
+this course the distinction is a footnote; the MLE is what the theory produces.
+
+## Aside: binary cross-entropy is a likelihood
+
+The most familiar loss in machine learning is a maximum-likelihood problem in
+disguise, and the disguise falls away the moment classification is read as a
+(conditional) generative model.
+
+**The model.** For the $i$-th sample with features $x_i$, model the binary label as
+a Bernoulli trial,
+
+$$
+y_i \mid x_i \;\sim\; \text{Bernoulli}(\pi_i), \qquad y_i \in \{0, 1\},
+$$
+
+and let a neural network supply the **logit** — the log-*odds*, not the
+log-probability:
+
+$$
+s_i = f_\theta(x_i) = \log \frac{\pi_i}{1 - \pi_i}
+\quad\Longleftrightarrow\quad
+\pi_i = \operatorname{sigmoid}(s_i).
+$$
+
+**The likelihood.** The Bernoulli pmf can be written in one line as
+$p(y \mid \pi) = \pi^{y} (1-\pi)^{1-y}$, so for independent samples
+
+$$
+L(\theta) = \prod_{i=1}^n \pi_i^{\,y_i} (1 - \pi_i)^{1 - y_i},
+\qquad
+-\ell(\theta) = -\sum_{i=1}^n \Big[ y_i \log \pi_i + (1 - y_i)\log(1 - \pi_i) \Big].
+$$
+
+The right-hand side is **exactly binary cross-entropy**. Training a classifier with
+BCE is maximum likelihood for a conditional Bernoulli model whose log-odds are the
+network output — nothing more. (The name is also earned: $-\ell/n$ is the
+cross-entropy between the empirical distribution of each label and the model's
+Bernoulli.)
+
+**The $\pm 1$ convention.** With labels $y_i \in \{-1, +1\}$, the identity
+$\operatorname{sigmoid}(-s) = 1 - \operatorname{sigmoid}(s)$ collapses both cases
+into $p(y_i \mid s_i) = \operatorname{sigmoid}(y_i s_i)$, and the negative
+log-likelihood becomes the **logistic loss**,
+
+$$
+-\ell(\theta) = \sum_{i=1}^n \log\!\big(1 + e^{-y_i s_i}\big)
+$$
+
+— the same objective, rewritten.
+
+**The connection to this course.** W01's latent posterior
+$\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)$ is precisely this
+model with logit $s(x) = 2x/\sigma^2$: the optimal classifier of the hidden
+component is a Bernoulli model whose log-odds are linear in the observation.
+Classification, denoising, and latent inference are all the same likelihood
+computation wearing different clothes.
+
+## Fitting the other families — honestly
+
+- **Uniform.** The likelihood is $(b-a)^{-n}$ if all points lie in $[a,b]$ and $0$
+  otherwise: to maximize, squeeze the interval as tight as the data allows —
+  $\hat a = \min_i x_i$, $\hat b = \max_i x_i$. (No calculus; the maximum is on the
+  boundary of the constraint. That is Exercise 2.)
+- **Gamma and Beta have no closed-form MLE.** Setting the derivatives to zero produces
+  equations involving the digamma function, solvable only numerically. The playground
+  therefore uses the **method of moments (MoM)**: equate the family's mean and
+  variance to the sample's $\bar x$ and $s^2$ and solve —
+
+  $$
+  \text{Gamma: } \hat k = \frac{\bar{x}^2}{s^2},\ \ \hat\theta = \frac{s^2}{\bar{x}};
+  \qquad
+  \text{Beta: } c = \frac{\bar{x}(1-\bar{x})}{s^2} - 1,\ \
+  \hat\alpha = \bar{x}\,c,\ \ \hat\beta = (1-\bar{x})\,c .
+  $$
+
+  MoM is a respectable estimator in its own right (consistent, and a standard warm
+  start for numerical MLE); the honest label matters because "just maximize the
+  likelihood" quietly assumes machinery we haven't built.
+- **Mixtures.** Even MoM gets awkward; the right tool is expectation–maximization
+  (EM), which belongs to a later conversation. Today the mixture plays a different
+  role — see below.
+
+## The trap: right method, wrong family
+
+In the playground: generate 3000 samples from the two-bump mixture, then fit a
+**single Normal** by maximum likelihood. The fit is *optimal within its family* — and
+its peak sits exactly in the empty valley between the clusters, because the best
+single Gaussian matches the overall mean and variance, not the shape.
+
+Two lessons. First, MLE optimizes *within the family you chose*; the choice of family
+is a modeling decision the likelihood cannot rescue. Second, we currently have no
+number that says *how wrong* this fit is. Constructing that number — the KL
+divergence, and its identity with maximum likelihood — is the next lecture.
+
+## Exercises
+
+1. Re-derive $\hat\sigma^2$ for the Gaussian, including the argument that the critical
+   point is a maximum.
+2. Show that the Uniform MLE is $(\hat a, \hat b) = (\min_i x_i, \max_i x_i)$, and
+   explain why calculus alone would miss it.
+3. Derive the Gamma method-of-moments estimators from $\mathbb{E}X = k\theta$ and
+   $\operatorname{Var} X = k\theta^2$.
+4. For a single observation $x$ from $\mathcal{N}(\mu, \sigma^2)$ with $\sigma$
+   known, sketch the likelihood in $\mu$. Now hold $\mu$ known and sketch the
+   likelihood in $\sigma$ — is it bell-shaped? Symmetric? (This kills the "likelihood
+   looks like a pdf" illusion outside the Gaussian-mean case.)
+5. **BCE gradient.** For the Bernoulli model of the aside with a linear logit
+   $s_i = \theta^\top x_i$, show that
+   $\nabla_\theta(-\ell) = \sum_i (\pi_i - y_i)\, x_i$ — prediction error times
+   input, the cleanest gradient in machine learning. Verify that the $\pm 1$
+   logistic form gives the same gradient.
+6. For a mixture $\sum_i \pi_i f_i$ with component means $\mu_i$ and variances
+   $\sigma_i^2$, show
+   $\operatorname{Var}(X) = \sum_i \pi_i \sigma_i^2 + \sum_i \pi_i (\mu_i - \bar\mu)^2$
+   with $\bar\mu = \sum_i \pi_i \mu_i$ — within-component plus between-component
+   spread. Use it to predict what $\hat\sigma$ the single-Gaussian fit in the trap
+   will report.
+

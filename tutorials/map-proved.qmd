@@ -1,0 +1,790 @@
+# The Deterministic Map, Proved {.unnumbered}
+
+*A standalone, self-contained tutorial. It constructs the deterministic map that
+turns uniform noise into samples from a symmetric two-component Gaussian mixture,
+proves that as the noise scale vanishes this map degenerates into the sign
+function, and then shows that the score-driven reverse flow — the sampler at the
+heart of diffusion models — computes the very same transport, incrementally, in a
+sense made exact in its second half.*
+
+## The claim, and the route
+
+Fix $\sigma > 0$ and consider the symmetric two-component Gaussian mixture with
+equal weights and means $\pm 1$:
+
+$$
+p_\sigma(x) = \tfrac12\,\mathcal{N}(x; -1, \sigma^2) + \tfrac12\,\mathcal{N}(x; +1, \sigma^2),
+\qquad
+F_\sigma(x) = \tfrac12\,\Phi\!\Big(\frac{x+1}{\sigma}\Big) + \tfrac12\,\Phi\!\Big(\frac{x-1}{\sigma}\Big),
+$$
+
+where $\Phi$ is the standard normal CDF. (Throughout, $p_\sigma$ denotes both
+the density and its law; pushforwards act on the law.) Two statements are to be
+proved:
+
+1. There exists a smooth, strictly increasing map $T_\sigma$ with
+   $T_\sigma(U) \sim p_\sigma$ for $U \sim \text{Uniform}(0,1)$.
+2. As $\sigma \downarrow 0$, $T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)$ for
+   every fixed $u \in (0,1) \setminus \{\tfrac12\}$ — the generator of the
+   two-point distribution $\tfrac12\,\delta_{-1} + \tfrac12\,\delta_{+1}$,
+   which is the $\sigma \to 0$ limit of the mixture.
+
+The route runs in five steps, each a plain claim backed by formal results:
+**(1)** sampling *is* a map — a uniform pushed through an inverse CDF acquires
+that CDF (Theorem 1); **(2)** our mixture *admits* the map — $F_\sigma$ is a
+smooth bijection, so $T_\sigma$ exists and is smooth (Proposition 2);
+**(3)** symmetry halves the work (Lemma 3); **(4)** a squeeze argument gives the
+sign-function limit (Theorem 4), with its distributional consequences
+(Corollary 5); **(5)** the fine structure — the shape of the stairs and the
+forming jump. Steps 1–5 build and analyze the one-shot map; the second half of
+the tutorial then earns the deeper claim — the score-driven reverse flow *is
+the same map*, and the practical sampler is its numerical solution. The
+theorems are the scaffolding; the argument is the building.
+
+## Step 1 — Sampling is a map
+
+The entire construction rests on one line: a uniform random number pushed
+through an inverse CDF is a sample from that CDF. Stated exactly:
+
+**Theorem 1 (probability integral transform).** Let $F$ be a continuous, strictly increasing CDF mapping $\mathbb{R}$
+onto $(0,1)$, and let $U \sim \text{Uniform}(0,1)$. Then $X = F^{-1}(U)$ has CDF $F$.
+
+*Proof.* Monotonicity of $F$ gives the equivalence
+$F^{-1}(u) \le x \iff u \le F(x)$. Hence
+
+$$
+\mathbb{P}\big(F^{-1}(U) \le x\big) = \mathbb{P}\big(U \le F(x)\big) = F(x). \qquad\square
+$$
+
+(For CDFs that are not strictly increasing or not continuous, the same conclusion
+holds with the generalized inverse $F^{-1}(u) = \inf\{x : F(x) \ge u\}$; Exercise 1.)
+
+## Step 2 — The mixture admits the map
+
+Step 1 applies to our target as soon as $F_\sigma$ is invertible — and it is,
+smoothly, at every positive noise level. That is the whole content of the
+supporting result:
+
+**Proposition 2 (existence and smoothness).** $F_\sigma$ is a smooth, strictly increasing bijection of
+$\mathbb{R}$ onto $(0,1)$. Consequently $T_\sigma := F_\sigma^{-1}$ exists, is
+smooth, and satisfies
+
+$$
+T_\sigma'(u) \;=\; \frac{1}{p_\sigma\big(T_\sigma(u)\big)} \;>\; 0 .
+$$
+
+*Proof.* $F_\sigma' = p_\sigma$, which is everywhere positive; hence $F_\sigma$ is
+strictly increasing. Both $\Phi$ terms tend to $0$ as $x \to -\infty$ and to $1$ as
+$x \to +\infty$, so $F_\sigma$ maps onto $(0,1)$ and is a bijection. Smoothness of
+$T_\sigma$ and the derivative formula follow from the inverse function theorem.
+$\square$
+
+The derivative formula deserves a comment, because it already contains the
+tutorial's central picture. $T_\sigma$ is *steepest exactly where the density is
+smallest*. Between the two bumps of $p_\sigma$ the density is nearly zero, so
+$F_\sigma$ is nearly flat there — a plateau at height $\tfrac12$ — and its
+inverse is correspondingly near-vertical. As $\sigma$ shrinks, the graph of
+$T_\sigma$ therefore sharpens into a **staircase**: two long, nearly flat treads
+(inputs $u < \tfrac12$ landing near $-1$, inputs $u > \tfrac12$ landing near
+$+1$) joined by an ever-steeper riser at $u = \tfrac12$. The remaining steps
+make this picture exact: the treads flatten onto the values $\pm 1$ (Step 4),
+and each tread retains a $\sigma$-sized microstructure (Step 5).
+
+## Step 3 — Symmetry halves the work
+
+The target is symmetric about the origin, and its map inherits the symmetry:
+the map is odd about the center point $u = \tfrac12$, so any limit statement
+proved on one side transfers to the other. The supporting computation:
+
+**Lemma 3 (symmetry).** $F_\sigma(-x) = 1 - F_\sigma(x)$ for all $x$; consequently
+$T_\sigma(1-u) = -T_\sigma(u)$ for all $u \in (0,1)$, and $T_\sigma(\tfrac12) = 0$.
+
+*Proof.* Using $\Phi(-t) = 1 - \Phi(t)$ on each term,
+
+$$
+F_\sigma(-x)
+= \tfrac12\,\Phi\!\Big(\frac{1-x}{\sigma}\Big) + \tfrac12\,\Phi\!\Big(\frac{-1-x}{\sigma}\Big)
+= \tfrac12\Big[1 - \Phi\!\Big(\frac{x-1}{\sigma}\Big)\Big]
++ \tfrac12\Big[1 - \Phi\!\Big(\frac{x+1}{\sigma}\Big)\Big]
+= 1 - F_\sigma(x).
+$$
+
+Applying $T_\sigma$ to both sides of $F_\sigma(-x) = 1 - F_\sigma(x)$ with
+$u = F_\sigma(x)$ yields $T_\sigma(1-u) = -T_\sigma(u)$; setting $u = \tfrac12$
+gives $T_\sigma(\tfrac12) = -T_\sigma(\tfrac12) = 0$. $\square$
+
+By the lemma, it suffices to analyze $u < \tfrac12$.
+
+## Step 4 — In the limit, the map is the sign function
+
+The idea is a squeeze: to show $T_\sigma(u) \to -1$, trap $T_\sigma(u)$ between
+$-1 - \varepsilon$ and $-1 + \varepsilon$ by evaluating $F_\sigma$ at those two
+points and letting monotonicity do the rest. Two evaluations, one theorem.
+
+**Theorem 4 (the limit is the sign function).** For every fixed $u \in (0,1)$ with $u \ne \tfrac12$,
+
+$$
+\lim_{\sigma \downarrow 0} T_\sigma(u) \;=\; \operatorname{sign}\big(u - \tfrac12\big).
+$$
+
+*Proof.* By Lemma 3 it suffices to treat $u < \tfrac12$ and show
+$T_\sigma(u) \to -1$. Fix $\varepsilon \in (0,1)$. Evaluate $F_\sigma$ at the two
+points $-1 \pm \varepsilon$ and let $\sigma \downarrow 0$:
+
+$$
+F_\sigma(-1+\varepsilon)
+= \tfrac12\,\Phi\!\Big(\frac{\varepsilon}{\sigma}\Big)
++ \tfrac12\,\Phi\!\Big(\frac{\varepsilon - 2}{\sigma}\Big)
+\;\longrightarrow\; \tfrac12 \cdot 1 + \tfrac12 \cdot 0 = \tfrac12,
+$$
+
+since $\varepsilon > 0$ and $\varepsilon - 2 < 0$. Because $u < \tfrac12$, there is a
+$\sigma_1 > 0$ with $F_\sigma(-1+\varepsilon) > u$ for all $\sigma < \sigma_1$; by
+strict monotonicity of $F_\sigma$ this gives $T_\sigma(u) < -1 + \varepsilon$.
+Similarly,
+
+$$
+F_\sigma(-1-\varepsilon)
+= \tfrac12\,\Phi\!\Big(\frac{-\varepsilon}{\sigma}\Big)
++ \tfrac12\,\Phi\!\Big(\frac{-2-\varepsilon}{\sigma}\Big)
+\;\longrightarrow\; 0,
+$$
+
+so there is a $\sigma_2 > 0$ with $F_\sigma(-1-\varepsilon) < u$ for
+$\sigma < \sigma_2$, whence $T_\sigma(u) > -1 - \varepsilon$. For
+$\sigma < \min(\sigma_1, \sigma_2)$ we conclude
+$|T_\sigma(u) - (-1)| < \varepsilon$. $\square$
+
+At the single point $u = \tfrac12$, Lemma 3 gives $T_\sigma(\tfrac12) = 0$ for every
+$\sigma$; since $\mathbb{P}(U = \tfrac12) = 0$, this point is irrelevant to the
+distributional statement below.
+
+### Consequences: the discrete generator as a limit of smooth ones
+
+**Corollary 5 (modes of convergence).** Let $S(u) = \operatorname{sign}(u - \tfrac12)$. Theorem 4 states
+$T_\sigma(U) \to S(U)$ **almost surely**. Almost-sure convergence implies
+convergence in distribution, and $S(U)$ takes the values $\pm 1$ with probability
+$\tfrac12$ each; hence
+
+$$
+p_\sigma \;\Longrightarrow\; \tfrac12\,\delta_{-1} + \tfrac12\,\delta_{+1}
+\qquad (\sigma \downarrow 0),
+$$
+
+recovering the two-point distribution $\tfrac12\,\delta_{-1} +
+\tfrac12\,\delta_{+1}$ as the weak limit of the mixtures. The
+discrete generator $x = S(u)$ — thresholding a uniform — is thereby exhibited as the
+pointwise limit of smooth generators.
+
+## Step 5 — The fine structure: how the stairs and the jump form
+
+Two refinements sharpen the qualitative theorem.
+
+**The shape of each stair.** Fix $u < \tfrac12$ and write $x = T_\sigma(u)$, which
+by Theorem 4 lies near $-1$ for small $\sigma$; in particular $x \le 0$ eventually,
+so the far component satisfies
+$0 < \tfrac12\Phi\big(\tfrac{x-1}{\sigma}\big) \le \tfrac12\Phi(-1/\sigma)$,
+exponentially small. From $u = F_\sigma(x)$,
+
+$$
+\Phi\!\Big(\frac{x+1}{\sigma}\Big) = 2u - 2\eta_\sigma,
+\qquad 0 < \eta_\sigma \le \tfrac12\,\Phi(-1/\sigma),
+$$
+
+and therefore
+
+$$
+T_\sigma(u) \;=\; -1 + \sigma\,\Phi^{-1}\!\big(2u - 2\eta_\sigma\big)
+\;\approx\; -1 + \sigma\,\Phi^{-1}(2u).
+$$
+
+Each tread of the limiting staircase carries a copy of the Gaussian quantile
+function, compressed by the factor $\sigma$ — asymptotically, the inverse-CDF
+map coincides with the two-stage sampler that first chooses the component from
+$u$ (below or above $\tfrac12$) and then applies that component's own Gaussian
+quantile.
+
+**The forming jump.** At the center, Proposition 2 gives
+
+$$
+T_\sigma'(\tfrac12) = \frac{1}{p_\sigma(0)} = \sigma\sqrt{2\pi}\; e^{1/(2\sigma^2)}
+\;\longrightarrow\; \infty ,
+$$
+
+so the slope at $u = \tfrac12$ blows up as the jump forms. Convergence in Theorem 4
+is uniform on compact subsets of $(0,1) \setminus \{\tfrac12\}$ (by uniform
+continuity of $\Phi^{-1}$ on compact subintervals together with the uniform
+exponential bound on the far component) but not across
+$u = \tfrac12$: a boundary layer of width shrinking with $\sigma$ always
+remains — the same non-uniform sharpening by which the smooth function
+$\tanh(x/\sigma^2)$ approaches $\operatorname{sign}(x)$.
+
+## The score-based flow is the same map
+
+**The objective.** The first half of this tutorial constructed one generator:
+the quantile map $T_\sigma$. This section confronts it with a second
+construction — the score-driven flow at the heart of diffusion models — built
+from entirely different ingredients, and settles their exact relationship.
+First, the problem both constructions solve, stated as a problem:
+
+> **The one-shot transport problem.** Given the source law $p_{\sigma_{\max}}$
+> and the target law $p_{\sigma_{\min}}$, find a deterministic map $M$ such
+> that if the input is distributed as $p_{\sigma_{\max}}$, the output $M(X)$ is
+> distributed as $p_{\sigma_{\min}}$ — in symbols,
+> $M_\# \, p_{\sigma_{\max}} = p_{\sigma_{\min}}$, where $M_\# \mu$ denotes the
+> *pushforward*: the law of $M(X)$ when $X \sim \mu$.
+
+**Definition (quantile transport).** For laws $\mu, \nu$ on $\mathbb{R}$ with
+continuous, strictly increasing CDFs $F_\mu, F_\nu$, the **quantile transport**
+from $\mu$ to $\nu$ is
+
+$$
+Q_{\mu \to \nu} \;:=\; F_\nu^{-1} \circ F_\mu .
+$$
+
+It solves the transport problem — $F_\mu(X) \sim \text{Uniform}(0,1)$ for
+$X \sim \mu$ (the probability integral transform read forward), and Theorem 1
+then carries the uniform to $\nu$ — and by Proposition 7 (proved below) it is the unique *continuous, strictly
+increasing* solution. It matches each $\mu$-quantile to the same $\nu$-quantile:
+median to median, 90th percentile to 90th percentile.
+
+The *one-shot* solution to our problem is
+$Q_{p_{\sigma_{\max}} \to\, p_{\sigma_{\min}}} = F_{\sigma_{\min}}^{-1} \circ
+F_{\sigma_{\max}}$: one formula, evaluated in a single stroke. The *incremental*
+solution flows particles down the noise ladder along the **score** of the
+current level. Two functions describe that local geometry. The
+**posterior-mean denoiser**
+
+$$
+D_\sigma(x) := \mathbb{E}[X_0 \mid X_\sigma = x] = \tanh(x/\sigma^2)
+$$
+
+is the conditional mean of the clean point given a noisy observation — the
+quantity diffusion models learn — and the **score** is its rescaled
+displacement,
+
+$$
+s_\sigma(x) = \partial_x \log p_\sigma(x)
+= \frac{D_\sigma(x) - x}{\sigma^2}
+$$
+
+(differentiate $\log p_\sigma$ to check). One caution about the resulting
+motion: it is *not* always "toward the nearer bump". At high noise
+($\sigma > 1$) the reverse field contracts everything toward the center; only
+once $\sigma$ drops below $1$ does the origin destabilize and the two clusters
+separate — the stability computation appears at the end of Layer 1. On the
+surface the two constructions look like different algorithms that happen to
+share endpoints. The claim — stated first, then earned in three layers — is
+much stronger.
+
+Before any claims, two conventions and a cast of characters. **Clock:**
+$\tau = \sigma^2$ is the *variance clock*; for $\tau$-indexed objects we write
+$\bar p_\tau := p_{\sqrt{\tau}}$, $\bar F_\tau := F_{\sqrt{\tau}}$, and
+$\bar s_\tau := \partial_x \log \bar p_\tau$, so that subscripts never
+silently change meaning. **Ladder:** $\sigma_{\max} = \sigma_0 > \sigma_1 >
+\cdots > \sigma_K = \sigma_{\min}$ denotes a descending sequence of noise
+levels (fixed when Layer 3 needs it; until then $\Psi_{a \to b}$ makes sense
+for any two levels $a > b$). Five distinct objects appear in this section, and
+they are easy to blur into one another:
+
+| Object | Symbol | What kind of thing it is |
+|---|---|---|
+| **score** | $s_\sigma(x) = \partial_x \log p_\sigma(x)$ | a function of position, one per noise level — the *local steering information*; for our mixture, $(\tanh(x/\sigma^2) - x)/\sigma^2$ |
+| **velocity field** | $v = -\tfrac12\, \bar s_\tau$ (variance clock) | an arrow attached to every (position, level) pair — built from the score; the sampler traverses it toward smaller $\tau$ |
+| **the flow (ODE)** | $dx/d\tau = v(x, \tau)$ | a dynamical rule: from a starting point, integrate to get a trajectory |
+| **flow map** | $\Psi_{a \to b}$ | a *function* $\mathbb{R} \to \mathbb{R}$: feed in a position at level $a$, integrate the ODE down to level $b$, read off where the trajectory ends |
+| **pushforward** | $\Psi_\# \mu$ | not a new object but an *operation*: the law of the outputs when the inputs have law $\mu$ |
+
+: {tbl-colwidths="[18,26,56]"}
+
+So $\Psi_{\sigma_0 \to \sigma_K}$ is *not* the score, and not a measure: it
+is the deterministic input–output function obtained by integrating the
+score-built velocity field from level $\sigma_0$ down to $\sigma_K$;
+$\Psi_{\sigma_k \to \sigma_{k+1}}$ is the same construction run over a single
+leg. The pushforward is how any map — this
+one included — acts on distributions, and the sentence "the flow solves the
+transport problem" means exactly $\Psi_\#\, p_{\sigma_{\max}} =
+p_{\sigma_{\min}}$: it is a *candidate* $M$ for the transport problem stated above. 
+
+::: {.callout-important icon="false"}
+## Key takeaway
+
+They are one and the same solution, at three levels of resolution.
+**(i) Identity:** in one dimension the exact probability-flow map *is* the
+quantile transport $F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}$ — at every
+positive noise level, not only in a limit. **(ii) Mechanism:** the flow
+*conserves the quantile*: $u = \bar F_\tau(x_\tau)$ is constant along every
+trajectory, so the one-shot map jumps each point to its quantile's final
+position while the flow tracks the same quantile continuously through every
+intermediate law. **(iii) Consequence:** every adjacent pair of noise
+levels admits its own quantile transport; each step of the practical sampler is
+the first-order approximation of that per-step quantile map; and the telescoping
+identity composes the per-step maps back into the one-shot transport — so
+**reverse diffusion is, literally, a numerical solution of the one-shot
+transport problem.**
+:::
+
+The layers prove, in order: the flow map equals the quantile transport $Q$
+(Layer 1); the reason is that it conserves quantiles (Layer 2); and it
+factorizes leg by leg, with the sampler as its Euler discretization (Layer 3).
+
+**The descent, in one chain.** The whole section — many-step reverse diffusion
+down to the one-shot inverse CDF — is the following sequence of constructions
+and identifications, each arrow one step:
+
+$$
+\begin{gathered}
+\text{score } s_\sigma = \partial_x \log p_\sigma \\[-1pt]
+\big\downarrow \; {\scriptstyle \text{scale}} \\[-1pt]
+\text{velocity field } v = -\tfrac12\, \bar s_\tau \\[-1pt]
+\big\downarrow \; {\scriptstyle \text{impose as dynamics}} \\[-1pt]
+\text{ODE } \; dx/d\tau = v(x, \tau) \\[-1pt]
+\big\downarrow \; {\scriptstyle \text{integrate — exactly: the flow; per frozen step: Euler, the } K\text{-step sampler}} \\[-1pt]
+\text{flow map } \Psi_{\sigma_{\max} \to \sigma_{\min}} \\[-1pt]
+\big\downarrow \; {\scriptstyle \text{pushforward } \Psi_\# p_{\sigma_{\max}} = p_{\sigma_{\min}} \;+\; \text{monotone (no crossing)} \;\Rightarrow\; \text{rigidity}} \\[-1pt]
+\text{quantile transport } Q = F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}
+\quad {\scriptstyle \text{(each leg identified by rigidity; legs composed by telescoping)}} \\[-1pt]
+\big\downarrow \; {\scriptstyle \sigma_{\min} \downarrow 0} \\[-1pt]
+\operatorname{sign}(x) \;\; {\scriptstyle \text{(the two-point generator)}}
+\end{gathered}
+$$
+
+Read downward, the chain is how reverse diffusion is *built*; the
+pushforward-plus-monotonicity arrow is where it is *identified* with the
+one-shot map — note that the pushforward property alone would not suffice
+(many maps carry $p_{\sigma_{\max}}$ to $p_{\sigma_{\min}}$); it is
+pushforward *together with* monotonicity that forces $\Psi = Q$, by
+Proposition 7. Everything below is this chain, one arrow at a time.
+
+### Layer 1 — the identity
+
+*(premise) — the flow transports the family.* Everything below uses one fact
+about the flow: it reproduces the prescribed marginals,
+$(\Psi_{a \to b})_\#\, p_a = p_b$. This is the defining property of the
+probability-flow field, verified by one rearrangement: with
+$v = -\tfrac12\, \bar s_\tau$ we have
+$\bar p_\tau v = -\tfrac12\, \partial_x \bar p_\tau$, so the continuity
+equation $\partial_\tau \bar p_\tau + \partial_x(\bar p_\tau v) = 0$ is
+*exactly* the heat equation
+$\partial_\tau \bar p_\tau = \tfrac12\, \partial_x^2 \bar p_\tau$, which the
+Gaussian-mixture family satisfies (the componentwise check opens Layer 2). An
+ensemble started with law $p_a$ and moved by the ODE therefore arrives with law
+$p_b$; Layer 2 sharpens this ensemble statement to a particlewise conservation
+law.
+
+*(a) — flows cannot cross, so the flow map is monotone.*
+
+**Proposition 6 (flows do not cross).** For $\sigma_{\min} > 0$, let $\Psi$ denote
+the exact probability-flow ODE map carrying noise level $\sigma_{\max}$ down to
+$\sigma_{\min}$ (the field $v = -\tfrac12\, \bar s_\tau$, integrated toward
+smaller $\tau$, exact score). Then $\Psi$ is continuous and strictly increasing.
+
+*Proof sketch.* The field is smooth, and its spatial derivative is globally
+bounded on the band: $s_\sigma'(x) = \sigma^{-4}\operatorname{sech}^2(x/\sigma^2)
+- \sigma^{-2}$ is bounded uniformly for $\sigma \in [\sigma_{\min},
+\sigma_{\max}]$, so solutions exist across the whole leg and are unique. If two trajectories starting
+at $x < x'$ met at some time, running the ODE backwards from the meeting point would
+violate uniqueness; hence trajectories preserve order, and $\Psi$ is strictly
+increasing. Continuity of the flow map in the initial condition is standard ODE
+theory. $\square$
+
+*(b) — a monotone transport between two given laws is unique.*
+
+**Proposition 7 (monotone transport is rigid).** Let $T$ be continuous and strictly
+increasing with $T_\# \mu = \nu$, where $\mu, \nu$ have continuous, strictly
+increasing CDFs $F_\mu, F_\nu$. Then $T = F_\nu^{-1} \circ F_\mu$.
+
+*Proof.* $F_\nu(T(x)) = \nu\big((-\infty, T(x)]\big)
+= \mu\big(T^{-1}(-\infty, T(x)]\big) = \mu\big((-\infty, x]\big) = F_\mu(x)$,
+using monotonicity in the middle step. Apply $F_\nu^{-1}$. $\square$
+
+*(c) — identify the flow, then take the limit.*
+
+**Corollary 8.** The end-to-end flow map satisfies
+$\Psi_{\sigma_{\max} \to \sigma_{\min}} = F_{\sigma_{\min}}^{-1} \circ
+F_{\sigma_{\max}}$: the flow map of the probability-flow ODE *is* the quantile
+transport, at every positive noise level. Composing with a uniform
+parametrization of the source — write $x_T$ for a starting position at the top
+level, $x_T = F_{\sigma_{\max}}^{-1}(u)$ — the composite
+$u \mapsto \Psi\big(F_{\sigma_{\max}}^{-1}(u)\big)$ is exactly the map
+$T_{\sigma_{\min}}$ of Step 2: uniform noise in, mixture sample out, through
+the flow. Theorem 4 therefore applies verbatim: as $\sigma_{\min} \downarrow 0$,
+
+$$
+\Psi(x_T) \;\longrightarrow\; \operatorname{sign}(x_T)
+\qquad \text{for every } x_T \ne 0,
+$$
+
+since $F_{\sigma_{\max}}(0) = \tfrac12$ by symmetry. The tanh-driven flow converges
+pointwise to the deterministic two-point generator. Its separatrix
+$x_T = 0$ — where the score vanishes by symmetry — is an equilibrium of the
+reverse dynamics whose character changes with the noise level: since
+$\tfrac12 s_\sigma'(0) = \tfrac12(\sigma^{-4} - \sigma^{-2})$, the origin
+attracts while $\sigma > 1$, is neutral at $\sigma = 1$, and repels once
+$\sigma < 1$ — the two regimes announced in the objective.
+
+
+**The identity, applied to the example.** Corollary 8 is not only a structural
+fact — for this tutorial's mixture it is a computable formula. Plugging the
+CDFs in:
+
+$$
+\Psi(x)
+= F_{\sigma_{\min}}^{-1}\!\Big(
+\tfrac12\, \Phi\big(\tfrac{x+1}{\sigma_{\max}}\big)
++ \tfrac12\, \Phi\big(\tfrac{x-1}{\sigma_{\max}}\big)
+\Big).
+$$
+
+The outer inverse has no closed form (numerically, one bisects it) — but the stair
+asymptotics of Step 5, applied here to the transport itself for the first time,
+give a closed-form asymptotic for it. With $u = F_{\sigma_{\max}}(x)$,
+
+$$
+\Psi(x) \;\approx\;
+\begin{cases}
+-1 + \sigma_{\min}\, \Phi^{-1}(2u), & u < \tfrac12,\\[2pt]
++1 + \sigma_{\min}\, \Phi^{-1}(2u - 1), & u > \tfrac12.
+\end{cases}
+$$
+
+Read as a formula, the applied transport is a **soft sign**: to leading order it
+collapses every input to $\pm 1$ — Theorem 4's limit, now visible term by term —
+while the $O(\sigma_{\min})$ residue records *where within its cluster* the
+sample lands: the conserved quantile, miniaturized into the stair. Concretely,
+for $\sigma_{\max} = 3$, $\sigma_{\min} = 10^{-2}$:
+
+| $x$ | $u = F_{3}(x)$ | exact $\Psi(x)$ | stair asymptotic |
+|---:|---:|---:|---:|
+| $0$ | $0.5000$ | $0$ (Lemma 3) | $0$ |
+| $1$ | $0.6238$ | $0.9932$ | $0.9932$ |
+| $2$ | $0.7360$ | $0.9993$ | $0.9993$ |
+| $6$ | $0.9712$ | $1.0158$ | $1.0158$ |
+
+: {tbl-colwidths="[15,25,30,30]"}
+
+Agreement to every displayed digit — and the exact column consists of the same
+numbers the ODE integration produces in the evidence paragraph below: one map,
+computed three independent ways (integrated flow, bisected quantile transport,
+stair asymptotics). The table also teaches how the map thinks: $x = 1$ and
+$x = 2$, though far apart, both land within $10^{-2}$ of $+1$ — the cluster
+forgets the details — while the extreme draw $x = 6$ lands *beyond* the atom, at
+$1.0158$, because its within-cluster quantile $\Phi^{-1}(0.9424) \approx 1.58$
+is carried, shrunk by $\sigma_{\min}$, into the stair. The transport is
+$\operatorname{sign}(x)$ plus quantile bookkeeping. And the transport problem
+that opened this section is now solved twice over, with the two solutions
+identified: $M = Q = \Psi$.
+
+### Layer 2 — the mechanism: the flow conserves quantiles
+
+The identity of Layer 1 is proved but not yet *explained*: why should an ODE
+driven by local score information reproduce a map built from global CDFs? The
+answer is a conservation law, and it takes two lines.
+
+Work in the variance clock ($\bar p_\tau, \bar F_\tau, \bar s_\tau$ as fixed in
+the conventions above). Each mixture component $\mathcal{N}(x; \pm 1, \tau)$ is
+a heat kernel, so the family satisfies the **heat equation**
+$\partial_\tau \bar p_\tau = \tfrac12 \partial_x^2 \bar p_\tau$ (differentiate
+a Gaussian once in $\tau$ and twice in $x$ to check; linearity does the rest).
+Integrating from $-\infty$ to $x$, using $\partial_x \bar p_\tau \to 0$ at
+$-\infty$, gives the CDF's equation of motion:
+
+$$
+\partial_\tau \bar F_\tau(x) = \tfrac12\, \partial_x \bar p_\tau(x).
+$$
+
+Now let $x(\tau)$ be any trajectory of the probability-flow ODE,
+$\dot x = v(x, \tau) = -\tfrac12\, \bar s_\tau(x)$ (the reverse sampler
+traverses the same curves toward smaller $\tau$ — reversed limits, same
+field). By the chain rule,
+
+$$
+\frac{d}{d\tau} \bar F_\tau\big(x(\tau)\big)
+= \partial_\tau \bar F_\tau(x) + \bar p_\tau(x)\, \dot x
+= \tfrac12\, \partial_x \bar p_\tau(x)
+- \bar p_\tau(x) \cdot \tfrac12\, \partial_x \log \bar p_\tau(x)
+= 0 .
+$$
+
+**The quantile $u = \bar F_\tau(x_\tau)$ is a conserved quantity of the flow.** Three
+things follow at once.
+
+- *Layer 1, re-derived in one line.* A trajectory started at $x_T$ carries
+  $u = F_{\sigma_{\max}}(x_T)$ unchanged, so it must terminate at
+  $F_{\sigma_{\min}}^{-1}(u)$ — Corollary 8 again, obtained now without the
+  rigidity argument.
+- *No-crossing, explained.* Distinct trajectories carry distinct conserved
+  quantiles, and $\bar F_\tau$ is strictly increasing — so they can never meet.
+  Proposition 6's order-preservation is the shadow of a conservation law.
+- *The two constructions unified.* The one-shot map evaluates the family
+  $x(\tau) = \bar F_\tau^{-1}(u)$ at its endpoint; the flow traces the same family
+  through every intermediate $\tau$. They are the same object read at different
+  resolutions — which is exactly what "same solution" means.
+
+### Layer 3 — the factorization, and why "numerical solution" is literal
+
+The conservation law upgrades naturally into an algebra of maps: three exact
+moves, followed by the Euler analysis.
+
+*Move 1 — at every step of the ladder, a quantile transport is available.*
+Proposition 2 was stated at one fixed $\sigma$, but its proof used nothing
+special about the level: **every** $F_s$ with $s > 0$ is a smooth, strictly
+increasing bijection onto $(0,1)$. Hence for each adjacent pair of the ladder
+$\sigma_{\max} = \sigma_0 > \sigma_1 > \cdots > \sigma_K = \sigma_{\min}$, the per-step
+quantile transport
+
+$$
+Q_k \;:=\; Q_{p_{\sigma_k} \to\, p_{\sigma_{k+1}}} \;=\; F_{\sigma_{k+1}}^{-1} \circ F_{\sigma_k}
+$$
+
+is well-defined, and by Proposition 7 it is the *unique monotone* map carrying
+level $\sigma_k$ to level $\sigma_{k+1}$. The one-shot problem has been sliced into $K$
+sub-problems of the same kind, each with its own one-shot solution.
+
+*Move 2 — each leg of the exact flow is that per-step quantile transport.*
+Layer 1's argument applies verbatim on the sub-interval: the flow leg
+$\Psi_{\sigma_k \to \sigma_{k+1}}$ is continuous and strictly increasing (no crossing)
+and pushes $p_{\sigma_k}$ to $p_{\sigma_{k+1}}$ (the flow reproduces the family), so by
+uniqueness $\Psi_{\sigma_k \to \sigma_{k+1}} = Q_k$. Equivalently, by Layer 2: each leg
+carries every particle along its iso-quantile curve from one level to the
+next — quantile in, same quantile out.
+
+*Move 3 — telescoping identifies the composition with the one-shot map.* Two
+independent derivations give the same identity. Dynamically, solution maps of
+an ODE compose — solving from $\sigma_0$ down to $\sigma_K$ while pausing at intermediate
+levels changes nothing, by uniqueness of solutions:
+
+$$
+\Psi_{\sigma_0 \to \sigma_K}
+= \Psi_{\sigma_{K-1} \to \sigma_K} \circ \cdots \circ \Psi_{\sigma_0 \to \sigma_1}
+= Q_{K-1} \circ \cdots \circ Q_0 .
+$$
+
+Analytically, the same chain is pure cancellation — each intermediate CDF
+annihilates its own inverse:
+
+$$
+\big(F_{\sigma_K}^{-1} \circ F_{\sigma_{K-1}}\big) \circ \cdots \circ
+\big(F_{\sigma_1}^{-1} \circ F_{\sigma_0}\big)
+= F_{\sigma_K}^{-1} \circ F_{\sigma_0}
+= Q_{p_{\sigma_{\max}} \to\, p_{\sigma_{\min}}} .
+$$
+
+Together: **the one-shot quantile transport factorizes exactly into per-level
+quantile transports.** Nothing is approximate yet — the exact reverse flow is
+not an approximation of the one-shot map but a *factorization* of it.
+
+The last move — connecting the exact factors to the practical sampler — is
+where "numerical solution" acquires its literal meaning, so it deserves a
+derivation rather than a remark.
+
+*Notation first.* Re-index the ladder by the variance clock: $\tau := \sigma^2$
+and $\tau_k := \sigma_k^2$, with $\Delta_k := \tau_k - \tau_{k+1} > 0$ the length of
+the $k$-th leg. Then $\Psi_{\tau_k \to \tau_{k+1}}$ denotes the **same** exact
+flow leg as $\Psi_{\sigma_k \to \sigma_{k+1}}$ — one object, two indexings — and by
+Move 2 it equals the per-step quantile transport $Q_k$.
+
+*The exact leg, in integral form.* The probability-flow ODE is
+$dx/d\tau = -\tfrac12\, \bar s_\tau(x)$; the sampler traverses it toward
+smaller $\tau$, which reverses the limits of integration, not the sign of the
+field. Integrating one leg from $\tau_k$ down to $\tau_{k+1}$, started at $x$:
+
+$$
+\Psi_{\tau_k \to \tau_{k+1}}(x)
+= x + \int_{\tau_{k+1}}^{\tau_k}
+\tfrac12\, \bar s_\tau\big(x(\tau)\big)\, d\tau ,
+$$
+
+where $x(\tau)$ is the trajectory itself. This is exact — but not directly
+evaluable as written, because the integrand must be evaluated along the very
+trajectory being solved for.
+
+*The one approximation.* Over a short leg, freeze the integrand at the leg's
+known starting data $(x, \tau_k)$:
+
+$$
+\int_{\tau_{k+1}}^{\tau_k}
+\tfrac12\, \bar s_\tau\big(x(\tau)\big)\, d\tau
+= \frac{\Delta_k}{2}\, \bar s_{\tau_k}(x) \;+\; R_k(x).
+$$
+
+The frozen version defines the **step map**
+
+$$
+E_k(x) \;:=\; x + \frac{\Delta_k}{2}\, \bar s_{\tau_k}(x)
+$$
+
+— symbol for symbol, the reverse-diffusion sampler update. Freezing the
+velocity at the left endpoint of each step is the *definition* of the explicit
+Euler method, so the sampler is the Euler discretization of the reverse ODE by
+construction, not by analogy. The remainder is second order: fix a compact set
+$C$ of starting points and a compact tube containing all exact trajectories
+from $C$ (such a tube exists because the field's spatial derivative is globally
+bounded on the band, as in Proposition 6), and let $L$ bound the field's
+derivatives on that tube. Along the leg the integrand then drifts by
+$O(\Delta_k)$, and it is integrated over an interval of length $\Delta_k$, so,
+uniformly on the tube,
+
+$$
+\big| E_k(x) - \Psi_{\tau_k \to \tau_{k+1}}(x) \big|
+= |R_k(x)| \;\le\; \tfrac{L}{2}\, \Delta_k^2 .
+$$
+
+Read through Move 2, this inequality *is* the statement that **each step of
+reverse diffusion is a per-level quantile transport, correct to first order**:
+$E_k = Q_k + O(\Delta_k^2)$.
+
+*From one step to the whole ladder.* The sampler is the composition
+$S_K := E_{K-1} \circ \cdots \circ E_0$; the exact transport is
+$\Psi = Q_{K-1} \circ \cdots \circ Q_0$ (Move 3). Compare them by swapping one
+factor at a time. Write $z_k := (Q_{k-1} \circ \cdots \circ Q_0)(x)$ for the
+exact state entering leg $k$, and $A_k := E_{K-1} \circ \cdots \circ E_{k+1}$
+for the remaining Euler tail. Inserting the hybrid compositions and
+telescoping gives the pointwise identity
+
+$$
+S_K(x) - \Psi(x)
+= \sum_{k=0}^{K-1}
+\Big[ A_k\big(E_k(z_k)\big) - A_k\big(Q_k(z_k)\big) \Big]
+$$
+
+(nonlinear maps do not distribute over subtraction, so the difference must
+remain *inside* the tail $A_k$). Each $E_j$ has derivative
+$1 + \tfrac{\Delta_j}{2}\, \partial_x \bar s_{\tau_j}$, hence Lipschitz
+constant at most $1 + L\Delta_j \le e^{L \Delta_j}$; every tail $A_k$ is
+therefore Lipschitz with constant at most
+$\Lambda := e^{L(\tau_{\max} - \tau_{\min})}$, *independently of $K$*. Applying
+this to each bracket and then the local error bound
+$|E_k(z_k) - Q_k(z_k)| \le \tfrac{L}{2}\Delta_k^2$,
+
+$$
+|S_K(x) - \Psi(x)|
+\;\le\; \Lambda \sum_{k=0}^{K-1} \tfrac{L}{2}\, \Delta_k^2
+\;\le\; \tfrac{\Lambda L}{2}\, (\tau_{\max} - \tau_{\min})\, \max_k \Delta_k
+$$
+
+which is $O(1/K)$ for any quasi-uniform ladder
+($\max_k \Delta_k = O(1/K)$ in the variance clock). (The constants are finite
+for every $\sigma_{\min} > 0$, though they grow as
+$\sigma_{\min} \downarrow 0$ — the stiffness recorded under Scope.) Letting
+the mesh $\max_k \Delta_k \to 0$:
+
+$$
+\boxed{\;
+\lim_{\max_k \Delta_k \to 0}\; E_{K-1} \circ \cdots \circ E_0
+\;=\; \Psi
+\;=\; Q_{\,p_{\sigma_{\max}} \to\, p_{\sigma_{\min}}}
+\;}
+$$
+
+uniformly on compact sets. The sampler and the one-shot map are not merely
+similar: the sampler *converges to* the one-shot map, at the Euler rate, and
+the derivation identifies every intermediate object along the way:
+
+$$
+\underbrace{F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}}_{\text{one-shot solution}}
+\;=\;
+\underbrace{Q_{K-1} \circ \cdots \circ Q_0}_{\text{exact factorization (Move 3)}}
+\;\approx\;
+\underbrace{E_{K-1} \circ \cdots \circ E_0}_{\substack{\text{reverse diffusion: the sampler } S_K\\ \text{Euler, error } O(1/K)}}
+$$
+
+Reverse diffusion is a numerical solution of the one-shot transport problem in
+the same sense that Euler's method is a numerical solution of an initial-value
+problem — because it *is* Euler's method, applied to an ODE whose exact
+solution map *is* the one-shot transport. Not an analogy: an instance, now
+derived.
+
+**The evidence — testing all three clauses.** Setup, fully specified: the
+ladder is geometric in $\sigma$ (uniform in $\log \sigma$) with $K = 20{,}000$
+legs from $\sigma_{\max} = 3$ to $\sigma_{\min} = 10^{-2}$; the update is the
+derived $E_k$; the starting grid is $33$ equispaced points on $[-8, 8]$ with
+the near-separatrix points $|x| < 0.25$ excluded (at $x = 0$ both maps give $0$
+exactly, by symmetry; the numerical difficulty concentrates *near* the
+separatrix, where the stiffness peaks); errors are suprema over the grid.
+Results: $\sup |S_K - Q| \approx 1.9 \times 10^{-5}$ — clause (i) and the
+Euler side of clause (iii), whose $O(1/K)$ signature Exercise 8 has you
+measure. And clause (ii) tested *directly*: the conserved quantile
+$\bar F_{\tau_k}(x_k)$, monitored along every trajectory, drifts from its
+initial value by at most $9.8 \times 10^{-5}$ over all twenty thousand steps —
+an Euler-sized violation of an exact conservation law, exactly as the theory
+prescribes.
+
+**Why the incremental route is the one that scales.** The factorization is also
+the interface between the mathematics and the learning. The one-shot map is
+globally wild — in the $\sigma \to 0$ limit, discontinuous — and is built from
+the CDF, a global object unavailable in high dimension. Each *Euler factor*
+$E_k$, by contrast, is near-identity and consumes only the score at a single
+noise level — a local quantity that is exactly a regression target (denoising);
+the exact factor $Q_k$ would still need the two endpoint CDFs, so it is the
+Euler step, not the exact leg, that is purely local. A composition of many
+learnable maps realizes one unlearnable map. Structurally, this is a homotopy
+(continuation) method for sampling: embed the intractable target in a family
+$\{p_\sigma\}$ terminating at an easy, approximately Gaussian high-noise law,
+and track the solution
+path — equivalently, by Layer 2, track each sample's conserved quantile — one
+level at a time.
+
+**Scope.** Two caveats frame the result. First, the identification of the flow with the
+quantile transport is special to one dimension, where "monotone" pins the transport
+down uniquely; in higher dimensions the probability-flow ODE defines a valid
+transport that is in general *not* the monotone (optimal-transport) map. Second, the
+statement concerns the exact score, exact terminal law, and exact integration; and
+the velocity field becomes increasingly stiff as $\sigma_{\min} \downarrow 0$ — for
+this example the score's derivative at the separatrix grows like $\sigma^{-4}$
+(compute: $s'(0) = 1/\sigma^4 - 1/\sigma^2$) — so the flow is smooth at every
+positive noise level even though its limit is discontinuous, which is the dynamical
+face of the boundary layer of Theorem 4.
+
+## Interpretation
+
+The same step function has now appeared on both sides of the generative pipeline.
+In data space, the *posterior-mean denoiser* — the conditional mean
+$\mathbb{E}[x_0 \mid x] = \tanh(x/\sigma^2)$ of the clean point given a noisy
+observation, the object diffusion models learn — sharpens into
+$\operatorname{sign}(x)$. In noise space, the generator
+$T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)$. In
+both cases a smooth object degenerates into a discontinuous one precisely as the
+noise scale vanishes. This is the one-dimensional instance of a general phenomenon:
+discrete or lower-dimensional data distributions are reached as limits of smooth
+transports, and learnable models operate at small positive noise scales exactly
+because smooth maps can be represented and trained while their discontinuous limits
+cannot. Diffusion models anneal $\sigma$ toward zero rather than starting there for
+this reason.
+
+## Exercises
+
+1. Prove Theorem 1 for a general CDF $F$ (not necessarily continuous or strictly
+   increasing) using the generalized inverse
+   $F^{-1}(u) = \inf\{x : F(x) \ge u\}$.
+2. Write out the case $u > \tfrac12$ of Theorem 4 directly (without invoking
+   Lemma 3), and verify that the two squeeze evaluations become
+   $F_\sigma(1-\varepsilon) \to \tfrac12$ and $F_\sigma(1+\varepsilon) \to 1$.
+3. **Unequal weights.** For the mixture
+   $\pi\,\mathcal{N}(-1,\sigma^2) + (1-\pi)\,\mathcal{N}(+1,\sigma^2)$ with
+   $0 < \pi < 1$, show $T_\sigma(u) \to -1$ for $u < \pi$ and $T_\sigma(u) \to +1$
+   for $u > \pi$: the location of the jump is the component weight.
+4. Verify the derivative computation $T_\sigma'(\tfrac12) = \sigma \sqrt{2\pi}\,
+   e^{1/(2\sigma^2)}$ and evaluate it numerically for $\sigma = 0.5, 0.2, 0.1$.
+5. **Three components.** For a symmetric three-component mixture with means
+   $-1, 0, +1$ and equal weights, describe the limit of $T_\sigma$: the number of
+   jumps, their locations in $u$, and the limiting values between them.
+6. Prove Proposition 7 in detail, identifying exactly where continuity and strict
+   monotonicity of $T$ are used.
+7. Reproduce the numerical confirmation: integrate the exact-score probability-flow
+   ODE with a fine step grid from a grid of initial points and compare
+   with $F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}$ computed by bisection.
+   Where is the agreement worst, and why?
+8. **The Euler signature.** Rerun Exercise 7 with $K = 25, 50, 100, 200, 400$
+   steps and plot the maximum deviation from the quantile transport against
+   $K$: confirm the $O(1/K)$ decay predicted by the factorization argument.
+   Additionally monitor $\bar F_{\tau_k}(x_k)$ along each trajectory and check
+   that its drift shrinks at the same rate — the direct test of quantile
+   conservation.
+9. **Quantile conservation.** (a) Verify that $\mathcal{N}(x; \mu, \tau)$
+   satisfies the heat equation in the variance clock. (b) Re-derive
+   $\partial_\tau F_\tau = \tfrac12 \partial_x p_\tau$, stating the boundary
+   behaviour used. (c) Prove the telescoping identity twice: by cancellation of
+   CDFs, and by the pause-and-resume (semigroup) property of ODE solution maps.
+
+

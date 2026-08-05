@@ -1,0 +1,808 @@
+# The Probability-Flow ODE {.unnumbered}
+
+*Standalone tutorial — a forward-looking one: it spans material from Modules 3–6
+(training objectives, Fokker–Planck, reverse-time dynamics) and shows where the
+course is headed. Everything is self-contained, but the pace is brisker than the
+W01–W02 tutorials it builds on:
+[The World's Smallest Diffusion Model](./two-point-diffusion.qmd),
+[Generative AI, in Its Simplest Form](./genai-simplest-form.qmd), and
+[The Deterministic Map, Proved](./map-proved.qmd). Notation: $\Phi$ is always the
+standard normal CDF; flow maps are written $\Psi$.*
+
+## The problem, and the thesis
+
+Score-based diffusion models are usually introduced as stochastic denoising: add
+Gaussian noise to data, learn to reverse the corruption, then start from noise and
+iteratively denoise. That description is correct, but it hides a second, equally
+exact reading:
+
+> A diffusion model learns a **time-dependent velocity field** that transports the
+> (near-Gaussian) terminal law $p_T$ of the forward process into the data
+> distribution. Once the field is known, samples can be generated
+> **deterministically**, by solving an ordinary differential equation.
+
+That deterministic dynamics is the **probability-flow ODE**, and the whole tutorial
+is the unpacking of one line:
+
+$$
+\boxed{\;
+\begin{gathered}
+\text{learn local score information} \\
+\Downarrow \\
+\text{construct a velocity field} \\
+\Downarrow \\
+\text{integrate a global transport map}
+\end{gathered}
+\;}
+$$
+
+The generative problem itself is the one fixed in
+[Generative AI, in Its Simplest Form](./genai-simplest-form.qmd): construct a map
+carrying a simple distribution to $p_{\text{data}}$. In practice the simple
+distribution is $\mathcal{N}(0, I)$; the exact statement, kept honest throughout,
+is that the machinery transports $p_T$, which the forward process drives *close*
+to $\mathcal{N}(0, I)$.
+
+One could try to learn the endpoint map directly (GANs do). Diffusion models
+instead construct a **continuous path of distributions** $p_0 \to p_t \to p_T$
+interpolating between data and near-Gaussian, and learn only the *local*
+information needed to move along the path. Why the incremental route wins was the
+subject of the factorization discussion in
+[The Deterministic Map, Proved](./map-proved.qmd); here we build the machinery
+that makes it practical when nothing about $p_{\text{data}}$ is known in closed
+form.
+
+## Two conventions: a dictionary
+
+A warning before any formulas. The W01–W02 tutorials used the
+**variance-exploding (VE)** convention,
+
+$$
+x_\sigma = x_0 + \sigma z ,
+$$
+
+in which the clean signal is never rescaled and the variance grows without bound.
+This tutorial uses the **variance-preserving (VP)** convention standard in the
+DDPM literature, in which the signal is simultaneously attenuated:
+
+$$
+x_t = \alpha_t\, x_0 + \sigma_t\, \varepsilon,
+\qquad \alpha_t^2 + \sigma_t^2 = 1 .
+$$
+
+The two are the same construction in different coordinates. The exact dictionary,
+valid whenever $\alpha_t > 0$:
+
+$$
+\boxed{\;
+\begin{aligned}
+Y_t &= \frac{X_t}{\alpha_t} = X_0 + \tilde\sigma_t\, \varepsilon,
+\qquad
+\tilde\sigma_t^2 = \frac{\sigma_t^2}{\alpha_t^2} = \frac{1}{\alpha_t^2} - 1, \\[2pt]
+s_Y(y, t) &= \alpha_t\, s_X(\alpha_t y,\, t)
+\end{aligned}
+\;}
+$$
+
+i.e. dividing the VP state by $\alpha_t$ yields exactly a VE process at noise
+scale $\tilde\sigma_t = \sigma_t/\alpha_t$ (the noise-to-signal ratio: with the
+usual $\mathrm{SNR} = \alpha^2/\sigma^2$, this is $\mathrm{SNR}^{-1/2}$), and
+scores transform by the chain rule. VP is VE followed by a deterministic shrink.
+
+One caution about a tempting shortcut. For *static* identities — the corruption
+formula, the posterior, the denoiser, Tweedie — setting $\alpha_t = 1$ in a VP
+expression recovers the corresponding VE formula from W01–W02, and we use this
+check repeatedly below. For *dynamics* the shortcut fails: $\alpha \equiv 1$ in VP
+forces $\beta \equiv 0$, a frozen process. The dynamical bridge is the coordinate
+change above, not a parameter setting.
+
+## The forward SDE, and what it constructs
+
+A general diffusion process is specified by a stochastic differential equation
+
+$$
+\boxed{\ dX_t = f(X_t, t)\, dt + g(t)\, dW_t \ }
+$$
+
+with four ingredients: the **state** $X_t \in \mathbb{R}^d$ (the sample at noise
+level $t$, with $X_0 \sim p_{\text{data}}$); the **time** $t \in [0, T]$, which is
+not physical time but a continuous corruption index; the **drift** $f(x,t)$, the
+deterministic part of the motion (remove the noise term and the dynamics would be
+$\dot X = f(X,t)$); and the **diffusion coefficient** $g(t)$ scaling the Brownian
+increments $W_{t + dt} - W_t \sim \mathcal{N}(0, dt\, I)$ — how much fresh noise
+is injected per unit of forward time.
+
+The **VP diffusion** is the choice
+
+$$
+\boxed{\ dX_t = -\tfrac12 \beta(t)\, X_t\, dt + \sqrt{\beta(t)}\, dW_t \ }
+$$
+
+$$
+f(x,t) = -\tfrac12\beta(t)\, x, \qquad g(t) = \sqrt{\beta(t)},
+$$
+
+where $\beta(t) > 0$ is the **noise schedule** — the only coefficient choice
+within this VP family: it fixes the drift, the diffusion coefficient, and (below)
+the corruption parameters. Small $\beta$ means slow corruption; the usual
+schedules increase $\beta(t)$ so that early times perturb gently and late times
+destroy aggressively.
+
+The name *variance-preserving* records a covariance identity. From the closed
+form below, $\operatorname{Cov}(X_t) = \alpha_t^2 \operatorname{Cov}(X_0) +
+(1 - \alpha_t^2) I$: any data law with unit covariance keeps covariance $I$ for
+all $t$ (and if $X_0 \sim \mathcal{N}(0, I)$, the entire law is stationary). For
+general data the intermediate laws are not Gaussian, but the variance scale stays
+controlled, and the law approaches $\mathcal{N}(0, I)$ *insofar as*
+$\alpha_t \to 0$.
+
+The VP SDE admits a closed-form conditional description — for each **fixed** $t$,
+
+$$
+\boxed{\ X_t \overset{d}{=} \alpha_t X_0 + \sigma_t \varepsilon, \qquad
+\varepsilon \sim \mathcal{N}(0, I) \text{ independent of } X_0 \ }
+$$
+
+$$
+\alpha_t = \exp\!\Big(\!-\tfrac12 \int_0^t \beta(s)\, ds\Big),
+\qquad \sigma_t^2 = 1 - \alpha_t^2 .
+$$
+
+(This is a distributional identity per time slice; a single fixed $\varepsilon$
+does not describe the joint law of the whole path — for that, the SDE itself is
+the object.) At $t = 0$: $\alpha_0 = 1$, $\sigma_0 = 0$ — the data itself. As $t$
+grows, $\alpha_t \to 0$ exactly when $\int_0^t \beta \to \infty$; at any finite
+$T$ with finite $\int_0^T \beta$, $\alpha_T$ is small but positive, and
+$p_T \approx \mathcal{N}(0, I)$ is an approximation — a good one for standard
+schedules, and the first entry in the error inventory kept below.
+
+::: {.callout-important icon="false"}
+## The forward process is a construction, not a destruction
+
+**What the forward process *constructs* is more important than what it
+destroys: a continuous family of distributions**
+
+$$
+p_0 = p_{\text{data}}
+\;\longrightarrow\; p_t \;\longrightarrow\; p_T \approx \mathcal{N}(0, I),
+$$
+
+$$
+p_t(x) = \int \mathcal{N}\big(x;\, \alpha_t x_0,\, \sigma_t^2 I\big)\,
+p_0(dx_0)
+$$
+
+— the rescaled data law convolved with $\mathcal{N}(0, \sigma_t^2 I)$. Every
+later object of the theory — the score, the velocity field, the transport — is a
+property of this family, not of any single noisy sample.
+:::
+
+(Writing
+$p_0(dx_0)$ matters: the two-point example below has an *atomic* $p_0$ with no
+density.) This family is the path along which the model will later transport
+probability mass; it is the VP version of the family $\{p_\sigma\}$ whose 1-D
+portrait fills the W01–W02 demos. Note that the family depends jointly on the
+schedule *and* on $p_{\text{data}}$: the schedule fixes the corruption kernel,
+the data fixes what gets corrupted.
+
+## The score
+
+For each intermediate distribution at $t > 0$ (where $p_t$ is a genuine smooth
+density, whatever $p_0$ was), define the **score**:
+
+$$
+\boxed{\ s_t(x) = \nabla_x \log p_t(x). \ }
+$$
+
+Geometrically: read the density as a landscape; the score points *uphill*, toward
+locally more probable samples. It is local information only — a direction, not a
+destination. Two canonical computations:
+
+- Gaussian: for $p = \mathcal{N}(\mu, \sigma^2 I)$,
+  $\nabla_x \log p(x) = -(x - \mu)/\sigma^2$, pointing at the mean; for
+  $\mathcal{N}(0, I)$, simply $-x$.
+- The two-bump mixture of W01, whose score
+  $\big(\tanh(x/\sigma^2) - x\big)/\sigma^2$ you have already derived and watched
+  drive the reverse flow.
+
+Here is the crux of the learning problem. The *conditional* corruption law
+$p_t(x_t \mid x_0) = \mathcal{N}(\alpha_t x_0, \sigma_t^2 I)$ is fully known — the
+schedule fixed it. But the **marginal** $p_t$ mixes the conditional over the
+unknown $p_{\text{data}}$, so its score cannot be evaluated. The score is the only
+learned time-dependent function this sampler requires (the exact terminal law
+$p_T$ also depends on the data, but it is *approximated* by a Gaussian rather
+than learned).
+
+## Learning the score
+
+Three objects must be kept distinct in this section; conflating any two of them
+is a standard error.
+
+**Object 1: the sampled conditional target.** The forward process manufactures
+training data: draw $x_0 \sim p_{\text{data}}$, a time $t$ (from a range bounded
+away from $0$, or with a weight that keeps the objective finite — see below), and
+$\varepsilon \sim \mathcal{N}(0, I)$; form $x_t = \alpha_t x_0 + \sigma_t
+\varepsilon$. The conditional score is analytically available:
+
+$$
+\nabla_{x_t} \log p_t(x_t \mid x_0)
+= -\frac{x_t - \alpha_t x_0}{\sigma_t^2}
+= -\frac{\varepsilon}{\sigma_t}.
+$$
+
+This is a *random target*, different for every draw.
+
+**Object 2: the marginal score — the posterior mean of the target.** Denoising
+score matching trains a network $s_\theta(x, t)$ against Object 1:
+
+$$
+\boxed{\
+\mathcal{L}(\theta)
+= \mathbb{E}\left[ \lambda(t)\,
+\Big\| s_\theta(x_t, t) + \frac{\varepsilon}{\sigma_t} \Big\|^2 \right],
+\ }
+$$
+
+with $\lambda(t) > 0$ a weighting choice. The reason this works: for each fixed
+$(x, t)$ with $t > 0$, the minimizer of a conditional squared error is the
+conditional mean, and (differentiating under the integral)
+
+$$
+\begin{aligned}
+s^\star(x, t)
+&= \mathbb{E}\big[ \nabla_x \log p_t(x \mid x_0) \,\big|\, x_t = x \big]
+= \frac{\int \nabla_x p_t(x \mid x_0)\, p_0(dx_0)}{p_t(x)} \\[2pt]
+&= \frac{\nabla_x p_t(x)}{p_t(x)}
+= \nabla_x \log p_t(x).
+\end{aligned}
+$$
+
+The *population* minimizer over unrestricted functions is the marginal score; a
+neural network approximates it within its class. (Module 4 does this with full
+care — Vincent's identity. Note also that with $\lambda \equiv 1$ the target
+variance behaves like $1/\sigma_t^2$ near $t = 0$, which is why practical recipes
+either weight or avoid the smallest times.)
+
+**Object 3: the noise-predictor parameterization.** Many implementations train
+$\varepsilon_\theta(x_t, t)$ to predict the injected noise. Its population
+optimum is the posterior mean $\varepsilon^\star(x, t) = \mathbb{E}[\varepsilon
+\mid x_t = x]$ — *not* the per-sample $\varepsilon$ — and the two optima are
+linked by
+
+$$
+s^\star(x, t) = -\frac{\varepsilon^\star(x, t)}{\sigma_t},
+\qquad\text{hence one trains with}\qquad
+s_\theta = -\frac{\varepsilon_\theta}{\sigma_t}.
+$$
+
+Score prediction and noise prediction are the same estimator in different units;
+a score loss with weight $\lambda(t)$ equals a noise loss with weight
+$\lambda(t)/\sigma_t^2$.
+
+::: {.callout-warning icon="false"}
+## "Noise prediction" is conditional-mean estimation
+
+The account above is the standard one and its algebra is correct — but the
+phrase *"the network predicts the injected noise"*, read literally, is
+misleading, and it quietly breeds specific misconceptions (collected at the end
+of this box, each traced to its root). Nor is the phrase a strawman: it is the
+research literature's own language, verbatim. The DDPM paper introduces the
+network as "a function approximator intended to predict $\varepsilon$ from
+$\mathbf{x}_t$"[^ddpm-q]; the DDIM paper writes that "the model
+$\varepsilon_\theta^{(t)}(\mathbf{x}_t)$ then attempts to predict
+$\varepsilon_t$ from $\mathbf{x}_t$, without knowledge of
+$\mathbf{x}_0$"[^ddim-q]; Nichol and Dhariwal state that "the network could
+also predict the noise $\varepsilon$" and that "predicting $\varepsilon$ worked
+best"[^iddpm-q]. The expository canon carries it further: the widely used
+Hugging Face implementation guide describes the reparametrization as making
+"the neural network learn (predict) the added noise" and concludes that "our
+neural network becomes a noise predictor, rather than a (direct) mean
+predictor"[^hf-q] — a phrasing worth savoring, since the population-optimal
+noise predictor *is* a mean predictor, of the conditional kind. Careful
+statements do exist in print — the tutorial of Nakkiran et al. presents
+$\varepsilon$-, $x_0$-, and $v$-prediction uniformly as estimation of
+conditional expectations[^nak-q] — but they are the exception, not the phrasing
+that spread. The phrasing is harmless to authors who hold the algebra in their
+heads — and misleading to every reader who does not. (One terminological note:
+throughout, $\varepsilon$ denotes the aggregate noise of the fixed-$t$
+representation $x_t = \alpha_t x_0 + \sigma_t \varepsilon$ — the object the
+literature's phrase refers to — not the one-step innovation between adjacent
+times.)
+
+[^ddpm-q]: Ho, Jain, Abbeel, *Denoising Diffusion Probabilistic Models*,
+NeurIPS 2020 ([arXiv:2006.11239](https://arxiv.org/abs/2006.11239)), §3.2.
+Quote verified against the arXiv text.
+
+[^ddim-q]: Song, Meng, Ermon, *Denoising Diffusion Implicit Models*, ICLR 2021
+([arXiv:2010.02502](https://arxiv.org/abs/2010.02502)), §3.2. Verified.
+
+[^iddpm-q]: Nichol, Dhariwal, *Improved Denoising Diffusion Probabilistic
+Models*, ICML 2021 ([arXiv:2102.09672](https://arxiv.org/abs/2102.09672)),
+§2.2. Verified.
+
+[^hf-q]: Rogge, Rasul, [*The Annotated Diffusion
+Model*](https://huggingface.co/blog/annotated-diffusion), Hugging Face blog,
+2022, section "Defining an objective function (by reparametrizing the mean)".
+Quotes verified against the live page.
+
+[^nak-q]: Nakkiran, Bradley, Zhou, Advani, *Step-by-Step Diffusion: An
+Elementary Tutorial* ([arXiv:2406.08929](https://arxiv.org/abs/2406.08929)),
+§5 and Appendix B.10. In ordinary usage *noise* connotes
+structureless randomness, and nothing structureless can be predicted. What makes
+the objective work is that $\varepsilon$, while independent of $X_0$, is **not**
+independent of the pair $(x_t, t)$ that the network sees: the observation is
+constructed from the noise and therefore carries information about it.
+Conditioning on that pair splits the noise into two parts, orthogonal in $L^2$:
+
+$$
+\varepsilon
+= \underbrace{\mathbb{E}[\varepsilon \mid x_t, t]}_{\displaystyle \varepsilon^\star(x_t, t)}
++ \underbrace{\big(\varepsilon - \mathbb{E}[\varepsilon \mid x_t, t]\big)}_{\text{zero conditional mean}} ,
+$$
+
+the first term a deterministic function of what the network sees, the second a
+residual with zero conditional mean (not independent of the observation — only
+its best point prediction is exhausted). For any predictor that is a function of
+$(x_t, t)$, the tower property splits the loss accordingly:
+
+$$
+\mathbb{E}\big\|\varepsilon_\theta - \varepsilon\big\|^2
+= \mathbb{E}\big\|\varepsilon_\theta - \varepsilon^\star\big\|^2
++ \underbrace{\mathbb{E}\big\|\varepsilon - \varepsilon^\star\big\|^2}_{\text{irreducible floor}}
+$$
+
+(a time-dependent weight $\lambda(t)$ multiplies both terms alike). Only the
+first term is reducible in population risk. The floor equals
+$\mathbb{E}\, \operatorname{tr} \operatorname{Cov}(\varepsilon \mid x_t, t)$ —
+the minimum mean-squared error — and for nondegenerate data at finite noise
+levels it is strictly positive: the training loss does not approach zero, and
+should not.
+
+The reducible part is an object we have already met:
+
+$$
+\varepsilon^\star(x, t) = -\sigma_t\, s_t(x)
+$$
+
+— the negative, $\sigma_t$-scaled score. **The predictable component of the
+noise encodes exactly the score, and nothing more.** Equivalently, in
+displacement form:
+$\sigma_t\, \varepsilon^\star(x,t) = x - \alpha_t\, \mathbb{E}[X_0 \mid x]
+= -\sigma_t^2 s_t(x)$ — the *posterior-mean* offset of the observation from the
+attenuated clean signal (a mean, not a most-likely value). It is a
+deterministic, smoothly varying field: for the two-point example below,
+$\varepsilon^\star(x,t) = \big(x - \alpha_t \tanh(\alpha_t x/\sigma_t^2)\big)/\sigma_t$,
+a smooth curve in $x$.
+
+The confusion has a simple source. In a regression there are two different
+objects: the *target* — the random quantity each training pair happens to
+contain (here, the sampled $\varepsilon$) — and the *fitted function* — what the
+trained model actually computes, namely the average of all targets compatible
+with a given input (here, $\varepsilon^\star$). The phrase "noise prediction"
+names the target; the network *is* the fitted function. In careful regression
+language the phrase is even defensible — predicting a random target *means*
+estimating its conditional mean — but the colloquial reading of "noise" hides
+that this is what is happening.
+
+Two consequences sharpen the picture.
+
+- **Structure in the data appears as the nonlinear part of the conditional-mean
+  field — and that field, not any randomness, is what the network learns.** For
+  data with no data-specific structure ($p_{\text{data}} = \mathcal{N}(0, I)$,
+  so $p_t = \mathcal{N}(0, I)$ and $s_t(x) = -x$), the field reduces to the
+  linear baseline $\varepsilon^\star = \sigma_t x$; in the probability-flow ODE
+  this score exactly cancels the VP drift — zero velocity, nothing to
+  transport.
+- **How much of the noise is predictable depends on the data and the noise
+  level.** For smooth, full-dimensional data,
+  $\mathbb{E}\|\varepsilon^\star\|^2 = \sigma_t^2\, J(p_t) \to 0$ as
+  $\sigma_t \to 0$ (with $J$ the Fisher information): the standardized noise
+  becomes mostly *unpredictable* even though denoising is easy. For atomic or
+  well-separated data — the two-point example — the nearby atom becomes
+  identifiable at small $\sigma_t$ and the noise becomes nearly recoverable
+  from the observation. At the other extreme ($\sigma_t \to 1$,
+  $\alpha_t \to 0$), $x_t \to \varepsilon$ and prediction is trivial: the
+  observation mostly *is* the noise.
+
+**The root cause, and the three misconceptions it breeds.** Each falsehood
+below is a logical consequence of taking "the network predicts the noise"
+literally; each is followed by the correcting fact.
+
+- *If the noise can truly be predicted, the training loss should reach zero.*
+  — In fact the loss is bounded below by
+  $\mathbb{E}\, \operatorname{tr} \operatorname{Cov}(\varepsilon \mid x_t, t) > 0$
+  for nondegenerate data at finite noise level; no function of $(x_t, t)$ can
+  go beneath it.
+- *If what is being predicted is "noise", the prediction should look like
+  static and jitter.* — In fact the fitted function is a deterministic field:
+  evaluated twice at the same $(x_t, t)$ it returns the same answer, and it
+  varies smoothly with its input — the two-point formula above is a $\tanh$
+  curve, not a jitter. (Its *values* can occasionally resemble a noise pattern
+  — for Gaussian data $\varepsilon^\star = \sigma_t x_t$ — but it is a fixed
+  function of the input, never a fresh random draw.)
+- *If the network predicts noise, it has the strange ability to predict
+  randomness.* — In fact it estimates a conditional mean: the structured
+  component $\mathbb{E}[\varepsilon \mid x_t, t]$, the part of the noise that
+  the observation determines. The genuinely random residual is never predicted
+  by anything.
+:::
+
+## From SDE to ODE: the derivation
+
+This is the heart of the tutorial. The density of the forward SDE evolves by the
+**Fokker–Planck equation** (Module 5 derives it; here we use it):
+
+$$
+\boxed{\
+\frac{\partial p_t}{\partial t}
+= -\nabla \cdot (f\, p_t) + \tfrac12 g(t)^2\, \Delta p_t
+\ }
+$$
+
+— deterministic transport by the drift, plus spreading by the noise. Separately,
+purely deterministic particle motion $\dot X_t = v(X_t, t)$ evolves its density
+by the **continuity equation**:
+
+$$
+\frac{\partial p_t}{\partial t} = -\nabla \cdot (p_t\, v).
+$$
+
+The question writes itself: *is there a velocity field $v$ whose noiseless
+transport reproduces exactly the density evolution of the noisy SDE?* Try
+
+$$
+v(x, t) = f(x, t) - \tfrac12 g(t)^2\, \nabla_x \log p_t(x).
+$$
+
+Then, using $p_t \nabla \log p_t = \nabla p_t$,
+
+$$
+p_t v = p_t f - \tfrac12 g^2\, p_t \nabla \log p_t
+      = p_t f - \tfrac12 g^2\, \nabla p_t,
+$$
+
+so
+
+$$
+-\nabla \cdot (p_t v)
+= -\nabla \cdot (p_t f) + \tfrac12 g^2\, \nabla \cdot (\nabla p_t)
+= -\nabla \cdot (p_t f) + \tfrac12 g^2\, \Delta p_t
+$$
+
+— exactly the Fokker–Planck right-hand side. The diffusion term has been absorbed
+into an extra drift along the score (in forward time the correction points *down*
+the score, spreading mass; integrated backward it points up). Hence the
+deterministic dynamics
+
+$$
+\boxed{\
+\frac{dX_t}{dt} = f(X_t, t) - \tfrac12 g(t)^2\, \nabla_x \log p_t(X_t)
+\ }
+$$
+
+reproduces the marginals $p_t$ on any interval $[\epsilon, T]$ with
+$\epsilon > 0$, when initialized from the matching law at either end (from $p_T$,
+integrated backward, for generation). If $p_0$ itself is singular — the two-point
+example — the flow reaches it only in the $\epsilon \downarrow 0$ limit: a smooth
+flow cannot terminate on atoms at any positive time, which is the VP face of the
+$\sigma_{\min}$ discussion in the earlier tutorials. This is the
+**probability-flow ODE**. For VP diffusion it takes a compact form:
+
+$$
+\boxed{\
+\frac{dX_t}{dt} = -\tfrac12 \beta(t)\, \big[ X_t + s_t(X_t) \big],
+\ }
+$$
+
+and with the learned score, $s_t \to s_\theta$. (In $d > 1$ this velocity is the
+*canonical* choice, not the unique one: adding any field $u$ with
+$\nabla\!\cdot(p_t u) = 0$ preserves the same marginals. In one dimension the
+monotone flow is unique — the rigidity used below.)
+
+One box on the stochastic alternative, for completeness. Introduce the increasing
+reverse clock $\tau = T - t$, so that "later" means "less noisy"; then the same
+score defines the **reverse-time SDE**
+
+$$
+dX = \big[ -f(X, t) + g(t)^2\, s_t(X) \big]\, d\tau + g(t)\, d\bar W_\tau ,
+$$
+
+with $\bar W$ a fresh Brownian motion in the $\tau$ clock. Note the score
+coefficient $g^2$ — *twice* the ODE's $\tfrac12 g^2$ — compensating the
+re-injected noise: the same doubling you saw in the two-point sampler of W01.
+With the exact score and exact initialization from $p_T$, both samplers traverse
+the same family $\{p_t\}$; the ODE is deterministic given $X_T$, the SDE consumes
+fresh randomness at every instant. From here on we follow the ODE.
+
+Two readings of the result:
+
+- **Kinematic**: the equation is first-order — it prescribes velocity, not force.
+  Every point of space-time carries an arrow $v(x,t)$; a particle follows the
+  arrow under its feet, and the arrows change both because the particle moves and
+  because the field is time-dependent.
+- **Hydrodynamic**: release many particles from $p_T$ and let each follow the
+  field; individually deterministic, collectively their density flows — the
+  continuity equation *is* conservation of probability mass. Hence the name:
+  probability flows through space under a deterministic velocity field.
+
+And the answer to a question worth asking out loud: **is the score the velocity?**
+No. The velocity is *drift plus score correction*,
+
+$$
+v = \underbrace{f}_{\text{known from the schedule}}
+- \underbrace{\tfrac12 g^2\, s}_{\text{learned correction}},
+$$
+
+with the schedule deciding how strongly the learned geometry steers the motion.
+
+## Sampling is numerical integration
+
+After training, everything on the right-hand side of the ODE is available: the
+schedule supplies $\beta(t)$ — hence $f$, $g$, $\alpha_t$, $\sigma_t$ — and the
+network supplies $s_\theta(x, t)$. Generation is: draw
+$X_T \sim \mathcal{N}(0, I)$ (the Gaussian stand-in for $p_T$), integrate
+backward to $t = \epsilon$, return the endpoint. But the trajectory is defined
+*implicitly* — $v$ depends on the state along the unknown path — so for a neural
+score there is generally no closed form. The trajectory is computed numerically.
+
+Fix a descending grid $T = t_N > t_{N-1} > \cdots > t_1 > t_0 = \epsilon$, with
+$h_k = t_{k-1} - t_k < 0$ (backward steps), and $\epsilon > 0$ a small final
+time. The **Euler sampler**:
+
+$$
+\boxed{\
+\begin{aligned}
+&X \sim \mathcal{N}(0, I) \\
+&\text{for } k = N, N-1, \dots, 1: \\
+&\qquad s \leftarrow s_\theta(X, t_k) \\
+&\qquad v \leftarrow -\tfrac12 \beta(t_k)\, (X + s) \\
+&\qquad X \leftarrow X + h_k\, v \\
+&\text{return } X
+\end{aligned}
+\ }
+$$
+
+Since $h_k < 0$, the score increment is $+\tfrac12 \beta(t_k)\, |h_k|\,
+s_\theta$ — the particle steps *up* the score, consistent with W01's sampler.
+Four remarks that carry more weight than the pseudocode:
+
+- **The score must be re-evaluated at every step.** Both of its arguments change:
+  the particle moved, and the noise level dropped. Each step is
+  *evaluate score → construct velocity → move → repeat* — the sampler
+  incrementally reconstructs a global transport from local information.
+- **Better integrators exist.** Heun's method: take the provisional Euler step
+  $X^* = X_k + h_k\, v(X_k, t_k)$, re-evaluate the velocity at the provisional
+  state *and the new time*, $v^* = v(X^*, t_{k-1})$, then move by the average,
+  $X_{k-1} = X_k + \tfrac{h_k}{2}\big( v(X_k, t_k) + v^* \big)$ — second-order
+  accuracy (for sufficiently smooth fields) at two network calls per step. Beyond
+  it: Runge–Kutta, adaptive solvers, multistep and diffusion-specific schemes. The
+  relevant cost metric is the number of neural function evaluations (**NFE**),
+  since each velocity evaluation runs the network once.
+- **The four errors, inventoried** (mirroring the W01 tutorial's honesty
+  paragraph): (i) *terminal-prior mismatch* — sampling $\mathcal{N}(0, I)$
+  instead of the true $p_T$; (ii) *score error* — $s_\theta \ne s_t$; (iii)
+  *integration error* — finite steps; (iv) *finite-$\epsilon$ endpoint bias* —
+  stopping at $t = \epsilon$. Under exact prior, exact score, and exact
+  integration, the endpoint law is exactly $p_\epsilon$; the practical sampler
+  carries all four deviations.
+- **The $\epsilon$-endpoint is not a technicality.** Even the idealized endpoint
+  $p_\epsilon$ is the *attenuated and smoothed* data law
+  ($\alpha_\epsilon X_0 + \sigma_\epsilon Z$), not the data law itself — the VP
+  twin of the terminal width $\sigma_{\min}$ quantified in
+  [the W01 tutorial](./two-point-diffusion.qmd) and
+  [The Deterministic Map, Proved](./map-proved.qmd). Increasing the step count
+  removes integration error only; lowering $\epsilon$ sharpens the target, at the
+  price of an increasingly **stiff** velocity field (for the two-point score
+  below, the derivative at the separatrix scales like $\sigma_t^{-4}$).
+
+## The two-point example, in VP coordinates
+
+Now run the entire pipeline on the course's home dataset,
+$p_0 = \tfrac12 \delta_{-1} + \tfrac12 \delta_{+1}$ — the case where every learned
+object has a formula, worked in the VE convention in
+[the W01 tutorial](./two-point-diffusion.qmd) and proved in
+[The Deterministic Map, Proved](./map-proved.qmd). Conditioning on the component,
+$X_t \mid X_0 = \pm 1 \sim \mathcal{N}(\pm\alpha_t, \sigma_t^2)$, so
+
+$$
+p_t(x) = \tfrac12\, \mathcal{N}(x; -\alpha_t, \sigma_t^2)
+       + \tfrac12\, \mathcal{N}(x; +\alpha_t, \sigma_t^2)
+$$
+
+(sanity check: $\operatorname{Var}(X_t) = \alpha_t^2 + \sigma_t^2 = 1$ — variance
+preserved exactly). The posterior is one line of Bayes — the likelihood ratio of
+the two components is $\exp(-2\alpha_t x/\sigma_t^2)$, so
+
+$$
+\mathbb{P}(X_0 = +1 \mid X_t = x)
+= \operatorname{sigmoid}\!\Big( \frac{2 \alpha_t x}{\sigma_t^2} \Big),
+$$
+
+$$
+\widehat X_0(x, t) := \mathbb{E}[X_0 \mid X_t = x]
+= \tanh\!\Big( \frac{\alpha_t x}{\sigma_t^2} \Big),
+$$
+
+and the score follows in one more line from VP Tweedie
+($s = (\alpha_t\, \mathbb{E}[X_0 \mid x] - x)/\sigma_t^2$, derived in the next
+section):
+
+$$
+s_t(x) = \frac{ \alpha_t \tanh(\alpha_t x / \sigma_t^2) - x }{ \sigma_t^2 },
+$$
+
+$$
+v_t(x) = -\tfrac12 \beta(t)
+\left[ x + \frac{ \alpha_t \tanh(\alpha_t x/\sigma_t^2) - x }{ \sigma_t^2 } \right].
+$$
+
+Setting $\alpha_t = 1$ recovers every corresponding W01 formula — the static
+dictionary at work. As $t \to 0$: $\alpha_t \to 1$, $\sigma_t \to 0$, so
+$\widehat X_0(x, t) \to \operatorname{sign}(x)$ pointwise for $x \ne 0$ (not
+uniformly near $0$) — the smooth $\tanh$ denoiser sharpening into the
+discontinuous sign map.
+
+What does the integrated flow do? The 1-D argument of
+[The Deterministic Map, Proved](./map-proved.qmd) runs in two stages, and the
+order matters. **Stage one, at positive noise:** for each $\epsilon > 0$, the
+flow map $\Psi_{T \to \epsilon}$ is continuous and strictly increasing
+(trajectories of a smooth 1-D ODE cannot cross), and a monotone map pushing
+$p_T$ to $p_\epsilon$ is unique — therefore
+
+$$
+\Psi_{T \to \epsilon} = F_\epsilon^{-1} \circ F_T ,
+$$
+
+the quantile transport between the two mixture CDFs. (At finite $T$, $F_T$ is the
+CDF of the near-Gaussian *mixture*, not of $\mathcal{N}(0,1)$; by symmetry both
+place their median at $0$, which is all the limit needs.) **Stage two, the
+limit:** as $\epsilon \downarrow 0$, the target collapses onto the atoms and
+
+$$
+\boxed{\ \Psi_{T \to \epsilon}(X_T) \;\longrightarrow\; \operatorname{sign}(X_T)
+\qquad p_T\text{-almost surely}. \ }
+$$
+
+Every positive start ends at $+1$, every negative start at $-1$, and symmetry
+sends exactly half the mass to each atom. For the smoothed target
+$\tfrac12\mathcal{N}(-1, \varrho^2) + \tfrac12\mathcal{N}(+1, \varrho^2)$ the
+finite-$T$ endpoint map is the genuine quantile transport
+$F_{0,\varrho}^{-1} \circ F_T$ (which becomes $F_{0,\varrho}^{-1} \circ \Phi$
+only in the idealized exactly-Gaussian-terminal limit), converging to the sign
+map as $\varrho \to 0$.
+
+One qualification keeps the example honest. In this special symmetric case the
+endpoint of the flow *happens* to be a formula we could have written down without
+any ODE. The solver is not "numerically approximating the sign function" in
+general: it solves a differential equation whose endpoint, for arbitrary data, is
+not known in advance — that is the entire point of learning the score.
+
+## Three distinctions that prevent three confusions
+
+**The score is not the velocity.** $v = f - \tfrac12 g^2 s$: the learned score is
+the *correction*; the schedule contributes the drift and decides the correction's
+strength.
+
+**The denoiser is not the endpoint.** VP Tweedie (set $\alpha \equiv 1$ to
+recover W01's version) gives the one-step posterior mean
+
+$$
+\mathbb{E}[X_0 \mid X_t = x] = \frac{x + \sigma_t^2\, s_t(x)}{\alpha_t}
+\qquad (\alpha_t > 0),
+$$
+
+a *single* denoising estimate from noise level $t$. The flow endpoint
+$\Psi_{T \to \epsilon}(X_T)$ integrates the score field through *every* level.
+In the two-point limit both converge to the same sign decision — because a
+trajectory that never touches $0$ keeps its sign, and the denoiser's sign at any
+level agrees with it — but they are different objects, and conflating them is a
+common reading error in the literature.
+
+**The one-shot map and the incremental flow solve the same problem.** Define the
+per-step Euler map $E_k(x) = x + h_k\, v(x, t_k)$. Then the endpoint transport is
+represented implicitly as a time-ordered composition,
+
+$$
+\Psi_{T \to \epsilon}
+= \lim_{\max_k |h_k| \to 0}\; E_1 \circ E_2 \circ \cdots \circ E_N ,
+$$
+
+— the factorization view of
+[The Deterministic Map, Proved](./map-proved.qmd), now with a learned field: each
+factor is near-identity and needs only local information. For fixed
+$\epsilon > 0$ this limit is a continuous map; any discontinuity (the sign
+function) arises only in the *separate* limit $\epsilon \downarrow 0$.
+
+## The pipeline, end to end
+
+**Design.** Choose a schedule $\beta(t)$. It determines the corruption kernel —
+$f$, $g$, $\alpha_t$, $\sigma_t$ — and, together with the data, the family
+$p_0 \to p_t \to p_T$. The forward process learns nothing — it *manufactures the
+training signal*: a near-Gaussian endpoint, exact corruption pairs
+$(x_0, x_t, t, \varepsilon)$, and an analytic conditional score target.
+
+**Train.**
+
+$$
+\boxed{\;
+\begin{gathered}
+x_0 \sim p_{\text{data}}, \quad t \sim p(t), \quad
+\varepsilon \sim \mathcal{N}(0, I), \\[2pt]
+\min_\theta\;
+\mathbb{E}
+\left[ \lambda(t)\,
+\big\| s_\theta(\alpha_t x_0 + \sigma_t \varepsilon,\; t)
++ \varepsilon/\sigma_t \big\|^2 \right]
+\end{gathered}
+\;}
+$$
+
+**Sample.**
+
+$$
+\boxed{\;
+\begin{gathered}
+X_T \sim \mathcal{N}(0, I), \\[2pt]
+\frac{dX_t}{dt} = f(X_t, t) - \tfrac12 g(t)^2 s_\theta(X_t, t)
+\quad \text{integrated } T \to \epsilon, \\[2pt]
+\text{return } X.
+\end{gathered}
+\;}
+$$
+
+## Takeaways
+
+1. The schedule $\beta(t)$ determines the corruption kernel — drift, diffusion
+   coefficient, $\alpha_t$, $\sigma_t$; together with the data it determines the
+   family $\{p_t\}$.
+2. The score $\nabla \log p_t$ is the only learned time-dependent function the
+   sampler needs, trained by denoising score matching on synthetically corrupted
+   data; noise prediction is the same estimator in different units, with
+   population optimum $-\mathbb{E}[\varepsilon \mid x_t]/\sigma_t$.
+3. The probability-flow ODE replaces the SDE's noise by an extra drift along the
+   score, reproducing the same marginals deterministically on $[\epsilon, T]$:
+   $v = f - \tfrac12 g^2 s$.
+4. Sampling is numerical ODE integration; each step is score evaluation →
+   velocity → move; accuracy is bought with NFE; and the practical sampler
+   carries four distinct errors — prior mismatch, score error, integration
+   error, and the finite-$\epsilon$ endpoint bias.
+5. In the two-point limit the integrated flow converges to the sign map —
+   locally learned gradients, integrated into a transport that is discontinuous
+   only in the $\epsilon \downarrow 0$ limit — and for real data the same
+   principle holds with no formula available: **the global generative
+   transformation is obtained by integrating locally learned score
+   information.**
+
+## Exercises
+
+1. (One-dimensional.) Verify from the closed form
+   $X_t \overset{d}{=} \alpha_t X_0 + \sigma_t \varepsilon$ that
+   $\operatorname{Var}(X_t) = \alpha_t^2 \operatorname{Var}(X_0) + \sigma_t^2$,
+   and confirm the variance-preserving property for unit-variance data. State the
+   $d$-dimensional covariance version.
+2. Use the static dictionary ($\alpha \equiv 1$) to recover, from the VP
+   two-point formulas: the mixture $p_t$, the posterior, the denoiser, and the
+   score — and match each against [the W01 tutorial](./two-point-diffusion.qmd).
+   Then use the *dynamic* dictionary ($Y = X/\alpha$) to transform the VP score
+   into the VE score and check consistency.
+3. Complete the proof that the population minimizer of the denoising
+   score-matching objective is the marginal score, stating explicitly where
+   $t > 0$, $\lambda(t) > 0$, and differentiation under the integral are used.
+4. Show that the reverse-time SDE and the probability-flow ODE differ exactly by
+   replacing $\tfrac12 g^2 s\, dt$ with $g^2 s\, dt - g\, d\bar W$, and argue via
+   the Fokker–Planck equation that both preserve the family $\{p_t\}$ under exact
+   score and exact terminal initialization.
+5. **A reproducible benchmark.** Take $\beta(t) = 0.1 + 19.9\,t$ on $[0, 1]$
+   (so $\alpha_t = e^{-(0.05 t + 4.975 t^2)}$), $\epsilon = 10^{-3}$, a uniform
+   grid in $t$, exact two-point score, and $X_T \sim \mathcal{N}(0,1)$. Measure
+   the RMS distance of endpoints to the nearest atom. Compare Euler and Heun *at
+   equal NFE* (Euler gets twice the steps). Which wins at NFE = 10? At NFE = 100?
+6. For the smoothed two-point target with component variance $\varrho^2$, write
+   the VP forward family $p_t$ explicitly (hint: Gaussians convolve), and verify
+   that the finite-$T$ quantile transport is $F_{0,\varrho}^{-1} \circ F_T$,
+   reducing to $F_{0,\varrho}^{-1} \circ \Phi$ only when $p_T$ is replaced by
+   its Gaussian idealization.
+7. For the two-point score, compute $s_t'(0)$ and show it scales as
+   $\alpha_t^2/\sigma_t^4$ for small $\sigma_t$ — the stiffness quoted in the
+   sampling section. Where in $x$ is $|s_t'|$ largest, and why is that exactly
+   where a numerical integrator needs small steps?

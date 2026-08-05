@@ -57,6 +57,14 @@ book:
         - weeks/w15.qmd
         - weeks/w16.qmd
         - weeks/w17.qmd
+    - part: "Tutorials"
+      chapters:
+        - tutorials/probability-101.qmd
+        - tutorials/two-point-diffusion.qmd
+        - tutorials/distributions-mle.qmd
+        - tutorials/genai-simplest-form.qmd
+        - tutorials/map-proved.qmd
+        - tutorials/probability-flow-ode.qmd
     - resources.qmd
 
 format:
