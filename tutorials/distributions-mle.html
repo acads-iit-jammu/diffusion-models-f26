@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Course – ID-5-02 (TO)</title>
+<title>Distributions and Maximum Likelihood – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +23,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./syllabus.html" rel="next">
-<link href="./index.html" rel="prev">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/genai-simplest-form.html" rel="next">
+<link href="../tutorials/two-point-diffusion.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -69,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -81,7 +110,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./course.html">Course</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/distributions-mle.html">Distributions and Maximum Likelihood</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -96,7 +125,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ID-5-02 (TO)</a> 
+      <a href="../">ID-5-02 (TO)</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
   <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
@@ -116,25 +145,25 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Welcome</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./course.html" class="sidebar-item-text sidebar-link active">
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Course</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./syllabus.html" class="sidebar-item-text sidebar-link">
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Syllabus</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./assignments.html" class="sidebar-item-text sidebar-link">
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assignments</span></a>
   </div>
 </li>
@@ -149,103 +178,103 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w01.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w01.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W01: Generative Modeling I</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w02.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w02.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W02: Generative Modeling II</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w03.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w03.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W03: High Dimensions &amp; Gaussians</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w04.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w04.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W04: Gaussian Calculus &amp; Markov Chains</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w05.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w05.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W05: Noise Accumulation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w06.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w06.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W06: DDPM I</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w07.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w07.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W07: DDPM II</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w08.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w08.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W08: Score Matching</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w09.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w09.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W09: Mid-Semester Examinations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w10.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w10.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W10: Denoising Score Matching</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w11.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w11.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W11: Brownian Motion &amp; SDEs</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w12.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w12.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W12: Fokker–Planck</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w13.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w13.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W13: Continuous Forward Equation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w14.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w14.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W14: Reverse-time Drift</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w15.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w15.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W15: Information Flow &amp; Probability Flow ODE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w16.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w16.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W16: Holiday Week</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w17.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w17.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W17: Flows, Applications &amp; Wrap-up</span></a>
   </div>
 </li>
@@ -253,46 +282,46 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/probability-101.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability 101 — A Refresher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/two-point-diffusion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/distributions-mle.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/distributions-mle.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
@@ -300,7 +329,7 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./resources.html" class="sidebar-item-text sidebar-link">
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Resources</span></a>
   </div>
 </li>
@@ -314,19 +343,24 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#logistics" id="toc-logistics" class="nav-link active" data-scroll-target="#logistics">Logistics</a></li>
-  <li><a href="#important-dates" id="toc-important-dates" class="nav-link" data-scroll-target="#important-dates">Important Dates</a></li>
-  <li><a href="#assessment" id="toc-assessment" class="nav-link" data-scroll-target="#assessment">Assessment</a></li>
-  <li><a href="#weekly-plan" id="toc-weekly-plan" class="nav-link" data-scroll-target="#weekly-plan">Weekly Plan</a></li>
+  <li><a href="#the-cast-of-distributions" id="toc-the-cast-of-distributions" class="nav-link active" data-scroll-target="#the-cast-of-distributions">The cast of distributions</a></li>
+  <li><a href="#how-sampling-actually-works" id="toc-how-sampling-actually-works" class="nav-link" data-scroll-target="#how-sampling-actually-works">How sampling actually works</a></li>
+  <li><a href="#likelihood" id="toc-likelihood" class="nav-link" data-scroll-target="#likelihood">Likelihood</a></li>
+  <li><a href="#pdf-vs-likelihood-the-same-function-two-readings" id="toc-pdf-vs-likelihood-the-same-function-two-readings" class="nav-link" data-scroll-target="#pdf-vs-likelihood-the-same-function-two-readings">PDF vs likelihood: the same function, two readings</a></li>
+  <li><a href="#the-gaussian-mle-in-full" id="toc-the-gaussian-mle-in-full" class="nav-link" data-scroll-target="#the-gaussian-mle-in-full">The Gaussian MLE, in full</a></li>
+  <li><a href="#aside-binary-cross-entropy-is-a-likelihood" id="toc-aside-binary-cross-entropy-is-a-likelihood" class="nav-link" data-scroll-target="#aside-binary-cross-entropy-is-a-likelihood">Aside: binary cross-entropy is a likelihood</a></li>
+  <li><a href="#fitting-the-other-families-honestly" id="toc-fitting-the-other-families-honestly" class="nav-link" data-scroll-target="#fitting-the-other-families-honestly">Fitting the other families — honestly</a></li>
+  <li><a href="#the-trap-right-method-wrong-family" id="toc-the-trap-right-method-wrong-family" class="nav-link" data-scroll-target="#the-trap-right-method-wrong-family">The trap: right method, wrong family</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/distributions-mle.html">Distributions and Maximum Likelihood</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Course</h1>
+<h1 class="title">Distributions and Maximum Likelihood</h1>
 </div>
 
 
@@ -343,246 +377,206 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="logistics" class="level2">
-<h2 class="anchored" data-anchor-id="logistics">Logistics</h2>
+<p><em>Standalone tutorial accompanying <a href="../weeks/w02.html">W02</a>. Interactive versions: <a href="../materials/distributions-playground.html">the Distribution Playground</a> and <a href="../materials/likelihood-lens.html">the Likelihood Lens</a>.</em></p>
+<p>This note walks one loop twice: <strong>distribution → samples → fitted distribution → new samples</strong>. First visually (the playground), then analytically (maximum likelihood for the Gaussian, derived in full). It doubles as a compact reference for the distribution families used throughout the course.</p>
+<section id="the-cast-of-distributions" class="level2">
+<h2 class="anchored" data-anchor-id="the-cast-of-distributions">The cast of distributions</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 35%">
-<col style="width: 65%">
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><strong>Lectures</strong></td>
-<td>Monday 9:00–9:50 · Tuesday 10:00–10:50 · Wednesday 11:00–11:50</td>
-</tr>
-<tr class="even">
-<td><strong>Venue</strong></td>
-<td>11AC4004</td>
-</tr>
-<tr class="odd">
-<td><strong>Instructors</strong></td>
-<td><a href="https://iitjammu.ac.in/faculty/~umasatyaranjan">Uma Satyaranjan</a> · <a href="https://dhavala.github.io/">Soma S Dhavala</a></td>
-</tr>
-<tr class="even">
-<td><strong>Prerequisite</strong></td>
-<td>CS-3-12 (MO) — Machine Learning</td>
-</tr>
-<tr class="odd">
-<td><strong>Open to</strong></td>
-<td>All B.Tech programmes (2<sup>nd</sup> year+), M.Tech, M.Sc, MS(R), PhD</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="important-dates" class="level2">
-<h2 class="anchored" data-anchor-id="important-dates">Important Dates</h2>
-<p>From the <span class="smallcaps">IIT Jammu academic calendar for 2<sup>nd</sup>/3<sup>rd</sup>/4<sup>th</sup> year UG students, Semester 2026-01</span>:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Event</th>
-<th>Dates</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Commencement of classes</td>
-<td>Wednesday, Jul 29, 2026</td>
-</tr>
-<tr class="even">
-<td>Add &amp; drop of courses</td>
-<td>Jul 29 – Aug 5, 2026</td>
-</tr>
-<tr class="odd">
-<td>Class Test-1<sup>*</sup></td>
-<td>Aug 19 – Aug 25, 2026</td>
-</tr>
-<tr class="even">
-<td>Mid-semester feedback (by students)</td>
-<td>Sep 9 – Sep 15, 2026</td>
-</tr>
-<tr class="odd">
-<td>Course withdrawal deadline</td>
-<td>Sep 15, 2026</td>
-</tr>
-<tr class="even">
-<td><strong>Mid-Semester Examination</strong></td>
-<td><strong>Sep 18 – Sep 23, 2026</strong></td>
-</tr>
-<tr class="odd">
-<td>Class Test-2<sup>*</sup></td>
-<td>Oct 14 – Oct 22, 2026</td>
-</tr>
-<tr class="even">
-<td>Last day of classes</td>
-<td>Friday, Nov 20, 2026</td>
-</tr>
-<tr class="odd">
-<td>End-semester feedback (by students)</td>
-<td>Nov 12 – Nov 17, 2026</td>
-</tr>
-<tr class="even">
-<td><strong>End-Semester Examination</strong></td>
-<td><strong>Nov 23 – Nov 30, 2026</strong></td>
-</tr>
-<tr class="odd">
-<td>Grades visible to students</td>
-<td>Dec 15, 2026</td>
-</tr>
-</tbody>
-</table>
-<p><sup>*</sup> Class tests are conducted with internal arrangements; whether and how this course uses them will be announced with the assessment scheme.</p>
-<p><strong>Institute holidays that affect our slots:</strong> Wed Aug 26 (Milad-un-Nabi), Mon Oct 19 &amp; Tue Oct 20 (Dussehra), Mon Nov 9 – Wed Nov 11 (Diwali cluster).</p>
-</section>
-<section id="assessment" class="level2">
-<h2 class="anchored" data-anchor-id="assessment">Assessment</h2>
-<p>The scheme below is <strong>tentative</strong>; any changes will be announced in class.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 70%">
+<col style="width: 22%">
 <col style="width: 30%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 20%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Component</th>
-<th style="text-align: center;">Weight</th>
+<th>Family</th>
+<th>pdf <span class="math inline">\(f(x)\)</span></th>
+<th>Support</th>
+<th>Mean</th>
+<th>Variance</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Assignments / Homeworks</td>
-<td style="text-align: center;">20%</td>
+<td>Uniform<span class="math inline">\((a,b)\)</span></td>
+<td><span class="math inline">\(\frac{1}{b-a}\)</span></td>
+<td><span class="math inline">\([a,b]\)</span></td>
+<td><span class="math inline">\(\frac{a+b}{2}\)</span></td>
+<td><span class="math inline">\(\frac{(b-a)^2}{12}\)</span></td>
 </tr>
 <tr class="even">
-<td>Mid-semester exam (pen &amp; paper)</td>
-<td style="text-align: center;">30%</td>
+<td>Normal<span class="math inline">\((\mu,\sigma^2)\)</span></td>
+<td><span class="math inline">\(\frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}\)</span></td>
+<td><span class="math inline">\(\mathbb{R}\)</span></td>
+<td><span class="math inline">\(\mu\)</span></td>
+<td><span class="math inline">\(\sigma^2\)</span></td>
 </tr>
 <tr class="odd">
-<td>End-semester exam (pen &amp; paper)</td>
-<td style="text-align: center;">40%</td>
+<td>Gamma<span class="math inline">\((k,\theta)\)</span></td>
+<td><span class="math inline">\(\frac{x^{k-1} e^{-x/\theta}}{\Gamma(k)\,\theta^{k}}\)</span></td>
+<td><span class="math inline">\((0,\infty)\)</span></td>
+<td><span class="math inline">\(k\theta\)</span></td>
+<td><span class="math inline">\(k\theta^2\)</span></td>
 </tr>
 <tr class="even">
-<td>Mini coding project</td>
-<td style="text-align: center;">10%</td>
+<td>Beta<span class="math inline">\((\alpha,\beta)\)</span></td>
+<td><span class="math inline">\(\frac{x^{\alpha-1}(1-x)^{\beta-1}}{B(\alpha,\beta)}\)</span></td>
+<td><span class="math inline">\((0,1)\)</span></td>
+<td><span class="math inline">\(\frac{\alpha}{\alpha+\beta}\)</span></td>
+<td><span class="math inline">\(\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}\)</span></td>
+</tr>
+<tr class="odd">
+<td>Mixture</td>
+<td><span class="math inline">\(\sum_i \pi_i\, f_i(x)\)</span></td>
+<td>union</td>
+<td><span class="math inline">\(\sum_i \pi_i \mu_i\)</span></td>
+<td>see Exercise 5</td>
 </tr>
 </tbody>
 </table>
-<p>See the <a href="./assignments.html">Assignments</a> page for the individual homeworks, exam windows, and the coding project.</p>
+<p>A sentence of habitat for each: the <strong>Uniform</strong> encodes total ignorance on an interval; the <strong>Normal</strong> is what sums of many small independent effects look like (W01’s warm-up demo <em>is</em> this statement); the <strong>Gamma</strong> models positive, right-skewed quantities such as waiting times; the <strong>Beta</strong> lives on <span class="math inline">\((0,1)\)</span> and models proportions and probabilities; a <strong>mixture</strong> models data with subpopulations — clusters — and is the recurring character of this course.</p>
 </section>
-<section id="weekly-plan" class="level2">
-<h2 class="anchored" data-anchor-id="weekly-plan">Weekly Plan</h2>
-<p>Lectures run Mon/Tue/Wed; with the holidays above and the mid-sem week, the semester provides <strong>exactly 40 lecture slots — matching the syllabus’s 40 hours</strong>. Readings refer to the <a href="./resources.html">primary text</a> (<em>The Principles of Diffusion Models</em>, arXiv:2510.21890). The plan is tentative in pacing, not in coverage.</p>
+<section id="how-sampling-actually-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-sampling-actually-works">How sampling actually works</h2>
+<p>Every sampler in the playground reduces to uniform random numbers:</p>
+<ul>
+<li><strong>Inverse CDF.</strong> If <span class="math inline">\(F\)</span> is a CDF and <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>, then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span> (proved in the companion note <a href="../tutorials/genai-simplest-form.html"><em>Generative AI, in Its Simplest Form</em></a>). This handles Uniform (<span class="math inline">\(x = a + (b-a)u\)</span>) and anything with a computable <span class="math inline">\(F^{-1}\)</span>.</li>
+<li><strong>Box–Muller</strong> for the Normal: with <span class="math inline">\(U_1, U_2\)</span> independent uniforms, <span class="math inline">\(\sqrt{-2\log U_1}\,\cos(2\pi U_2)\)</span> is exactly <span class="math inline">\(\mathcal{N}(0,1)\)</span>. This is the sampler inside every demo of this course.</li>
+<li><strong>Pick-then-sample</strong> for mixtures: draw the component index with probabilities <span class="math inline">\(\pi_i\)</span>, then sample that component — ancestral sampling, the subject of the companion note.</li>
+<li>Gamma and Beta use clever rejection samplers (the playground uses Marsaglia–Tsang); we treat them as black boxes.</li>
+</ul>
+</section>
+<section id="likelihood" class="level2">
+<h2 class="anchored" data-anchor-id="likelihood">Likelihood</h2>
+<p>Fix a family <span class="math inline">\(f(x;\theta)\)</span> and observe an i.i.d. dataset <span class="math inline">\(x_1, \dots, x_n\)</span>. The <strong>likelihood</strong> and <strong>log-likelihood</strong> are</p>
+<p><span class="math display">\[
+L(\theta) = \prod_{i=1}^n f(x_i; \theta),
+\qquad
+\ell(\theta) = \sum_{i=1}^n \log f(x_i; \theta),
+\]</span></p>
+<p>and the <strong>maximum likelihood estimator (MLE)</strong> is <span class="math inline">\(\hat\theta = \arg\max_\theta \ell(\theta)\)</span>. The log changes nothing about the argmax (monotonicity) and everything about the algebra and the numerics: a product of 3000 numbers of size <span class="math inline">\(10^{-2}\)</span> underflows; a sum of their logs is a perfectly pleasant <span class="math inline">\(\approx -13{,}800\)</span>.</p>
+</section>
+<section id="pdf-vs-likelihood-the-same-function-two-readings" class="level2">
+<h2 class="anchored" data-anchor-id="pdf-vs-likelihood-the-same-function-two-readings">PDF vs likelihood: the same function, two readings</h2>
+<p>The chronic confusion, settled: <span class="math inline">\(f(x;\theta)\)</span> is <strong>one formula with two arguments</strong>.</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 7%">
-<col style="width: 16%">
-<col style="width: 77%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 36%">
+<col style="width: 20%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: center;">Week</th>
-<th>Class days</th>
-<th>Module · Topics</th>
+<th>Fix</th>
+<th>Vary</th>
+<th>You get</th>
+<th>Area under the curve</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w01.html">01</a></td>
-<td>Jul 29</td>
-<td><strong>M1</strong> Course overview; generative modeling: data distributions and model families <em>(1 lecture)</em></td>
+<td>parameters <span class="math inline">\(\theta\)</span></td>
+<td>data <span class="math inline">\(x\)</span></td>
+<td>the <strong>pdf</strong> — a distribution over data</td>
+<td><span class="math inline">\(= 1\)</span>, always</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;"><a href="./weeks/w02.html">02</a></td>
-<td>Aug 3, 4, 5</td>
-<td><strong>M1</strong> Maximum-likelihood estimation; KL divergence; empirical risk minimization</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w03.html">03</a></td>
-<td>Aug 10, 11, 12</td>
-<td><strong>M1</strong> Challenges of high-dimensional density estimation · <strong>M2</strong> multivariate Gaussians</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w04.html">04</a></td>
-<td>Aug 17, 18, 19</td>
-<td><strong>M2</strong> Conditioning &amp; marginalization; linear transformations; discrete-time Markov chains. <em>CT-1 window opens Aug 19</em></td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w05.html">05</a></td>
-<td>Aug 24, 25</td>
-<td><strong>M2</strong> Noise accumulation through repeated Gaussian perturbation <em>(no Wed class — Milad-un-Nabi)</em></td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w06.html">06</a></td>
-<td>Aug 31, Sep 1, 2</td>
-<td><strong>M3</strong> DDPM: forward diffusion process; concept of the reverse process</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w07.html">07</a></td>
-<td>Sep 7, 8, 9</td>
-<td><strong>M3</strong> Variational lower bound; decomposition of KL terms; reduction to noise-prediction loss</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w08.html">08</a></td>
-<td>Sep 14, 15, 16</td>
-<td><strong>M4</strong> Score functions; score matching. <em>Mid-sem begins Fri Sep 18</em></td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w09.html">09</a></td>
-<td>—</td>
-<td><strong>Mid-Semester Examinations (Sep 18–23)</strong> — covers M1–M3 and W08’s score-matching material</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w10.html">10</a></td>
-<td>Sep 28, 29, 30</td>
-<td><strong>M4</strong> Denoising score matching; synthesis</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w11.html">11</a></td>
-<td>Oct 5, 6, 7</td>
-<td><strong>M5</strong> Random walks and Brownian motion; the concept of an SDE</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w12.html">12</a></td>
-<td>Oct 12, 13, 14</td>
-<td><strong>M5</strong> Heat-equation intuition; Fokker–Planck equation. <em>CT-2 window opens Oct 14</em></td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w13.html">13</a></td>
-<td>Oct 21</td>
-<td><strong>M5</strong> Continuous formulation of the forward equation <em>(1 lecture — Mon/Tue are Dussehra holidays)</em></td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w14.html">14</a></td>
-<td>Oct 26, 27, 28</td>
-<td><strong>M5</strong> wrap-up · <strong>M6</strong> Heuristic derivation of reverse-time drift</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w15.html">15</a></td>
-<td>Nov 2, 3, 4</td>
-<td><strong>M6</strong> Entropy &amp; information-flow interpretation; probability flow ODE</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w16.html">16</a></td>
-<td>—</td>
-<td><strong>No classes — holidays Mon Nov 9 – Wed Nov 11 (Diwali cluster)</strong></td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w17.html">17</a></td>
-<td>Nov 16, 17, 18</td>
-<td><strong>M6</strong> Neural ODEs and flow-based models; applications &amp; extensions; course wrap-up</td>
+<td>observed data <span class="math inline">\(x\)</span></td>
+<td>parameters <span class="math inline">\(\theta\)</span></td>
+<td>the <strong>likelihood</strong> — a score for fitting</td>
+<td>meaningless</td>
 </tr>
 </tbody>
 </table>
-<div class="callout callout-style-simple callout-note">
-<div class="callout-body d-flex">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-body-container">
-<p>Module hours per the syllabus: M1–M4 are 6 hours each; M5–M6 are 8 hours each (40 total). The 40 available slots cover this exactly, so any lecture lost to unforeseen events will be made up on a compensatory day.</p>
-</div>
-</div>
-</div>
+<p>The <a href="../materials/likelihood-lens.html">Likelihood Lens</a> shows both as slices of the same surface <span class="math inline">\(f(x;\mu) = \mathcal{N}(x; \mu, \sigma^2)\)</span>: the horizontal slice (fix <span class="math inline">\(\mu\)</span>) is a density in <span class="math inline">\(x\)</span>; the vertical slice (fix <span class="math inline">\(x\)</span>) is a likelihood in <span class="math inline">\(\mu\)</span>. For the Gaussian the two slices happen to have the same bell shape, because <span class="math inline">\(f(x;\mu) = f(\mu;x)\)</span> — a symmetry of this family, <em>not</em> a general fact (repeat the exercise mentally with a Gamma in <span class="math inline">\(\theta\)</span>). What is general: <strong>the likelihood is not a probability distribution over <span class="math inline">\(\theta\)</span></strong> — it need not integrate to 1, and only its argmax and local shape carry meaning.</p>
+</section>
+<section id="the-gaussian-mle-in-full" class="level2">
+<h2 class="anchored" data-anchor-id="the-gaussian-mle-in-full">The Gaussian MLE, in full</h2>
+<p><span class="math display">\[
+\ell(\mu, \sigma^2)
+= -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^n (x_i - \mu)^2 .
+\]</span></p>
+<p><strong>Maximize over <span class="math inline">\(\mu\)</span>.</strong> Only the second term involves <span class="math inline">\(\mu\)</span>:</p>
+<p><span class="math display">\[
+\frac{\partial \ell}{\partial \mu}
+= \frac{1}{\sigma^2}\sum_{i=1}^n (x_i - \mu)
+= \frac{n}{\sigma^2}(\bar{x} - \mu)
+\;\stackrel{!}{=}\; 0
+\quad\Longrightarrow\quad
+\boxed{\ \hat\mu = \bar{x}\ }
+\]</span></p>
+<p>for <strong>every</strong> <span class="math inline">\(\sigma\)</span> — which is why, in the Lens, changing <span class="math inline">\(\sigma\)</span> sharpens the log-likelihood parabola but never moves its peak.</p>
+<p><strong>Maximize over <span class="math inline">\(\sigma^2\)</span></strong> (treat <span class="math inline">\(v = \sigma^2\)</span> as the variable):</p>
+<p><span class="math display">\[
+\frac{\partial \ell}{\partial v}
+= -\frac{n}{2v} + \frac{1}{2v^2}\sum_i (x_i - \hat\mu)^2
+\;\stackrel{!}{=}\; 0
+\quad\Longrightarrow\quad
+\boxed{\ \hat\sigma^2 = \frac{1}{n}\sum_{i=1}^n (x_i - \bar{x})^2\ }
+\]</span></p>
+<p>(One should check this is a maximum, not merely critical: <span class="math inline">\(\ell \to -\infty\)</span> as <span class="math inline">\(v \to 0^+\)</span> and as <span class="math inline">\(v \to \infty\)</span>, and this is the only critical point.) Note the divisor <span class="math inline">\(n\)</span>: the MLE of the variance is <em>biased</em> — <span class="math inline">\(\mathbb{E}[\hat\sigma^2] =
+\frac{n-1}{n}\sigma^2\)</span> — which is where the familiar <span class="math inline">\(n-1\)</span> estimator comes from. For this course the distinction is a footnote; the MLE is what the theory produces.</p>
+</section>
+<section id="aside-binary-cross-entropy-is-a-likelihood" class="level2">
+<h2 class="anchored" data-anchor-id="aside-binary-cross-entropy-is-a-likelihood">Aside: binary cross-entropy is a likelihood</h2>
+<p>The most familiar loss in machine learning is a maximum-likelihood problem in disguise, and the disguise falls away the moment classification is read as a (conditional) generative model.</p>
+<p><strong>The model.</strong> For the <span class="math inline">\(i\)</span>-th sample with features <span class="math inline">\(x_i\)</span>, model the binary label as a Bernoulli trial,</p>
+<p><span class="math display">\[
+y_i \mid x_i \;\sim\; \text{Bernoulli}(\pi_i), \qquad y_i \in \{0, 1\},
+\]</span></p>
+<p>and let a neural network supply the <strong>logit</strong> — the log-<em>odds</em>, not the log-probability:</p>
+<p><span class="math display">\[
+s_i = f_\theta(x_i) = \log \frac{\pi_i}{1 - \pi_i}
+\quad\Longleftrightarrow\quad
+\pi_i = \operatorname{sigmoid}(s_i).
+\]</span></p>
+<p><strong>The likelihood.</strong> The Bernoulli pmf can be written in one line as <span class="math inline">\(p(y \mid \pi) = \pi^{y} (1-\pi)^{1-y}\)</span>, so for independent samples</p>
+<p><span class="math display">\[
+L(\theta) = \prod_{i=1}^n \pi_i^{\,y_i} (1 - \pi_i)^{1 - y_i},
+\qquad
+-\ell(\theta) = -\sum_{i=1}^n \Big[ y_i \log \pi_i + (1 - y_i)\log(1 - \pi_i) \Big].
+\]</span></p>
+<p>The right-hand side is <strong>exactly binary cross-entropy</strong>. Training a classifier with BCE is maximum likelihood for a conditional Bernoulli model whose log-odds are the network output — nothing more. (The name is also earned: <span class="math inline">\(-\ell/n\)</span> is the cross-entropy between the empirical distribution of each label and the model’s Bernoulli.)</p>
+<p><strong>The <span class="math inline">\(\pm 1\)</span> convention.</strong> With labels <span class="math inline">\(y_i \in \{-1, +1\}\)</span>, the identity <span class="math inline">\(\operatorname{sigmoid}(-s) = 1 - \operatorname{sigmoid}(s)\)</span> collapses both cases into <span class="math inline">\(p(y_i \mid s_i) = \operatorname{sigmoid}(y_i s_i)\)</span>, and the negative log-likelihood becomes the <strong>logistic loss</strong>,</p>
+<p><span class="math display">\[
+-\ell(\theta) = \sum_{i=1}^n \log\!\big(1 + e^{-y_i s_i}\big)
+\]</span></p>
+<p>— the same objective, rewritten.</p>
+<p><strong>The connection to this course.</strong> W01’s latent posterior <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is precisely this model with logit <span class="math inline">\(s(x) = 2x/\sigma^2\)</span>: the optimal classifier of the hidden component is a Bernoulli model whose log-odds are linear in the observation. Classification, denoising, and latent inference are all the same likelihood computation wearing different clothes.</p>
+</section>
+<section id="fitting-the-other-families-honestly" class="level2">
+<h2 class="anchored" data-anchor-id="fitting-the-other-families-honestly">Fitting the other families — honestly</h2>
+<ul>
+<li><p><strong>Uniform.</strong> The likelihood is <span class="math inline">\((b-a)^{-n}\)</span> if all points lie in <span class="math inline">\([a,b]\)</span> and <span class="math inline">\(0\)</span> otherwise: to maximize, squeeze the interval as tight as the data allows — <span class="math inline">\(\hat a = \min_i x_i\)</span>, <span class="math inline">\(\hat b = \max_i x_i\)</span>. (No calculus; the maximum is on the boundary of the constraint. That is Exercise 2.)</p></li>
+<li><p><strong>Gamma and Beta have no closed-form MLE.</strong> Setting the derivatives to zero produces equations involving the digamma function, solvable only numerically. The playground therefore uses the <strong>method of moments (MoM)</strong>: equate the family’s mean and variance to the sample’s <span class="math inline">\(\bar x\)</span> and <span class="math inline">\(s^2\)</span> and solve —</p>
+<p><span class="math display">\[
+\text{Gamma: } \hat k = \frac{\bar{x}^2}{s^2},\ \ \hat\theta = \frac{s^2}{\bar{x}};
+\qquad
+\text{Beta: } c = \frac{\bar{x}(1-\bar{x})}{s^2} - 1,\ \
+\hat\alpha = \bar{x}\,c,\ \ \hat\beta = (1-\bar{x})\,c .
+\]</span></p>
+<p>MoM is a respectable estimator in its own right (consistent, and a standard warm start for numerical MLE); the honest label matters because “just maximize the likelihood” quietly assumes machinery we haven’t built.</p></li>
+<li><p><strong>Mixtures.</strong> Even MoM gets awkward; the right tool is expectation–maximization (EM), which belongs to a later conversation. Today the mixture plays a different role — see below.</p></li>
+</ul>
+</section>
+<section id="the-trap-right-method-wrong-family" class="level2">
+<h2 class="anchored" data-anchor-id="the-trap-right-method-wrong-family">The trap: right method, wrong family</h2>
+<p>In the playground: generate 3000 samples from the two-bump mixture, then fit a <strong>single Normal</strong> by maximum likelihood. The fit is <em>optimal within its family</em> — and its peak sits exactly in the empty valley between the clusters, because the best single Gaussian matches the overall mean and variance, not the shape.</p>
+<p>Two lessons. First, MLE optimizes <em>within the family you chose</em>; the choice of family is a modeling decision the likelihood cannot rescue. Second, we currently have no number that says <em>how wrong</em> this fit is. Constructing that number — the KL divergence, and its identity with maximum likelihood — is the next lecture.</p>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Re-derive <span class="math inline">\(\hat\sigma^2\)</span> for the Gaussian, including the argument that the critical point is a maximum.</li>
+<li>Show that the Uniform MLE is <span class="math inline">\((\hat a, \hat b) = (\min_i x_i, \max_i x_i)\)</span>, and explain why calculus alone would miss it.</li>
+<li>Derive the Gamma method-of-moments estimators from <span class="math inline">\(\mathbb{E}X = k\theta\)</span> and <span class="math inline">\(\operatorname{Var} X = k\theta^2\)</span>.</li>
+<li>For a single observation <span class="math inline">\(x\)</span> from <span class="math inline">\(\mathcal{N}(\mu, \sigma^2)\)</span> with <span class="math inline">\(\sigma\)</span> known, sketch the likelihood in <span class="math inline">\(\mu\)</span>. Now hold <span class="math inline">\(\mu\)</span> known and sketch the likelihood in <span class="math inline">\(\sigma\)</span> — is it bell-shaped? Symmetric? (This kills the “likelihood looks like a pdf” illusion outside the Gaussian-mean case.)</li>
+<li><strong>BCE gradient.</strong> For the Bernoulli model of the aside with a linear logit <span class="math inline">\(s_i = \theta^\top x_i\)</span>, show that <span class="math inline">\(\nabla_\theta(-\ell) = \sum_i (\pi_i - y_i)\, x_i\)</span> — prediction error times input, the cleanest gradient in machine learning. Verify that the <span class="math inline">\(\pm 1\)</span> logistic form gives the same gradient.</li>
+<li>For a mixture <span class="math inline">\(\sum_i \pi_i f_i\)</span> with component means <span class="math inline">\(\mu_i\)</span> and variances <span class="math inline">\(\sigma_i^2\)</span>, show <span class="math inline">\(\operatorname{Var}(X) = \sum_i \pi_i \sigma_i^2 + \sum_i \pi_i (\mu_i - \bar\mu)^2\)</span> with <span class="math inline">\(\bar\mu = \sum_i \pi_i \mu_i\)</span> — within-component plus between-component spread. Use it to predict what <span class="math inline">\(\hat\sigma\)</span> the single-Gaussian fit in the trap will report.</li>
+</ol>
 
 
 </section>
@@ -1015,13 +1009,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./index.html" class="pagination-link" aria-label="Welcome">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Welcome</span>
+      <a href="../tutorials/two-point-diffusion.html" class="pagination-link" aria-label="The World's Smallest Diffusion Model">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The World’s Smallest Diffusion Model</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./syllabus.html" class="pagination-link" aria-label="Syllabus">
-        <span class="nav-page-text">Syllabus</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/genai-simplest-form.html" class="pagination-link" aria-label="Generative AI, in Its Simplest Form">
+        <span class="nav-page-text">Generative AI, in Its Simplest Form</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Course – ID-5-02 (TO)</title>
+<title>Generative AI, in Its Simplest Form – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +23,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./syllabus.html" rel="next">
-<link href="./index.html" rel="prev">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/map-proved.html" rel="next">
+<link href="../tutorials/distributions-mle.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -69,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -81,7 +110,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./course.html">Course</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/genai-simplest-form.html">Generative AI, in Its Simplest Form</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -96,7 +125,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ID-5-02 (TO)</a> 
+      <a href="../">ID-5-02 (TO)</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
   <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
@@ -116,25 +145,25 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Welcome</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./course.html" class="sidebar-item-text sidebar-link active">
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Course</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./syllabus.html" class="sidebar-item-text sidebar-link">
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Syllabus</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./assignments.html" class="sidebar-item-text sidebar-link">
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assignments</span></a>
   </div>
 </li>
@@ -149,103 +178,103 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w01.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w01.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W01: Generative Modeling I</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w02.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w02.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W02: Generative Modeling II</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w03.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w03.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W03: High Dimensions &amp; Gaussians</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w04.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w04.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W04: Gaussian Calculus &amp; Markov Chains</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w05.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w05.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W05: Noise Accumulation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w06.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w06.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W06: DDPM I</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w07.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w07.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W07: DDPM II</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w08.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w08.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W08: Score Matching</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w09.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w09.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W09: Mid-Semester Examinations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w10.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w10.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W10: Denoising Score Matching</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w11.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w11.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W11: Brownian Motion &amp; SDEs</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w12.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w12.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W12: Fokker–Planck</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w13.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w13.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W13: Continuous Forward Equation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w14.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w14.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W14: Reverse-time Drift</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w15.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w15.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W15: Information Flow &amp; Probability Flow ODE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w16.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w16.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W16: Holiday Week</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./weeks/w17.html" class="sidebar-item-text sidebar-link">
+  <a href="../weeks/w17.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">W17: Flows, Applications &amp; Wrap-up</span></a>
   </div>
 </li>
@@ -253,46 +282,46 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/probability-101.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability 101 — A Refresher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/two-point-diffusion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/distributions-mle.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/genai-simplest-form.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
@@ -300,7 +329,7 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./resources.html" class="sidebar-item-text sidebar-link">
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Resources</span></a>
   </div>
 </li>
@@ -314,19 +343,21 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#logistics" id="toc-logistics" class="nav-link active" data-scroll-target="#logistics">Logistics</a></li>
-  <li><a href="#important-dates" id="toc-important-dates" class="nav-link" data-scroll-target="#important-dates">Important Dates</a></li>
-  <li><a href="#assessment" id="toc-assessment" class="nav-link" data-scroll-target="#assessment">Assessment</a></li>
-  <li><a href="#weekly-plan" id="toc-weekly-plan" class="nav-link" data-scroll-target="#weekly-plan">Weekly Plan</a></li>
+  <li><a href="#view-1-conditional-generation-a-hierarchical-model" id="toc-view-1-conditional-generation-a-hierarchical-model" class="nav-link active" data-scroll-target="#view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</a></li>
+  <li><a href="#view-2-the-coin-disappears-into-a-map" id="toc-view-2-the-coin-disappears-into-a-map" class="nav-link" data-scroll-target="#view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</a></li>
+  <li><a href="#the-two-point-limit" id="toc-the-two-point-limit" class="nav-link" data-scroll-target="#the-two-point-limit">The two-point limit</a></li>
+  <li><a href="#maps-are-not-unique" id="toc-maps-are-not-unique" class="nav-link" data-scroll-target="#maps-are-not-unique">Maps are not unique</a></li>
+  <li><a href="#the-claim-that-organizes-everything" id="toc-the-claim-that-organizes-everything" class="nav-link" data-scroll-target="#the-claim-that-organizes-everything">The claim that organizes everything</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/genai-simplest-form.html">Generative AI, in Its Simplest Form</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Course</h1>
+<h1 class="title">Generative AI, in Its Simplest Form</h1>
 </div>
 
 
@@ -343,246 +374,125 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="logistics" class="level2">
-<h2 class="anchored" data-anchor-id="logistics">Logistics</h2>
+<p><em>Standalone tutorial accompanying <a href="../weeks/w02.html">W02</a>. Interactive version: <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>.</em></p>
+<p>This note presents the same tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative sampler, diffusion included, is the second picture — once all of its random inputs are exposed — with a learned ingredient in place of the formula.</p>
+<section id="view-1-conditional-generation-a-hierarchical-model" class="level2">
+<h2 class="anchored" data-anchor-id="view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</h2>
+<p>The simplest latent-variable model:</p>
+<p><span class="math display">\[
+\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
+x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
+\]</span></p>
+<p><strong>Ancestral sampling</strong> generates by following the arrows: draw the latent coin <span class="math inline">\(z\)</span>, then draw <span class="math inline">\(x\)</span> from the selected component. The observed marginal is obtained by summing out the latent:</p>
+<p><span class="math display">\[
+p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
+\;=\; \pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)
+\]</span></p>
+<p>— exactly the two-component mixture from the playground. A mixture is not just a formula; it is a <em>generative story</em>: population <span class="math inline">\(\to\)</span> subpopulation <span class="math inline">\(\to\)</span> individual.</p>
+<p><strong>Inference is the same hierarchy, run backwards.</strong> Given an observed <span class="math inline">\(x\)</span>, Bayes’ rule gives the posterior over the hidden coin:</p>
+<p><span class="math display">\[
+\mathbb{P}(z = 1 \mid x)
+= \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
+       {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
+\]</span></p>
+<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this equals <span class="math inline">\(\operatorname{sigmoid}(-2x/\sigma^2)\)</span>; its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is exactly the posterior W01 computed for the <span class="math inline">\(+1\)</span> component, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
+</section>
+<section id="view-2-the-coin-disappears-into-a-map" class="level2">
+<h2 class="anchored" data-anchor-id="view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</h2>
+<p><strong>Theorem (inverse-CDF / probability integral transform).</strong> Let <span class="math inline">\(F\)</span> be a CDF with generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
+<p><em>Proof.</em> <span class="math inline">\(\mathbb{P}(F^{-1}(U) \le x) = \mathbb{P}(U \le F(x)) = F(x)\)</span>, since <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span> by monotonicity. <span class="math inline">\(\square\)</span></p>
+<p>For our mixture, <span class="math inline">\(F(x) = \pi\,\Phi\!\big(\tfrac{x-\mu_1}{\sigma}\big) +
+(1-\pi)\,\Phi\!\big(\tfrac{x-\mu_2}{\sigma}\big)\)</span> is continuous and strictly increasing, so <span class="math inline">\(F^{-1}\)</span> is an honest function, and</p>
+<p><span class="math display">\[
+u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
+\]</span></p>
+<p>generates the mixture <strong>with no coin anywhere</strong> — the explicit coin has been marginalized out. One caution about where it went: under this map, the event <span class="math inline">\(u &lt; \pi\)</span> selects the lowest <span class="math inline">\(\pi\)</span>-fraction of the <em>mixture</em> distribution, which is <strong>not</strong> the same as the ancestral label <span class="math inline">\(z = 1\)</span> when the components overlap — both Gaussians have full support, so each contributes on both sides of any quantile. (In the well-separated limit <span class="math inline">\(\sigma \to 0\)</span> the two events do coincide, and the <em>packed</em> map below is the construction in which <span class="math inline">\(u &lt; \pi\)</span> genuinely encodes the coin.) Randomness in, structure out, everything in between deterministic.</p>
+</section>
+<section id="the-two-point-limit" class="level2">
+<h2 class="anchored" data-anchor-id="the-two-point-limit">The two-point limit</h2>
+<p>Send <span class="math inline">\(\sigma \to 0\)</span> with <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>. The CDF collapses to a staircase: a jump of height <span class="math inline">\(\pi\)</span> at <span class="math inline">\(-1\)</span>, a flat <strong>plateau</strong> at height <span class="math inline">\(\pi\)</span> across the empty middle, a jump to <span class="math inline">\(1\)</span> at <span class="math inline">\(+1\)</span>. The map becomes</p>
+<p><span class="math display">\[
+x = \begin{cases} -1, &amp; u &lt; \pi \\ +1, &amp; u &gt; \pi \end{cases}
+\qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
+\]</span></p>
+<p>W01’s dataset, generated by thresholding a uniform (almost surely: the single point <span class="math inline">\(u = \pi\)</span> has probability zero). The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. <a href="../tutorials/map-proved.html">The Deterministic Map, Proved</a> proves this limit. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
+</section>
+<section id="maps-are-not-unique" class="level2">
+<h2 class="anchored" data-anchor-id="maps-are-not-unique">Maps are not unique</h2>
+<p><span class="math inline">\(F^{-1}\)</span> is the <em>monotone</em> map pushing <span class="math inline">\(\text{Uniform}(0,1)\)</span> to <span class="math inline">\(p\)</span>, but not the only map. The “packed” two-stage construction</p>
+<p><span class="math display">\[
+x = \begin{cases}
+\mu_1 + \sigma\, \Phi^{-1}\!\big(u/\pi\big), &amp; u &lt; \pi,\\[2pt]
+\mu_2 + \sigma\, \Phi^{-1}\!\big(\tfrac{u-\pi}{1-\pi}\big), &amp; u \ge \pi,
+\end{cases}
+\]</span></p>
+<p>also pushes uniform to the mixture (each branch rescales its segment of <span class="math inline">\([0,1]\)</span> back to a full uniform — Exercise 3), and it is <em>literally</em> ancestral sampling written as one formula. Different map, same distribution: what is canonical is the <em>distribution</em>, not the transport. (In higher dimensions, choosing among the many maps is its own subject — optimal transport — which we will brush against later.)</p>
+</section>
+<section id="the-claim-that-organizes-everything" class="level2">
+<h2 class="anchored" data-anchor-id="the-claim-that-organizes-everything">The claim that organizes everything</h2>
+<blockquote class="blockquote">
+<p><strong>Once all of its random draws are exposed, a generative sampler is a deterministic map from base randomness to a sample.</strong></p>
+</blockquote>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 35%">
-<col style="width: 65%">
+<col style="width: 18%">
+<col style="width: 24%">
+<col style="width: 32%">
+<col style="width: 26%">
 </colgroup>
-<tbody>
-<tr class="odd">
-<td><strong>Lectures</strong></td>
-<td>Monday 9:00–9:50 · Tuesday 10:00–10:50 · Wednesday 11:00–11:50</td>
-</tr>
-<tr class="even">
-<td><strong>Venue</strong></td>
-<td>11AC4004</td>
-</tr>
-<tr class="odd">
-<td><strong>Instructors</strong></td>
-<td><a href="https://iitjammu.ac.in/faculty/~umasatyaranjan">Uma Satyaranjan</a> · <a href="https://dhavala.github.io/">Soma S Dhavala</a></td>
-</tr>
-<tr class="even">
-<td><strong>Prerequisite</strong></td>
-<td>CS-3-12 (MO) — Machine Learning</td>
-</tr>
-<tr class="odd">
-<td><strong>Open to</strong></td>
-<td>All B.Tech programmes (2<sup>nd</sup> year+), M.Tech, M.Sc, MS(R), PhD</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="important-dates" class="level2">
-<h2 class="anchored" data-anchor-id="important-dates">Important Dates</h2>
-<p>From the <span class="smallcaps">IIT Jammu academic calendar for 2<sup>nd</sup>/3<sup>rd</sup>/4<sup>th</sup> year UG students, Semester 2026-01</span>:</p>
-<table class="caption-top table">
 <thead>
 <tr class="header">
-<th>Event</th>
-<th>Dates</th>
+<th>Model</th>
+<th>Random input(s)</th>
+<th>Sampling mechanism</th>
+<th>Typical fitting</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Commencement of classes</td>
-<td>Wednesday, Jul 29, 2026</td>
+<td>This note</td>
+<td><span class="math inline">\(u \sim \text{U}(0,1)\)</span></td>
+<td>quantile <span class="math inline">\(F^{-1}(u)\)</span> (numerical in the demo)</td>
+<td>the CDF is known</td>
 </tr>
 <tr class="even">
-<td>Add &amp; drop of courses</td>
-<td>Jul 29 – Aug 5, 2026</td>
+<td>GAN</td>
+<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
+<td><span class="math inline">\(G_\theta(z)\)</span>, a network</td>
+<td>adversarial objective</td>
 </tr>
 <tr class="odd">
-<td>Class Test-1<sup>*</sup></td>
-<td>Aug 19 – Aug 25, 2026</td>
+<td>VAE</td>
+<td><span class="math inline">\(z\)</span>, plus decoder noise <span class="math inline">\(\varepsilon\)</span></td>
+<td>sample <span class="math inline">\(p_\theta(x \mid z)\)</span>, i.e.&nbsp;<span class="math inline">\(T_\theta(z, \varepsilon)\)</span></td>
+<td>ELBO / variational learning</td>
 </tr>
 <tr class="even">
-<td>Mid-semester feedback (by students)</td>
-<td>Sep 9 – Sep 15, 2026</td>
+<td>Normalizing flow</td>
+<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
+<td>invertible <span class="math inline">\(f_\theta(z)\)</span></td>
+<td>exact likelihood (change of variables)</td>
 </tr>
 <tr class="odd">
-<td>Course withdrawal deadline</td>
-<td>Sep 15, 2026</td>
-</tr>
-<tr class="even">
-<td><strong>Mid-Semester Examination</strong></td>
-<td><strong>Sep 18 – Sep 23, 2026</strong></td>
-</tr>
-<tr class="odd">
-<td>Class Test-2<sup>*</sup></td>
-<td>Oct 14 – Oct 22, 2026</td>
-</tr>
-<tr class="even">
-<td>Last day of classes</td>
-<td>Friday, Nov 20, 2026</td>
-</tr>
-<tr class="odd">
-<td>End-semester feedback (by students)</td>
-<td>Nov 12 – Nov 17, 2026</td>
-</tr>
-<tr class="even">
-<td><strong>End-Semester Examination</strong></td>
-<td><strong>Nov 23 – Nov 30, 2026</strong></td>
-</tr>
-<tr class="odd">
-<td>Grades visible to students</td>
-<td>Dec 15, 2026</td>
+<td><strong>Diffusion</strong></td>
+<td><span class="math inline">\(x_T \sim \mathcal{N}\)</span>; step noise if stochastic</td>
+<td><strong>probability-flow ODE</strong> (deterministic) or reverse SDE</td>
+<td><strong>score/denoising objectives, ELBO</strong></td>
 </tr>
 </tbody>
 </table>
-<p><sup>*</sup> Class tests are conducted with internal arrangements; whether and how this course uses them will be announced with the assessment scheme.</p>
-<p><strong>Institute holidays that affect our slots:</strong> Wed Aug 26 (Milad-un-Nabi), Mon Oct 19 &amp; Tue Oct 20 (Dussehra), Mon Nov 9 – Wed Nov 11 (Diwali cluster).</p>
+<p>The outer skeleton is shared — simple randomness, a sampling mechanism, data — while the learned object, the structural constraints, and the sampler differ. For diffusion in particular, determinism is a <em>sampler choice</em>: the probability-flow ODE is a deterministic map from <span class="math inline">\(x_T\)</span>; the reverse SDE consumes fresh noise at every step and is a deterministic function only of <span class="math inline">\((x_T, \text{all step noises})\)</span>.</p>
+<p>In one dimension with a known CDF, the map is a formula. For images, the population law is unknown and no tractable multivariate inverse-CDF construction exists — so deep generative models learn a <em>transport, density, score, or other ingredient</em> of a sampler rather than writing the map down. And you have already run one: W01’s probability-flow ODE numerically transported a moment-matched Gaussian to within <span class="math inline">\(\approx \sigma_{\min}\)</span> of the two-point data (W01 lists the approximations involved); with the exact terminal law, score, and integration, it is an exact deterministic transport — an inverse-CDF-like map built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
 </section>
-<section id="assessment" class="level2">
-<h2 class="anchored" data-anchor-id="assessment">Assessment</h2>
-<p>The scheme below is <strong>tentative</strong>; any changes will be announced in class.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 70%">
-<col style="width: 30%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Component</th>
-<th style="text-align: center;">Weight</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Assignments / Homeworks</td>
-<td style="text-align: center;">20%</td>
-</tr>
-<tr class="even">
-<td>Mid-semester exam (pen &amp; paper)</td>
-<td style="text-align: center;">30%</td>
-</tr>
-<tr class="odd">
-<td>End-semester exam (pen &amp; paper)</td>
-<td style="text-align: center;">40%</td>
-</tr>
-<tr class="even">
-<td>Mini coding project</td>
-<td style="text-align: center;">10%</td>
-</tr>
-</tbody>
-</table>
-<p>See the <a href="./assignments.html">Assignments</a> page for the individual homeworks, exam windows, and the coding project.</p>
-</section>
-<section id="weekly-plan" class="level2">
-<h2 class="anchored" data-anchor-id="weekly-plan">Weekly Plan</h2>
-<p>Lectures run Mon/Tue/Wed; with the holidays above and the mid-sem week, the semester provides <strong>exactly 40 lecture slots — matching the syllabus’s 40 hours</strong>. Readings refer to the <a href="./resources.html">primary text</a> (<em>The Principles of Diffusion Models</em>, arXiv:2510.21890). The plan is tentative in pacing, not in coverage.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 7%">
-<col style="width: 16%">
-<col style="width: 77%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: center;">Week</th>
-<th>Class days</th>
-<th>Module · Topics</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w01.html">01</a></td>
-<td>Jul 29</td>
-<td><strong>M1</strong> Course overview; generative modeling: data distributions and model families <em>(1 lecture)</em></td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w02.html">02</a></td>
-<td>Aug 3, 4, 5</td>
-<td><strong>M1</strong> Maximum-likelihood estimation; KL divergence; empirical risk minimization</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w03.html">03</a></td>
-<td>Aug 10, 11, 12</td>
-<td><strong>M1</strong> Challenges of high-dimensional density estimation · <strong>M2</strong> multivariate Gaussians</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w04.html">04</a></td>
-<td>Aug 17, 18, 19</td>
-<td><strong>M2</strong> Conditioning &amp; marginalization; linear transformations; discrete-time Markov chains. <em>CT-1 window opens Aug 19</em></td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w05.html">05</a></td>
-<td>Aug 24, 25</td>
-<td><strong>M2</strong> Noise accumulation through repeated Gaussian perturbation <em>(no Wed class — Milad-un-Nabi)</em></td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w06.html">06</a></td>
-<td>Aug 31, Sep 1, 2</td>
-<td><strong>M3</strong> DDPM: forward diffusion process; concept of the reverse process</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w07.html">07</a></td>
-<td>Sep 7, 8, 9</td>
-<td><strong>M3</strong> Variational lower bound; decomposition of KL terms; reduction to noise-prediction loss</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w08.html">08</a></td>
-<td>Sep 14, 15, 16</td>
-<td><strong>M4</strong> Score functions; score matching. <em>Mid-sem begins Fri Sep 18</em></td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w09.html">09</a></td>
-<td>—</td>
-<td><strong>Mid-Semester Examinations (Sep 18–23)</strong> — covers M1–M3 and W08’s score-matching material</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w10.html">10</a></td>
-<td>Sep 28, 29, 30</td>
-<td><strong>M4</strong> Denoising score matching; synthesis</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w11.html">11</a></td>
-<td>Oct 5, 6, 7</td>
-<td><strong>M5</strong> Random walks and Brownian motion; the concept of an SDE</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w12.html">12</a></td>
-<td>Oct 12, 13, 14</td>
-<td><strong>M5</strong> Heat-equation intuition; Fokker–Planck equation. <em>CT-2 window opens Oct 14</em></td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w13.html">13</a></td>
-<td>Oct 21</td>
-<td><strong>M5</strong> Continuous formulation of the forward equation <em>(1 lecture — Mon/Tue are Dussehra holidays)</em></td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w14.html">14</a></td>
-<td>Oct 26, 27, 28</td>
-<td><strong>M5</strong> wrap-up · <strong>M6</strong> Heuristic derivation of reverse-time drift</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w15.html">15</a></td>
-<td>Nov 2, 3, 4</td>
-<td><strong>M6</strong> Entropy &amp; information-flow interpretation; probability flow ODE</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><a href="./weeks/w16.html">16</a></td>
-<td>—</td>
-<td><strong>No classes — holidays Mon Nov 9 – Wed Nov 11 (Diwali cluster)</strong></td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><a href="./weeks/w17.html">17</a></td>
-<td>Nov 16, 17, 18</td>
-<td><strong>M6</strong> Neural ODEs and flow-based models; applications &amp; extensions; course wrap-up</td>
-</tr>
-</tbody>
-</table>
-<div class="callout callout-style-simple callout-note">
-<div class="callout-body d-flex">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-body-container">
-<p>Module hours per the syllabus: M1–M4 are 6 hours each; M5–M6 are 8 hours each (40 total). The 40 available slots cover this exactly, so any lecture lost to unforeseen events will be made up on a compensatory day.</p>
-</div>
-</div>
-</div>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Complete the inverse-CDF proof for a general (possibly non-strictly-increasing) <span class="math inline">\(F\)</span> using the generalized inverse.</li>
+<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above, and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x)\)</span> equals W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span> posterior (mind which component carries the <span class="math inline">\(+\)</span> sign); compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
+<li>Verify the packed map: show that conditional on <span class="math inline">\(u &lt; \pi\)</span>, the rescaled variable <span class="math inline">\(u/\pi\)</span> is <span class="math inline">\(\text{Uniform}(0,1)\)</span>, and conclude that the branch produces <span class="math inline">\(\mathcal{N}(\mu_1, \sigma^2)\)</span> with the correct probability.</li>
+<li>Construct the inverse-CDF map for a <strong>three</strong>-component mixture and describe its staircase limit as <span class="math inline">\(\sigma \to 0\)</span>. How many plateaus, at what heights?</li>
+<li>The map <span class="math inline">\(x = F^{-1}(u)\)</span> is monotone increasing. Exhibit a <em>decreasing</em> map with the same pushforward, and a map that is neither monotone nor continuous. (Hint: <span class="math inline">\(1 - u\)</span> is also uniform.)</li>
+</ol>
 
 
 </section>
@@ -1015,13 +925,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./index.html" class="pagination-link" aria-label="Welcome">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Welcome</span>
+      <a href="../tutorials/distributions-mle.html" class="pagination-link" aria-label="Distributions and Maximum Likelihood">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Distributions and Maximum Likelihood</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./syllabus.html" class="pagination-link" aria-label="Syllabus">
-        <span class="nav-page-text">Syllabus</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/map-proved.html" class="pagination-link" aria-label="The Deterministic Map, Proved">
+        <span class="nav-page-text">The Deterministic Map, Proved</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

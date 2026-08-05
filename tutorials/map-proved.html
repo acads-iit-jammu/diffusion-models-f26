@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>The Deterministic Map, Proved – ID-5-02 (TO)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/probability-flow-ode.html" rel="next">
+<link href="../tutorials/genai-simplest-form.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/map-proved.html">The Deterministic Map, Proved</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">ID-5-02 (TO)</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Syllabus</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assignments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Weekly Notes</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W01: Generative Modeling I</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W02: Generative Modeling II</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W03: High Dimensions &amp; Gaussians</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W04: Gaussian Calculus &amp; Markov Chains</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W05: Noise Accumulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w06.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W06: DDPM I</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w07.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W07: DDPM II</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w08.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W08: Score Matching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w09.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W09: Mid-Semester Examinations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W10: Denoising Score Matching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W11: Brownian Motion &amp; SDEs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W12: Fokker–Planck</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w13.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W13: Continuous Forward Equation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w14.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W14: Reverse-time Drift</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w15.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W15: Information Flow &amp; Probability Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w16.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W16: Holiday Week</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w17.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W17: Flows, Applications &amp; Wrap-up</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Probability 101 — A Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/map-proved.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">The Deterministic Map, Proved</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Probability-Flow ODE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resources</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-claim-and-the-route" id="toc-the-claim-and-the-route" class="nav-link active" data-scroll-target="#the-claim-and-the-route">The claim, and the route</a></li>
+  <li><a href="#step-1-sampling-is-a-map" id="toc-step-1-sampling-is-a-map" class="nav-link" data-scroll-target="#step-1-sampling-is-a-map">Step 1 — Sampling is a map</a></li>
+  <li><a href="#step-2-the-mixture-admits-the-map" id="toc-step-2-the-mixture-admits-the-map" class="nav-link" data-scroll-target="#step-2-the-mixture-admits-the-map">Step 2 — The mixture admits the map</a></li>
+  <li><a href="#step-3-symmetry-halves-the-work" id="toc-step-3-symmetry-halves-the-work" class="nav-link" data-scroll-target="#step-3-symmetry-halves-the-work">Step 3 — Symmetry halves the work</a></li>
+  <li><a href="#step-4-in-the-limit-the-map-is-the-sign-function" id="toc-step-4-in-the-limit-the-map-is-the-sign-function" class="nav-link" data-scroll-target="#step-4-in-the-limit-the-map-is-the-sign-function">Step 4 — In the limit, the map is the sign function</a>
+  <ul class="collapse">
+  <li><a href="#consequences-the-discrete-generator-as-a-limit-of-smooth-ones" id="toc-consequences-the-discrete-generator-as-a-limit-of-smooth-ones" class="nav-link" data-scroll-target="#consequences-the-discrete-generator-as-a-limit-of-smooth-ones">Consequences: the discrete generator as a limit of smooth ones</a></li>
+  </ul></li>
+  <li><a href="#step-5-the-fine-structure-how-the-stairs-and-the-jump-form" id="toc-step-5-the-fine-structure-how-the-stairs-and-the-jump-form" class="nav-link" data-scroll-target="#step-5-the-fine-structure-how-the-stairs-and-the-jump-form">Step 5 — The fine structure: how the stairs and the jump form</a></li>
+  <li><a href="#the-score-based-flow-is-the-same-map" id="toc-the-score-based-flow-is-the-same-map" class="nav-link" data-scroll-target="#the-score-based-flow-is-the-same-map">The score-based flow is the same map</a>
+  <ul class="collapse">
+  <li><a href="#layer-1-the-identity" id="toc-layer-1-the-identity" class="nav-link" data-scroll-target="#layer-1-the-identity">Layer 1 — the identity</a></li>
+  <li><a href="#layer-2-the-mechanism-the-flow-conserves-quantiles" id="toc-layer-2-the-mechanism-the-flow-conserves-quantiles" class="nav-link" data-scroll-target="#layer-2-the-mechanism-the-flow-conserves-quantiles">Layer 2 — the mechanism: the flow conserves quantiles</a></li>
+  <li><a href="#layer-3-the-factorization-and-why-numerical-solution-is-literal" id="toc-layer-3-the-factorization-and-why-numerical-solution-is-literal" class="nav-link" data-scroll-target="#layer-3-the-factorization-and-why-numerical-solution-is-literal">Layer 3 — the factorization, and why “numerical solution” is literal</a></li>
+  </ul></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/map-proved.html">The Deterministic Map, Proved</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">The Deterministic Map, Proved</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>A standalone, self-contained tutorial. It constructs the deterministic map that turns uniform noise into samples from a symmetric two-component Gaussian mixture, proves that as the noise scale vanishes this map degenerates into the sign function, and then shows that the score-driven reverse flow — the sampler at the heart of diffusion models — computes the very same transport, incrementally, in a sense made exact in its second half.</em></p>
+<section id="the-claim-and-the-route" class="level2">
+<h2 class="anchored" data-anchor-id="the-claim-and-the-route">The claim, and the route</h2>
+<p>Fix <span class="math inline">\(\sigma &gt; 0\)</span> and consider the symmetric two-component Gaussian mixture with equal weights and means <span class="math inline">\(\pm 1\)</span>:</p>
+<p><span class="math display">\[
+p_\sigma(x) = \tfrac12\,\mathcal{N}(x; -1, \sigma^2) + \tfrac12\,\mathcal{N}(x; +1, \sigma^2),
+\qquad
+F_\sigma(x) = \tfrac12\,\Phi\!\Big(\frac{x+1}{\sigma}\Big) + \tfrac12\,\Phi\!\Big(\frac{x-1}{\sigma}\Big),
+\]</span></p>
+<p>where <span class="math inline">\(\Phi\)</span> is the standard normal CDF. (Throughout, <span class="math inline">\(p_\sigma\)</span> denotes both the density and its law; pushforwards act on the law.) Two statements are to be proved:</p>
+<ol type="1">
+<li>There exists a smooth, strictly increasing map <span class="math inline">\(T_\sigma\)</span> with <span class="math inline">\(T_\sigma(U) \sim p_\sigma\)</span> for <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>.</li>
+<li>As <span class="math inline">\(\sigma \downarrow 0\)</span>, <span class="math inline">\(T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)\)</span> for every fixed <span class="math inline">\(u \in (0,1) \setminus \{\tfrac12\}\)</span> — the generator of the two-point distribution <span class="math inline">\(\tfrac12\,\delta_{-1} + \tfrac12\,\delta_{+1}\)</span>, which is the <span class="math inline">\(\sigma \to 0\)</span> limit of the mixture.</li>
+</ol>
+<p>The route runs in five steps, each a plain claim backed by formal results: <strong>(1)</strong> sampling <em>is</em> a map — a uniform pushed through an inverse CDF acquires that CDF (Theorem 1); <strong>(2)</strong> our mixture <em>admits</em> the map — <span class="math inline">\(F_\sigma\)</span> is a smooth bijection, so <span class="math inline">\(T_\sigma\)</span> exists and is smooth (Proposition 2); <strong>(3)</strong> symmetry halves the work (Lemma 3); <strong>(4)</strong> a squeeze argument gives the sign-function limit (Theorem 4), with its distributional consequences (Corollary 5); <strong>(5)</strong> the fine structure — the shape of the stairs and the forming jump. Steps 1–5 build and analyze the one-shot map; the second half of the tutorial then earns the deeper claim — the score-driven reverse flow <em>is the same map</em>, and the practical sampler is its numerical solution. The theorems are the scaffolding; the argument is the building.</p>
+</section>
+<section id="step-1-sampling-is-a-map" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-sampling-is-a-map">Step 1 — Sampling is a map</h2>
+<p>The entire construction rests on one line: a uniform random number pushed through an inverse CDF is a sample from that CDF. Stated exactly:</p>
+<p><strong>Theorem 1 (probability integral transform).</strong> Let <span class="math inline">\(F\)</span> be a continuous, strictly increasing CDF mapping <span class="math inline">\(\mathbb{R}\)</span> onto <span class="math inline">\((0,1)\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
+<p><em>Proof.</em> Monotonicity of <span class="math inline">\(F\)</span> gives the equivalence <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span>. Hence</p>
+<p><span class="math display">\[
+\mathbb{P}\big(F^{-1}(U) \le x\big) = \mathbb{P}\big(U \le F(x)\big) = F(x). \qquad\square
+\]</span></p>
+<p>(For CDFs that are not strictly increasing or not continuous, the same conclusion holds with the generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>; Exercise 1.)</p>
+</section>
+<section id="step-2-the-mixture-admits-the-map" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-the-mixture-admits-the-map">Step 2 — The mixture admits the map</h2>
+<p>Step 1 applies to our target as soon as <span class="math inline">\(F_\sigma\)</span> is invertible — and it is, smoothly, at every positive noise level. That is the whole content of the supporting result:</p>
+<p><strong>Proposition 2 (existence and smoothness).</strong> <span class="math inline">\(F_\sigma\)</span> is a smooth, strictly increasing bijection of <span class="math inline">\(\mathbb{R}\)</span> onto <span class="math inline">\((0,1)\)</span>. Consequently <span class="math inline">\(T_\sigma := F_\sigma^{-1}\)</span> exists, is smooth, and satisfies</p>
+<p><span class="math display">\[
+T_\sigma'(u) \;=\; \frac{1}{p_\sigma\big(T_\sigma(u)\big)} \;&gt;\; 0 .
+\]</span></p>
+<p><em>Proof.</em> <span class="math inline">\(F_\sigma' = p_\sigma\)</span>, which is everywhere positive; hence <span class="math inline">\(F_\sigma\)</span> is strictly increasing. Both <span class="math inline">\(\Phi\)</span> terms tend to <span class="math inline">\(0\)</span> as <span class="math inline">\(x \to -\infty\)</span> and to <span class="math inline">\(1\)</span> as <span class="math inline">\(x \to +\infty\)</span>, so <span class="math inline">\(F_\sigma\)</span> maps onto <span class="math inline">\((0,1)\)</span> and is a bijection. Smoothness of <span class="math inline">\(T_\sigma\)</span> and the derivative formula follow from the inverse function theorem. <span class="math inline">\(\square\)</span></p>
+<p>The derivative formula deserves a comment, because it already contains the tutorial’s central picture. <span class="math inline">\(T_\sigma\)</span> is <em>steepest exactly where the density is smallest</em>. Between the two bumps of <span class="math inline">\(p_\sigma\)</span> the density is nearly zero, so <span class="math inline">\(F_\sigma\)</span> is nearly flat there — a plateau at height <span class="math inline">\(\tfrac12\)</span> — and its inverse is correspondingly near-vertical. As <span class="math inline">\(\sigma\)</span> shrinks, the graph of <span class="math inline">\(T_\sigma\)</span> therefore sharpens into a <strong>staircase</strong>: two long, nearly flat treads (inputs <span class="math inline">\(u &lt; \tfrac12\)</span> landing near <span class="math inline">\(-1\)</span>, inputs <span class="math inline">\(u &gt; \tfrac12\)</span> landing near <span class="math inline">\(+1\)</span>) joined by an ever-steeper riser at <span class="math inline">\(u = \tfrac12\)</span>. The remaining steps make this picture exact: the treads flatten onto the values <span class="math inline">\(\pm 1\)</span> (Step 4), and each tread retains a <span class="math inline">\(\sigma\)</span>-sized microstructure (Step 5).</p>
+</section>
+<section id="step-3-symmetry-halves-the-work" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-symmetry-halves-the-work">Step 3 — Symmetry halves the work</h2>
+<p>The target is symmetric about the origin, and its map inherits the symmetry: the map is odd about the center point <span class="math inline">\(u = \tfrac12\)</span>, so any limit statement proved on one side transfers to the other. The supporting computation:</p>
+<p><strong>Lemma 3 (symmetry).</strong> <span class="math inline">\(F_\sigma(-x) = 1 - F_\sigma(x)\)</span> for all <span class="math inline">\(x\)</span>; consequently <span class="math inline">\(T_\sigma(1-u) = -T_\sigma(u)\)</span> for all <span class="math inline">\(u \in (0,1)\)</span>, and <span class="math inline">\(T_\sigma(\tfrac12) = 0\)</span>.</p>
+<p><em>Proof.</em> Using <span class="math inline">\(\Phi(-t) = 1 - \Phi(t)\)</span> on each term,</p>
+<p><span class="math display">\[
+F_\sigma(-x)
+= \tfrac12\,\Phi\!\Big(\frac{1-x}{\sigma}\Big) + \tfrac12\,\Phi\!\Big(\frac{-1-x}{\sigma}\Big)
+= \tfrac12\Big[1 - \Phi\!\Big(\frac{x-1}{\sigma}\Big)\Big]
++ \tfrac12\Big[1 - \Phi\!\Big(\frac{x+1}{\sigma}\Big)\Big]
+= 1 - F_\sigma(x).
+\]</span></p>
+<p>Applying <span class="math inline">\(T_\sigma\)</span> to both sides of <span class="math inline">\(F_\sigma(-x) = 1 - F_\sigma(x)\)</span> with <span class="math inline">\(u = F_\sigma(x)\)</span> yields <span class="math inline">\(T_\sigma(1-u) = -T_\sigma(u)\)</span>; setting <span class="math inline">\(u = \tfrac12\)</span> gives <span class="math inline">\(T_\sigma(\tfrac12) = -T_\sigma(\tfrac12) = 0\)</span>. <span class="math inline">\(\square\)</span></p>
+<p>By the lemma, it suffices to analyze <span class="math inline">\(u &lt; \tfrac12\)</span>.</p>
+</section>
+<section id="step-4-in-the-limit-the-map-is-the-sign-function" class="level2">
+<h2 class="anchored" data-anchor-id="step-4-in-the-limit-the-map-is-the-sign-function">Step 4 — In the limit, the map is the sign function</h2>
+<p>The idea is a squeeze: to show <span class="math inline">\(T_\sigma(u) \to -1\)</span>, trap <span class="math inline">\(T_\sigma(u)\)</span> between <span class="math inline">\(-1 - \varepsilon\)</span> and <span class="math inline">\(-1 + \varepsilon\)</span> by evaluating <span class="math inline">\(F_\sigma\)</span> at those two points and letting monotonicity do the rest. Two evaluations, one theorem.</p>
+<p><strong>Theorem 4 (the limit is the sign function).</strong> For every fixed <span class="math inline">\(u \in (0,1)\)</span> with <span class="math inline">\(u \ne \tfrac12\)</span>,</p>
+<p><span class="math display">\[
+\lim_{\sigma \downarrow 0} T_\sigma(u) \;=\; \operatorname{sign}\big(u - \tfrac12\big).
+\]</span></p>
+<p><em>Proof.</em> By Lemma 3 it suffices to treat <span class="math inline">\(u &lt; \tfrac12\)</span> and show <span class="math inline">\(T_\sigma(u) \to -1\)</span>. Fix <span class="math inline">\(\varepsilon \in (0,1)\)</span>. Evaluate <span class="math inline">\(F_\sigma\)</span> at the two points <span class="math inline">\(-1 \pm \varepsilon\)</span> and let <span class="math inline">\(\sigma \downarrow 0\)</span>:</p>
+<p><span class="math display">\[
+F_\sigma(-1+\varepsilon)
+= \tfrac12\,\Phi\!\Big(\frac{\varepsilon}{\sigma}\Big)
++ \tfrac12\,\Phi\!\Big(\frac{\varepsilon - 2}{\sigma}\Big)
+\;\longrightarrow\; \tfrac12 \cdot 1 + \tfrac12 \cdot 0 = \tfrac12,
+\]</span></p>
+<p>since <span class="math inline">\(\varepsilon &gt; 0\)</span> and <span class="math inline">\(\varepsilon - 2 &lt; 0\)</span>. Because <span class="math inline">\(u &lt; \tfrac12\)</span>, there is a <span class="math inline">\(\sigma_1 &gt; 0\)</span> with <span class="math inline">\(F_\sigma(-1+\varepsilon) &gt; u\)</span> for all <span class="math inline">\(\sigma &lt; \sigma_1\)</span>; by strict monotonicity of <span class="math inline">\(F_\sigma\)</span> this gives <span class="math inline">\(T_\sigma(u) &lt; -1 + \varepsilon\)</span>. Similarly,</p>
+<p><span class="math display">\[
+F_\sigma(-1-\varepsilon)
+= \tfrac12\,\Phi\!\Big(\frac{-\varepsilon}{\sigma}\Big)
++ \tfrac12\,\Phi\!\Big(\frac{-2-\varepsilon}{\sigma}\Big)
+\;\longrightarrow\; 0,
+\]</span></p>
+<p>so there is a <span class="math inline">\(\sigma_2 &gt; 0\)</span> with <span class="math inline">\(F_\sigma(-1-\varepsilon) &lt; u\)</span> for <span class="math inline">\(\sigma &lt; \sigma_2\)</span>, whence <span class="math inline">\(T_\sigma(u) &gt; -1 - \varepsilon\)</span>. For <span class="math inline">\(\sigma &lt; \min(\sigma_1, \sigma_2)\)</span> we conclude <span class="math inline">\(|T_\sigma(u) - (-1)| &lt; \varepsilon\)</span>. <span class="math inline">\(\square\)</span></p>
+<p>At the single point <span class="math inline">\(u = \tfrac12\)</span>, Lemma 3 gives <span class="math inline">\(T_\sigma(\tfrac12) = 0\)</span> for every <span class="math inline">\(\sigma\)</span>; since <span class="math inline">\(\mathbb{P}(U = \tfrac12) = 0\)</span>, this point is irrelevant to the distributional statement below.</p>
+<section id="consequences-the-discrete-generator-as-a-limit-of-smooth-ones" class="level3">
+<h3 class="anchored" data-anchor-id="consequences-the-discrete-generator-as-a-limit-of-smooth-ones">Consequences: the discrete generator as a limit of smooth ones</h3>
+<p><strong>Corollary 5 (modes of convergence).</strong> Let <span class="math inline">\(S(u) = \operatorname{sign}(u - \tfrac12)\)</span>. Theorem 4 states <span class="math inline">\(T_\sigma(U) \to S(U)\)</span> <strong>almost surely</strong>. Almost-sure convergence implies convergence in distribution, and <span class="math inline">\(S(U)\)</span> takes the values <span class="math inline">\(\pm 1\)</span> with probability <span class="math inline">\(\tfrac12\)</span> each; hence</p>
+<p><span class="math display">\[
+p_\sigma \;\Longrightarrow\; \tfrac12\,\delta_{-1} + \tfrac12\,\delta_{+1}
+\qquad (\sigma \downarrow 0),
+\]</span></p>
+<p>recovering the two-point distribution <span class="math inline">\(\tfrac12\,\delta_{-1} +
+\tfrac12\,\delta_{+1}\)</span> as the weak limit of the mixtures. The discrete generator <span class="math inline">\(x = S(u)\)</span> — thresholding a uniform — is thereby exhibited as the pointwise limit of smooth generators.</p>
+</section>
+</section>
+<section id="step-5-the-fine-structure-how-the-stairs-and-the-jump-form" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-the-fine-structure-how-the-stairs-and-the-jump-form">Step 5 — The fine structure: how the stairs and the jump form</h2>
+<p>Two refinements sharpen the qualitative theorem.</p>
+<p><strong>The shape of each stair.</strong> Fix <span class="math inline">\(u &lt; \tfrac12\)</span> and write <span class="math inline">\(x = T_\sigma(u)\)</span>, which by Theorem 4 lies near <span class="math inline">\(-1\)</span> for small <span class="math inline">\(\sigma\)</span>; in particular <span class="math inline">\(x \le 0\)</span> eventually, so the far component satisfies <span class="math inline">\(0 &lt; \tfrac12\Phi\big(\tfrac{x-1}{\sigma}\big) \le \tfrac12\Phi(-1/\sigma)\)</span>, exponentially small. From <span class="math inline">\(u = F_\sigma(x)\)</span>,</p>
+<p><span class="math display">\[
+\Phi\!\Big(\frac{x+1}{\sigma}\Big) = 2u - 2\eta_\sigma,
+\qquad 0 &lt; \eta_\sigma \le \tfrac12\,\Phi(-1/\sigma),
+\]</span></p>
+<p>and therefore</p>
+<p><span class="math display">\[
+T_\sigma(u) \;=\; -1 + \sigma\,\Phi^{-1}\!\big(2u - 2\eta_\sigma\big)
+\;\approx\; -1 + \sigma\,\Phi^{-1}(2u).
+\]</span></p>
+<p>Each tread of the limiting staircase carries a copy of the Gaussian quantile function, compressed by the factor <span class="math inline">\(\sigma\)</span> — asymptotically, the inverse-CDF map coincides with the two-stage sampler that first chooses the component from <span class="math inline">\(u\)</span> (below or above <span class="math inline">\(\tfrac12\)</span>) and then applies that component’s own Gaussian quantile.</p>
+<p><strong>The forming jump.</strong> At the center, Proposition 2 gives</p>
+<p><span class="math display">\[
+T_\sigma'(\tfrac12) = \frac{1}{p_\sigma(0)} = \sigma\sqrt{2\pi}\; e^{1/(2\sigma^2)}
+\;\longrightarrow\; \infty ,
+\]</span></p>
+<p>so the slope at <span class="math inline">\(u = \tfrac12\)</span> blows up as the jump forms. Convergence in Theorem 4 is uniform on compact subsets of <span class="math inline">\((0,1) \setminus \{\tfrac12\}\)</span> (by uniform continuity of <span class="math inline">\(\Phi^{-1}\)</span> on compact subintervals together with the uniform exponential bound on the far component) but not across <span class="math inline">\(u = \tfrac12\)</span>: a boundary layer of width shrinking with <span class="math inline">\(\sigma\)</span> always remains — the same non-uniform sharpening by which the smooth function <span class="math inline">\(\tanh(x/\sigma^2)\)</span> approaches <span class="math inline">\(\operatorname{sign}(x)\)</span>.</p>
+</section>
+<section id="the-score-based-flow-is-the-same-map" class="level2">
+<h2 class="anchored" data-anchor-id="the-score-based-flow-is-the-same-map">The score-based flow is the same map</h2>
+<p><strong>The objective.</strong> The first half of this tutorial constructed one generator: the quantile map <span class="math inline">\(T_\sigma\)</span>. This section confronts it with a second construction — the score-driven flow at the heart of diffusion models — built from entirely different ingredients, and settles their exact relationship. First, the problem both constructions solve, stated as a problem:</p>
+<blockquote class="blockquote">
+<p><strong>The one-shot transport problem.</strong> Given the source law <span class="math inline">\(p_{\sigma_{\max}}\)</span> and the target law <span class="math inline">\(p_{\sigma_{\min}}\)</span>, find a deterministic map <span class="math inline">\(M\)</span> such that if the input is distributed as <span class="math inline">\(p_{\sigma_{\max}}\)</span>, the output <span class="math inline">\(M(X)\)</span> is distributed as <span class="math inline">\(p_{\sigma_{\min}}\)</span> — in symbols, <span class="math inline">\(M_\# \, p_{\sigma_{\max}} = p_{\sigma_{\min}}\)</span>, where <span class="math inline">\(M_\# \mu\)</span> denotes the <em>pushforward</em>: the law of <span class="math inline">\(M(X)\)</span> when <span class="math inline">\(X \sim \mu\)</span>.</p>
+</blockquote>
+<p><strong>Definition (quantile transport).</strong> For laws <span class="math inline">\(\mu, \nu\)</span> on <span class="math inline">\(\mathbb{R}\)</span> with continuous, strictly increasing CDFs <span class="math inline">\(F_\mu, F_\nu\)</span>, the <strong>quantile transport</strong> from <span class="math inline">\(\mu\)</span> to <span class="math inline">\(\nu\)</span> is</p>
+<p><span class="math display">\[
+Q_{\mu \to \nu} \;:=\; F_\nu^{-1} \circ F_\mu .
+\]</span></p>
+<p>It solves the transport problem — <span class="math inline">\(F_\mu(X) \sim \text{Uniform}(0,1)\)</span> for <span class="math inline">\(X \sim \mu\)</span> (the probability integral transform read forward), and Theorem 1 then carries the uniform to <span class="math inline">\(\nu\)</span> — and by Proposition 7 (proved below) it is the unique <em>continuous, strictly increasing</em> solution. It matches each <span class="math inline">\(\mu\)</span>-quantile to the same <span class="math inline">\(\nu\)</span>-quantile: median to median, 90th percentile to 90th percentile.</p>
+<p>The <em>one-shot</em> solution to our problem is <span class="math inline">\(Q_{p_{\sigma_{\max}} \to\, p_{\sigma_{\min}}} = F_{\sigma_{\min}}^{-1} \circ
+F_{\sigma_{\max}}\)</span>: one formula, evaluated in a single stroke. The <em>incremental</em> solution flows particles down the noise ladder along the <strong>score</strong> of the current level. Two functions describe that local geometry. The <strong>posterior-mean denoiser</strong></p>
+<p><span class="math display">\[
+D_\sigma(x) := \mathbb{E}[X_0 \mid X_\sigma = x] = \tanh(x/\sigma^2)
+\]</span></p>
+<p>is the conditional mean of the clean point given a noisy observation — the quantity diffusion models learn — and the <strong>score</strong> is its rescaled displacement,</p>
+<p><span class="math display">\[
+s_\sigma(x) = \partial_x \log p_\sigma(x)
+= \frac{D_\sigma(x) - x}{\sigma^2}
+\]</span></p>
+<p>(differentiate <span class="math inline">\(\log p_\sigma\)</span> to check). One caution about the resulting motion: it is <em>not</em> always “toward the nearer bump”. At high noise (<span class="math inline">\(\sigma &gt; 1\)</span>) the reverse field contracts everything toward the center; only once <span class="math inline">\(\sigma\)</span> drops below <span class="math inline">\(1\)</span> does the origin destabilize and the two clusters separate — the stability computation appears at the end of Layer 1. On the surface the two constructions look like different algorithms that happen to share endpoints. The claim — stated first, then earned in three layers — is much stronger.</p>
+<p>Before any claims, two conventions and a cast of characters. <strong>Clock:</strong> <span class="math inline">\(\tau = \sigma^2\)</span> is the <em>variance clock</em>; for <span class="math inline">\(\tau\)</span>-indexed objects we write <span class="math inline">\(\bar p_\tau := p_{\sqrt{\tau}}\)</span>, <span class="math inline">\(\bar F_\tau := F_{\sqrt{\tau}}\)</span>, and <span class="math inline">\(\bar s_\tau := \partial_x \log \bar p_\tau\)</span>, so that subscripts never silently change meaning. <strong>Ladder:</strong> <span class="math inline">\(\sigma_{\max} = \sigma_0 &gt; \sigma_1 &gt;
+\cdots &gt; \sigma_K = \sigma_{\min}\)</span> denotes a descending sequence of noise levels (fixed when Layer 3 needs it; until then <span class="math inline">\(\Psi_{a \to b}\)</span> makes sense for any two levels <span class="math inline">\(a &gt; b\)</span>). Five distinct objects appear in this section, and they are easy to blur into one another:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 26%">
+<col style="width: 56%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Object</th>
+<th>Symbol</th>
+<th>What kind of thing it is</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>score</strong></td>
+<td><span class="math inline">\(s_\sigma(x) = \partial_x \log p_\sigma(x)\)</span></td>
+<td>a function of position, one per noise level — the <em>local steering information</em>; for our mixture, <span class="math inline">\((\tanh(x/\sigma^2) - x)/\sigma^2\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>velocity field</strong></td>
+<td><span class="math inline">\(v = -\tfrac12\, \bar s_\tau\)</span> (variance clock)</td>
+<td>an arrow attached to every (position, level) pair — built from the score; the sampler traverses it toward smaller <span class="math inline">\(\tau\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>the flow (ODE)</strong></td>
+<td><span class="math inline">\(dx/d\tau = v(x, \tau)\)</span></td>
+<td>a dynamical rule: from a starting point, integrate to get a trajectory</td>
+</tr>
+<tr class="even">
+<td><strong>flow map</strong></td>
+<td><span class="math inline">\(\Psi_{a \to b}\)</span></td>
+<td>a <em>function</em> <span class="math inline">\(\mathbb{R} \to \mathbb{R}\)</span>: feed in a position at level <span class="math inline">\(a\)</span>, integrate the ODE down to level <span class="math inline">\(b\)</span>, read off where the trajectory ends</td>
+</tr>
+<tr class="odd">
+<td><strong>pushforward</strong></td>
+<td><span class="math inline">\(\Psi_\# \mu\)</span></td>
+<td>not a new object but an <em>operation</em>: the law of the outputs when the inputs have law <span class="math inline">\(\mu\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>So <span class="math inline">\(\Psi_{\sigma_0 \to \sigma_K}\)</span> is <em>not</em> the score, and not a measure: it is the deterministic input–output function obtained by integrating the score-built velocity field from level <span class="math inline">\(\sigma_0\)</span> down to <span class="math inline">\(\sigma_K\)</span>; <span class="math inline">\(\Psi_{\sigma_k \to \sigma_{k+1}}\)</span> is the same construction run over a single leg. The pushforward is how any map — this one included — acts on distributions, and the sentence “the flow solves the transport problem” means exactly <span class="math inline">\(\Psi_\#\, p_{\sigma_{\max}} =
+p_{\sigma_{\min}}\)</span>: it is a <em>candidate</em> <span class="math inline">\(M\)</span> for the transport problem stated above.</p>
+<div class="callout callout-style-simple callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key takeaway
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>They are one and the same solution, at three levels of resolution. <strong>(i) Identity:</strong> in one dimension the exact probability-flow map <em>is</em> the quantile transport <span class="math inline">\(F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}\)</span> — at every positive noise level, not only in a limit. <strong>(ii) Mechanism:</strong> the flow <em>conserves the quantile</em>: <span class="math inline">\(u = \bar F_\tau(x_\tau)\)</span> is constant along every trajectory, so the one-shot map jumps each point to its quantile’s final position while the flow tracks the same quantile continuously through every intermediate law. <strong>(iii) Consequence:</strong> every adjacent pair of noise levels admits its own quantile transport; each step of the practical sampler is the first-order approximation of that per-step quantile map; and the telescoping identity composes the per-step maps back into the one-shot transport — so <strong>reverse diffusion is, literally, a numerical solution of the one-shot transport problem.</strong></p>
+</div>
+</div>
+<p>The layers prove, in order: the flow map equals the quantile transport <span class="math inline">\(Q\)</span> (Layer 1); the reason is that it conserves quantiles (Layer 2); and it factorizes leg by leg, with the sampler as its Euler discretization (Layer 3).</p>
+<p><strong>The descent, in one chain.</strong> The whole section — many-step reverse diffusion down to the one-shot inverse CDF — is the following sequence of constructions and identifications, each arrow one step:</p>
+<p><span class="math display">\[
+\begin{gathered}
+\text{score } s_\sigma = \partial_x \log p_\sigma \\[-1pt]
+\big\downarrow \; {\scriptstyle \text{scale}} \\[-1pt]
+\text{velocity field } v = -\tfrac12\, \bar s_\tau \\[-1pt]
+\big\downarrow \; {\scriptstyle \text{impose as dynamics}} \\[-1pt]
+\text{ODE } \; dx/d\tau = v(x, \tau) \\[-1pt]
+\big\downarrow \; {\scriptstyle \text{integrate — exactly: the flow; per frozen step: Euler, the } K\text{-step sampler}} \\[-1pt]
+\text{flow map } \Psi_{\sigma_{\max} \to \sigma_{\min}} \\[-1pt]
+\big\downarrow \; {\scriptstyle \text{pushforward } \Psi_\# p_{\sigma_{\max}} = p_{\sigma_{\min}} \;+\; \text{monotone (no crossing)} \;\Rightarrow\; \text{rigidity}} \\[-1pt]
+\text{quantile transport } Q = F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}
+\quad {\scriptstyle \text{(each leg identified by rigidity; legs composed by telescoping)}} \\[-1pt]
+\big\downarrow \; {\scriptstyle \sigma_{\min} \downarrow 0} \\[-1pt]
+\operatorname{sign}(x) \;\; {\scriptstyle \text{(the two-point generator)}}
+\end{gathered}
+\]</span></p>
+<p>Read downward, the chain is how reverse diffusion is <em>built</em>; the pushforward-plus-monotonicity arrow is where it is <em>identified</em> with the one-shot map — note that the pushforward property alone would not suffice (many maps carry <span class="math inline">\(p_{\sigma_{\max}}\)</span> to <span class="math inline">\(p_{\sigma_{\min}}\)</span>); it is pushforward <em>together with</em> monotonicity that forces <span class="math inline">\(\Psi = Q\)</span>, by Proposition 7. Everything below is this chain, one arrow at a time.</p>
+<section id="layer-1-the-identity" class="level3">
+<h3 class="anchored" data-anchor-id="layer-1-the-identity">Layer 1 — the identity</h3>
+<p><em>(premise) — the flow transports the family.</em> Everything below uses one fact about the flow: it reproduces the prescribed marginals, <span class="math inline">\((\Psi_{a \to b})_\#\, p_a = p_b\)</span>. This is the defining property of the probability-flow field, verified by one rearrangement: with <span class="math inline">\(v = -\tfrac12\, \bar s_\tau\)</span> we have <span class="math inline">\(\bar p_\tau v = -\tfrac12\, \partial_x \bar p_\tau\)</span>, so the continuity equation <span class="math inline">\(\partial_\tau \bar p_\tau + \partial_x(\bar p_\tau v) = 0\)</span> is <em>exactly</em> the heat equation <span class="math inline">\(\partial_\tau \bar p_\tau = \tfrac12\, \partial_x^2 \bar p_\tau\)</span>, which the Gaussian-mixture family satisfies (the componentwise check opens Layer 2). An ensemble started with law <span class="math inline">\(p_a\)</span> and moved by the ODE therefore arrives with law <span class="math inline">\(p_b\)</span>; Layer 2 sharpens this ensemble statement to a particlewise conservation law.</p>
+<p><em>(a) — flows cannot cross, so the flow map is monotone.</em></p>
+<p><strong>Proposition 6 (flows do not cross).</strong> For <span class="math inline">\(\sigma_{\min} &gt; 0\)</span>, let <span class="math inline">\(\Psi\)</span> denote the exact probability-flow ODE map carrying noise level <span class="math inline">\(\sigma_{\max}\)</span> down to <span class="math inline">\(\sigma_{\min}\)</span> (the field <span class="math inline">\(v = -\tfrac12\, \bar s_\tau\)</span>, integrated toward smaller <span class="math inline">\(\tau\)</span>, exact score). Then <span class="math inline">\(\Psi\)</span> is continuous and strictly increasing.</p>
+<p><em>Proof sketch.</em> The field is smooth, and its spatial derivative is globally bounded on the band: <span class="math inline">\(s_\sigma'(x) = \sigma^{-4}\operatorname{sech}^2(x/\sigma^2)
+- \sigma^{-2}\)</span> is bounded uniformly for <span class="math inline">\(\sigma \in [\sigma_{\min},
+\sigma_{\max}]\)</span>, so solutions exist across the whole leg and are unique. If two trajectories starting at <span class="math inline">\(x &lt; x'\)</span> met at some time, running the ODE backwards from the meeting point would violate uniqueness; hence trajectories preserve order, and <span class="math inline">\(\Psi\)</span> is strictly increasing. Continuity of the flow map in the initial condition is standard ODE theory. <span class="math inline">\(\square\)</span></p>
+<p><em>(b) — a monotone transport between two given laws is unique.</em></p>
+<p><strong>Proposition 7 (monotone transport is rigid).</strong> Let <span class="math inline">\(T\)</span> be continuous and strictly increasing with <span class="math inline">\(T_\# \mu = \nu\)</span>, where <span class="math inline">\(\mu, \nu\)</span> have continuous, strictly increasing CDFs <span class="math inline">\(F_\mu, F_\nu\)</span>. Then <span class="math inline">\(T = F_\nu^{-1} \circ F_\mu\)</span>.</p>
+<p><em>Proof.</em> <span class="math inline">\(F_\nu(T(x)) = \nu\big((-\infty, T(x)]\big)
+= \mu\big(T^{-1}(-\infty, T(x)]\big) = \mu\big((-\infty, x]\big) = F_\mu(x)\)</span>, using monotonicity in the middle step. Apply <span class="math inline">\(F_\nu^{-1}\)</span>. <span class="math inline">\(\square\)</span></p>
+<p><em>(c) — identify the flow, then take the limit.</em></p>
+<p><strong>Corollary 8.</strong> The end-to-end flow map satisfies <span class="math inline">\(\Psi_{\sigma_{\max} \to \sigma_{\min}} = F_{\sigma_{\min}}^{-1} \circ
+F_{\sigma_{\max}}\)</span>: the flow map of the probability-flow ODE <em>is</em> the quantile transport, at every positive noise level. Composing with a uniform parametrization of the source — write <span class="math inline">\(x_T\)</span> for a starting position at the top level, <span class="math inline">\(x_T = F_{\sigma_{\max}}^{-1}(u)\)</span> — the composite <span class="math inline">\(u \mapsto \Psi\big(F_{\sigma_{\max}}^{-1}(u)\big)\)</span> is exactly the map <span class="math inline">\(T_{\sigma_{\min}}\)</span> of Step 2: uniform noise in, mixture sample out, through the flow. Theorem 4 therefore applies verbatim: as <span class="math inline">\(\sigma_{\min} \downarrow 0\)</span>,</p>
+<p><span class="math display">\[
+\Psi(x_T) \;\longrightarrow\; \operatorname{sign}(x_T)
+\qquad \text{for every } x_T \ne 0,
+\]</span></p>
+<p>since <span class="math inline">\(F_{\sigma_{\max}}(0) = \tfrac12\)</span> by symmetry. The tanh-driven flow converges pointwise to the deterministic two-point generator. Its separatrix <span class="math inline">\(x_T = 0\)</span> — where the score vanishes by symmetry — is an equilibrium of the reverse dynamics whose character changes with the noise level: since <span class="math inline">\(\tfrac12 s_\sigma'(0) = \tfrac12(\sigma^{-4} - \sigma^{-2})\)</span>, the origin attracts while <span class="math inline">\(\sigma &gt; 1\)</span>, is neutral at <span class="math inline">\(\sigma = 1\)</span>, and repels once <span class="math inline">\(\sigma &lt; 1\)</span> — the two regimes announced in the objective.</p>
+<p><strong>The identity, applied to the example.</strong> Corollary 8 is not only a structural fact — for this tutorial’s mixture it is a computable formula. Plugging the CDFs in:</p>
+<p><span class="math display">\[
+\Psi(x)
+= F_{\sigma_{\min}}^{-1}\!\Big(
+\tfrac12\, \Phi\big(\tfrac{x+1}{\sigma_{\max}}\big)
++ \tfrac12\, \Phi\big(\tfrac{x-1}{\sigma_{\max}}\big)
+\Big).
+\]</span></p>
+<p>The outer inverse has no closed form (numerically, one bisects it) — but the stair asymptotics of Step 5, applied here to the transport itself for the first time, give a closed-form asymptotic for it. With <span class="math inline">\(u = F_{\sigma_{\max}}(x)\)</span>,</p>
+<p><span class="math display">\[
+\Psi(x) \;\approx\;
+\begin{cases}
+-1 + \sigma_{\min}\, \Phi^{-1}(2u), &amp; u &lt; \tfrac12,\\[2pt]
++1 + \sigma_{\min}\, \Phi^{-1}(2u - 1), &amp; u &gt; \tfrac12.
+\end{cases}
+\]</span></p>
+<p>Read as a formula, the applied transport is a <strong>soft sign</strong>: to leading order it collapses every input to <span class="math inline">\(\pm 1\)</span> — Theorem 4’s limit, now visible term by term — while the <span class="math inline">\(O(\sigma_{\min})\)</span> residue records <em>where within its cluster</em> the sample lands: the conserved quantile, miniaturized into the stair. Concretely, for <span class="math inline">\(\sigma_{\max} = 3\)</span>, <span class="math inline">\(\sigma_{\min} = 10^{-2}\)</span>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 25%">
+<col style="width: 30%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;"><span class="math inline">\(x\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(u = F_{3}(x)\)</span></th>
+<th style="text-align: right;">exact <span class="math inline">\(\Psi(x)\)</span></th>
+<th style="text-align: right;">stair asymptotic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.5000\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span> (Lemma 3)</td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.6238\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.9932\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.9932\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.7360\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.9993\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.9993\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><span class="math inline">\(6\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.9712\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1.0158\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1.0158\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Agreement to every displayed digit — and the exact column consists of the same numbers the ODE integration produces in the evidence paragraph below: one map, computed three independent ways (integrated flow, bisected quantile transport, stair asymptotics). The table also teaches how the map thinks: <span class="math inline">\(x = 1\)</span> and <span class="math inline">\(x = 2\)</span>, though far apart, both land within <span class="math inline">\(10^{-2}\)</span> of <span class="math inline">\(+1\)</span> — the cluster forgets the details — while the extreme draw <span class="math inline">\(x = 6\)</span> lands <em>beyond</em> the atom, at <span class="math inline">\(1.0158\)</span>, because its within-cluster quantile <span class="math inline">\(\Phi^{-1}(0.9424) \approx 1.58\)</span> is carried, shrunk by <span class="math inline">\(\sigma_{\min}\)</span>, into the stair. The transport is <span class="math inline">\(\operatorname{sign}(x)\)</span> plus quantile bookkeeping. And the transport problem that opened this section is now solved twice over, with the two solutions identified: <span class="math inline">\(M = Q = \Psi\)</span>.</p>
+</section>
+<section id="layer-2-the-mechanism-the-flow-conserves-quantiles" class="level3">
+<h3 class="anchored" data-anchor-id="layer-2-the-mechanism-the-flow-conserves-quantiles">Layer 2 — the mechanism: the flow conserves quantiles</h3>
+<p>The identity of Layer 1 is proved but not yet <em>explained</em>: why should an ODE driven by local score information reproduce a map built from global CDFs? The answer is a conservation law, and it takes two lines.</p>
+<p>Work in the variance clock (<span class="math inline">\(\bar p_\tau, \bar F_\tau, \bar s_\tau\)</span> as fixed in the conventions above). Each mixture component <span class="math inline">\(\mathcal{N}(x; \pm 1, \tau)\)</span> is a heat kernel, so the family satisfies the <strong>heat equation</strong> <span class="math inline">\(\partial_\tau \bar p_\tau = \tfrac12 \partial_x^2 \bar p_\tau\)</span> (differentiate a Gaussian once in <span class="math inline">\(\tau\)</span> and twice in <span class="math inline">\(x\)</span> to check; linearity does the rest). Integrating from <span class="math inline">\(-\infty\)</span> to <span class="math inline">\(x\)</span>, using <span class="math inline">\(\partial_x \bar p_\tau \to 0\)</span> at <span class="math inline">\(-\infty\)</span>, gives the CDF’s equation of motion:</p>
+<p><span class="math display">\[
+\partial_\tau \bar F_\tau(x) = \tfrac12\, \partial_x \bar p_\tau(x).
+\]</span></p>
+<p>Now let <span class="math inline">\(x(\tau)\)</span> be any trajectory of the probability-flow ODE, <span class="math inline">\(\dot x = v(x, \tau) = -\tfrac12\, \bar s_\tau(x)\)</span> (the reverse sampler traverses the same curves toward smaller <span class="math inline">\(\tau\)</span> — reversed limits, same field). By the chain rule,</p>
+<p><span class="math display">\[
+\frac{d}{d\tau} \bar F_\tau\big(x(\tau)\big)
+= \partial_\tau \bar F_\tau(x) + \bar p_\tau(x)\, \dot x
+= \tfrac12\, \partial_x \bar p_\tau(x)
+- \bar p_\tau(x) \cdot \tfrac12\, \partial_x \log \bar p_\tau(x)
+= 0 .
+\]</span></p>
+<p><strong>The quantile <span class="math inline">\(u = \bar F_\tau(x_\tau)\)</span> is a conserved quantity of the flow.</strong> Three things follow at once.</p>
+<ul>
+<li><em>Layer 1, re-derived in one line.</em> A trajectory started at <span class="math inline">\(x_T\)</span> carries <span class="math inline">\(u = F_{\sigma_{\max}}(x_T)\)</span> unchanged, so it must terminate at <span class="math inline">\(F_{\sigma_{\min}}^{-1}(u)\)</span> — Corollary 8 again, obtained now without the rigidity argument.</li>
+<li><em>No-crossing, explained.</em> Distinct trajectories carry distinct conserved quantiles, and <span class="math inline">\(\bar F_\tau\)</span> is strictly increasing — so they can never meet. Proposition 6’s order-preservation is the shadow of a conservation law.</li>
+<li><em>The two constructions unified.</em> The one-shot map evaluates the family <span class="math inline">\(x(\tau) = \bar F_\tau^{-1}(u)\)</span> at its endpoint; the flow traces the same family through every intermediate <span class="math inline">\(\tau\)</span>. They are the same object read at different resolutions — which is exactly what “same solution” means.</li>
+</ul>
+</section>
+<section id="layer-3-the-factorization-and-why-numerical-solution-is-literal" class="level3">
+<h3 class="anchored" data-anchor-id="layer-3-the-factorization-and-why-numerical-solution-is-literal">Layer 3 — the factorization, and why “numerical solution” is literal</h3>
+<p>The conservation law upgrades naturally into an algebra of maps: three exact moves, followed by the Euler analysis.</p>
+<p><em>Move 1 — at every step of the ladder, a quantile transport is available.</em> Proposition 2 was stated at one fixed <span class="math inline">\(\sigma\)</span>, but its proof used nothing special about the level: <strong>every</strong> <span class="math inline">\(F_s\)</span> with <span class="math inline">\(s &gt; 0\)</span> is a smooth, strictly increasing bijection onto <span class="math inline">\((0,1)\)</span>. Hence for each adjacent pair of the ladder <span class="math inline">\(\sigma_{\max} = \sigma_0 &gt; \sigma_1 &gt; \cdots &gt; \sigma_K = \sigma_{\min}\)</span>, the per-step quantile transport</p>
+<p><span class="math display">\[
+Q_k \;:=\; Q_{p_{\sigma_k} \to\, p_{\sigma_{k+1}}} \;=\; F_{\sigma_{k+1}}^{-1} \circ F_{\sigma_k}
+\]</span></p>
+<p>is well-defined, and by Proposition 7 it is the <em>unique monotone</em> map carrying level <span class="math inline">\(\sigma_k\)</span> to level <span class="math inline">\(\sigma_{k+1}\)</span>. The one-shot problem has been sliced into <span class="math inline">\(K\)</span> sub-problems of the same kind, each with its own one-shot solution.</p>
+<p><em>Move 2 — each leg of the exact flow is that per-step quantile transport.</em> Layer 1’s argument applies verbatim on the sub-interval: the flow leg <span class="math inline">\(\Psi_{\sigma_k \to \sigma_{k+1}}\)</span> is continuous and strictly increasing (no crossing) and pushes <span class="math inline">\(p_{\sigma_k}\)</span> to <span class="math inline">\(p_{\sigma_{k+1}}\)</span> (the flow reproduces the family), so by uniqueness <span class="math inline">\(\Psi_{\sigma_k \to \sigma_{k+1}} = Q_k\)</span>. Equivalently, by Layer 2: each leg carries every particle along its iso-quantile curve from one level to the next — quantile in, same quantile out.</p>
+<p><em>Move 3 — telescoping identifies the composition with the one-shot map.</em> Two independent derivations give the same identity. Dynamically, solution maps of an ODE compose — solving from <span class="math inline">\(\sigma_0\)</span> down to <span class="math inline">\(\sigma_K\)</span> while pausing at intermediate levels changes nothing, by uniqueness of solutions:</p>
+<p><span class="math display">\[
+\Psi_{\sigma_0 \to \sigma_K}
+= \Psi_{\sigma_{K-1} \to \sigma_K} \circ \cdots \circ \Psi_{\sigma_0 \to \sigma_1}
+= Q_{K-1} \circ \cdots \circ Q_0 .
+\]</span></p>
+<p>Analytically, the same chain is pure cancellation — each intermediate CDF annihilates its own inverse:</p>
+<p><span class="math display">\[
+\big(F_{\sigma_K}^{-1} \circ F_{\sigma_{K-1}}\big) \circ \cdots \circ
+\big(F_{\sigma_1}^{-1} \circ F_{\sigma_0}\big)
+= F_{\sigma_K}^{-1} \circ F_{\sigma_0}
+= Q_{p_{\sigma_{\max}} \to\, p_{\sigma_{\min}}} .
+\]</span></p>
+<p>Together: <strong>the one-shot quantile transport factorizes exactly into per-level quantile transports.</strong> Nothing is approximate yet — the exact reverse flow is not an approximation of the one-shot map but a <em>factorization</em> of it.</p>
+<p>The last move — connecting the exact factors to the practical sampler — is where “numerical solution” acquires its literal meaning, so it deserves a derivation rather than a remark.</p>
+<p><em>Notation first.</em> Re-index the ladder by the variance clock: <span class="math inline">\(\tau := \sigma^2\)</span> and <span class="math inline">\(\tau_k := \sigma_k^2\)</span>, with <span class="math inline">\(\Delta_k := \tau_k - \tau_{k+1} &gt; 0\)</span> the length of the <span class="math inline">\(k\)</span>-th leg. Then <span class="math inline">\(\Psi_{\tau_k \to \tau_{k+1}}\)</span> denotes the <strong>same</strong> exact flow leg as <span class="math inline">\(\Psi_{\sigma_k \to \sigma_{k+1}}\)</span> — one object, two indexings — and by Move 2 it equals the per-step quantile transport <span class="math inline">\(Q_k\)</span>.</p>
+<p><em>The exact leg, in integral form.</em> The probability-flow ODE is <span class="math inline">\(dx/d\tau = -\tfrac12\, \bar s_\tau(x)\)</span>; the sampler traverses it toward smaller <span class="math inline">\(\tau\)</span>, which reverses the limits of integration, not the sign of the field. Integrating one leg from <span class="math inline">\(\tau_k\)</span> down to <span class="math inline">\(\tau_{k+1}\)</span>, started at <span class="math inline">\(x\)</span>:</p>
+<p><span class="math display">\[
+\Psi_{\tau_k \to \tau_{k+1}}(x)
+= x + \int_{\tau_{k+1}}^{\tau_k}
+\tfrac12\, \bar s_\tau\big(x(\tau)\big)\, d\tau ,
+\]</span></p>
+<p>where <span class="math inline">\(x(\tau)\)</span> is the trajectory itself. This is exact — but not directly evaluable as written, because the integrand must be evaluated along the very trajectory being solved for.</p>
+<p><em>The one approximation.</em> Over a short leg, freeze the integrand at the leg’s known starting data <span class="math inline">\((x, \tau_k)\)</span>:</p>
+<p><span class="math display">\[
+\int_{\tau_{k+1}}^{\tau_k}
+\tfrac12\, \bar s_\tau\big(x(\tau)\big)\, d\tau
+= \frac{\Delta_k}{2}\, \bar s_{\tau_k}(x) \;+\; R_k(x).
+\]</span></p>
+<p>The frozen version defines the <strong>step map</strong></p>
+<p><span class="math display">\[
+E_k(x) \;:=\; x + \frac{\Delta_k}{2}\, \bar s_{\tau_k}(x)
+\]</span></p>
+<p>— symbol for symbol, the reverse-diffusion sampler update. Freezing the velocity at the left endpoint of each step is the <em>definition</em> of the explicit Euler method, so the sampler is the Euler discretization of the reverse ODE by construction, not by analogy. The remainder is second order: fix a compact set <span class="math inline">\(C\)</span> of starting points and a compact tube containing all exact trajectories from <span class="math inline">\(C\)</span> (such a tube exists because the field’s spatial derivative is globally bounded on the band, as in Proposition 6), and let <span class="math inline">\(L\)</span> bound the field’s derivatives on that tube. Along the leg the integrand then drifts by <span class="math inline">\(O(\Delta_k)\)</span>, and it is integrated over an interval of length <span class="math inline">\(\Delta_k\)</span>, so, uniformly on the tube,</p>
+<p><span class="math display">\[
+\big| E_k(x) - \Psi_{\tau_k \to \tau_{k+1}}(x) \big|
+= |R_k(x)| \;\le\; \tfrac{L}{2}\, \Delta_k^2 .
+\]</span></p>
+<p>Read through Move 2, this inequality <em>is</em> the statement that <strong>each step of reverse diffusion is a per-level quantile transport, correct to first order</strong>: <span class="math inline">\(E_k = Q_k + O(\Delta_k^2)\)</span>.</p>
+<p><em>From one step to the whole ladder.</em> The sampler is the composition <span class="math inline">\(S_K := E_{K-1} \circ \cdots \circ E_0\)</span>; the exact transport is <span class="math inline">\(\Psi = Q_{K-1} \circ \cdots \circ Q_0\)</span> (Move 3). Compare them by swapping one factor at a time. Write <span class="math inline">\(z_k := (Q_{k-1} \circ \cdots \circ Q_0)(x)\)</span> for the exact state entering leg <span class="math inline">\(k\)</span>, and <span class="math inline">\(A_k := E_{K-1} \circ \cdots \circ E_{k+1}\)</span> for the remaining Euler tail. Inserting the hybrid compositions and telescoping gives the pointwise identity</p>
+<p><span class="math display">\[
+S_K(x) - \Psi(x)
+= \sum_{k=0}^{K-1}
+\Big[ A_k\big(E_k(z_k)\big) - A_k\big(Q_k(z_k)\big) \Big]
+\]</span></p>
+<p>(nonlinear maps do not distribute over subtraction, so the difference must remain <em>inside</em> the tail <span class="math inline">\(A_k\)</span>). Each <span class="math inline">\(E_j\)</span> has derivative <span class="math inline">\(1 + \tfrac{\Delta_j}{2}\, \partial_x \bar s_{\tau_j}\)</span>, hence Lipschitz constant at most <span class="math inline">\(1 + L\Delta_j \le e^{L \Delta_j}\)</span>; every tail <span class="math inline">\(A_k\)</span> is therefore Lipschitz with constant at most <span class="math inline">\(\Lambda := e^{L(\tau_{\max} - \tau_{\min})}\)</span>, <em>independently of <span class="math inline">\(K\)</span></em>. Applying this to each bracket and then the local error bound <span class="math inline">\(|E_k(z_k) - Q_k(z_k)| \le \tfrac{L}{2}\Delta_k^2\)</span>,</p>
+<p><span class="math display">\[
+|S_K(x) - \Psi(x)|
+\;\le\; \Lambda \sum_{k=0}^{K-1} \tfrac{L}{2}\, \Delta_k^2
+\;\le\; \tfrac{\Lambda L}{2}\, (\tau_{\max} - \tau_{\min})\, \max_k \Delta_k
+\]</span></p>
+<p>which is <span class="math inline">\(O(1/K)\)</span> for any quasi-uniform ladder (<span class="math inline">\(\max_k \Delta_k = O(1/K)\)</span> in the variance clock). (The constants are finite for every <span class="math inline">\(\sigma_{\min} &gt; 0\)</span>, though they grow as <span class="math inline">\(\sigma_{\min} \downarrow 0\)</span> — the stiffness recorded under Scope.) Letting the mesh <span class="math inline">\(\max_k \Delta_k \to 0\)</span>:</p>
+<p><span class="math display">\[
+\boxed{\;
+\lim_{\max_k \Delta_k \to 0}\; E_{K-1} \circ \cdots \circ E_0
+\;=\; \Psi
+\;=\; Q_{\,p_{\sigma_{\max}} \to\, p_{\sigma_{\min}}}
+\;}
+\]</span></p>
+<p>uniformly on compact sets. The sampler and the one-shot map are not merely similar: the sampler <em>converges to</em> the one-shot map, at the Euler rate, and the derivation identifies every intermediate object along the way:</p>
+<p><span class="math display">\[
+\underbrace{F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}}_{\text{one-shot solution}}
+\;=\;
+\underbrace{Q_{K-1} \circ \cdots \circ Q_0}_{\text{exact factorization (Move 3)}}
+\;\approx\;
+\underbrace{E_{K-1} \circ \cdots \circ E_0}_{\substack{\text{reverse diffusion: the sampler } S_K\\ \text{Euler, error } O(1/K)}}
+\]</span></p>
+<p>Reverse diffusion is a numerical solution of the one-shot transport problem in the same sense that Euler’s method is a numerical solution of an initial-value problem — because it <em>is</em> Euler’s method, applied to an ODE whose exact solution map <em>is</em> the one-shot transport. Not an analogy: an instance, now derived.</p>
+<p><strong>The evidence — testing all three clauses.</strong> Setup, fully specified: the ladder is geometric in <span class="math inline">\(\sigma\)</span> (uniform in <span class="math inline">\(\log \sigma\)</span>) with <span class="math inline">\(K = 20{,}000\)</span> legs from <span class="math inline">\(\sigma_{\max} = 3\)</span> to <span class="math inline">\(\sigma_{\min} = 10^{-2}\)</span>; the update is the derived <span class="math inline">\(E_k\)</span>; the starting grid is <span class="math inline">\(33\)</span> equispaced points on <span class="math inline">\([-8, 8]\)</span> with the near-separatrix points <span class="math inline">\(|x| &lt; 0.25\)</span> excluded (at <span class="math inline">\(x = 0\)</span> both maps give <span class="math inline">\(0\)</span> exactly, by symmetry; the numerical difficulty concentrates <em>near</em> the separatrix, where the stiffness peaks); errors are suprema over the grid. Results: <span class="math inline">\(\sup |S_K - Q| \approx 1.9 \times 10^{-5}\)</span> — clause (i) and the Euler side of clause (iii), whose <span class="math inline">\(O(1/K)\)</span> signature Exercise 8 has you measure. And clause (ii) tested <em>directly</em>: the conserved quantile <span class="math inline">\(\bar F_{\tau_k}(x_k)\)</span>, monitored along every trajectory, drifts from its initial value by at most <span class="math inline">\(9.8 \times 10^{-5}\)</span> over all twenty thousand steps — an Euler-sized violation of an exact conservation law, exactly as the theory prescribes.</p>
+<p><strong>Why the incremental route is the one that scales.</strong> The factorization is also the interface between the mathematics and the learning. The one-shot map is globally wild — in the <span class="math inline">\(\sigma \to 0\)</span> limit, discontinuous — and is built from the CDF, a global object unavailable in high dimension. Each <em>Euler factor</em> <span class="math inline">\(E_k\)</span>, by contrast, is near-identity and consumes only the score at a single noise level — a local quantity that is exactly a regression target (denoising); the exact factor <span class="math inline">\(Q_k\)</span> would still need the two endpoint CDFs, so it is the Euler step, not the exact leg, that is purely local. A composition of many learnable maps realizes one unlearnable map. Structurally, this is a homotopy (continuation) method for sampling: embed the intractable target in a family <span class="math inline">\(\{p_\sigma\}\)</span> terminating at an easy, approximately Gaussian high-noise law, and track the solution path — equivalently, by Layer 2, track each sample’s conserved quantile — one level at a time.</p>
+<p><strong>Scope.</strong> Two caveats frame the result. First, the identification of the flow with the quantile transport is special to one dimension, where “monotone” pins the transport down uniquely; in higher dimensions the probability-flow ODE defines a valid transport that is in general <em>not</em> the monotone (optimal-transport) map. Second, the statement concerns the exact score, exact terminal law, and exact integration; and the velocity field becomes increasingly stiff as <span class="math inline">\(\sigma_{\min} \downarrow 0\)</span> — for this example the score’s derivative at the separatrix grows like <span class="math inline">\(\sigma^{-4}\)</span> (compute: <span class="math inline">\(s'(0) = 1/\sigma^4 - 1/\sigma^2\)</span>) — so the flow is smooth at every positive noise level even though its limit is discontinuous, which is the dynamical face of the boundary layer of Theorem 4.</p>
+</section>
+</section>
+<section id="interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation">Interpretation</h2>
+<p>The same step function has now appeared on both sides of the generative pipeline. In data space, the <em>posterior-mean denoiser</em> — the conditional mean <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh(x/\sigma^2)\)</span> of the clean point given a noisy observation, the object diffusion models learn — sharpens into <span class="math inline">\(\operatorname{sign}(x)\)</span>. In noise space, the generator <span class="math inline">\(T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)\)</span>. In both cases a smooth object degenerates into a discontinuous one precisely as the noise scale vanishes. This is the one-dimensional instance of a general phenomenon: discrete or lower-dimensional data distributions are reached as limits of smooth transports, and learnable models operate at small positive noise scales exactly because smooth maps can be represented and trained while their discontinuous limits cannot. Diffusion models anneal <span class="math inline">\(\sigma\)</span> toward zero rather than starting there for this reason.</p>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Prove Theorem 1 for a general CDF <span class="math inline">\(F\)</span> (not necessarily continuous or strictly increasing) using the generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>.</li>
+<li>Write out the case <span class="math inline">\(u &gt; \tfrac12\)</span> of Theorem 4 directly (without invoking Lemma 3), and verify that the two squeeze evaluations become <span class="math inline">\(F_\sigma(1-\varepsilon) \to \tfrac12\)</span> and <span class="math inline">\(F_\sigma(1+\varepsilon) \to 1\)</span>.</li>
+<li><strong>Unequal weights.</strong> For the mixture <span class="math inline">\(\pi\,\mathcal{N}(-1,\sigma^2) + (1-\pi)\,\mathcal{N}(+1,\sigma^2)\)</span> with <span class="math inline">\(0 &lt; \pi &lt; 1\)</span>, show <span class="math inline">\(T_\sigma(u) \to -1\)</span> for <span class="math inline">\(u &lt; \pi\)</span> and <span class="math inline">\(T_\sigma(u) \to +1\)</span> for <span class="math inline">\(u &gt; \pi\)</span>: the location of the jump is the component weight.</li>
+<li>Verify the derivative computation <span class="math inline">\(T_\sigma'(\tfrac12) = \sigma \sqrt{2\pi}\,
+e^{1/(2\sigma^2)}\)</span> and evaluate it numerically for <span class="math inline">\(\sigma = 0.5, 0.2, 0.1\)</span>.</li>
+<li><strong>Three components.</strong> For a symmetric three-component mixture with means <span class="math inline">\(-1, 0, +1\)</span> and equal weights, describe the limit of <span class="math inline">\(T_\sigma\)</span>: the number of jumps, their locations in <span class="math inline">\(u\)</span>, and the limiting values between them.</li>
+<li>Prove Proposition 7 in detail, identifying exactly where continuity and strict monotonicity of <span class="math inline">\(T\)</span> are used.</li>
+<li>Reproduce the numerical confirmation: integrate the exact-score probability-flow ODE with a fine step grid from a grid of initial points and compare with <span class="math inline">\(F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}\)</span> computed by bisection. Where is the agreement worst, and why?</li>
+<li><strong>The Euler signature.</strong> Rerun Exercise 7 with <span class="math inline">\(K = 25, 50, 100, 200, 400\)</span> steps and plot the maximum deviation from the quantile transport against <span class="math inline">\(K\)</span>: confirm the <span class="math inline">\(O(1/K)\)</span> decay predicted by the factorization argument. Additionally monitor <span class="math inline">\(\bar F_{\tau_k}(x_k)\)</span> along each trajectory and check that its drift shrinks at the same rate — the direct test of quantile conservation.</li>
+<li><strong>Quantile conservation.</strong> (a) Verify that <span class="math inline">\(\mathcal{N}(x; \mu, \tau)\)</span> satisfies the heat equation in the variance clock. (b) Re-derive <span class="math inline">\(\partial_\tau F_\tau = \tfrac12 \partial_x p_\tau\)</span>, stating the boundary behaviour used. (c) Prove the telescoping identity twice: by cancellation of CDFs, and by the pause-and-resume (semigroup) property of ODE solution maps.</li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/acads-iit-jammu\.github\.io\/diffusion-models-f26");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../tutorials/genai-simplest-form.html" class="pagination-link" aria-label="Generative AI, in Its Simplest Form">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Generative AI, in Its Simplest Form</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../tutorials/probability-flow-ode.html" class="pagination-link" aria-label="The Probability-Flow ODE">
+        <span class="nav-page-text">The Probability-Flow ODE</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
