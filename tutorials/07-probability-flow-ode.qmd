@@ -4,9 +4,9 @@
 (training objectives, Fokker–Planck, reverse-time dynamics) and shows where the
 course is headed. Everything is self-contained, but the pace is brisker than the
 W01–W02 tutorials it builds on:
-[The World's Smallest Diffusion Model](./two-point-diffusion.qmd),
-[Generative AI, in Its Simplest Form](./genai-simplest-form.qmd), and
-[The Deterministic Map, Proved](./map-proved.qmd). Notation: $\Phi$ is always the
+[The World's Smallest Diffusion Model](./05-two-point-diffusion.qmd),
+[Generative AI, in Its Simplest Form](./04-genai-simplest-form.qmd), and
+[The Deterministic Map, Proved](./06-map-proved.qmd). Notation: $\Phi$ is always the
 standard normal CDF; flow maps are written $\Psi$.*
 
 ## The problem, and the thesis
@@ -37,7 +37,7 @@ $$
 $$
 
 The generative problem itself is the one fixed in
-[Generative AI, in Its Simplest Form](./genai-simplest-form.qmd): construct a map
+[Generative AI, in Its Simplest Form](./04-genai-simplest-form.qmd): construct a map
 carrying a simple distribution to $p_{\text{data}}$. In practice the simple
 distribution is $\mathcal{N}(0, I)$; the exact statement, kept honest throughout,
 is that the machinery transports $p_T$, which the forward process drives *close*
@@ -48,7 +48,7 @@ instead construct a **continuous path of distributions** $p_0 \to p_t \to p_T$
 interpolating between data and near-Gaussian, and learn only the *local*
 information needed to move along the path. Why the incremental route wins was the
 subject of the factorization discussion in
-[The Deterministic Map, Proved](./map-proved.qmd); here we build the machinery
+[The Deterministic Map, Proved](./06-map-proved.qmd); here we build the machinery
 that makes it practical when nothing about $p_{\text{data}}$ is known in closed
 form.
 
@@ -589,8 +589,8 @@ Four remarks that carry more weight than the pseudocode:
   $p_\epsilon$ is the *attenuated and smoothed* data law
   ($\alpha_\epsilon X_0 + \sigma_\epsilon Z$), not the data law itself — the VP
   twin of the terminal width $\sigma_{\min}$ quantified in
-  [the W01 tutorial](./two-point-diffusion.qmd) and
-  [The Deterministic Map, Proved](./map-proved.qmd). Increasing the step count
+  [the W01 tutorial](./05-two-point-diffusion.qmd) and
+  [The Deterministic Map, Proved](./06-map-proved.qmd). Increasing the step count
   removes integration error only; lowering $\epsilon$ sharpens the target, at the
   price of an increasingly **stiff** velocity field (for the two-point score
   below, the derivative at the separatrix scales like $\sigma_t^{-4}$).
@@ -600,8 +600,8 @@ Four remarks that carry more weight than the pseudocode:
 Now run the entire pipeline on the course's home dataset,
 $p_0 = \tfrac12 \delta_{-1} + \tfrac12 \delta_{+1}$ — the case where every learned
 object has a formula, worked in the VE convention in
-[the W01 tutorial](./two-point-diffusion.qmd) and proved in
-[The Deterministic Map, Proved](./map-proved.qmd). Conditioning on the component,
+[the W01 tutorial](./05-two-point-diffusion.qmd) and proved in
+[The Deterministic Map, Proved](./06-map-proved.qmd). Conditioning on the component,
 $X_t \mid X_0 = \pm 1 \sim \mathcal{N}(\pm\alpha_t, \sigma_t^2)$, so
 
 $$
@@ -643,7 +643,7 @@ uniformly near $0$) — the smooth $\tanh$ denoiser sharpening into the
 discontinuous sign map.
 
 What does the integrated flow do? The 1-D argument of
-[The Deterministic Map, Proved](./map-proved.qmd) runs in two stages, and the
+[The Deterministic Map, Proved](./06-map-proved.qmd) runs in two stages, and the
 order matters. **Stage one, at positive noise:** for each $\epsilon > 0$, the
 flow map $\Psi_{T \to \epsilon}$ is continuous and strictly increasing
 (trajectories of a smooth 1-D ODE cannot cross), and a monotone map pushing
@@ -708,7 +708,7 @@ $$
 $$
 
 — the factorization view of
-[The Deterministic Map, Proved](./map-proved.qmd), now with a learned field: each
+[The Deterministic Map, Proved](./06-map-proved.qmd), now with a learned field: each
 factor is near-identity and needs only local information. For fixed
 $\epsilon > 0$ this limit is a continuous map; any discontinuity (the sign
 function) arises only in the *separate* limit $\epsilon \downarrow 0$.
@@ -782,7 +782,7 @@ $$
    $d$-dimensional covariance version.
 2. Use the static dictionary ($\alpha \equiv 1$) to recover, from the VP
    two-point formulas: the mixture $p_t$, the posterior, the denoiser, and the
-   score — and match each against [the W01 tutorial](./two-point-diffusion.qmd).
+   score — and match each against [the W01 tutorial](./05-two-point-diffusion.qmd).
    Then use the *dynamic* dictionary ($Y = X/\alpha$) to transform the VP score
    into the VE score and check consistency.
 3. Complete the proof that the population minimizer of the denoising

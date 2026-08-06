@@ -516,10 +516,36 @@ things follow at once.
 - *No-crossing, explained.* Distinct trajectories carry distinct conserved
   quantiles, and $\bar F_\tau$ is strictly increasing — so they can never meet.
   Proposition 6's order-preservation is the shadow of a conservation law.
-- *The two constructions unified.* The one-shot map evaluates the family
-  $x(\tau) = \bar F_\tau^{-1}(u)$ at its endpoint; the flow traces the same family
-  through every intermediate $\tau$. They are the same object read at different
-  resolutions — which is exactly what "same solution" means.
+
+::: {.callout-important icon="false"}
+## Trajectories are iso-quantile curves
+
+For each fixed $u \in (0,1)$, the level set $\bar F_\tau(x) = u$ traces a
+smooth curve through the $(x, \tau)$ plane,
+
+$$
+\tau \;\longmapsto\; x_u(\tau) = \bar F_\tau^{-1}(u)
+$$
+
+— the **iso-quantile curve** of the evolving family: the locus of "the
+$u$-th quantile" as the noise level changes. The conservation law says exactly
+this: **the flow's trajectories are these curves.** Every particle rides its
+own quantile line and never leaves it. And every map in this tutorial is a
+reading of this one bundle of curves:
+
+- the per-leg quantile transport $Q_k$ reads one curve at two adjacent ladder
+  levels;
+- the end-to-end flow map $\Psi$ reads it at the top and bottom levels;
+- the one-shot map $T_{\sigma_{\min}}$ parameterizes the curves by $u$ itself
+  and reads the bottom;
+- the staircase limit is the geometry of the whole bundle as
+  $\tau \downarrow 0$: every curve with $u < \tfrac12$ funnels into $-1$,
+  every curve with $u > \tfrac12$ funnels into $+1$, and the single
+  $u = \tfrac12$ curve — the separatrix — stays pinned at $0$.
+
+One family of curves; the one-shot map, the flow, and the sampler are three
+ways of reading it — at the endpoint, continuously, and at ladder resolution.
+:::
 
 ### Layer 3 — the factorization, and why "numerical solution" is literal
 

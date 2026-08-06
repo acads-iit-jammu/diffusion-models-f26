@@ -1,0 +1,196 @@
+# Moving Distributions: The Transport Story {.unnumbered}
+
+*An informal tutorial, for readers with no particular background. No proofs, few
+formulas — just the one idea that organizes all of generative modeling, told from
+the beginning. Its rigorous twin, with the history and the theorems, is
+[Generative Models as Transport: History and Validation](./08-transport-rigorous.qmd).*
+
+## The problem, without any symbols
+
+You have a pile of examples — photographs, sentences, measurements. Behind them
+stands a *distribution*: the invisible shape that says which examples are common,
+which are rare, which are impossible. Generative modeling is one wish:
+
+> **Make more examples with the same shape.**
+
+Here is the reframing that unlocks everything. A computer already owns one
+perfect source of randomness — dull, structureless randomness, like a uniform
+lottery number or television static. So the wish becomes a *moving* job:
+
+> Take the boring randomness we have, and **transport** it onto the interesting
+> shape we want. Move the pile of sand into the sculpture.
+
+Every generative model you have heard of — VAEs, GANs, normalizing flows,
+diffusion models — is a machine for doing exactly this. They differ only in *how
+they decide which grain of sand goes where*. That difference is the whole story.
+
+## In one dimension, the problem is completely solved
+
+Suppose your data is just numbers — heights, incomes, temperatures. One
+dimension. Then there is a classical trick, and it settles everything.
+
+**The rank trick.** To transform lottery numbers into incomes:
+
+1. Draw a uniform lottery number between 0 and 1 — say $0.83$.
+2. Read it as a *rank*: "the 83rd percentile."
+3. Output the income that sits at the 83rd percentile of the income
+   distribution.
+
+That's the entire generator. Ask "what fraction of the data lies below this
+value?" — that question is the **CDF**, and it converts values into ranks. Answer
+it backwards — rank into value — and that is the **inverse CDF**. The generator
+is: *uniform randomness in, read as a rank, matched to the value with the same
+rank.*
+
+Three things make this trick special, not just convenient:
+
+- **It always works.** Any distribution of numbers, however lumpy, has
+  percentiles.
+- **It is fair, and it never crosses.** The 20th percentile of the lottery goes
+  to the 20th percentile of incomes, the 90th to the 90th. Lower stays lower,
+  higher stays higher — two grains of sand never swap places in flight.
+- **It is the only such rule — *if* you insist on never crossing.** Drop that
+  insistence and even one dimension has many transports (flip every rank,
+  $u \leftrightarrow 1-u$, and the output distribution is identical). What is
+  special about one dimension is not that transport is unique — it is that the
+  line comes with a natural tie-breaking rule everyone accepts: *lower stays
+  lower*. The rule crowns a unique king.
+- One small honesty note for the reverse direction: turning *data back into
+  ranks* needs care when many data points tie (repeated values); ties must be
+  broken with a coin flip. Generation — ranks into data — never has this
+  problem.
+
+You can watch this trick operating in the course demo
+[Sampling as a Map](../materials/sampling-as-a-map.html), and it is the exact
+mechanism behind the two-point generator of W01. In one dimension, generative
+modeling is *finished* — a lookup in a percentile table.
+
+## And in two dimensions, the trick dies
+
+Now let the data be pairs — a height *and* a weight; an image with many pixels.
+Try the rank trick: "what fraction of the data lies *below* this point?"
+
+Below? Point A is up and to the left of point B. Which one is "lower"? In a
+plane there is **no natural order**. No order, no ranks; no ranks, no
+percentiles; no percentiles, no inverse CDF. The one canonical tool we had does
+not survive the second dimension.
+
+Worse — the problem is not that transport becomes impossible. It becomes
+*embarrassingly possible*. Picture moving a round cloud of sand onto another
+round cloud: you can slide it straight over; or slide it over and rotate it by
+any angle; or swirl the middle while fixing the edge. **Infinitely many
+transports do the job, and no one of them is the boss.** In one dimension the
+never-cross rule crowned a unique king; in two dimensions there is no throne.
+
+This is the honest statement of the difficulty: in higher dimensions, transport
+is not *undefined* — it is **underdetermined**. And the thing that is missing is
+precisely the tie-breaker: the line's "lower stays lower" rule has no natural
+analogue in the plane. Something must be *added* to pick one map out of the
+infinite crowd.
+
+## Every model family is a different way of choosing
+
+Here is the reveal: the famous generative model families are exactly the famous
+ways of adding that missing choice.
+
+**Sort by coordinates anyway — normalizing flows.** Alphabetical order: sort by
+the first coordinate; break ties with the second; and so on. This resurrects
+ranks, one coordinate at a time — transform the first coordinate by its
+percentiles, then the second *given* the first, and so on. It works at every
+scale, and it is exactly what autoregressive normalizing flows do. The cost:
+the answer depends on which coordinate you called "first," as alphabetical order
+depends on the alphabet.
+
+**Move at the cheapest total cost — optimal transport.** Charge for distance:
+among all valid transports, take the one minimizing the total moving bill. A
+deep theorem says that (in the natural settings) this again produces a *unique*
+map. The cost: computing it at scale is hard, and — a genuine surprise below —
+it is *not* what the popular generators actually compute.
+
+**Melt, then re-freeze — diffusion models.** Refuse the direct matching
+entirely. Instead, *melt* the data — add noise a little at a time until every
+shape becomes the same formless Gaussian blob — and learn to run the melting
+backwards. Freezing is guided by a purely local question: "from here, which
+direction looks denser?" That local question is learnable by a neural network
+even in a million dimensions. Two choices select the route: the melting
+*schedule*, and — a subtlety — a *no-swirling* rule: many wind patterns produce
+the same evolution of the sand's density (add any swirl that circulates without
+piling anything up), and diffusion picks the swirl-free wind. This is the
+entire subject of this course, met from a new side.
+
+**Fool the inspector — GANs.** Train a forger against a detective: any transport
+whose output the detective cannot distinguish from data is accepted. Note what
+is missing: *any* transport. Here is how loose that is, even in one dimension:
+take the fair rank-matcher, but first *fold* the lottery ticket — send every
+rank $u$ to $1-u$, or crease it in the middle like a tent. The folded generator
+produces exactly the same distribution, so no inspector, however perfect, can
+object — yet it is not the rank map. GANs add no selection principle at all,
+which is part of why they are powerful and part of why they are temperamental.
+
+**Compress and decompress — VAEs.** Learn an encoder that squeezes data into
+tidy randomness and a decoder that reinflates it. Here is a lovely secret: in
+one dimension, the *perfect* encoder is precisely the rank trick — the CDF! —
+and the perfect decoder is the inverse CDF. But two honest footnotes. First,
+nothing in the VAE's training *forces* that choice: many equally good codes
+exist (swap all ranks $u \leftrightarrow 1-u$, for a start), and the VAE has no
+reason to prefer the tidy one. Second, a textbook VAE is not even *allowed* to
+be perfectly tidy — its rules require the code to stay a little blurry (a
+perfectly sharp code costs it an infinite penalty). The "encoder = CDF" story
+is the idealized, noise-free, never-crossing limit of a VAE — a beautiful
+limit, and one the actual training objective does not select. The VAE
+illustrates underdeterminacy from the inside.
+
+## The punchline: five roads, one destination — in 1-D only
+
+Run all five families on one-dimensional data, each trained to perfection *and
+each given the natural tie-breaking rule* (never cross), and they collapse into
+the same map: the rank trick. But the fine print matters, and it splits three
+ways. For the smooth-flow families — diffusion's deterministic sampler,
+normalizing flows, flow matching — the collapse is a **theorem**: a
+one-dimensional flow physically cannot cross itself, so the tie-breaker comes
+built in (this course proves the diffusion case in
+[The Deterministic Map, Proved](./06-map-proved.qmd)). For GANs and VAEs the
+collapse is merely **available**: their training rules accept the rank map but
+do not prefer it — the folded forger and the blurry code are equally welcome.
+In one dimension the five philosophies *can* be one philosophy; only some of
+them insist on it.
+
+In two dimensions and up, they genuinely part ways — and that is not a defect
+but the point: each family is one answer to a question that no longer has a
+single answer. If you understand (a) the 1-D trick, (b) why it dies upstairs,
+and (c) what each family adds to revive it, you understand the map of the whole
+field.
+
+## A warning label: what *not* to carry upstairs
+
+The 1-D picture is a superb ladder and a treacherous railing. Keep the ladder,
+do not lean on it:
+
+- **"Lower stays lower" means nothing upstairs.** There is no single order to
+  preserve — and "monotone" does not become meaningless, it becomes *many
+  different things* (several inequivalent notions replace it, and different
+  fixes pick different ones).
+- **"The transport" is not a phrase you may use** without saying which
+  selection rule you chose.
+- **The diffusion route is not the cheapest route.** In 1-D the melter and the
+  cheapest mover coincide; in higher dimensions they provably differ —
+  professionals conjectured otherwise in print and were corrected by a
+  counterexample.
+- **Even the melting does not determine the route by itself.** Upstairs, many
+  winds produce the same density evolution (swirls circulate without piling);
+  the no-swirl rule is an extra choice, invisible in 1-D where there is no room
+  to swirl.
+- **Percentile bookkeeping is a 1-D luxury.** The beautiful fact that a
+  diffusing particle "rides its quantile" (proved in this course) has no
+  higher-dimensional analogue.
+
+## Where to go from here
+
+The rigorous twin of this tutorial —
+[Generative Models as Transport: History and Validation](./08-transport-rigorous.qmd)
+— replays this story with theorems, dates, and citations: who proved the rank
+trick unique, who invented each fix and when, what exactly is true about the
+"VAE encoder = CDF" slogan, and where the counterexamples live. And the rest of
+the course is the deep dive into one of the five roads — the melt-and-refreeze
+road — chosen because its local, learnable steering question scales to the
+dimensions where images and language live.

@@ -57,14 +57,18 @@ book:
         - weeks/w15.qmd
         - weeks/w16.qmd
         - weeks/w17.qmd
-    - part: "Tutorials"
+    - part: "Tutorials · Foundations"
       chapters:
-        - tutorials/probability-101.qmd
-        - tutorials/two-point-diffusion.qmd
-        - tutorials/distributions-mle.qmd
-        - tutorials/genai-simplest-form.qmd
-        - tutorials/map-proved.qmd
-        - tutorials/probability-flow-ode.qmd
+        - tutorials/01-probability-101.qmd
+        - tutorials/02-distributions-mle.qmd
+    - part: "Tutorials · Diffusion Models"
+      chapters:
+        - tutorials/03-transport-story.qmd
+        - tutorials/04-genai-simplest-form.qmd
+        - tutorials/05-two-point-diffusion.qmd
+        - tutorials/06-map-proved.qmd
+        - tutorials/07-probability-flow-ode.qmd
+        - tutorials/08-transport-rigorous.qmd
     - resources.qmd
 
 format:
