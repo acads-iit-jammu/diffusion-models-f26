@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Generative AI, in Its Simplest Form – ID-5-02 (TO)</title>
+<title>The World’s Smallest Diffusion Model – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +64,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/map-proved.html" rel="next">
-<link href="../tutorials/distributions-mle.html" rel="prev">
+<link href="../tutorials/06-map-proved.html" rel="next">
+<link href="../tutorials/04-genai-simplest-form.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +144,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/genai-simplest-form.html">Generative AI, in Its Simplest Form</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/05-two-point-diffusion.html">The World’s Smallest Diffusion Model</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -282,47 +316,70 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials · Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/probability-101.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability 101 — A Refresher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/two-point-diffusion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/distributions-mle.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials · Diffusion Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/genai-simplest-form.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
   </div>
 </li>
       </ul>
@@ -343,11 +400,12 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#view-1-conditional-generation-a-hierarchical-model" id="toc-view-1-conditional-generation-a-hierarchical-model" class="nav-link active" data-scroll-target="#view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</a></li>
-  <li><a href="#view-2-the-coin-disappears-into-a-map" id="toc-view-2-the-coin-disappears-into-a-map" class="nav-link" data-scroll-target="#view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</a></li>
-  <li><a href="#the-two-point-limit" id="toc-the-two-point-limit" class="nav-link" data-scroll-target="#the-two-point-limit">The two-point limit</a></li>
-  <li><a href="#maps-are-not-unique" id="toc-maps-are-not-unique" class="nav-link" data-scroll-target="#maps-are-not-unique">Maps are not unique</a></li>
-  <li><a href="#the-claim-that-organizes-everything" id="toc-the-claim-that-organizes-everything" class="nav-link" data-scroll-target="#the-claim-that-organizes-everything">The claim that organizes everything</a></li>
+  <li><a href="#the-dataset" id="toc-the-dataset" class="nav-link active" data-scroll-target="#the-dataset">The dataset</a></li>
+  <li><a href="#forward-process-noise-melts-the-data" id="toc-forward-process-noise-melts-the-data" class="nav-link" data-scroll-target="#forward-process-noise-melts-the-data">Forward process: noise melts the data</a></li>
+  <li><a href="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" id="toc-denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="nav-link" data-scroll-target="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</a></li>
+  <li><a href="#the-score-function-a-preview-of-module-4" id="toc-the-score-function-a-preview-of-module-4" class="nav-link" data-scroll-target="#the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</a></li>
+  <li><a href="#reverse-process-run-the-diffusion-backwards" id="toc-reverse-process-run-the-diffusion-backwards" class="nav-link" data-scroll-target="#reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</a></li>
+  <li><a href="#why-the-course-exists-what-breaks-for-images" id="toc-why-the-course-exists-what-breaks-for-images" class="nav-link" data-scroll-target="#why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</a></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
@@ -355,9 +413,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/genai-simplest-form.html">Generative AI, in Its Simplest Form</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/05-two-point-diffusion.html">The World’s Smallest Diffusion Model</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Generative AI, in Its Simplest Form</h1>
+<h1 class="title">The World’s Smallest Diffusion Model</h1>
 </div>
 
 
@@ -374,124 +432,159 @@ window.Quarto = {
 </header>
 
 
-<p><em>Standalone tutorial accompanying <a href="../weeks/w02.html">W02</a>. Interactive version: <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>.</em></p>
-<p>This note presents the same tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative sampler, diffusion included, is the second picture — once all of its random inputs are exposed — with a learned ingredient in place of the formula.</p>
-<section id="view-1-conditional-generation-a-hierarchical-model" class="level2">
-<h2 class="anchored" data-anchor-id="view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</h2>
-<p>The simplest latent-variable model:</p>
+<p><em>Standalone tutorial accompanying <a href="../weeks/w01.html">W01</a>. Interactive version: <a href="../materials/two-point-diffusion-demo.html">live demo</a> — every figure in this note, animated.</em></p>
+<p>Diffusion models generate images from pure noise. Before we spend forty lectures on the mathematics, this note builds a <strong>complete diffusion model with a dataset of two points</strong> — small enough that every quantity the course will later approximate with a neural network can be computed <em>exactly</em>, with nothing beyond Bayes’ rule.</p>
+<section id="the-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="the-dataset">The dataset</h2>
+<p>Our data distribution puts equal mass on two points:</p>
 <p><span class="math display">\[
-\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
-x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
+p_{\text{data}}(x_0) \;=\; \tfrac{1}{2}\,\delta(x_0 + 1) \;+\; \tfrac{1}{2}\,\delta(x_0 - 1),
+\qquad x_0 \in \{-1, +1\}.
 \]</span></p>
-<p><strong>Ancestral sampling</strong> generates by following the arrows: draw the latent coin <span class="math inline">\(z\)</span>, then draw <span class="math inline">\(x\)</span> from the selected component. The observed marginal is obtained by summing out the latent:</p>
-<p><span class="math display">\[
-p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
-\;=\; \pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)
-\]</span></p>
-<p>— exactly the two-component mixture from the playground. A mixture is not just a formula; it is a <em>generative story</em>: population <span class="math inline">\(\to\)</span> subpopulation <span class="math inline">\(\to\)</span> individual.</p>
-<p><strong>Inference is the same hierarchy, run backwards.</strong> Given an observed <span class="math inline">\(x\)</span>, Bayes’ rule gives the posterior over the hidden coin:</p>
-<p><span class="math display">\[
-\mathbb{P}(z = 1 \mid x)
-= \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
-       {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
-\]</span></p>
-<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this equals <span class="math inline">\(\operatorname{sigmoid}(-2x/\sigma^2)\)</span>; its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is exactly the posterior W01 computed for the <span class="math inline">\(+1\)</span> component, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
+<p>Generative modeling asks: given samples from <span class="math inline">\(p_{\text{data}}\)</span>, produce <em>more</em> samples. For this dataset the answer is a coin flip — which is exactly why it is the right dataset: the machinery becomes transparent.</p>
 </section>
-<section id="view-2-the-coin-disappears-into-a-map" class="level2">
-<h2 class="anchored" data-anchor-id="view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</h2>
-<p><strong>Theorem (inverse-CDF / probability integral transform).</strong> Let <span class="math inline">\(F\)</span> be a CDF with generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
-<p><em>Proof.</em> <span class="math inline">\(\mathbb{P}(F^{-1}(U) \le x) = \mathbb{P}(U \le F(x)) = F(x)\)</span>, since <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span> by monotonicity. <span class="math inline">\(\square\)</span></p>
-<p>For our mixture, <span class="math inline">\(F(x) = \pi\,\Phi\!\big(\tfrac{x-\mu_1}{\sigma}\big) +
-(1-\pi)\,\Phi\!\big(\tfrac{x-\mu_2}{\sigma}\big)\)</span> is continuous and strictly increasing, so <span class="math inline">\(F^{-1}\)</span> is an honest function, and</p>
+<section id="forward-process-noise-melts-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="forward-process-noise-melts-the-data">Forward process: noise melts the data</h2>
+<p>Corrupt a clean sample with Gaussian noise of size <span class="math inline">\(\sigma\)</span>:</p>
 <p><span class="math display">\[
-u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
+x_\sigma \;=\; x_0 + \sigma z, \qquad z \sim \mathcal{N}(0, 1) \text{ independent of } x_0.
 \]</span></p>
-<p>generates the mixture <strong>with no coin anywhere</strong> — the explicit coin has been marginalized out. One caution about where it went: under this map, the event <span class="math inline">\(u &lt; \pi\)</span> selects the lowest <span class="math inline">\(\pi\)</span>-fraction of the <em>mixture</em> distribution, which is <strong>not</strong> the same as the ancestral label <span class="math inline">\(z = 1\)</span> when the components overlap — both Gaussians have full support, so each contributes on both sides of any quantile. (In the well-separated limit <span class="math inline">\(\sigma \to 0\)</span> the two events do coincide, and the <em>packed</em> map below is the construction in which <span class="math inline">\(u &lt; \pi\)</span> genuinely encodes the coin.) Randomness in, structure out, everything in between deterministic.</p>
-</section>
-<section id="the-two-point-limit" class="level2">
-<h2 class="anchored" data-anchor-id="the-two-point-limit">The two-point limit</h2>
-<p>Send <span class="math inline">\(\sigma \to 0\)</span> with <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>. The CDF collapses to a staircase: a jump of height <span class="math inline">\(\pi\)</span> at <span class="math inline">\(-1\)</span>, a flat <strong>plateau</strong> at height <span class="math inline">\(\pi\)</span> across the empty middle, a jump to <span class="math inline">\(1\)</span> at <span class="math inline">\(+1\)</span>. The map becomes</p>
+<p>Since <span class="math inline">\(x_0 = \pm 1\)</span> with probability <span class="math inline">\(\tfrac12\)</span> each, the density of the corrupted sample is a two-component Gaussian mixture:</p>
 <p><span class="math display">\[
-x = \begin{cases} -1, &amp; u &lt; \pi \\ +1, &amp; u &gt; \pi \end{cases}
-\qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
+p_\sigma(x) \;=\; \tfrac{1}{2}\,\mathcal{N}(x;\, -1,\, \sigma^2)
+\;+\; \tfrac{1}{2}\,\mathcal{N}(x;\, +1,\, \sigma^2).
 \]</span></p>
-<p>W01’s dataset, generated by thresholding a uniform (almost surely: the single point <span class="math inline">\(u = \pi\)</span> has probability zero). The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. <a href="../tutorials/map-proved.html">The Deterministic Map, Proved</a> proves this limit. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
+<p>Two facts, both visible in the demo:</p>
+<ul>
+<li><strong>Small <span class="math inline">\(\sigma\)</span>:</strong> two sharp bumps at <span class="math inline">\(\pm 1\)</span> — the data is intact.</li>
+<li><strong>Large <span class="math inline">\(\sigma\)</span>:</strong> the bumps merge. Indeed <span class="math inline">\(\mathbb{E}[x_\sigma] = 0\)</span> and <span class="math inline">\(\operatorname{Var}(x_\sigma) = \mathbb{E}[x_0^2] + \sigma^2 = 1 + \sigma^2\)</span>, and for <span class="math inline">\(\sigma \gtrsim 3\)</span> the mixture is indistinguishable in practice from <span class="math inline">\(\mathcal{N}(0,\, 1 + \sigma^2)\)</span> — at <span class="math inline">\(\sigma = 3\)</span> its excess kurtosis is only <span class="math inline">\(-0.02\)</span>. (It is never <em>exactly</em> Gaussian at finite <span class="math inline">\(\sigma\)</span>; the precise statement is <span class="math inline">\(x_\sigma / \sqrt{1+\sigma^2} \Rightarrow \mathcal{N}(0,1)\)</span> as <span class="math inline">\(\sigma \to \infty\)</span>.)</li>
+</ul>
+<p>This is the first design principle of diffusion models: <strong>destroying structure is easy, fully understood, and ends somewhere known</strong> (a Gaussian), no matter what the data was.</p>
 </section>
-<section id="maps-are-not-unique" class="level2">
-<h2 class="anchored" data-anchor-id="maps-are-not-unique">Maps are not unique</h2>
-<p><span class="math inline">\(F^{-1}\)</span> is the <em>monotone</em> map pushing <span class="math inline">\(\text{Uniform}(0,1)\)</span> to <span class="math inline">\(p\)</span>, but not the only map. The “packed” two-stage construction</p>
+<section id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="level2">
+<h2 class="anchored" data-anchor-id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</h2>
+<p>Now invert: we observe a noisy <span class="math inline">\(x_\sigma = x\)</span> and want the clean <span class="math inline">\(x_0\)</span>. The best guess under squared error is the <strong>posterior mean</strong> <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma = x]\)</span> (we will prove this optimality claim in Module 1; for now, take it).</p>
+<p>The posterior over the two candidates follows from Bayes’ rule:</p>
 <p><span class="math display">\[
-x = \begin{cases}
-\mu_1 + \sigma\, \Phi^{-1}\!\big(u/\pi\big), &amp; u &lt; \pi,\\[2pt]
-\mu_2 + \sigma\, \Phi^{-1}\!\big(\tfrac{u-\pi}{1-\pi}\big), &amp; u \ge \pi,
-\end{cases}
+\mathbb{P}(x_0 = +1 \mid x)
+= \frac{\tfrac12\,\mathcal{N}(x; +1, \sigma^2)}
+       {\tfrac12\,\mathcal{N}(x; +1, \sigma^2) + \tfrac12\,\mathcal{N}(x; -1, \sigma^2)}
+= \frac{1}{1 + \exp\!\big(-\tfrac{2x}{\sigma^2}\big)}
+= \operatorname{sigmoid}\!\Big(\frac{2x}{\sigma^2}\Big),
 \]</span></p>
-<p>also pushes uniform to the mixture (each branch rescales its segment of <span class="math inline">\([0,1]\)</span> back to a full uniform — Exercise 3), and it is <em>literally</em> ancestral sampling written as one formula. Different map, same distribution: what is canonical is the <em>distribution</em>, not the transport. (In higher dimensions, choosing among the many maps is its own subject — optimal transport — which we will brush against later.)</p>
+<p>where the middle step divides through by <span class="math inline">\(\mathcal{N}(x; +1, \sigma^2)\)</span> and uses <span class="math inline">\(\exp\!\big(-\tfrac{(x+1)^2}{2\sigma^2}\big) \big/ \exp\!\big(-\tfrac{(x-1)^2}{2\sigma^2}\big)
+= \exp\!\big(-\tfrac{2x}{\sigma^2}\big)\)</span>. Therefore</p>
+<p><span class="math display">\[
+\boxed{\;\mathbb{E}[x_0 \mid x_\sigma = x]
+= (+1)\,\mathbb{P}(+1 \mid x) + (-1)\,\mathbb{P}(-1 \mid x)
+= \tanh\!\Big(\frac{x}{\sigma^2}\Big).\;}
+\]</span></p>
+<p>The optimal denoiser is a <strong>tanh</strong> — an activation function you already know, produced by nothing but probability. Sanity-check its two regimes:</p>
+<ul>
+<li><span class="math inline">\(\sigma \to 0\)</span>: <span class="math inline">\(\tanh(x/\sigma^2)\)</span> becomes a hard step — snap to the nearer data point.</li>
+<li><span class="math inline">\(\sigma \to \infty\)</span>: <span class="math inline">\(\tanh(x/\sigma^2) \approx x/\sigma^2 \to 0\)</span> — the observation is all noise, so the best guess is the prior mean <span class="math inline">\(0\)</span>.</li>
+</ul>
 </section>
-<section id="the-claim-that-organizes-everything" class="level2">
-<h2 class="anchored" data-anchor-id="the-claim-that-organizes-everything">The claim that organizes everything</h2>
-<blockquote class="blockquote">
-<p><strong>Once all of its random draws are exposed, a generative sampler is a deterministic map from base randomness to a sample.</strong></p>
-</blockquote>
+<section id="the-score-function-a-preview-of-module-4" class="level2">
+<h2 class="anchored" data-anchor-id="the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</h2>
+<p>Differentiate <span class="math inline">\(\log p_\sigma\)</span> directly. With <span class="math inline">\(\varphi_\pm(x) = \mathcal{N}(x; \pm 1, \sigma^2)\)</span> and <span class="math inline">\(\varphi_\pm'(x) = -\tfrac{x \mp 1}{\sigma^2}\varphi_\pm(x)\)</span>,</p>
+<p><span class="math display">\[
+\nabla_x \log p_\sigma(x)
+= \frac{\tfrac12\varphi_-'(x) + \tfrac12\varphi_+'(x)}{p_\sigma(x)}
+= -\frac{x - \mathbb{E}[x_0 \mid x]}{\sigma^2}
+= \frac{\tanh\!\big(\tfrac{x}{\sigma^2}\big) - x}{\sigma^2}.
+\]</span></p>
+<p>Rearranged, this is <strong>Tweedie’s formula</strong>, one of the two or three most important identities of the course:</p>
+<p><span class="math display">\[
+\mathbb{E}[x_0 \mid x_\sigma = x] \;=\; x + \sigma^2\, \nabla_x \log p_\sigma(x).
+\]</span></p>
+<p><em>Denoising and knowing the score are the same thing</em> — for additive Gaussian noise of known size <span class="math inline">\(\sigma\)</span>, which is exactly the diffusion setting. The score <span class="math inline">\(\nabla_x \log p_\sigma\)</span> points from <span class="math inline">\(x\)</span> toward where the (noised) data is denser; the denoiser just moves by <span class="math inline">\(\sigma^2\)</span> times the score. One caveat: the score is a <em>local</em> quantity — at <span class="math inline">\(x = 0\)</span> it vanishes by symmetry even though, in the two-bump regime, <span class="math inline">\(x = 0\)</span> is a density <em>minimum</em>. It is an unstable equilibrium: the reverse dynamics leave a particle sitting exactly there alone, and push a particle on either side away toward the nearer mode.</p>
+</section>
+<section id="reverse-process-run-the-diffusion-backwards" class="level2">
+<h2 class="anchored" data-anchor-id="reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</h2>
+<p>Generation now works by <em>annealing</em>: start from pure noise at a large <span class="math inline">\(\sigma_{\max}\)</span>, and lower <span class="math inline">\(\sigma\)</span> along a grid <span class="math inline">\(\sigma_{\max} = \sigma_0 &gt; \sigma_1 &gt; \cdots &gt; \sigma_K \approx 0\)</span>, nudging the sample along the score at every step. (We write <span class="math inline">\(y_k\)</span> for the reverse iterate at noise level <span class="math inline">\(\sigma_k\)</span>, keeping <span class="math inline">\(x_0\)</span> reserved for the clean data point; <span class="math inline">\(y_0\)</span> is pure noise and <span class="math inline">\(y_K\)</span> is the generated sample.)</p>
+<p><span class="math display">\[
+y_{k+1} \;=\; y_k \;+\; \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\,
+\nabla_y \log p_{\sigma_k}(y_k)
+\;=\; y_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\cdot
+\frac{\tanh\!\big(y_k/\sigma_k^2\big) - y_k}{\sigma_k^2}.
+\]</span></p>
+<p>This deterministic rule is the explicit Euler discretization of the <strong>probability-flow ODE</strong> in the variance clock <span class="math inline">\(\tau = \sigma^2\)</span>. (Strictly, to speak of dynamics <em>across</em> noise levels we couple them: <span class="math inline">\(x_\tau = x_0 + w_\tau\)</span> with <span class="math inline">\(w\)</span> a Brownian motion — Module 5 makes this precise; nothing below needs it yet.) The stochastic variant both <strong>doubles the score drift and injects fresh independent noise</strong> at each step,</p>
+<p><span class="math display">\[
+y_{k+1} = y_k + \big(\sigma_k^2 - \sigma_{k+1}^2\big)\,\nabla_y \log p_{\sigma_k}(y_k)
++ \sqrt{\sigma_k^2 - \sigma_{k+1}^2}\; z_k, \qquad z_k \sim \mathcal{N}(0,1)
+\text{ i.i.d.},
+\]</span></p>
+<p>giving the Euler–Maruyama discretization of the <strong>reverse-time SDE</strong>. Where these updates <em>come from</em> is the business of Modules 5–6 (Fokker–Planck, reverse-time dynamics); today we only need to <em>watch them work</em>: a cloud of particles started from <span class="math inline">\(\mathcal{N}(0,\, 1+\sigma_{\max}^2)\)</span> splits, condenses, and lands within <span class="math inline">\(\approx \sigma_{\min}\)</span> of <span class="math inline">\(\{-1, +1\}\)</span>, in equal proportions up to sampling error.</p>
+<p>To be honest about the word “exact”: the <em>formulas</em> are exact, but the sampler carries four small approximations — we initialize from the moment-matched Gaussian rather than the true mixture <span class="math inline">\(p_{\sigma_{\max}}\)</span> (indistinguishable at <span class="math inline">\(\sigma_{\max} = 3\)</span>, but not equal); we stop at <span class="math inline">\(\sigma_{\min} = 10^{-2} &gt; 0\)</span>, so samples end a hair’s width from the atoms; the Euler steps discretize the flow; and any finite run has sampling noise. Each vanishes in the appropriate limit — and every one of them has a counterpart in real diffusion models.</p>
+<p>The full sampler, with no neural network anywhere:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(y, s2):                 <span class="co"># ∇ log p_σ(y), exact for the two-point data</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (np.tanh(y <span class="op">/</span> s2) <span class="op">-</span> y) <span class="op">/</span> s2</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>smax, smin, K, N <span class="op">=</span> <span class="fl">3.0</span>, <span class="fl">1e-2</span>, <span class="dv">500</span>, <span class="dv">100_000</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sig <span class="op">=</span> smax <span class="op">*</span> (smin <span class="op">/</span> smax) <span class="op">**</span> (np.arange(K <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> K)    <span class="co"># geometric σ grid</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> smax<span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> np.random.randn(N)           <span class="co"># start from pure noise</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):                                       <span class="co"># probability-flow ODE</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> sig[k]<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> sig[k <span class="op">+</span> <span class="dv">1</span>]<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    y <span class="op">+=</span> <span class="fl">0.5</span> <span class="op">*</span> d <span class="op">*</span> score(y, sig[k]<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>err <span class="op">=</span> np.<span class="bu">abs</span>(np.<span class="bu">abs</span>(y) <span class="op">-</span> <span class="dv">1</span>).<span class="bu">max</span>()      <span class="co"># worst distance to the nearest data point</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(err, (y <span class="op">&gt;</span> <span class="dv">0</span>).mean())   <span class="co"># ≈ 0 and ≈ 0.5, up to σ_min + discretization + sampling</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="why-the-course-exists-what-breaks-for-images" class="level2">
+<h2 class="anchored" data-anchor-id="why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</h2>
+<p>Everything above was exact because the posterior mean had a formula. For images there is no usable one. (Exercise 4 gives a closed form for any <em>finite</em> training set — but a sampler built on it can only ever reproduce the training points; what we actually want is the posterior mean under the unknown <em>population</em> distribution.) Nor can it be tabulated: a <span class="math inline">\(64 \times 64\)</span> RGB image lives in a space of <span class="math inline">\(256^{12288}\)</span> configurations, and the data occupies a vanishingly thin filament of it (Module 1: the curse of dimensionality). The entire role of the neural network in a diffusion model is to <strong>approximate the map <span class="math inline">\((x, \sigma) \mapsto \mathbb{E}[x_0 \mid x]\)</span></strong> — to be the tanh we can no longer derive. Every other ingredient of this note survives unchanged, and each becomes a module of the course:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 18%">
-<col style="width: 24%">
-<col style="width: 32%">
-<col style="width: 26%">
+<col style="width: 50%">
+<col style="width: 50%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Model</th>
-<th>Random input(s)</th>
-<th>Sampling mechanism</th>
-<th>Typical fitting</th>
+<th>In this note</th>
+<th>In the course</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>This note</td>
-<td><span class="math inline">\(u \sim \text{U}(0,1)\)</span></td>
-<td>quantile <span class="math inline">\(F^{-1}(u)\)</span> (numerical in the demo)</td>
-<td>the CDF is known</td>
+<td>The “produce more samples” problem; why direct density estimation fails</td>
+<td>M1 — Foundations of generative modeling</td>
 </tr>
 <tr class="even">
-<td>GAN</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td><span class="math inline">\(G_\theta(z)\)</span>, a network</td>
-<td>adversarial objective</td>
+<td>Gaussian mixture, conditioning, <span class="math inline">\(\operatorname{Var} = 1+\sigma^2\)</span></td>
+<td>M2 — Gaussians and noise accumulation</td>
 </tr>
 <tr class="odd">
-<td>VAE</td>
-<td><span class="math inline">\(z\)</span>, plus decoder noise <span class="math inline">\(\varepsilon\)</span></td>
-<td>sample <span class="math inline">\(p_\theta(x \mid z)\)</span>, i.e.&nbsp;<span class="math inline">\(T_\theta(z, \varepsilon)\)</span></td>
-<td>ELBO / variational learning</td>
+<td>The discrete <span class="math inline">\(\sigma\)</span> grid; denoising as the training target</td>
+<td>M3 — DDPM framework</td>
 </tr>
 <tr class="even">
-<td>Normalizing flow</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td>invertible <span class="math inline">\(f_\theta(z)\)</span></td>
-<td>exact likelihood (change of variables)</td>
+<td><span class="math inline">\(\nabla_x \log p_\sigma\)</span>, Tweedie’s formula</td>
+<td>M4 — Score matching and denoising</td>
 </tr>
 <tr class="odd">
-<td><strong>Diffusion</strong></td>
-<td><span class="math inline">\(x_T \sim \mathcal{N}\)</span>; step noise if stochastic</td>
-<td><strong>probability-flow ODE</strong> (deterministic) or reverse SDE</td>
-<td><strong>score/denoising objectives, ELBO</strong></td>
+<td>The <span class="math inline">\(\sigma\)</span>-continuum, densities evolving with <span class="math inline">\(\sigma\)</span></td>
+<td>M5 — SDEs and Fokker–Planck</td>
+</tr>
+<tr class="even">
+<td>The reverse update and the probability-flow ODE</td>
+<td>M6 — Reverse-time dynamics</td>
 </tr>
 </tbody>
 </table>
-<p>The outer skeleton is shared — simple randomness, a sampling mechanism, data — while the learned object, the structural constraints, and the sampler differ. For diffusion in particular, determinism is a <em>sampler choice</em>: the probability-flow ODE is a deterministic map from <span class="math inline">\(x_T\)</span>; the reverse SDE consumes fresh noise at every step and is a deterministic function only of <span class="math inline">\((x_T, \text{all step noises})\)</span>.</p>
-<p>In one dimension with a known CDF, the map is a formula. For images, the population law is unknown and no tractable multivariate inverse-CDF construction exists — so deep generative models learn a <em>transport, density, score, or other ingredient</em> of a sampler rather than writing the map down. And you have already run one: W01’s probability-flow ODE numerically transported a moment-matched Gaussian to within <span class="math inline">\(\approx \sigma_{\min}\)</span> of the two-point data (W01 lists the approximations involved); with the exact terminal law, score, and integration, it is an exact deterministic transport — an inverse-CDF-like map built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
 <ol type="1">
-<li>Complete the inverse-CDF proof for a general (possibly non-strictly-increasing) <span class="math inline">\(F\)</span> using the generalized inverse.</li>
-<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above, and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x)\)</span> equals W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span> posterior (mind which component carries the <span class="math inline">\(+\)</span> sign); compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
-<li>Verify the packed map: show that conditional on <span class="math inline">\(u &lt; \pi\)</span>, the rescaled variable <span class="math inline">\(u/\pi\)</span> is <span class="math inline">\(\text{Uniform}(0,1)\)</span>, and conclude that the branch produces <span class="math inline">\(\mathcal{N}(\mu_1, \sigma^2)\)</span> with the correct probability.</li>
-<li>Construct the inverse-CDF map for a <strong>three</strong>-component mixture and describe its staircase limit as <span class="math inline">\(\sigma \to 0\)</span>. How many plateaus, at what heights?</li>
-<li>The map <span class="math inline">\(x = F^{-1}(u)\)</span> is monotone increasing. Exhibit a <em>decreasing</em> map with the same pushforward, and a map that is neither monotone nor continuous. (Hint: <span class="math inline">\(1 - u\)</span> is also uniform.)</li>
+<li>Fill in the algebra for <span class="math inline">\(\mathbb{P}(x_0 = +1 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> and <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh(x/\sigma^2)\)</span>.</li>
+<li>Show <span class="math inline">\(\operatorname{Var}(x_\sigma) = 1 + \sigma^2\)</span>, and more generally <span class="math inline">\(\operatorname{Var}(x_\sigma) = \operatorname{Var}(x_0) + \sigma^2\)</span> for any data distribution with finite variance (independence of <span class="math inline">\(z\)</span> and <span class="math inline">\(x_0\)</span> is all you need — zero mean is not required).</li>
+<li><strong>Unequal weights.</strong> Let <span class="math inline">\(\mathbb{P}(x_0 = +1) = \pi\)</span> with <span class="math inline">\(0 &lt; \pi &lt; 1\)</span>. Show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh\!\big(\tfrac{x}{\sigma^2} + \tfrac12 \log\tfrac{\pi}{1-\pi}\big)\)</span> — the denoiser acquires a <em>bias</em>. Check that as <span class="math inline">\(\sigma \to \infty\)</span> this tends to <span class="math inline">\(2\pi - 1\)</span>, the prior mean, and work out what happens in the degenerate cases <span class="math inline">\(\pi \in \{0, 1\}\)</span> by taking limits.</li>
+<li><strong>More points.</strong> For data uniform on <span class="math inline">\(\{a_1, \dots, a_m\}\)</span>, show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \sum_i a_i\, w_i(x)\)</span> with <span class="math inline">\(w_i(x) \propto \exp\!\big(\tfrac{a_i x}{\sigma^2} - \tfrac{a_i^2}{2\sigma^2}\big)
+\propto \exp\!\big(-\tfrac{(x - a_i)^2}{2\sigma^2}\big)\)</span> — a <em>softmax</em> with Gaussian-kernel weights. (So the optimal denoiser for a finite dataset under Gaussian corruption is attention-like: an RBF-weighted average of the training points. For non-uniform weights <span class="math inline">\(\pi_i\)</span>, each logit gains <span class="math inline">\(\log \pi_i\)</span>.)</li>
+<li>Run the sampler above with the SDE update instead of the ODE. Compare the RMS distance of the final samples to the nearest data point for both, as a function of <span class="math inline">\(K\)</span> and of <span class="math inline">\(\sigma_{\min}\)</span>. (You should find that increasing <span class="math inline">\(K\)</span> removes discretization error but both samplers retain a terminal width <span class="math inline">\(\approx \sigma_{\min}\)</span> — lowering <span class="math inline">\(\sigma_{\min}\)</span>, not raising <span class="math inline">\(K\)</span>, is what sharpens the atoms.)</li>
 </ol>
 
 
@@ -925,12 +1018,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/distributions-mle.html" class="pagination-link" aria-label="Distributions and Maximum Likelihood">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Distributions and Maximum Likelihood</span>
+      <a href="../tutorials/04-genai-simplest-form.html" class="pagination-link" aria-label="Generative AI, in Its Simplest Form">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Generative AI, in Its Simplest Form</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/map-proved.html" class="pagination-link" aria-label="The Deterministic Map, Proved">
+      <a href="../tutorials/06-map-proved.html" class="pagination-link" aria-label="The Deterministic Map, Proved">
         <span class="nav-page-text">The Deterministic Map, Proved</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>

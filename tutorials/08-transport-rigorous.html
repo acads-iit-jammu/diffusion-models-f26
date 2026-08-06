@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Generative Models as Transport: History and Validation – ID-5-02 (TO)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../resources.html" rel="next">
+<link href="../tutorials/07-probability-flow-ode.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/08-transport-rigorous.html">Generative Models as Transport: History and Validation</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">ID-5-02 (TO)</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Syllabus</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assignments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Weekly Notes</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W01: Generative Modeling I</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W02: Generative Modeling II</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W03: High Dimensions &amp; Gaussians</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W04: Gaussian Calculus &amp; Markov Chains</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W05: Noise Accumulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w06.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W06: DDPM I</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w07.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W07: DDPM II</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w08.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W08: Score Matching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w09.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W09: Mid-Semester Examinations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W10: Denoising Score Matching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W11: Brownian Motion &amp; SDEs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W12: Fokker–Planck</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w13.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W13: Continuous Forward Equation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w14.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W14: Reverse-time Drift</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w15.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W15: Information Flow &amp; Probability Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w16.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W16: Holiday Week</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w17.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W17: Flows, Applications &amp; Wrap-up</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials · Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Probability 101 — A Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials · Diffusion Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Deterministic Map, Proved</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resources</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-thesis-and-two-category-errors-to-avoid" id="toc-the-thesis-and-two-category-errors-to-avoid" class="nav-link active" data-scroll-target="#the-thesis-and-two-category-errors-to-avoid">The thesis, and two category errors to avoid</a></li>
+  <li><a href="#dimension-one-the-complete-theory-of-order-compatible-transport" id="toc-dimension-one-the-complete-theory-of-order-compatible-transport" class="nav-link" data-scroll-target="#dimension-one-the-complete-theory-of-order-compatible-transport">Dimension one: the complete theory of order-compatible transport</a></li>
+  <li><a href="#dimension-two-and-above-underdeterminacy-and-the-selection-principles" id="toc-dimension-two-and-above-underdeterminacy-and-the-selection-principles" class="nav-link" data-scroll-target="#dimension-two-and-above-underdeterminacy-and-the-selection-principles">Dimension two and above: underdeterminacy, and the selection principles</a></li>
+  <li><a href="#the-1-d-coincidences-stratified-by-epistemic-status" id="toc-the-1-d-coincidences-stratified-by-epistemic-status" class="nav-link" data-scroll-target="#the-1-d-coincidences-stratified-by-epistemic-status">The 1-D coincidences, stratified by epistemic status</a></li>
+  <li><a href="#what-breaks-upstairs-the-misleading-intuitions-inventory" id="toc-what-breaks-upstairs-the-misleading-intuitions-inventory" class="nav-link" data-scroll-target="#what-breaks-upstairs-the-misleading-intuitions-inventory">What breaks upstairs: the misleading-intuitions inventory</a></li>
+  <li><a href="#a-short-history-as-the-pedagogys-spine" id="toc-a-short-history-as-the-pedagogys-spine" class="nav-link" data-scroll-target="#a-short-history-as-the-pedagogys-spine">A short history, as the pedagogy’s spine</a></li>
+  <li><a href="#the-refined-thesis" id="toc-the-refined-thesis" class="nav-link" data-scroll-target="#the-refined-thesis">The refined thesis</a></li>
+  <li><a href="#sources" id="toc-sources" class="nav-link" data-scroll-target="#sources">Sources</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/08-transport-rigorous.html">Generative Models as Transport: History and Validation</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Generative Models as Transport: History and Validation</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>The rigorous twin of <a href="../tutorials/03-transport-story.html">Moving Distributions: The Transport Story</a>. This tutorial states the transport view of generative modeling precisely, traces its history, and validates — or corrects — each of its claims against theorems and the literature. Every load-bearing citation below was checked against its source; the two adversarial review passes that shaped this document flagged, in particular, two category errors that the folklore version of the thesis commits, and both are repaired here.</em></p>
+<section id="the-thesis-and-two-category-errors-to-avoid" class="level2">
+<h2 class="anchored" data-anchor-id="the-thesis-and-two-category-errors-to-avoid">The thesis, and two category errors to avoid</h2>
+<p>The folklore version of the transport view says: <em>generative modeling is fundamentally transport; in 1-D the inverse CDF solves it completely and all model families coincide there; in higher dimension the transport is no longer unique, and VAEs, GANs, flows, and diffusion models are different general constructions.</em> This is close to right — and wrong in two instructive ways.</p>
+<p><strong>Category error 1: representation is not explanation.</strong> On standard Borel spaces, <em>essentially every</em> distribution is the pushforward of a uniform random variable by some measurable map; a stochastic sampler becomes a deterministic one after adjoining its auxiliary noise to the source. “Every generative model is a transport” is therefore nearly tautological — a <em>representation</em> available for anything, not a characterization of anything. What the transport language genuinely does not capture: tractability of the <strong>likelihood</strong> (flows buy it with Jacobians, the probability-flow ODE with divergence integration, VAEs with an evidence bound, GANs not at all); <strong>conditioning</strong> (a coherent family <span class="math inline">\(p(dx \mid c)\)</span> is more structure than an endpoint map); <strong>stochastic kernels</strong> (a VAE decoder is a Markov kernel, not a map, and its encoder approximates a posterior kernel, not an inverse); and — decisively for what follows — <strong>coupling identification</strong>: two maps can have identical pushforwards and completely different input–output correspondences. Matching the endpoint law does not identify the map.</p>
+<p><strong>Category error 2: 1-D uniqueness is a property of a <em>selection rule</em>, not of dimension.</strong> Even on the real line, transport is wildly nonunique: both <span class="math inline">\(u \mapsto u\)</span> and <span class="math inline">\(u \mapsto 1-u\)</span> carry <span class="math inline">\(\mathrm{Uniform}(0,1)\)</span> to itself, and composing any generator with a source-preserving map changes nothing about the output law. What dimension one possesses is a <em>uniquely privileged selection</em>: the total order, and with it the requirement “order-preserving,” which singles out one map. Higher dimensions do not lose transport; they lose the privileged tie-breaker.</p>
+<p>With both corrections made, the thesis survives in a sharper form, stated at the end of this tutorial. The body earns it.</p>
+</section>
+<section id="dimension-one-the-complete-theory-of-order-compatible-transport" class="level2">
+<h2 class="anchored" data-anchor-id="dimension-one-the-complete-theory-of-order-compatible-transport">Dimension one: the complete theory of order-compatible transport</h2>
+<p>Fix probability measures <span class="math inline">\(\mu, \nu\)</span> on <span class="math inline">\(\mathbb{R}\)</span> with CDFs <span class="math inline">\(F_\mu, F_\nu\)</span> and quantile functions <span class="math inline">\(Q_\mu(u) = \inf\{x : F_\mu(x) \ge u\}\)</span> (generalized inverses, defined for <em>all</em> laws, atoms included).</p>
+<p><strong>Fact 1 (generation always works — atoms included).</strong> <span class="math inline">\(Q_{\nu\#}\,
+\mathrm{Uniform}(0,1) = \nu\)</span> for <em>every</em> law <span class="math inline">\(\nu\)</span> on <span class="math inline">\(\mathbb{R}\)</span>. The quantile coupling <span class="math inline">\(\gamma^\uparrow = (Q_\mu, Q_\nu)_\#\, \mathrm{Leb}_{(0,1)}\)</span> exists for arbitrary <span class="math inline">\(\mu, \nu\)</span> and is the canonical order-preserving (comonotone) coupling. (Standard; see Santambrogio, <em>Optimal Transport for Applied Mathematicians</em>, Ch. 2.)</p>
+<p><strong>Fact 2 (uniqueness, under the order selection, for atomless sources).</strong> If <span class="math inline">\(\mu\)</span> is atomless, then <span class="math inline">\(T = Q_\nu \circ F_\mu\)</span> is the unique nondecreasing map with <span class="math inline">\(T_\# \mu = \nu\)</span>, up to <span class="math inline">\(\mu\)</span>-null sets. The target may be atomic — this course’s two-point distribution is generated by exactly such a map, and the full proof is in <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a> (Theorem 1 and Propositions 2 and 7 there).</p>
+<p><strong>Fact 3 (optimality, for free).</strong> The same monotone map is optimal for <em>every</em> convex displacement cost <span class="math inline">\(c(x - y)\)</span> — a universality that is essentially one-dimensional and will <em>fail</em> upstairs.</p>
+<p><strong>Fact 4 (the honest direction of the atomic caveat).</strong> The failure mode is not generation into atomic targets — that always works — but deterministic <em>encoding out of</em> atomic sources: a source atom cannot be split by a map, so no deterministic encoder carries atomic data onto a continuous prior. The canonical repair is stochastic — Rüschendorf’s <em>distributional transform</em> <span class="math inline">\(U = F_\mu(X^-) + V\,(F_\mu(X) - F_\mu(X^-))\)</span> with <span class="math inline">\(V \sim \mathrm{Uniform}(0,1)\)</span> independent, which is exactly uniform even when <span class="math inline">\(X\)</span> has atoms. (Randomized rank-breaking of ties: the coin flip of the informal tutorial.)</p>
+<p>So the precise sense in which dimension one is “completely understood”: <strong>order-compatible transport on the line has an explicit, generalized-quantile solution in all cases.</strong> Not solved by this: transport under other selections, statistical estimation, or learnability — distinctions that matter below.</p>
+</section>
+<section id="dimension-two-and-above-underdeterminacy-and-the-selection-principles" class="level2">
+<h2 class="anchored" data-anchor-id="dimension-two-and-above-underdeterminacy-and-the-selection-principles">Dimension two and above: underdeterminacy, and the selection principles</h2>
+<p>Endpoint marginals never determine a coupling: if <span class="math inline">\(T_\# \rho = \mu\)</span> and <span class="math inline">\(S_\# \rho = \rho\)</span>, then <span class="math inline">\((T \circ S)_\# \rho = \mu\)</span>. In <span class="math inline">\(d \ge 2\)</span> the supply of source-preserving maps <span class="math inline">\(S\)</span> is enormous, and — the genuine loss — no total order exists to privilege one choice. There is a second, subtler underdeterminacy at the level of <em>dynamics</em>: for the continuity equation <span class="math inline">\(\partial_t p + \nabla\!\cdot(p v) = 0\)</span>, if <span class="math inline">\(v\)</span> transports the path <span class="math inline">\(\{p_t\}\)</span> then so does <span class="math inline">\(v + w\)</span> for any <span class="math inline">\(w\)</span> with <span class="math inline">\(\nabla\!\cdot(p w) = 0\)</span> — weighted divergence-free “gauge” fields, abundant in <span class="math inline">\(d \ge 2\)</span>, invisible in <span class="math inline">\(d = 1\)</span> (no room to swirl on a line). Even a prescribed marginal path does not determine particle trajectories; a <em>current</em> must be chosen too.</p>
+<p>Each classical and each modern construction is a <strong>selection principle</strong> — something added to the marginal-matching requirement to pin down a map, a coupling, or a path. The audit table (each row’s qualification is part of the claim):</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Construction</th>
+<th>What selects</th>
+<th>Essential qualification</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Brenier / optimal transport</strong></td>
+<td>minimize squared displacement</td>
+<td>unique map <span class="math inline">\(T = \nabla \phi\)</span>, <span class="math inline">\(\phi\)</span> convex, for absolutely continuous sources with second moments — canonical <em>relative to Euclidean quadratic geometry</em> (Brenier 1991; McCann 1995)</td>
+</tr>
+<tr class="even">
+<td><strong>Knothe–Rosenblatt</strong></td>
+<td>sequential conditional quantiles</td>
+<td>unique monotone <em>triangular</em> map after fixing a coordinate order; not rotation-invariant, generally not optimal (Rosenblatt 1952; Knothe 1957; Carlier–Galichon–Santambrogio 2009)</td>
+</tr>
+<tr class="odd">
+<td><strong>Autoregressive flows</strong></td>
+<td>triangular architecture + likelihood</td>
+<td>an expressive monotone triangular flow can recover KR; permuted stacks need not equal any single KR map (Irons et al.&nbsp;2022)</td>
+</tr>
+<tr class="even">
+<td><strong>General normalizing flows</strong></td>
+<td>architecture, orientation, optimization</td>
+<td>maximum likelihood identifies the <em>density</em>, not the map</td>
+</tr>
+<tr class="odd">
+<td><strong>Diffusion / probability-flow ODE</strong></td>
+<td>forward SDE + schedule + score + <strong>choice of current</strong></td>
+<td>the path <span class="math inline">\(\{p_t\}\)</span> alone does not fix the velocity in <span class="math inline">\(d \ge 2\)</span>; the gradient-form (curl-free relative to <span class="math inline">\(p\)</span>) current is part of the selection</td>
+</tr>
+<tr class="even">
+<td><strong>Flow matching / rectified flow</strong></td>
+<td>endpoint coupling + interpolant + regression</td>
+<td>different couplings/interpolants give different fields with identical endpoints (Lipman et al.&nbsp;2023; Liu et al.&nbsp;2023)</td>
+</tr>
+<tr class="odd">
+<td><strong>GAN</strong></td>
+<td><em>none</em></td>
+<td>any transport fooling the discriminator is accepted; even WGAN’s optimal-transport problem lives between the real and generated laws in data space — it does not select a latent-to-data map (Goodfellow et al.&nbsp;2014; Arjovsky et al.&nbsp;2017)</td>
+</tr>
+<tr class="even">
+<td><strong>VAE</strong></td>
+<td>ELBO + prior + decoder noise + architecture</td>
+<td>selects a generally <em>nonidentifiable</em> joint model and posterior kernel, not a Monge map</td>
+</tr>
+<tr class="odd">
+<td><strong>Schrödinger bridge</strong></td>
+<td>path-space relative entropy to a reference process</td>
+<td>the principled <em>stochastic</em> transport selection (Léonard 2014)</td>
+</tr>
+</tbody>
+</table>
+<p>And the statistics community, needing multivariate quantiles for its own reasons, ran the same route: the <strong>center-outward distribution functions</strong> of Chernozhukov–Galichon–Hallin–Henry (2017) and Hallin et al.&nbsp;(2021, <a href="https://arxiv.org/abs/1806.01238">arXiv:1806.01238</a>) <em>define</em> the multivariate CDF as the Brenier map to a reference spherical law — canonical relative to that chosen reference geometry, not choice-free. The lesson of the whole table in one line: <strong>beyond dimension one, “the transport” is a category mistake; only “the transport selected by ⟨rule⟩” is well-posed.</strong></p>
+</section>
+<section id="the-1-d-coincidences-stratified-by-epistemic-status" class="level2">
+<h2 class="anchored" data-anchor-id="the-1-d-coincidences-stratified-by-epistemic-status">The 1-D coincidences, stratified by epistemic status</h2>
+<p>The folklore says “all families coincide with the quantile map in 1-D.” The truth splits three ways, and the split is the pedagogy.</p>
+<p><strong>Theorem-level (all exact scalar ODE samplers — one proof covers them).</strong> Let <span class="math inline">\(\{p_t\}\)</span> be a smooth positive scalar density path with velocity <span class="math inline">\(v\)</span> solving the continuity equation with zero flux at <span class="math inline">\(-\infty\)</span>. Then <span class="math inline">\(\partial_t F_t = -p_t v_t\)</span>, and along any characteristic <span class="math inline">\(\dot X = v_t(X)\)</span>: <span class="math inline">\(\frac{d}{dt} F_t(X_t) = 0\)</span> — quantile labels are conserved, so the endpoint map is the quantile transport. This single argument covers the diffusion probability-flow ODE (proved in full, with numerics, in <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a>), continuous normalizing flows, flow matching, and rectified flow <em>at the exact/population level</em>; the distinctions among them are about how <span class="math inline">\(p_t\)</span> and <span class="math inline">\(v_t\)</span> are chosen and estimated, not about the exact 1-D endpoint. Monotone discrete-time flows join by Fact 2 directly. (Practical training adds estimation and integration error — conditionality of practice, not of mathematics.)</p>
+<p><strong>Available-but-not-selected (GANs).</strong> An explicit counterexample: with <span class="math inline">\(U \sim \mathrm{Uniform}(0,1)\)</span>, the tent map <span class="math inline">\(s(u) = 2u \wedge (2 - 2u)\)</span> preserves uniformity, so <span class="math inline">\(Q_\mu(s(U))\)</span> generates <span class="math inline">\(\mu\)</span> <em>exactly</em> — and is not the quantile map. No idealized adversarial objective can distinguish it from <span class="math inline">\(Q_\mu(U)\)</span>: marginal matching leaves the generator unidentified. The coincidence is available to a GAN and never implied by its training.</p>
+<p><strong>Available-only-in-a-singular-idealization (VAEs).</strong> The precise proposition: if data and latent are scalar and atomless, the prior has continuous strictly increasing CDF <span class="math inline">\(H\)</span>, the encoder <span class="math inline">\(E\)</span> and decoder <span class="math inline">\(D\)</span> are <em>deterministic</em>, mutually inverse a.e., aggregate-matched ($E_# = $ prior), <em>nondecreasing</em>, and exactly optimized, then Fact 2 forces <span class="math inline">\(E = H^{-1} \circ F_\mu\)</span> and <span class="math inline">\(D = Q_\mu \circ H\)</span> — with a uniform prior, literally <span class="math inline">\(E = F_\mu\)</span>, <span class="math inline">\(D = Q_\mu\)</span>. Every hypothesis earns its place: drop monotonicity and the decreasing solution (and worse) appears; and a <em>strict</em> VAE cannot even enter this idealization — a deterministic encoder against a continuous prior has infinite KL penalty (<span class="math inline">\(\mathrm{KL}(\mathcal{N}(E(x), \sigma^2) \,\|\, \mathcal{N}(0,1)) \to \infty\)</span> as <span class="math inline">\(\sigma \downarrow 0\)</span>), and an expressive decoder admits <em>posterior collapse</em> (<span class="math inline">\(p_\theta(x \mid z) = p_{\text{data}}\)</span>, encoder carrying no information) which fits the marginal perfectly with no CDF anywhere. Identifiability theory does not rescue the slogan: the identifiable-VAE results of Khemakhem et al.&nbsp;(2020) require auxiliary observed variables and structured priors, deliver identification only up to linear/permutation ambiguities, and do not apply to the ordinary unconditional VAE — consistent with the classical nonidentifiability of nonlinear ICA (Hyvärinen–Pajunen 1999) and the impossibility results for unsupervised disentanglement (Locatello et al. 2019). The idealized object is better named a <em>monotone scalar normalizing flow</em> (or a Wasserstein-autoencoder-style construction, whose objective — Tolstikhin et al.&nbsp;2018 — does regularize the aggregate encoding, unlike the VAE’s). The slogan “the encoder is the CDF” is a theorem about that idealized object and a <em>false statement about VAE training</em>.</p>
+<p>The three-way split generalizes into the distinction this tutorial exists to teach:</p>
+<blockquote class="blockquote">
+<p>For any generative method, ask three separate questions. <strong>(1) Existence:</strong> can it represent a transport achieving the target law? <strong>(2) Selection:</strong> does its construction single out <em>which</em> transport? <strong>(3) Identification:</strong> does its <em>training objective</em> actually enforce that selection? In 1-D, exact scalar ODE methods answer yes–yes–yes (order is built into non-crossing); GANs answer yes–no–no; VAEs answer yes–no–no with an extra obstruction (kernels, not maps). The families feel identical in 1-D only if one asks question (1) alone.</p>
+</blockquote>
+</section>
+<section id="what-breaks-upstairs-the-misleading-intuitions-inventory" class="level2">
+<h2 class="anchored" data-anchor-id="what-breaks-upstairs-the-misleading-intuitions-inventory">What breaks upstairs: the misleading-intuitions inventory</h2>
+<p>Each entry is a 1-D truth that fails in <span class="math inline">\(d \ge 2\)</span> — with the failure’s certificate.</p>
+<ol type="1">
+<li><strong>“Transport is unique.”</strong> Never was — uniqueness belonged to the order selection, which does not exist upstairs.</li>
+<li><strong>“Non-crossing implies the canonical map.”</strong> In <span class="math inline">\(d \ge 2\)</span> trajectories can rotate and swirl without intersecting; orientation-preserving diffeomorphisms need not be (cyclically) monotone or optimal.</li>
+<li><strong>“A gradient velocity field integrates to a gradient map.”</strong> False: time-ordered products of symmetric Jacobians lose symmetry when Hessians at different times fail to commute. This is precisely the mechanism of <strong>Lavenant–Santambrogio (2022)</strong> (<a href="https://hal.science/hal-04134092">Appl. Math. Lett.</a>): a smooth two-dimensional example where the Fokker–Planck flow map is a perfectly valid transport to the Gaussian and <em>not</em> the Brenier map — written to refute a published conjecture (Khrulkov–Oseledets 2022) that assumed otherwise. The 1-D coincidence misled professionals in print.</li>
+<li><strong>“The marginal path determines the particle paths.”</strong> Only on the line, where zero-flux kills the ambiguity. Upstairs, divergence-free currents are a genuine gauge freedom; the diffusion velocity is a <em>choice</em> of current.</li>
+<li><strong>“Componentwise CDFs are a multivariate rank.”</strong> They uniformize marginals and leave the entire dependence structure (the copula) untouched; Rosenblatt’s transform fixes this at the price of coordinate-order dependence.</li>
+<li><strong>“Monotone becomes meaningless.”</strong> It becomes <em>plural</em>: coordinatewise isotonicity, monotone operators, triangular monotonicity, and cyclic monotonicity are inequivalent notions — and different selection principles commit to different ones (Brenier: cyclic; KR: triangular).</li>
+<li><strong>“One map is optimal for all convex costs.”</strong> Essentially one-dimensional. Upstairs the selected map depends on the cost and the geometry.</li>
+<li><strong>“Low-dimensional pictures scale.”</strong> <span class="math inline">\(\|Z\| \approx \sqrt{d}\)</span> for <span class="math inline">\(Z \sim \mathcal{N}(0, I_d)\)</span> — mass lives on shells, not at the mode; and empirical transport estimation suffers dimension-dependent rates of order <span class="math inline">\(n^{-1/d}\)</span> (Weed–Bach 2019). The 1-D laboratory is a laboratory, not a scale model.</li>
+</ol>
+</section>
+<section id="a-short-history-as-the-pedagogys-spine" class="level2">
+<h2 class="anchored" data-anchor-id="a-short-history-as-the-pedagogys-spine">A short history, as the pedagogy’s spine</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Year</th>
+<th>Event</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1781</td>
+<td>Monge poses the transport problem (déblais et remblais)</td>
+</tr>
+<tr class="even">
+<td>1942</td>
+<td>Kantorovich relaxes maps to couplings — transport becomes tractable</td>
+</tr>
+<tr class="odd">
+<td>1952 / 1957</td>
+<td>Rosenblatt’s transformation; Knothe’s rearrangement — the coordinate-order selection</td>
+</tr>
+<tr class="even">
+<td>1991 / 1995</td>
+<td>Brenier’s polar factorization; McCann’s refinements — the cost selection, uniqueness restored in <span class="math inline">\(d \ge 2\)</span></td>
+</tr>
+<tr class="odd">
+<td>2013–2014</td>
+<td>VAEs (Kingma–Welling); GANs (Goodfellow et al.) — learned transports with variational and adversarial objectives, no map selection</td>
+</tr>
+<tr class="even">
+<td>2015–2017</td>
+<td>Normalizing flows mature (Rezende–Mohamed; autoregressive = triangular ≈ KR); WGAN imports the OT <em>metric</em> (not the OT map)</td>
+</tr>
+<tr class="odd">
+<td>2015–2021</td>
+<td>Diffusion: nonequilibrium thermodynamics (Sohl-Dickstein et al.), DDPM (Ho et al.), score SDE and probability-flow ODE (Song et al.) — the dynamic selection</td>
+</tr>
+<tr class="even">
+<td>2017–2021</td>
+<td>Statistics rebuilds the CDF via transport: Monge–Kantorovich depth, center-outward distribution functions (Chernozhukov et al.; Hallin et al.)</td>
+</tr>
+<tr class="odd">
+<td>2022</td>
+<td>Khrulkov–Oseledets conjecture the diffusion flow is OT; <strong>Lavenant–Santambrogio refute it</strong> — the 1-D coincidence formally dies in <span class="math inline">\(d \ge 2\)</span></td>
+</tr>
+<tr class="even">
+<td>2022–2023</td>
+<td>Flow matching (Lipman et al.), rectified flow (Liu et al.), stochastic interpolants (Albergo–Boffi–Vanden-Eijnden) — the coupling-and-interpolant selection made explicit</td>
+</tr>
+</tbody>
+</table>
+<p>The pedagogy of this course tracks that history in miniature: quantiles first, then the loss of order, then the selections — and the stochastic-interpolant viewpoint, in which coupling, interpolant, velocity, and noise are all explicit choices, is where the modern account closes the loop.</p>
+</section>
+<section id="the-refined-thesis" class="level2">
+<h2 class="anchored" data-anchor-id="the-refined-thesis">The refined thesis</h2>
+<div class="callout callout-style-simple callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What we actually teach
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Many generative samplers can be represented as maps or stochastic kernels carrying a reference law to the model law — a useful common language, not a complete characterization of generative modeling. On the real line, the total order selects a canonical quantile coupling; for atomless sources it is induced by the unique nondecreasing map, which is simultaneously optimal for every convex displacement cost. Other transports exist even there. In higher dimensions, endpoint marginals underdetermine both the coupling and the dynamics, so additional structure — a cost and its geometry (Brenier), a coordinate order (Knothe–Rosenblatt, autoregressive flows), a forward corruption process together with a choice of probability current (diffusion), an endpoint coupling and interpolant (flow matching, rectified flow, stochastic interpolants), path-space entropy (Schrödinger bridges), or merely an architecture and an objective (GANs, VAEs) — selects the construction. Exact scalar ODE samplers necessarily implement the quantile map, because non-crossing on a line <em>is</em> the order selection; adversarial and variational objectives do not select it, and stochastic decoders and reverse SDEs are kernels, not inverse maps. Dimension one is therefore a <strong>laboratory for separating four questions</strong> — endpoint matching, transport selection, dynamics, and learnability — not a setting in which the model families are intrinsically identical.</p>
+</div>
+</div>
+</section>
+<section id="sources" class="level2">
+<h2 class="anchored" data-anchor-id="sources">Sources</h2>
+<p>Brenier, <em>Comm. Pure Appl. Math.</em> 44 (1991) · McCann, <em>Duke Math. J.</em> 80 (1995) · Rosenblatt, <em>Ann. Math. Statist.</em> 23 (1952) · Knothe (1957) · Carlier–Galichon–Santambrogio (<a href="https://arxiv.org/abs/0810.4153">arXiv:0810.4153</a>) · Santambrogio, <em>Optimal Transport for Applied Mathematicians</em> (2015) · Chernozhukov–Galichon–Hallin–Henry, <em>Ann. Statist.</em> (2017) · Hallin–del Barrio–Cuesta-Albertos–Matrán, <em>Ann. Statist.</em> (2021; <a href="https://arxiv.org/abs/1806.01238">arXiv:1806.01238</a>) · Rüschendorf, <em>J. Statist. Plann. Inference</em> (2009) · Kingma–Welling (<a href="https://arxiv.org/abs/1312.6114">arXiv:1312.6114</a>) · Goodfellow et al. (<a href="https://arxiv.org/abs/1406.2661">arXiv:1406.2661</a>) · Arjovsky et al., ICML 2017 · Tolstikhin et al., WAE (<a href="https://arxiv.org/abs/1711.01558">arXiv:1711.01558</a>) · Khemakhem et al., AISTATS 2020 · Hyvärinen–Pajunen, <em>Neural Networks</em> (1999) · Locatello et al., ICML 2019 · Sohl-Dickstein et al., ICML 2015 · Ho et al. (<a href="https://arxiv.org/abs/2006.11239">arXiv:2006.11239</a>) · Song et al. (<a href="https://arxiv.org/abs/2011.13456">arXiv:2011.13456</a>) · Lipman et al., ICLR 2023 (<a href="https://arxiv.org/abs/2210.02747">arXiv:2210.02747</a>) · Liu et al., ICLR 2023 (<a href="https://arxiv.org/abs/2209.03003">arXiv:2209.03003</a>) · Liu, <em>Rectified Flow: A Marginal Preserving Approach to Optimal Transport</em> (<a href="https://arxiv.org/abs/2209.14577">arXiv:2209.14577</a>) · Albergo–Boffi–Vanden-Eijnden, JMLR 2025 (<a href="https://arxiv.org/abs/2303.08797">arXiv:2303.08797</a>) · Baptista–Marzouk–Zahm, <em>Found. Comput. Math.</em> (2023; <a href="https://arxiv.org/abs/2009.10303">arXiv:2009.10303</a>) · Irons et al., AISTATS 2022 · Khrulkov–Oseledets (<a href="https://arxiv.org/abs/2202.07477">arXiv:2202.07477</a>) · <strong>Lavenant–Santambrogio</strong>, <em>Appl. Math. Lett.</em> 133 (2022; <a href="https://hal.science/hal-04134092">HAL</a>) · Léonard, <em>DCDS</em> (2014) · Weed–Bach, <em>Bernoulli</em> (2019; <a href="https://arxiv.org/abs/1707.00087">arXiv:1707.00087</a>).</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/acads-iit-jammu\.github\.io\/diffusion-models-f26");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../tutorials/07-probability-flow-ode.html" class="pagination-link" aria-label="The Probability-Flow ODE">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The Probability-Flow ODE</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../resources.html" class="pagination-link" aria-label="Resources">
+        <span class="nav-page-text">Resources</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

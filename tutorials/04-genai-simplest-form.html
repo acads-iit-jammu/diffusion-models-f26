@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Distributions and Maximum Likelihood – ID-5-02 (TO)</title>
+<title>Generative AI, in Its Simplest Form – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/genai-simplest-form.html" rel="next">
-<link href="../tutorials/two-point-diffusion.html" rel="prev">
+<link href="../tutorials/05-two-point-diffusion.html" rel="next">
+<link href="../tutorials/03-transport-story.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/distributions-mle.html">Distributions and Maximum Likelihood</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -282,47 +282,70 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials · Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/probability-101.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability 101 — A Refresher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/two-point-diffusion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/distributions-mle.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials · Diffusion Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
   </div>
 </li>
       </ul>
@@ -343,14 +366,11 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-cast-of-distributions" id="toc-the-cast-of-distributions" class="nav-link active" data-scroll-target="#the-cast-of-distributions">The cast of distributions</a></li>
-  <li><a href="#how-sampling-actually-works" id="toc-how-sampling-actually-works" class="nav-link" data-scroll-target="#how-sampling-actually-works">How sampling actually works</a></li>
-  <li><a href="#likelihood" id="toc-likelihood" class="nav-link" data-scroll-target="#likelihood">Likelihood</a></li>
-  <li><a href="#pdf-vs-likelihood-the-same-function-two-readings" id="toc-pdf-vs-likelihood-the-same-function-two-readings" class="nav-link" data-scroll-target="#pdf-vs-likelihood-the-same-function-two-readings">PDF vs likelihood: the same function, two readings</a></li>
-  <li><a href="#the-gaussian-mle-in-full" id="toc-the-gaussian-mle-in-full" class="nav-link" data-scroll-target="#the-gaussian-mle-in-full">The Gaussian MLE, in full</a></li>
-  <li><a href="#aside-binary-cross-entropy-is-a-likelihood" id="toc-aside-binary-cross-entropy-is-a-likelihood" class="nav-link" data-scroll-target="#aside-binary-cross-entropy-is-a-likelihood">Aside: binary cross-entropy is a likelihood</a></li>
-  <li><a href="#fitting-the-other-families-honestly" id="toc-fitting-the-other-families-honestly" class="nav-link" data-scroll-target="#fitting-the-other-families-honestly">Fitting the other families — honestly</a></li>
-  <li><a href="#the-trap-right-method-wrong-family" id="toc-the-trap-right-method-wrong-family" class="nav-link" data-scroll-target="#the-trap-right-method-wrong-family">The trap: right method, wrong family</a></li>
+  <li><a href="#view-1-conditional-generation-a-hierarchical-model" id="toc-view-1-conditional-generation-a-hierarchical-model" class="nav-link active" data-scroll-target="#view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</a></li>
+  <li><a href="#view-2-the-coin-disappears-into-a-map" id="toc-view-2-the-coin-disappears-into-a-map" class="nav-link" data-scroll-target="#view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</a></li>
+  <li><a href="#the-two-point-limit" id="toc-the-two-point-limit" class="nav-link" data-scroll-target="#the-two-point-limit">The two-point limit</a></li>
+  <li><a href="#maps-are-not-unique" id="toc-maps-are-not-unique" class="nav-link" data-scroll-target="#maps-are-not-unique">Maps are not unique</a></li>
+  <li><a href="#the-claim-that-organizes-everything" id="toc-the-claim-that-organizes-everything" class="nav-link" data-scroll-target="#the-claim-that-organizes-everything">The claim that organizes everything</a></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
@@ -358,9 +378,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/distributions-mle.html">Distributions and Maximum Likelihood</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Distributions and Maximum Likelihood</h1>
+<h1 class="title">Generative AI, in Its Simplest Form</h1>
 </div>
 
 
@@ -377,205 +397,124 @@ window.Quarto = {
 </header>
 
 
-<p><em>Standalone tutorial accompanying <a href="../weeks/w02.html">W02</a>. Interactive versions: <a href="../materials/distributions-playground.html">the Distribution Playground</a> and <a href="../materials/likelihood-lens.html">the Likelihood Lens</a>.</em></p>
-<p>This note walks one loop twice: <strong>distribution → samples → fitted distribution → new samples</strong>. First visually (the playground), then analytically (maximum likelihood for the Gaussian, derived in full). It doubles as a compact reference for the distribution families used throughout the course.</p>
-<section id="the-cast-of-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="the-cast-of-distributions">The cast of distributions</h2>
+<p><em>Standalone tutorial accompanying <a href="../weeks/w02.html">W02</a>. Interactive version: <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>.</em></p>
+<p>This note presents the same tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative sampler, diffusion included, is the second picture — once all of its random inputs are exposed — with a learned ingredient in place of the formula.</p>
+<section id="view-1-conditional-generation-a-hierarchical-model" class="level2">
+<h2 class="anchored" data-anchor-id="view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</h2>
+<p>The simplest latent-variable model:</p>
+<p><span class="math display">\[
+\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
+x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
+\]</span></p>
+<p><strong>Ancestral sampling</strong> generates by following the arrows: draw the latent coin <span class="math inline">\(z\)</span>, then draw <span class="math inline">\(x\)</span> from the selected component. The observed marginal is obtained by summing out the latent:</p>
+<p><span class="math display">\[
+p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
+\;=\; \pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)
+\]</span></p>
+<p>— exactly the two-component mixture from the playground. A mixture is not just a formula; it is a <em>generative story</em>: population <span class="math inline">\(\to\)</span> subpopulation <span class="math inline">\(\to\)</span> individual.</p>
+<p><strong>Inference is the same hierarchy, run backwards.</strong> Given an observed <span class="math inline">\(x\)</span>, Bayes’ rule gives the posterior over the hidden coin:</p>
+<p><span class="math display">\[
+\mathbb{P}(z = 1 \mid x)
+= \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
+       {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
+\]</span></p>
+<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this equals <span class="math inline">\(\operatorname{sigmoid}(-2x/\sigma^2)\)</span>; its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is exactly the posterior W01 computed for the <span class="math inline">\(+1\)</span> component, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
+</section>
+<section id="view-2-the-coin-disappears-into-a-map" class="level2">
+<h2 class="anchored" data-anchor-id="view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</h2>
+<p><strong>Theorem (inverse-CDF / probability integral transform).</strong> Let <span class="math inline">\(F\)</span> be a CDF with generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
+<p><em>Proof.</em> <span class="math inline">\(\mathbb{P}(F^{-1}(U) \le x) = \mathbb{P}(U \le F(x)) = F(x)\)</span>, since <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span> by monotonicity. <span class="math inline">\(\square\)</span></p>
+<p>For our mixture, <span class="math inline">\(F(x) = \pi\,\Phi\!\big(\tfrac{x-\mu_1}{\sigma}\big) +
+(1-\pi)\,\Phi\!\big(\tfrac{x-\mu_2}{\sigma}\big)\)</span> is continuous and strictly increasing, so <span class="math inline">\(F^{-1}\)</span> is an honest function, and</p>
+<p><span class="math display">\[
+u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
+\]</span></p>
+<p>generates the mixture <strong>with no coin anywhere</strong> — the explicit coin has been marginalized out. One caution about where it went: under this map, the event <span class="math inline">\(u &lt; \pi\)</span> selects the lowest <span class="math inline">\(\pi\)</span>-fraction of the <em>mixture</em> distribution, which is <strong>not</strong> the same as the ancestral label <span class="math inline">\(z = 1\)</span> when the components overlap — both Gaussians have full support, so each contributes on both sides of any quantile. (In the well-separated limit <span class="math inline">\(\sigma \to 0\)</span> the two events do coincide, and the <em>packed</em> map below is the construction in which <span class="math inline">\(u &lt; \pi\)</span> genuinely encodes the coin.) Randomness in, structure out, everything in between deterministic.</p>
+</section>
+<section id="the-two-point-limit" class="level2">
+<h2 class="anchored" data-anchor-id="the-two-point-limit">The two-point limit</h2>
+<p>Send <span class="math inline">\(\sigma \to 0\)</span> with <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>. The CDF collapses to a staircase: a jump of height <span class="math inline">\(\pi\)</span> at <span class="math inline">\(-1\)</span>, a flat <strong>plateau</strong> at height <span class="math inline">\(\pi\)</span> across the empty middle, a jump to <span class="math inline">\(1\)</span> at <span class="math inline">\(+1\)</span>. The map becomes</p>
+<p><span class="math display">\[
+x = \begin{cases} -1, &amp; u &lt; \pi \\ +1, &amp; u &gt; \pi \end{cases}
+\qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
+\]</span></p>
+<p>W01’s dataset, generated by thresholding a uniform (almost surely: the single point <span class="math inline">\(u = \pi\)</span> has probability zero). The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a> proves this limit. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
+</section>
+<section id="maps-are-not-unique" class="level2">
+<h2 class="anchored" data-anchor-id="maps-are-not-unique">Maps are not unique</h2>
+<p><span class="math inline">\(F^{-1}\)</span> is the <em>monotone</em> map pushing <span class="math inline">\(\text{Uniform}(0,1)\)</span> to <span class="math inline">\(p\)</span>, but not the only map. The “packed” two-stage construction</p>
+<p><span class="math display">\[
+x = \begin{cases}
+\mu_1 + \sigma\, \Phi^{-1}\!\big(u/\pi\big), &amp; u &lt; \pi,\\[2pt]
+\mu_2 + \sigma\, \Phi^{-1}\!\big(\tfrac{u-\pi}{1-\pi}\big), &amp; u \ge \pi,
+\end{cases}
+\]</span></p>
+<p>also pushes uniform to the mixture (each branch rescales its segment of <span class="math inline">\([0,1]\)</span> back to a full uniform — Exercise 3), and it is <em>literally</em> ancestral sampling written as one formula. Different map, same distribution: what is canonical is the <em>distribution</em>, not the transport. (In higher dimensions, choosing among the many maps is its own subject — optimal transport — which we will brush against later.)</p>
+</section>
+<section id="the-claim-that-organizes-everything" class="level2">
+<h2 class="anchored" data-anchor-id="the-claim-that-organizes-everything">The claim that organizes everything</h2>
+<blockquote class="blockquote">
+<p><strong>Once all of its random draws are exposed, a generative sampler is a deterministic map from base randomness to a sample.</strong></p>
+</blockquote>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 22%">
-<col style="width: 30%">
-<col style="width: 14%">
-<col style="width: 14%">
-<col style="width: 20%">
+<col style="width: 18%">
+<col style="width: 24%">
+<col style="width: 32%">
+<col style="width: 26%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Family</th>
-<th>pdf <span class="math inline">\(f(x)\)</span></th>
-<th>Support</th>
-<th>Mean</th>
-<th>Variance</th>
+<th>Model</th>
+<th>Random input(s)</th>
+<th>Sampling mechanism</th>
+<th>Typical fitting</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Uniform<span class="math inline">\((a,b)\)</span></td>
-<td><span class="math inline">\(\frac{1}{b-a}\)</span></td>
-<td><span class="math inline">\([a,b]\)</span></td>
-<td><span class="math inline">\(\frac{a+b}{2}\)</span></td>
-<td><span class="math inline">\(\frac{(b-a)^2}{12}\)</span></td>
+<td>This note</td>
+<td><span class="math inline">\(u \sim \text{U}(0,1)\)</span></td>
+<td>quantile <span class="math inline">\(F^{-1}(u)\)</span> (numerical in the demo)</td>
+<td>the CDF is known</td>
 </tr>
 <tr class="even">
-<td>Normal<span class="math inline">\((\mu,\sigma^2)\)</span></td>
-<td><span class="math inline">\(\frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}\)</span></td>
-<td><span class="math inline">\(\mathbb{R}\)</span></td>
-<td><span class="math inline">\(\mu\)</span></td>
-<td><span class="math inline">\(\sigma^2\)</span></td>
+<td>GAN</td>
+<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
+<td><span class="math inline">\(G_\theta(z)\)</span>, a network</td>
+<td>adversarial objective</td>
 </tr>
 <tr class="odd">
-<td>Gamma<span class="math inline">\((k,\theta)\)</span></td>
-<td><span class="math inline">\(\frac{x^{k-1} e^{-x/\theta}}{\Gamma(k)\,\theta^{k}}\)</span></td>
-<td><span class="math inline">\((0,\infty)\)</span></td>
-<td><span class="math inline">\(k\theta\)</span></td>
-<td><span class="math inline">\(k\theta^2\)</span></td>
+<td>VAE</td>
+<td><span class="math inline">\(z\)</span>, plus decoder noise <span class="math inline">\(\varepsilon\)</span></td>
+<td>sample <span class="math inline">\(p_\theta(x \mid z)\)</span>, i.e.&nbsp;<span class="math inline">\(T_\theta(z, \varepsilon)\)</span></td>
+<td>ELBO / variational learning</td>
 </tr>
 <tr class="even">
-<td>Beta<span class="math inline">\((\alpha,\beta)\)</span></td>
-<td><span class="math inline">\(\frac{x^{\alpha-1}(1-x)^{\beta-1}}{B(\alpha,\beta)}\)</span></td>
-<td><span class="math inline">\((0,1)\)</span></td>
-<td><span class="math inline">\(\frac{\alpha}{\alpha+\beta}\)</span></td>
-<td><span class="math inline">\(\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}\)</span></td>
+<td>Normalizing flow</td>
+<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
+<td>invertible <span class="math inline">\(f_\theta(z)\)</span></td>
+<td>exact likelihood (change of variables)</td>
 </tr>
 <tr class="odd">
-<td>Mixture</td>
-<td><span class="math inline">\(\sum_i \pi_i\, f_i(x)\)</span></td>
-<td>union</td>
-<td><span class="math inline">\(\sum_i \pi_i \mu_i\)</span></td>
-<td>see Exercise 5</td>
+<td><strong>Diffusion</strong></td>
+<td><span class="math inline">\(x_T \sim \mathcal{N}\)</span>; step noise if stochastic</td>
+<td><strong>probability-flow ODE</strong> (deterministic) or reverse SDE</td>
+<td><strong>score/denoising objectives, ELBO</strong></td>
 </tr>
 </tbody>
 </table>
-<p>A sentence of habitat for each: the <strong>Uniform</strong> encodes total ignorance on an interval; the <strong>Normal</strong> is what sums of many small independent effects look like (W01’s warm-up demo <em>is</em> this statement); the <strong>Gamma</strong> models positive, right-skewed quantities such as waiting times; the <strong>Beta</strong> lives on <span class="math inline">\((0,1)\)</span> and models proportions and probabilities; a <strong>mixture</strong> models data with subpopulations — clusters — and is the recurring character of this course.</p>
-</section>
-<section id="how-sampling-actually-works" class="level2">
-<h2 class="anchored" data-anchor-id="how-sampling-actually-works">How sampling actually works</h2>
-<p>Every sampler in the playground reduces to uniform random numbers:</p>
-<ul>
-<li><strong>Inverse CDF.</strong> If <span class="math inline">\(F\)</span> is a CDF and <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>, then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span> (proved in the companion note <a href="../tutorials/genai-simplest-form.html"><em>Generative AI, in Its Simplest Form</em></a>). This handles Uniform (<span class="math inline">\(x = a + (b-a)u\)</span>) and anything with a computable <span class="math inline">\(F^{-1}\)</span>.</li>
-<li><strong>Box–Muller</strong> for the Normal: with <span class="math inline">\(U_1, U_2\)</span> independent uniforms, <span class="math inline">\(\sqrt{-2\log U_1}\,\cos(2\pi U_2)\)</span> is exactly <span class="math inline">\(\mathcal{N}(0,1)\)</span>. This is the sampler inside every demo of this course.</li>
-<li><strong>Pick-then-sample</strong> for mixtures: draw the component index with probabilities <span class="math inline">\(\pi_i\)</span>, then sample that component — ancestral sampling, the subject of the companion note.</li>
-<li>Gamma and Beta use clever rejection samplers (the playground uses Marsaglia–Tsang); we treat them as black boxes.</li>
-</ul>
-</section>
-<section id="likelihood" class="level2">
-<h2 class="anchored" data-anchor-id="likelihood">Likelihood</h2>
-<p>Fix a family <span class="math inline">\(f(x;\theta)\)</span> and observe an i.i.d. dataset <span class="math inline">\(x_1, \dots, x_n\)</span>. The <strong>likelihood</strong> and <strong>log-likelihood</strong> are</p>
-<p><span class="math display">\[
-L(\theta) = \prod_{i=1}^n f(x_i; \theta),
-\qquad
-\ell(\theta) = \sum_{i=1}^n \log f(x_i; \theta),
-\]</span></p>
-<p>and the <strong>maximum likelihood estimator (MLE)</strong> is <span class="math inline">\(\hat\theta = \arg\max_\theta \ell(\theta)\)</span>. The log changes nothing about the argmax (monotonicity) and everything about the algebra and the numerics: a product of 3000 numbers of size <span class="math inline">\(10^{-2}\)</span> underflows; a sum of their logs is a perfectly pleasant <span class="math inline">\(\approx -13{,}800\)</span>.</p>
-</section>
-<section id="pdf-vs-likelihood-the-same-function-two-readings" class="level2">
-<h2 class="anchored" data-anchor-id="pdf-vs-likelihood-the-same-function-two-readings">PDF vs likelihood: the same function, two readings</h2>
-<p>The chronic confusion, settled: <span class="math inline">\(f(x;\theta)\)</span> is <strong>one formula with two arguments</strong>.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 22%">
-<col style="width: 22%">
-<col style="width: 36%">
-<col style="width: 20%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Fix</th>
-<th>Vary</th>
-<th>You get</th>
-<th>Area under the curve</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>parameters <span class="math inline">\(\theta\)</span></td>
-<td>data <span class="math inline">\(x\)</span></td>
-<td>the <strong>pdf</strong> — a distribution over data</td>
-<td><span class="math inline">\(= 1\)</span>, always</td>
-</tr>
-<tr class="even">
-<td>observed data <span class="math inline">\(x\)</span></td>
-<td>parameters <span class="math inline">\(\theta\)</span></td>
-<td>the <strong>likelihood</strong> — a score for fitting</td>
-<td>meaningless</td>
-</tr>
-</tbody>
-</table>
-<p>The <a href="../materials/likelihood-lens.html">Likelihood Lens</a> shows both as slices of the same surface <span class="math inline">\(f(x;\mu) = \mathcal{N}(x; \mu, \sigma^2)\)</span>: the horizontal slice (fix <span class="math inline">\(\mu\)</span>) is a density in <span class="math inline">\(x\)</span>; the vertical slice (fix <span class="math inline">\(x\)</span>) is a likelihood in <span class="math inline">\(\mu\)</span>. For the Gaussian the two slices happen to have the same bell shape, because <span class="math inline">\(f(x;\mu) = f(\mu;x)\)</span> — a symmetry of this family, <em>not</em> a general fact (repeat the exercise mentally with a Gamma in <span class="math inline">\(\theta\)</span>). What is general: <strong>the likelihood is not a probability distribution over <span class="math inline">\(\theta\)</span></strong> — it need not integrate to 1, and only its argmax and local shape carry meaning.</p>
-</section>
-<section id="the-gaussian-mle-in-full" class="level2">
-<h2 class="anchored" data-anchor-id="the-gaussian-mle-in-full">The Gaussian MLE, in full</h2>
-<p><span class="math display">\[
-\ell(\mu, \sigma^2)
-= -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^n (x_i - \mu)^2 .
-\]</span></p>
-<p><strong>Maximize over <span class="math inline">\(\mu\)</span>.</strong> Only the second term involves <span class="math inline">\(\mu\)</span>:</p>
-<p><span class="math display">\[
-\frac{\partial \ell}{\partial \mu}
-= \frac{1}{\sigma^2}\sum_{i=1}^n (x_i - \mu)
-= \frac{n}{\sigma^2}(\bar{x} - \mu)
-\;\stackrel{!}{=}\; 0
-\quad\Longrightarrow\quad
-\boxed{\ \hat\mu = \bar{x}\ }
-\]</span></p>
-<p>for <strong>every</strong> <span class="math inline">\(\sigma\)</span> — which is why, in the Lens, changing <span class="math inline">\(\sigma\)</span> sharpens the log-likelihood parabola but never moves its peak.</p>
-<p><strong>Maximize over <span class="math inline">\(\sigma^2\)</span></strong> (treat <span class="math inline">\(v = \sigma^2\)</span> as the variable):</p>
-<p><span class="math display">\[
-\frac{\partial \ell}{\partial v}
-= -\frac{n}{2v} + \frac{1}{2v^2}\sum_i (x_i - \hat\mu)^2
-\;\stackrel{!}{=}\; 0
-\quad\Longrightarrow\quad
-\boxed{\ \hat\sigma^2 = \frac{1}{n}\sum_{i=1}^n (x_i - \bar{x})^2\ }
-\]</span></p>
-<p>(One should check this is a maximum, not merely critical: <span class="math inline">\(\ell \to -\infty\)</span> as <span class="math inline">\(v \to 0^+\)</span> and as <span class="math inline">\(v \to \infty\)</span>, and this is the only critical point.) Note the divisor <span class="math inline">\(n\)</span>: the MLE of the variance is <em>biased</em> — <span class="math inline">\(\mathbb{E}[\hat\sigma^2] =
-\frac{n-1}{n}\sigma^2\)</span> — which is where the familiar <span class="math inline">\(n-1\)</span> estimator comes from. For this course the distinction is a footnote; the MLE is what the theory produces.</p>
-</section>
-<section id="aside-binary-cross-entropy-is-a-likelihood" class="level2">
-<h2 class="anchored" data-anchor-id="aside-binary-cross-entropy-is-a-likelihood">Aside: binary cross-entropy is a likelihood</h2>
-<p>The most familiar loss in machine learning is a maximum-likelihood problem in disguise, and the disguise falls away the moment classification is read as a (conditional) generative model.</p>
-<p><strong>The model.</strong> For the <span class="math inline">\(i\)</span>-th sample with features <span class="math inline">\(x_i\)</span>, model the binary label as a Bernoulli trial,</p>
-<p><span class="math display">\[
-y_i \mid x_i \;\sim\; \text{Bernoulli}(\pi_i), \qquad y_i \in \{0, 1\},
-\]</span></p>
-<p>and let a neural network supply the <strong>logit</strong> — the log-<em>odds</em>, not the log-probability:</p>
-<p><span class="math display">\[
-s_i = f_\theta(x_i) = \log \frac{\pi_i}{1 - \pi_i}
-\quad\Longleftrightarrow\quad
-\pi_i = \operatorname{sigmoid}(s_i).
-\]</span></p>
-<p><strong>The likelihood.</strong> The Bernoulli pmf can be written in one line as <span class="math inline">\(p(y \mid \pi) = \pi^{y} (1-\pi)^{1-y}\)</span>, so for independent samples</p>
-<p><span class="math display">\[
-L(\theta) = \prod_{i=1}^n \pi_i^{\,y_i} (1 - \pi_i)^{1 - y_i},
-\qquad
--\ell(\theta) = -\sum_{i=1}^n \Big[ y_i \log \pi_i + (1 - y_i)\log(1 - \pi_i) \Big].
-\]</span></p>
-<p>The right-hand side is <strong>exactly binary cross-entropy</strong>. Training a classifier with BCE is maximum likelihood for a conditional Bernoulli model whose log-odds are the network output — nothing more. (The name is also earned: <span class="math inline">\(-\ell/n\)</span> is the cross-entropy between the empirical distribution of each label and the model’s Bernoulli.)</p>
-<p><strong>The <span class="math inline">\(\pm 1\)</span> convention.</strong> With labels <span class="math inline">\(y_i \in \{-1, +1\}\)</span>, the identity <span class="math inline">\(\operatorname{sigmoid}(-s) = 1 - \operatorname{sigmoid}(s)\)</span> collapses both cases into <span class="math inline">\(p(y_i \mid s_i) = \operatorname{sigmoid}(y_i s_i)\)</span>, and the negative log-likelihood becomes the <strong>logistic loss</strong>,</p>
-<p><span class="math display">\[
--\ell(\theta) = \sum_{i=1}^n \log\!\big(1 + e^{-y_i s_i}\big)
-\]</span></p>
-<p>— the same objective, rewritten.</p>
-<p><strong>The connection to this course.</strong> W01’s latent posterior <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is precisely this model with logit <span class="math inline">\(s(x) = 2x/\sigma^2\)</span>: the optimal classifier of the hidden component is a Bernoulli model whose log-odds are linear in the observation. Classification, denoising, and latent inference are all the same likelihood computation wearing different clothes.</p>
-</section>
-<section id="fitting-the-other-families-honestly" class="level2">
-<h2 class="anchored" data-anchor-id="fitting-the-other-families-honestly">Fitting the other families — honestly</h2>
-<ul>
-<li><p><strong>Uniform.</strong> The likelihood is <span class="math inline">\((b-a)^{-n}\)</span> if all points lie in <span class="math inline">\([a,b]\)</span> and <span class="math inline">\(0\)</span> otherwise: to maximize, squeeze the interval as tight as the data allows — <span class="math inline">\(\hat a = \min_i x_i\)</span>, <span class="math inline">\(\hat b = \max_i x_i\)</span>. (No calculus; the maximum is on the boundary of the constraint. That is Exercise 2.)</p></li>
-<li><p><strong>Gamma and Beta have no closed-form MLE.</strong> Setting the derivatives to zero produces equations involving the digamma function, solvable only numerically. The playground therefore uses the <strong>method of moments (MoM)</strong>: equate the family’s mean and variance to the sample’s <span class="math inline">\(\bar x\)</span> and <span class="math inline">\(s^2\)</span> and solve —</p>
-<p><span class="math display">\[
-\text{Gamma: } \hat k = \frac{\bar{x}^2}{s^2},\ \ \hat\theta = \frac{s^2}{\bar{x}};
-\qquad
-\text{Beta: } c = \frac{\bar{x}(1-\bar{x})}{s^2} - 1,\ \
-\hat\alpha = \bar{x}\,c,\ \ \hat\beta = (1-\bar{x})\,c .
-\]</span></p>
-<p>MoM is a respectable estimator in its own right (consistent, and a standard warm start for numerical MLE); the honest label matters because “just maximize the likelihood” quietly assumes machinery we haven’t built.</p></li>
-<li><p><strong>Mixtures.</strong> Even MoM gets awkward; the right tool is expectation–maximization (EM), which belongs to a later conversation. Today the mixture plays a different role — see below.</p></li>
-</ul>
-</section>
-<section id="the-trap-right-method-wrong-family" class="level2">
-<h2 class="anchored" data-anchor-id="the-trap-right-method-wrong-family">The trap: right method, wrong family</h2>
-<p>In the playground: generate 3000 samples from the two-bump mixture, then fit a <strong>single Normal</strong> by maximum likelihood. The fit is <em>optimal within its family</em> — and its peak sits exactly in the empty valley between the clusters, because the best single Gaussian matches the overall mean and variance, not the shape.</p>
-<p>Two lessons. First, MLE optimizes <em>within the family you chose</em>; the choice of family is a modeling decision the likelihood cannot rescue. Second, we currently have no number that says <em>how wrong</em> this fit is. Constructing that number — the KL divergence, and its identity with maximum likelihood — is the next lecture.</p>
+<p>The outer skeleton is shared — simple randomness, a sampling mechanism, data — while the learned object, the structural constraints, and the sampler differ. For diffusion in particular, determinism is a <em>sampler choice</em>: the probability-flow ODE is a deterministic map from <span class="math inline">\(x_T\)</span>; the reverse SDE consumes fresh noise at every step and is a deterministic function only of <span class="math inline">\((x_T, \text{all step noises})\)</span>.</p>
+<p>In one dimension with a known CDF, the map is a formula. For images, the population law is unknown and no tractable multivariate inverse-CDF construction exists — so deep generative models learn a <em>transport, density, score, or other ingredient</em> of a sampler rather than writing the map down. And you have already run one: W01’s probability-flow ODE numerically transported a moment-matched Gaussian to within <span class="math inline">\(\approx \sigma_{\min}\)</span> of the two-point data (W01 lists the approximations involved); with the exact terminal law, score, and integration, it is an exact deterministic transport — an inverse-CDF-like map built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
 <ol type="1">
-<li>Re-derive <span class="math inline">\(\hat\sigma^2\)</span> for the Gaussian, including the argument that the critical point is a maximum.</li>
-<li>Show that the Uniform MLE is <span class="math inline">\((\hat a, \hat b) = (\min_i x_i, \max_i x_i)\)</span>, and explain why calculus alone would miss it.</li>
-<li>Derive the Gamma method-of-moments estimators from <span class="math inline">\(\mathbb{E}X = k\theta\)</span> and <span class="math inline">\(\operatorname{Var} X = k\theta^2\)</span>.</li>
-<li>For a single observation <span class="math inline">\(x\)</span> from <span class="math inline">\(\mathcal{N}(\mu, \sigma^2)\)</span> with <span class="math inline">\(\sigma\)</span> known, sketch the likelihood in <span class="math inline">\(\mu\)</span>. Now hold <span class="math inline">\(\mu\)</span> known and sketch the likelihood in <span class="math inline">\(\sigma\)</span> — is it bell-shaped? Symmetric? (This kills the “likelihood looks like a pdf” illusion outside the Gaussian-mean case.)</li>
-<li><strong>BCE gradient.</strong> For the Bernoulli model of the aside with a linear logit <span class="math inline">\(s_i = \theta^\top x_i\)</span>, show that <span class="math inline">\(\nabla_\theta(-\ell) = \sum_i (\pi_i - y_i)\, x_i\)</span> — prediction error times input, the cleanest gradient in machine learning. Verify that the <span class="math inline">\(\pm 1\)</span> logistic form gives the same gradient.</li>
-<li>For a mixture <span class="math inline">\(\sum_i \pi_i f_i\)</span> with component means <span class="math inline">\(\mu_i\)</span> and variances <span class="math inline">\(\sigma_i^2\)</span>, show <span class="math inline">\(\operatorname{Var}(X) = \sum_i \pi_i \sigma_i^2 + \sum_i \pi_i (\mu_i - \bar\mu)^2\)</span> with <span class="math inline">\(\bar\mu = \sum_i \pi_i \mu_i\)</span> — within-component plus between-component spread. Use it to predict what <span class="math inline">\(\hat\sigma\)</span> the single-Gaussian fit in the trap will report.</li>
+<li>Complete the inverse-CDF proof for a general (possibly non-strictly-increasing) <span class="math inline">\(F\)</span> using the generalized inverse.</li>
+<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above, and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x)\)</span> equals W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span> posterior (mind which component carries the <span class="math inline">\(+\)</span> sign); compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
+<li>Verify the packed map: show that conditional on <span class="math inline">\(u &lt; \pi\)</span>, the rescaled variable <span class="math inline">\(u/\pi\)</span> is <span class="math inline">\(\text{Uniform}(0,1)\)</span>, and conclude that the branch produces <span class="math inline">\(\mathcal{N}(\mu_1, \sigma^2)\)</span> with the correct probability.</li>
+<li>Construct the inverse-CDF map for a <strong>three</strong>-component mixture and describe its staircase limit as <span class="math inline">\(\sigma \to 0\)</span>. How many plateaus, at what heights?</li>
+<li>The map <span class="math inline">\(x = F^{-1}(u)\)</span> is monotone increasing. Exhibit a <em>decreasing</em> map with the same pushforward, and a map that is neither monotone nor continuous. (Hint: <span class="math inline">\(1 - u\)</span> is also uniform.)</li>
 </ol>
 
 
@@ -1009,13 +948,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/two-point-diffusion.html" class="pagination-link" aria-label="The World's Smallest Diffusion Model">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The World’s Smallest Diffusion Model</span>
+      <a href="../tutorials/03-transport-story.html" class="pagination-link" aria-label="Moving Distributions: The Transport Story">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Moving Distributions: The Transport Story</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/genai-simplest-form.html" class="pagination-link" aria-label="Generative AI, in Its Simplest Form">
-        <span class="nav-page-text">Generative AI, in Its Simplest Form</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/05-two-point-diffusion.html" class="pagination-link" aria-label="The World's Smallest Diffusion Model">
+        <span class="nav-page-text">The World’s Smallest Diffusion Model</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

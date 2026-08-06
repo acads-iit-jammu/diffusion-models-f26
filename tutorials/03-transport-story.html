@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>The World’s Smallest Diffusion Model – ID-5-02 (TO)</title>
+<title>Moving Distributions: The Transport Story – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -64,8 +30,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/distributions-mle.html" rel="next">
-<link href="../tutorials/probability-101.html" rel="prev">
+<link href="../tutorials/04-genai-simplest-form.html" rel="next">
+<link href="../tutorials/02-distributions-mle.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -144,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/two-point-diffusion.html">The World’s Smallest Diffusion Model</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Moving Distributions: The Transport Story</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -316,47 +282,70 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials · Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/probability-101.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability 101 — A Refresher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/two-point-diffusion.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/distributions-mle.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials · Diffusion Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
   </div>
 </li>
       </ul>
@@ -377,22 +366,22 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-dataset" id="toc-the-dataset" class="nav-link active" data-scroll-target="#the-dataset">The dataset</a></li>
-  <li><a href="#forward-process-noise-melts-the-data" id="toc-forward-process-noise-melts-the-data" class="nav-link" data-scroll-target="#forward-process-noise-melts-the-data">Forward process: noise melts the data</a></li>
-  <li><a href="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" id="toc-denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="nav-link" data-scroll-target="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</a></li>
-  <li><a href="#the-score-function-a-preview-of-module-4" id="toc-the-score-function-a-preview-of-module-4" class="nav-link" data-scroll-target="#the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</a></li>
-  <li><a href="#reverse-process-run-the-diffusion-backwards" id="toc-reverse-process-run-the-diffusion-backwards" class="nav-link" data-scroll-target="#reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</a></li>
-  <li><a href="#why-the-course-exists-what-breaks-for-images" id="toc-why-the-course-exists-what-breaks-for-images" class="nav-link" data-scroll-target="#why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  <li><a href="#the-problem-without-any-symbols" id="toc-the-problem-without-any-symbols" class="nav-link active" data-scroll-target="#the-problem-without-any-symbols">The problem, without any symbols</a></li>
+  <li><a href="#in-one-dimension-the-problem-is-completely-solved" id="toc-in-one-dimension-the-problem-is-completely-solved" class="nav-link" data-scroll-target="#in-one-dimension-the-problem-is-completely-solved">In one dimension, the problem is completely solved</a></li>
+  <li><a href="#and-in-two-dimensions-the-trick-dies" id="toc-and-in-two-dimensions-the-trick-dies" class="nav-link" data-scroll-target="#and-in-two-dimensions-the-trick-dies">And in two dimensions, the trick dies</a></li>
+  <li><a href="#every-model-family-is-a-different-way-of-choosing" id="toc-every-model-family-is-a-different-way-of-choosing" class="nav-link" data-scroll-target="#every-model-family-is-a-different-way-of-choosing">Every model family is a different way of choosing</a></li>
+  <li><a href="#the-punchline-five-roads-one-destination-in-1-d-only" id="toc-the-punchline-five-roads-one-destination-in-1-d-only" class="nav-link" data-scroll-target="#the-punchline-five-roads-one-destination-in-1-d-only">The punchline: five roads, one destination — in 1-D only</a></li>
+  <li><a href="#a-warning-label-what-not-to-carry-upstairs" id="toc-a-warning-label-what-not-to-carry-upstairs" class="nav-link" data-scroll-target="#a-warning-label-what-not-to-carry-upstairs">A warning label: what <em>not</em> to carry upstairs</a></li>
+  <li><a href="#where-to-go-from-here" id="toc-where-to-go-from-here" class="nav-link" data-scroll-target="#where-to-go-from-here">Where to go from here</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-101.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/two-point-diffusion.html">The World’s Smallest Diffusion Model</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Moving Distributions: The Transport Story</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">The World’s Smallest Diffusion Model</h1>
+<h1 class="title">Moving Distributions: The Transport Story</h1>
 </div>
 
 
@@ -409,160 +398,73 @@ window.Quarto = {
 </header>
 
 
-<p><em>Standalone tutorial accompanying <a href="../weeks/w01.html">W01</a>. Interactive version: <a href="../materials/two-point-diffusion-demo.html">live demo</a> — every figure in this note, animated.</em></p>
-<p>Diffusion models generate images from pure noise. Before we spend forty lectures on the mathematics, this note builds a <strong>complete diffusion model with a dataset of two points</strong> — small enough that every quantity the course will later approximate with a neural network can be computed <em>exactly</em>, with nothing beyond Bayes’ rule.</p>
-<section id="the-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="the-dataset">The dataset</h2>
-<p>Our data distribution puts equal mass on two points:</p>
-<p><span class="math display">\[
-p_{\text{data}}(x_0) \;=\; \tfrac{1}{2}\,\delta(x_0 + 1) \;+\; \tfrac{1}{2}\,\delta(x_0 - 1),
-\qquad x_0 \in \{-1, +1\}.
-\]</span></p>
-<p>Generative modeling asks: given samples from <span class="math inline">\(p_{\text{data}}\)</span>, produce <em>more</em> samples. For this dataset the answer is a coin flip — which is exactly why it is the right dataset: the machinery becomes transparent.</p>
+<p><em>An informal tutorial, for readers with no particular background. No proofs, few formulas — just the one idea that organizes all of generative modeling, told from the beginning. Its rigorous twin, with the history and the theorems, is <a href="../tutorials/08-transport-rigorous.html">Generative Models as Transport: History and Validation</a>.</em></p>
+<section id="the-problem-without-any-symbols" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem-without-any-symbols">The problem, without any symbols</h2>
+<p>You have a pile of examples — photographs, sentences, measurements. Behind them stands a <em>distribution</em>: the invisible shape that says which examples are common, which are rare, which are impossible. Generative modeling is one wish:</p>
+<blockquote class="blockquote">
+<p><strong>Make more examples with the same shape.</strong></p>
+</blockquote>
+<p>Here is the reframing that unlocks everything. A computer already owns one perfect source of randomness — dull, structureless randomness, like a uniform lottery number or television static. So the wish becomes a <em>moving</em> job:</p>
+<blockquote class="blockquote">
+<p>Take the boring randomness we have, and <strong>transport</strong> it onto the interesting shape we want. Move the pile of sand into the sculpture.</p>
+</blockquote>
+<p>Every generative model you have heard of — VAEs, GANs, normalizing flows, diffusion models — is a machine for doing exactly this. They differ only in <em>how they decide which grain of sand goes where</em>. That difference is the whole story.</p>
 </section>
-<section id="forward-process-noise-melts-the-data" class="level2">
-<h2 class="anchored" data-anchor-id="forward-process-noise-melts-the-data">Forward process: noise melts the data</h2>
-<p>Corrupt a clean sample with Gaussian noise of size <span class="math inline">\(\sigma\)</span>:</p>
-<p><span class="math display">\[
-x_\sigma \;=\; x_0 + \sigma z, \qquad z \sim \mathcal{N}(0, 1) \text{ independent of } x_0.
-\]</span></p>
-<p>Since <span class="math inline">\(x_0 = \pm 1\)</span> with probability <span class="math inline">\(\tfrac12\)</span> each, the density of the corrupted sample is a two-component Gaussian mixture:</p>
-<p><span class="math display">\[
-p_\sigma(x) \;=\; \tfrac{1}{2}\,\mathcal{N}(x;\, -1,\, \sigma^2)
-\;+\; \tfrac{1}{2}\,\mathcal{N}(x;\, +1,\, \sigma^2).
-\]</span></p>
-<p>Two facts, both visible in the demo:</p>
-<ul>
-<li><strong>Small <span class="math inline">\(\sigma\)</span>:</strong> two sharp bumps at <span class="math inline">\(\pm 1\)</span> — the data is intact.</li>
-<li><strong>Large <span class="math inline">\(\sigma\)</span>:</strong> the bumps merge. Indeed <span class="math inline">\(\mathbb{E}[x_\sigma] = 0\)</span> and <span class="math inline">\(\operatorname{Var}(x_\sigma) = \mathbb{E}[x_0^2] + \sigma^2 = 1 + \sigma^2\)</span>, and for <span class="math inline">\(\sigma \gtrsim 3\)</span> the mixture is indistinguishable in practice from <span class="math inline">\(\mathcal{N}(0,\, 1 + \sigma^2)\)</span> — at <span class="math inline">\(\sigma = 3\)</span> its excess kurtosis is only <span class="math inline">\(-0.02\)</span>. (It is never <em>exactly</em> Gaussian at finite <span class="math inline">\(\sigma\)</span>; the precise statement is <span class="math inline">\(x_\sigma / \sqrt{1+\sigma^2} \Rightarrow \mathcal{N}(0,1)\)</span> as <span class="math inline">\(\sigma \to \infty\)</span>.)</li>
-</ul>
-<p>This is the first design principle of diffusion models: <strong>destroying structure is easy, fully understood, and ends somewhere known</strong> (a Gaussian), no matter what the data was.</p>
-</section>
-<section id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="level2">
-<h2 class="anchored" data-anchor-id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</h2>
-<p>Now invert: we observe a noisy <span class="math inline">\(x_\sigma = x\)</span> and want the clean <span class="math inline">\(x_0\)</span>. The best guess under squared error is the <strong>posterior mean</strong> <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma = x]\)</span> (we will prove this optimality claim in Module 1; for now, take it).</p>
-<p>The posterior over the two candidates follows from Bayes’ rule:</p>
-<p><span class="math display">\[
-\mathbb{P}(x_0 = +1 \mid x)
-= \frac{\tfrac12\,\mathcal{N}(x; +1, \sigma^2)}
-       {\tfrac12\,\mathcal{N}(x; +1, \sigma^2) + \tfrac12\,\mathcal{N}(x; -1, \sigma^2)}
-= \frac{1}{1 + \exp\!\big(-\tfrac{2x}{\sigma^2}\big)}
-= \operatorname{sigmoid}\!\Big(\frac{2x}{\sigma^2}\Big),
-\]</span></p>
-<p>where the middle step divides through by <span class="math inline">\(\mathcal{N}(x; +1, \sigma^2)\)</span> and uses <span class="math inline">\(\exp\!\big(-\tfrac{(x+1)^2}{2\sigma^2}\big) \big/ \exp\!\big(-\tfrac{(x-1)^2}{2\sigma^2}\big)
-= \exp\!\big(-\tfrac{2x}{\sigma^2}\big)\)</span>. Therefore</p>
-<p><span class="math display">\[
-\boxed{\;\mathbb{E}[x_0 \mid x_\sigma = x]
-= (+1)\,\mathbb{P}(+1 \mid x) + (-1)\,\mathbb{P}(-1 \mid x)
-= \tanh\!\Big(\frac{x}{\sigma^2}\Big).\;}
-\]</span></p>
-<p>The optimal denoiser is a <strong>tanh</strong> — an activation function you already know, produced by nothing but probability. Sanity-check its two regimes:</p>
-<ul>
-<li><span class="math inline">\(\sigma \to 0\)</span>: <span class="math inline">\(\tanh(x/\sigma^2)\)</span> becomes a hard step — snap to the nearer data point.</li>
-<li><span class="math inline">\(\sigma \to \infty\)</span>: <span class="math inline">\(\tanh(x/\sigma^2) \approx x/\sigma^2 \to 0\)</span> — the observation is all noise, so the best guess is the prior mean <span class="math inline">\(0\)</span>.</li>
-</ul>
-</section>
-<section id="the-score-function-a-preview-of-module-4" class="level2">
-<h2 class="anchored" data-anchor-id="the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</h2>
-<p>Differentiate <span class="math inline">\(\log p_\sigma\)</span> directly. With <span class="math inline">\(\varphi_\pm(x) = \mathcal{N}(x; \pm 1, \sigma^2)\)</span> and <span class="math inline">\(\varphi_\pm'(x) = -\tfrac{x \mp 1}{\sigma^2}\varphi_\pm(x)\)</span>,</p>
-<p><span class="math display">\[
-\nabla_x \log p_\sigma(x)
-= \frac{\tfrac12\varphi_-'(x) + \tfrac12\varphi_+'(x)}{p_\sigma(x)}
-= -\frac{x - \mathbb{E}[x_0 \mid x]}{\sigma^2}
-= \frac{\tanh\!\big(\tfrac{x}{\sigma^2}\big) - x}{\sigma^2}.
-\]</span></p>
-<p>Rearranged, this is <strong>Tweedie’s formula</strong>, one of the two or three most important identities of the course:</p>
-<p><span class="math display">\[
-\mathbb{E}[x_0 \mid x_\sigma = x] \;=\; x + \sigma^2\, \nabla_x \log p_\sigma(x).
-\]</span></p>
-<p><em>Denoising and knowing the score are the same thing</em> — for additive Gaussian noise of known size <span class="math inline">\(\sigma\)</span>, which is exactly the diffusion setting. The score <span class="math inline">\(\nabla_x \log p_\sigma\)</span> points from <span class="math inline">\(x\)</span> toward where the (noised) data is denser; the denoiser just moves by <span class="math inline">\(\sigma^2\)</span> times the score. One caveat: the score is a <em>local</em> quantity — at <span class="math inline">\(x = 0\)</span> it vanishes by symmetry even though, in the two-bump regime, <span class="math inline">\(x = 0\)</span> is a density <em>minimum</em>. It is an unstable equilibrium: the reverse dynamics leave a particle sitting exactly there alone, and push a particle on either side away toward the nearer mode.</p>
-</section>
-<section id="reverse-process-run-the-diffusion-backwards" class="level2">
-<h2 class="anchored" data-anchor-id="reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</h2>
-<p>Generation now works by <em>annealing</em>: start from pure noise at a large <span class="math inline">\(\sigma_{\max}\)</span>, and lower <span class="math inline">\(\sigma\)</span> along a grid <span class="math inline">\(\sigma_{\max} = \sigma_0 &gt; \sigma_1 &gt; \cdots &gt; \sigma_K \approx 0\)</span>, nudging the sample along the score at every step. (We write <span class="math inline">\(y_k\)</span> for the reverse iterate at noise level <span class="math inline">\(\sigma_k\)</span>, keeping <span class="math inline">\(x_0\)</span> reserved for the clean data point; <span class="math inline">\(y_0\)</span> is pure noise and <span class="math inline">\(y_K\)</span> is the generated sample.)</p>
-<p><span class="math display">\[
-y_{k+1} \;=\; y_k \;+\; \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\,
-\nabla_y \log p_{\sigma_k}(y_k)
-\;=\; y_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\cdot
-\frac{\tanh\!\big(y_k/\sigma_k^2\big) - y_k}{\sigma_k^2}.
-\]</span></p>
-<p>This deterministic rule is the explicit Euler discretization of the <strong>probability-flow ODE</strong> in the variance clock <span class="math inline">\(\tau = \sigma^2\)</span>. (Strictly, to speak of dynamics <em>across</em> noise levels we couple them: <span class="math inline">\(x_\tau = x_0 + w_\tau\)</span> with <span class="math inline">\(w\)</span> a Brownian motion — Module 5 makes this precise; nothing below needs it yet.) The stochastic variant both <strong>doubles the score drift and injects fresh independent noise</strong> at each step,</p>
-<p><span class="math display">\[
-y_{k+1} = y_k + \big(\sigma_k^2 - \sigma_{k+1}^2\big)\,\nabla_y \log p_{\sigma_k}(y_k)
-+ \sqrt{\sigma_k^2 - \sigma_{k+1}^2}\; z_k, \qquad z_k \sim \mathcal{N}(0,1)
-\text{ i.i.d.},
-\]</span></p>
-<p>giving the Euler–Maruyama discretization of the <strong>reverse-time SDE</strong>. Where these updates <em>come from</em> is the business of Modules 5–6 (Fokker–Planck, reverse-time dynamics); today we only need to <em>watch them work</em>: a cloud of particles started from <span class="math inline">\(\mathcal{N}(0,\, 1+\sigma_{\max}^2)\)</span> splits, condenses, and lands within <span class="math inline">\(\approx \sigma_{\min}\)</span> of <span class="math inline">\(\{-1, +1\}\)</span>, in equal proportions up to sampling error.</p>
-<p>To be honest about the word “exact”: the <em>formulas</em> are exact, but the sampler carries four small approximations — we initialize from the moment-matched Gaussian rather than the true mixture <span class="math inline">\(p_{\sigma_{\max}}\)</span> (indistinguishable at <span class="math inline">\(\sigma_{\max} = 3\)</span>, but not equal); we stop at <span class="math inline">\(\sigma_{\min} = 10^{-2} &gt; 0\)</span>, so samples end a hair’s width from the atoms; the Euler steps discretize the flow; and any finite run has sampling noise. Each vanishes in the appropriate limit — and every one of them has a counterpart in real diffusion models.</p>
-<p>The full sampler, with no neural network anywhere:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(y, s2):                 <span class="co"># ∇ log p_σ(y), exact for the two-point data</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (np.tanh(y <span class="op">/</span> s2) <span class="op">-</span> y) <span class="op">/</span> s2</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>smax, smin, K, N <span class="op">=</span> <span class="fl">3.0</span>, <span class="fl">1e-2</span>, <span class="dv">500</span>, <span class="dv">100_000</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sig <span class="op">=</span> smax <span class="op">*</span> (smin <span class="op">/</span> smax) <span class="op">**</span> (np.arange(K <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> K)    <span class="co"># geometric σ grid</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> smax<span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> np.random.randn(N)           <span class="co"># start from pure noise</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):                                       <span class="co"># probability-flow ODE</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> sig[k]<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> sig[k <span class="op">+</span> <span class="dv">1</span>]<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    y <span class="op">+=</span> <span class="fl">0.5</span> <span class="op">*</span> d <span class="op">*</span> score(y, sig[k]<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>err <span class="op">=</span> np.<span class="bu">abs</span>(np.<span class="bu">abs</span>(y) <span class="op">-</span> <span class="dv">1</span>).<span class="bu">max</span>()      <span class="co"># worst distance to the nearest data point</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(err, (y <span class="op">&gt;</span> <span class="dv">0</span>).mean())   <span class="co"># ≈ 0 and ≈ 0.5, up to σ_min + discretization + sampling</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="why-the-course-exists-what-breaks-for-images" class="level2">
-<h2 class="anchored" data-anchor-id="why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</h2>
-<p>Everything above was exact because the posterior mean had a formula. For images there is no usable one. (Exercise 4 gives a closed form for any <em>finite</em> training set — but a sampler built on it can only ever reproduce the training points; what we actually want is the posterior mean under the unknown <em>population</em> distribution.) Nor can it be tabulated: a <span class="math inline">\(64 \times 64\)</span> RGB image lives in a space of <span class="math inline">\(256^{12288}\)</span> configurations, and the data occupies a vanishingly thin filament of it (Module 1: the curse of dimensionality). The entire role of the neural network in a diffusion model is to <strong>approximate the map <span class="math inline">\((x, \sigma) \mapsto \mathbb{E}[x_0 \mid x]\)</span></strong> — to be the tanh we can no longer derive. Every other ingredient of this note survives unchanged, and each becomes a module of the course:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>In this note</th>
-<th>In the course</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>The “produce more samples” problem; why direct density estimation fails</td>
-<td>M1 — Foundations of generative modeling</td>
-</tr>
-<tr class="even">
-<td>Gaussian mixture, conditioning, <span class="math inline">\(\operatorname{Var} = 1+\sigma^2\)</span></td>
-<td>M2 — Gaussians and noise accumulation</td>
-</tr>
-<tr class="odd">
-<td>The discrete <span class="math inline">\(\sigma\)</span> grid; denoising as the training target</td>
-<td>M3 — DDPM framework</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\nabla_x \log p_\sigma\)</span>, Tweedie’s formula</td>
-<td>M4 — Score matching and denoising</td>
-</tr>
-<tr class="odd">
-<td>The <span class="math inline">\(\sigma\)</span>-continuum, densities evolving with <span class="math inline">\(\sigma\)</span></td>
-<td>M5 — SDEs and Fokker–Planck</td>
-</tr>
-<tr class="even">
-<td>The reverse update and the probability-flow ODE</td>
-<td>M6 — Reverse-time dynamics</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="exercises" class="level2">
-<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<section id="in-one-dimension-the-problem-is-completely-solved" class="level2">
+<h2 class="anchored" data-anchor-id="in-one-dimension-the-problem-is-completely-solved">In one dimension, the problem is completely solved</h2>
+<p>Suppose your data is just numbers — heights, incomes, temperatures. One dimension. Then there is a classical trick, and it settles everything.</p>
+<p><strong>The rank trick.</strong> To transform lottery numbers into incomes:</p>
 <ol type="1">
-<li>Fill in the algebra for <span class="math inline">\(\mathbb{P}(x_0 = +1 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> and <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh(x/\sigma^2)\)</span>.</li>
-<li>Show <span class="math inline">\(\operatorname{Var}(x_\sigma) = 1 + \sigma^2\)</span>, and more generally <span class="math inline">\(\operatorname{Var}(x_\sigma) = \operatorname{Var}(x_0) + \sigma^2\)</span> for any data distribution with finite variance (independence of <span class="math inline">\(z\)</span> and <span class="math inline">\(x_0\)</span> is all you need — zero mean is not required).</li>
-<li><strong>Unequal weights.</strong> Let <span class="math inline">\(\mathbb{P}(x_0 = +1) = \pi\)</span> with <span class="math inline">\(0 &lt; \pi &lt; 1\)</span>. Show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh\!\big(\tfrac{x}{\sigma^2} + \tfrac12 \log\tfrac{\pi}{1-\pi}\big)\)</span> — the denoiser acquires a <em>bias</em>. Check that as <span class="math inline">\(\sigma \to \infty\)</span> this tends to <span class="math inline">\(2\pi - 1\)</span>, the prior mean, and work out what happens in the degenerate cases <span class="math inline">\(\pi \in \{0, 1\}\)</span> by taking limits.</li>
-<li><strong>More points.</strong> For data uniform on <span class="math inline">\(\{a_1, \dots, a_m\}\)</span>, show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \sum_i a_i\, w_i(x)\)</span> with <span class="math inline">\(w_i(x) \propto \exp\!\big(\tfrac{a_i x}{\sigma^2} - \tfrac{a_i^2}{2\sigma^2}\big)
-\propto \exp\!\big(-\tfrac{(x - a_i)^2}{2\sigma^2}\big)\)</span> — a <em>softmax</em> with Gaussian-kernel weights. (So the optimal denoiser for a finite dataset under Gaussian corruption is attention-like: an RBF-weighted average of the training points. For non-uniform weights <span class="math inline">\(\pi_i\)</span>, each logit gains <span class="math inline">\(\log \pi_i\)</span>.)</li>
-<li>Run the sampler above with the SDE update instead of the ODE. Compare the RMS distance of the final samples to the nearest data point for both, as a function of <span class="math inline">\(K\)</span> and of <span class="math inline">\(\sigma_{\min}\)</span>. (You should find that increasing <span class="math inline">\(K\)</span> removes discretization error but both samplers retain a terminal width <span class="math inline">\(\approx \sigma_{\min}\)</span> — lowering <span class="math inline">\(\sigma_{\min}\)</span>, not raising <span class="math inline">\(K\)</span>, is what sharpens the atoms.)</li>
+<li>Draw a uniform lottery number between 0 and 1 — say <span class="math inline">\(0.83\)</span>.</li>
+<li>Read it as a <em>rank</em>: “the 83rd percentile.”</li>
+<li>Output the income that sits at the 83rd percentile of the income distribution.</li>
 </ol>
+<p>That’s the entire generator. Ask “what fraction of the data lies below this value?” — that question is the <strong>CDF</strong>, and it converts values into ranks. Answer it backwards — rank into value — and that is the <strong>inverse CDF</strong>. The generator is: <em>uniform randomness in, read as a rank, matched to the value with the same rank.</em></p>
+<p>Three things make this trick special, not just convenient:</p>
+<ul>
+<li><strong>It always works.</strong> Any distribution of numbers, however lumpy, has percentiles.</li>
+<li><strong>It is fair, and it never crosses.</strong> The 20th percentile of the lottery goes to the 20th percentile of incomes, the 90th to the 90th. Lower stays lower, higher stays higher — two grains of sand never swap places in flight.</li>
+<li><strong>It is the only such rule — <em>if</em> you insist on never crossing.</strong> Drop that insistence and even one dimension has many transports (flip every rank, <span class="math inline">\(u \leftrightarrow 1-u\)</span>, and the output distribution is identical). What is special about one dimension is not that transport is unique — it is that the line comes with a natural tie-breaking rule everyone accepts: <em>lower stays lower</em>. The rule crowns a unique king.</li>
+<li>One small honesty note for the reverse direction: turning <em>data back into ranks</em> needs care when many data points tie (repeated values); ties must be broken with a coin flip. Generation — ranks into data — never has this problem.</li>
+</ul>
+<p>You can watch this trick operating in the course demo <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>, and it is the exact mechanism behind the two-point generator of W01. In one dimension, generative modeling is <em>finished</em> — a lookup in a percentile table.</p>
+</section>
+<section id="and-in-two-dimensions-the-trick-dies" class="level2">
+<h2 class="anchored" data-anchor-id="and-in-two-dimensions-the-trick-dies">And in two dimensions, the trick dies</h2>
+<p>Now let the data be pairs — a height <em>and</em> a weight; an image with many pixels. Try the rank trick: “what fraction of the data lies <em>below</em> this point?”</p>
+<p>Below? Point A is up and to the left of point B. Which one is “lower”? In a plane there is <strong>no natural order</strong>. No order, no ranks; no ranks, no percentiles; no percentiles, no inverse CDF. The one canonical tool we had does not survive the second dimension.</p>
+<p>Worse — the problem is not that transport becomes impossible. It becomes <em>embarrassingly possible</em>. Picture moving a round cloud of sand onto another round cloud: you can slide it straight over; or slide it over and rotate it by any angle; or swirl the middle while fixing the edge. <strong>Infinitely many transports do the job, and no one of them is the boss.</strong> In one dimension the never-cross rule crowned a unique king; in two dimensions there is no throne.</p>
+<p>This is the honest statement of the difficulty: in higher dimensions, transport is not <em>undefined</em> — it is <strong>underdetermined</strong>. And the thing that is missing is precisely the tie-breaker: the line’s “lower stays lower” rule has no natural analogue in the plane. Something must be <em>added</em> to pick one map out of the infinite crowd.</p>
+</section>
+<section id="every-model-family-is-a-different-way-of-choosing" class="level2">
+<h2 class="anchored" data-anchor-id="every-model-family-is-a-different-way-of-choosing">Every model family is a different way of choosing</h2>
+<p>Here is the reveal: the famous generative model families are exactly the famous ways of adding that missing choice.</p>
+<p><strong>Sort by coordinates anyway — normalizing flows.</strong> Alphabetical order: sort by the first coordinate; break ties with the second; and so on. This resurrects ranks, one coordinate at a time — transform the first coordinate by its percentiles, then the second <em>given</em> the first, and so on. It works at every scale, and it is exactly what autoregressive normalizing flows do. The cost: the answer depends on which coordinate you called “first,” as alphabetical order depends on the alphabet.</p>
+<p><strong>Move at the cheapest total cost — optimal transport.</strong> Charge for distance: among all valid transports, take the one minimizing the total moving bill. A deep theorem says that (in the natural settings) this again produces a <em>unique</em> map. The cost: computing it at scale is hard, and — a genuine surprise below — it is <em>not</em> what the popular generators actually compute.</p>
+<p><strong>Melt, then re-freeze — diffusion models.</strong> Refuse the direct matching entirely. Instead, <em>melt</em> the data — add noise a little at a time until every shape becomes the same formless Gaussian blob — and learn to run the melting backwards. Freezing is guided by a purely local question: “from here, which direction looks denser?” That local question is learnable by a neural network even in a million dimensions. Two choices select the route: the melting <em>schedule</em>, and — a subtlety — a <em>no-swirling</em> rule: many wind patterns produce the same evolution of the sand’s density (add any swirl that circulates without piling anything up), and diffusion picks the swirl-free wind. This is the entire subject of this course, met from a new side.</p>
+<p><strong>Fool the inspector — GANs.</strong> Train a forger against a detective: any transport whose output the detective cannot distinguish from data is accepted. Note what is missing: <em>any</em> transport. Here is how loose that is, even in one dimension: take the fair rank-matcher, but first <em>fold</em> the lottery ticket — send every rank <span class="math inline">\(u\)</span> to <span class="math inline">\(1-u\)</span>, or crease it in the middle like a tent. The folded generator produces exactly the same distribution, so no inspector, however perfect, can object — yet it is not the rank map. GANs add no selection principle at all, which is part of why they are powerful and part of why they are temperamental.</p>
+<p><strong>Compress and decompress — VAEs.</strong> Learn an encoder that squeezes data into tidy randomness and a decoder that reinflates it. Here is a lovely secret: in one dimension, the <em>perfect</em> encoder is precisely the rank trick — the CDF! — and the perfect decoder is the inverse CDF. But two honest footnotes. First, nothing in the VAE’s training <em>forces</em> that choice: many equally good codes exist (swap all ranks <span class="math inline">\(u \leftrightarrow 1-u\)</span>, for a start), and the VAE has no reason to prefer the tidy one. Second, a textbook VAE is not even <em>allowed</em> to be perfectly tidy — its rules require the code to stay a little blurry (a perfectly sharp code costs it an infinite penalty). The “encoder = CDF” story is the idealized, noise-free, never-crossing limit of a VAE — a beautiful limit, and one the actual training objective does not select. The VAE illustrates underdeterminacy from the inside.</p>
+</section>
+<section id="the-punchline-five-roads-one-destination-in-1-d-only" class="level2">
+<h2 class="anchored" data-anchor-id="the-punchline-five-roads-one-destination-in-1-d-only">The punchline: five roads, one destination — in 1-D only</h2>
+<p>Run all five families on one-dimensional data, each trained to perfection <em>and each given the natural tie-breaking rule</em> (never cross), and they collapse into the same map: the rank trick. But the fine print matters, and it splits three ways. For the smooth-flow families — diffusion’s deterministic sampler, normalizing flows, flow matching — the collapse is a <strong>theorem</strong>: a one-dimensional flow physically cannot cross itself, so the tie-breaker comes built in (this course proves the diffusion case in <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a>). For GANs and VAEs the collapse is merely <strong>available</strong>: their training rules accept the rank map but do not prefer it — the folded forger and the blurry code are equally welcome. In one dimension the five philosophies <em>can</em> be one philosophy; only some of them insist on it.</p>
+<p>In two dimensions and up, they genuinely part ways — and that is not a defect but the point: each family is one answer to a question that no longer has a single answer. If you understand (a) the 1-D trick, (b) why it dies upstairs, and (c) what each family adds to revive it, you understand the map of the whole field.</p>
+</section>
+<section id="a-warning-label-what-not-to-carry-upstairs" class="level2">
+<h2 class="anchored" data-anchor-id="a-warning-label-what-not-to-carry-upstairs">A warning label: what <em>not</em> to carry upstairs</h2>
+<p>The 1-D picture is a superb ladder and a treacherous railing. Keep the ladder, do not lean on it:</p>
+<ul>
+<li><strong>“Lower stays lower” means nothing upstairs.</strong> There is no single order to preserve — and “monotone” does not become meaningless, it becomes <em>many different things</em> (several inequivalent notions replace it, and different fixes pick different ones).</li>
+<li><strong>“The transport” is not a phrase you may use</strong> without saying which selection rule you chose.</li>
+<li><strong>The diffusion route is not the cheapest route.</strong> In 1-D the melter and the cheapest mover coincide; in higher dimensions they provably differ — professionals conjectured otherwise in print and were corrected by a counterexample.</li>
+<li><strong>Even the melting does not determine the route by itself.</strong> Upstairs, many winds produce the same density evolution (swirls circulate without piling); the no-swirl rule is an extra choice, invisible in 1-D where there is no room to swirl.</li>
+<li><strong>Percentile bookkeeping is a 1-D luxury.</strong> The beautiful fact that a diffusing particle “rides its quantile” (proved in this course) has no higher-dimensional analogue.</li>
+</ul>
+</section>
+<section id="where-to-go-from-here" class="level2">
+<h2 class="anchored" data-anchor-id="where-to-go-from-here">Where to go from here</h2>
+<p>The rigorous twin of this tutorial — <a href="../tutorials/08-transport-rigorous.html">Generative Models as Transport: History and Validation</a> — replays this story with theorems, dates, and citations: who proved the rank trick unique, who invented each fix and when, what exactly is true about the “VAE encoder = CDF” slogan, and where the counterexamples live. And the rest of the course is the deep dive into one of the five roads — the melt-and-refreeze road — chosen because its local, learnable steering question scales to the dimensions where images and language live.</p>
 
 
 </section>
@@ -995,13 +897,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/probability-101.html" class="pagination-link" aria-label="Probability 101 — A Refresher">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Probability 101 — A Refresher</span>
+      <a href="../tutorials/02-distributions-mle.html" class="pagination-link" aria-label="Distributions and Maximum Likelihood">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Distributions and Maximum Likelihood</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/distributions-mle.html" class="pagination-link" aria-label="Distributions and Maximum Likelihood">
-        <span class="nav-page-text">Distributions and Maximum Likelihood</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/04-genai-simplest-form.html" class="pagination-link" aria-label="Generative AI, in Its Simplest Form">
+        <span class="nav-page-text">Generative AI, in Its Simplest Form</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
