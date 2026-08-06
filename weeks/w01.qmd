@@ -26,7 +26,7 @@
 
 <iframe src="../materials/w01-deck-03-toy-example.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 deck 3: the toy example"></iframe>
 
-- Companion tutorial: [The World's Smallest Diffusion Model](../tutorials/05-two-point-diffusion.qmd) — a complete diffusion model on a two-point dataset, every step exact.
+- Companion tutorial: [The World's Smallest Diffusion Model](../tutorials/07-two-point-diffusion.qmd) — a complete diffusion model on a two-point dataset, every step exact.
 - [Interactive demo](../materials/two-point-diffusion-demo.html) used in the lecture: forward melting, the tanh denoiser, and reverse-time generation.
 - Warm-up demo: [Progressively Adding Noise](../materials/one-point-noise-demo.html) — one point at 0, kicked by noise; one walker, then many, with the √t envelope and the live Gaussian cross-section.
 

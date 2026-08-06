@@ -1,0 +1,277 @@
+# Joint, Marginal, Conditional — and Bayes {.unnumbered}
+
+*A standalone tutorial, the second of two on the measure-theoretic view of
+probability, continuing [Measuring Things](./01-measuring-things.qmd). One new
+move — paint **two** numbers on the blob instead of one — generates the entire
+multivariate vocabulary: joints as mountains, marginals as shadows, conditionals
+as renormalized slices, Bayes' rule as the license to slice in either direction.
+No new measure theory is needed.*
+
+## 1. Two colorings, one blob
+
+Recall the picture: a blob $\Omega$ of unit mass, a probability measure $P$
+weighing its regions, and a random variable as numbers painted on the blob. Now
+paint the blob **twice**: two measurable functions
+
+$$
+X : \Omega \to \mathbb{R}, \qquad Y : \Omega \to \mathbb{R},
+$$
+
+on the *same* blob. This co-residence is the whole point. "$X$ and $Y$ are
+jointly distributed" is not an extra assumption bolted on later; it is the
+statement that one outcome $\omega$ determines both numbers at once —
+height *and* weight of the same person, today's price *and* tomorrow's price of
+the same stock, clean image *and* noisy image from the same generation run.
+
+The pair is a single map into the plane,
+
+$$
+(X, Y) : \Omega \to \mathbb{R}^2,
+\qquad
+\mu_{X,Y} \;=\; (X,Y)_\# P,
+$$
+
+and the pushforward $\mu_{X,Y}$ — the blob's mass transported to the plane — is
+the **joint distribution**. When it has a density $p(x,y)$, picture the joint as
+a **mountain** of mass over the plane: total volume $1$, height = mass per unit
+area.
+
+## 2. Marginals are shadows — and shadows forget
+
+The **marginal** of $X$ is nothing new: it is the pushforward of $P$ under $X$
+alone, obtained from the joint by integrating out the other coordinate,
+
+$$
+p(x) = \int p(x, y)\, dy ,
+\qquad
+p(y) = \int p(x, y)\, dx .
+$$
+
+Geometrically: collapse the mountain onto one axis — the marginal is the
+mountain's **shadow**. And a shadow forgets. It records how much mass sits over
+each $x$, but nothing about how that mass is distributed in $y$.
+
+This forgetting is a one-way street with a name you will meet again:
+
+::: {.callout-tip}
+
+## Key takeaway: many mountains, same shadows
+
+The map from joints to marginal pairs is **many-to-one**. Fix both shadows to be
+standard normal; then *every* correlation $\rho \in (-1, 1)$ gives a different
+mountain casting those same two shadows (Act I of the demo below — drag $\rho$
+and watch the mountain twist while the shadows stand still). A joint with
+prescribed marginals is called a **coupling** of them, and the set of couplings
+is enormous. Choosing a *particular* coupling of noise and data — a particular
+mountain over the (noise, data) plane — is precisely what a generative model
+does; the transport tutorials
+([the intuitive story](./05-transport-story.qmd) and
+[the rigorous account](./10-transport-rigorous.qmd)) are entirely about which
+coupling to select. The mathematics of that choice starts here, with the fact
+that shadows do not determine the mountain.
+
+:::
+
+One special coupling deserves its name now: $X$ and $Y$ are **independent** when
+the joint is the product of the marginals, $p(x,y) = p(x)\,p(y)$ — the mountain
+built by extruding one shadow along the other, with no interaction. Independence
+is thus *one point* in the vast space of couplings, not the typical case;
+elementary courses over-expose it because it is the easiest mountain to compute
+with.
+
+**Interactive demo** — [The Joint Slicer](../materials/joint-slicer.html){target="_blank"}
+
+<iframe src="../materials/joint-slicer.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: a correlated Gaussian joint with fixed marginals and draggable slices; a mixed two-shelf joint with posterior readout"></iframe>
+
+## 3. Conditionals are slices, renormalized
+
+Fix a value $x_0$ and ask: *given* that $X = x_0$, how is $Y$ distributed? On the
+mountain, the answer is geometric: cut a vertical **slice** through the mountain
+at $x = x_0$. The slice's profile $y \mapsto p(x_0, y)$ has the right *shape* but
+the wrong *total* — it is a sliver of mass, not a probability distribution. So
+renormalize: divide by the slice's own area, which is exactly the marginal
+$p(x_0)$. The result is the **conditional density**
+
+$$
+p(y \mid x_0) \;=\; \frac{p(x_0, y)}{p(x_0)} .
+$$
+
+*Slice, then renormalize.* That is the entire definition, and Act I of the demo
+lets you drag the slice line and watch both steps: the raw sliver (dashed) and
+its re-inflated version (solid).
+
+In blob language: conditioning on $X = x_0$ *restricts* the blob to the region
+$\{X = x_0\}$ and rescales $P$ so the restricted region has mass $1$. For an
+event $B$ with $P(B) > 0$ this is elementary division,
+$P(A \mid B) = P(A \cap B)/P(B)$. For $X = x_0$ with a continuous $X$ the
+conditioning event has probability zero, division is $0/0$ — and the density
+formula above quietly does something deeper: it defines the conditional as a
+*limit of thickened slices* $\{x_0 \le X \le x_0 + \varepsilon\}$ as
+$\varepsilon \to 0$.
+
+::: {.callout-warning}
+
+## A lean caution: conditioning on probability-zero events (Borel–Kolmogorov)
+
+Because that limit is taken along shrinking *bands*, the answer can depend on the
+**shape of the bands**. The same probability-zero set can be presented in two
+ways — say, as the vertical line $\{X = 0\}$ or as a diagonal-parameterized
+family that happens to collapse onto that same line — and the two shrinking
+procedures can yield *different* conditional distributions. This is the
+Borel–Kolmogorov paradox. The operational rule is simple: **a conditional
+distribution is well-defined relative to a chosen slicing variable** (formally: a
+chosen $\sigma$-algebra), not relative to the bare event. Always know *which
+variable* you are conditioning on. In this course the slicing variable is always
+explicit — $p(x_0 \mid x_t)$ slices along $x_t$ — so the paradox never bites;
+but it is why careful texts define conditionals via $\sigma$-algebras rather
+than via events.
+
+:::
+
+## 4. Bayes' rule is the freedom to slice both ways
+
+The mountain does not care which axis you slice along. Vertical slices give
+$p(y \mid x)$; horizontal slices give $p(x \mid y)$; and both factorizations
+rebuild the same mountain:
+
+$$
+p(x, y) \;=\; p(y \mid x)\, p(x) \;=\; p(x \mid y)\, p(y).
+$$
+
+Read the second equality as a statement about one object — *ribbons of
+conditional mass, weighted by the shadow, tile the mountain, in either
+direction* — and division gives
+
+$$
+p(x \mid y) \;=\; \frac{p(y \mid x)\, p(x)}{p(y)} ,
+\qquad
+p(y) = \int p(y \mid x)\, p(x)\, dx .
+$$
+
+That is Bayes' rule. On the measure-theoretic picture it is not a new axiom, not
+a philosophy, not even a theorem of any depth: it is the observation that a
+mountain admits two slicings. All of its power in applications comes from an
+asymmetry of *availability*, not of mathematics — models are naturally specified
+in one direction (a cause $x$ producing an observation $y$ via $p(y \mid x)$),
+while inference needs the other ($p(x \mid y)$). Bayes' rule is the pivot between
+them.
+
+## 5. Mixed joints: the two-shelf picture
+
+Diffusion models constantly condition between a *discrete* variable and a
+*continuous* one, and there the mountain picture needs one adjustment. Let $z \in
+\{-1, +1\}$ be a latent label with $P(z = -1) = \pi$, and let $x \mid z \sim
+\mathcal{N}(z, \sigma^2)$. The joint of $(z, x)$ is not a mountain over the
+plane: it is **two shelves** of 1-D density, one per value of $z$, holding masses
+$\pi$ and $1 - \pi$:
+
+$$
+p(z, x) \;=\;
+\begin{cases}
+\pi \cdot \mathcal{N}(x; -1, \sigma^2) & z = -1,\\[2pt]
+(1-\pi) \cdot \mathcal{N}(x; +1, \sigma^2) & z = +1.
+\end{cases}
+$$
+
+![A mixed joint: one discrete and one continuous variable. The joint is two weighted shelves of density; a vertical slice crosses both shelves, and renormalizing the two heights gives the posterior over z.](figs/two-shelves.svg){width=100%}
+
+Everything from §§2–4 transfers verbatim, with one integral replaced by a sum:
+
+- **Marginal of $x$** (shadow of both shelves): the mixture
+  $p(x) = \pi\, \mathcal{N}(x; -1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; +1,
+  \sigma^2)$.
+- **Conditional of $x$ given $z$** (one shelf, renormalized): just
+  $\mathcal{N}(x; z, \sigma^2)$ — the model as specified.
+- **Conditional of $z$ given $x$** — slice vertically at $x$. The slice meets
+  *two points* of mass, the heights of the two shelves; renormalizing the pair
+  gives the **posterior**
+
+$$
+P(z = +1 \mid x)
+= \frac{(1-\pi)\, \mathcal{N}(x; +1, \sigma^2)}
+       {\pi\, \mathcal{N}(x; -1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; +1, \sigma^2)} .
+$$
+
+This is Bayes' rule again, but now the slice-and-renormalize is a two-bar
+histogram — Act II of the demo, where the slice line drags across both shelves
+and the posterior bars re-balance live.
+
+### The worked example this course runs on
+
+Set $\pi = \tfrac12$. Cancel the common factor and simplify the ratio of
+Gaussians:
+
+$$
+P(z = +1 \mid x)
+= \frac{e^{-(x-1)^2/2\sigma^2}}{e^{-(x+1)^2/2\sigma^2} + e^{-(x-1)^2/2\sigma^2}}
+= \frac{1}{1 + e^{-2x/\sigma^2}}
+= \operatorname{sigmoid}\!\left(\frac{2x}{\sigma^2}\right),
+$$
+
+and therefore the **posterior mean** of the label is
+
+$$
+\mathbb{E}[z \mid x]
+= (+1)\,P(z{=}{+1} \mid x) + (-1)\,P(z{=}{-1} \mid x)
+= \tanh\!\left(\frac{x}{\sigma^2}\right).
+$$
+
+This sigmoid/tanh pair is the exact object that appears in
+[Two-Point Diffusion](./07-two-point-diffusion.qmd) as the optimal denoiser
+$\mathbb{E}[x_0 \mid x]$: what a denoiser computes *is* a posterior mean — a
+slice through a joint of (clean, noisy), renormalized, then averaged. Seen from
+this tutorial, the W01 formula is one drag of the slice line in Act II.
+
+::: {.callout-tip}
+
+## Key takeaway
+
+Four pictures, one object. The **joint** is the complete description (mountain,
+or shelves). **Marginals** are its shadows — lossy, with many joints per
+shadow-pair. **Conditionals** are its slices, renormalized to unit mass —
+well-defined once you say which variable slices. **Bayes' rule** is the identity
+between the two ways of slicing. Every probabilistic statement in this course —
+$p(x_t \mid x_0)$, the posterior over components, $\mathbb{E}[x_0 \mid x_t]$ —
+is one of these four moves on some joint.
+
+:::
+
+## 6. What is deferred, deliberately
+
+Three objects belong to this storyline but deserve their own installment:
+**likelihood** (the conditional read as a function of the parameter, not the
+data), the **score** (the gradient of a log-density, i.e. of a log-slice), and
+**KL divergence** (a measure-theoretic comparison of two mountains). They are
+next in the sequence; for now, [Distributions and Maximum
+Likelihood](./04-distributions-mle.qmd) covers the working versions used in
+lecture.
+
+## Exercises
+
+1. Two fair coin tosses; $X$ = first toss, $Y$ = number of heads. Write the four
+   nonzero entries of the joint as a $2 \times 3$ table, compute both marginals
+   (shadow along each axis), and both conditional families. Verify Bayes' rule on
+   $P(X = H \mid Y = 1)$.
+2. For the correlated Gaussian of Act I, verify by completing the square that the
+   vertical slice at $x_0$, renormalized, is
+   $\mathcal{N}(\rho x_0,\, 1 - \rho^2)$. Confirm both readings against the demo:
+   the slice's center moves with $x_0$ (unless $\rho = 0$) and its width does
+   not.
+3. Construct two *different* joints on $\{0,1\}^2$ with both marginals uniform.
+   (You have found two couplings of the same shadows. How many are there?)
+4. Show that if $p(x,y) = p(x)\,p(y)$ then every vertical slice, renormalized, is
+   the same distribution $p(y)$ — independence means *the slices don't move*.
+   Check this in Act I at $\rho = 0$.
+5. Derive the sigmoid posterior above, keeping general $\pi$; show the effect of
+   $\pi \neq \tfrac12$ is an additive shift $\tfrac{\sigma^2}{2}\log
+   \tfrac{1-\pi}{\pi}$ in $x$. Watch the bars in Act II shift as you drag $\pi$.
+6. Compute $\mathbb{E}[\,\mathbb{E}[z \mid x]\,]$ for the two-shelf joint by
+   integrating the tanh against the mixture marginal — argue *without
+   computing any integral* that the answer must be $1 - 2\pi$. (This is the tower
+   property; it will become the workhorse identity of the course.)
+7. *(Borel–Kolmogorov, lean.)* On the unit square with uniform mass, the event
+   "$Y = X$" has probability zero. Compare conditioning via horizontal bands
+   $\{|Y - x| \le \varepsilon\}$ at each $x$ with conditioning via diagonal bands
+   $\{|Y - X| \le \varepsilon\}$: both shrink to the same line, but the induced
+   distributions on the line differ. Which slicing variable does each choice
+   correspond to?

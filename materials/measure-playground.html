@@ -1,0 +1,353 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Measure Playground</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+      --heat: 57, 135, 229;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+    --heat: 57, 135, 229;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  .math { font-style: italic; white-space: nowrap; }
+  sub, sup { line-height: 0; font-size: 0.68em; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  .legend { display: flex; gap: 1.1rem; font-size: 0.74rem; color: var(--ink-2);
+    text-transform: none; letter-spacing: 0; }
+  .legend .key { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend .swatch { width: 14px; height: 0; border-top: 2.5px solid var(--data); border-radius: 2px; }
+  .legend .swatch.lik { border-top-color: var(--lik); }
+  canvas { display: block; width: 100%; touch-action: none; }
+  #c-blob { height: 360px; }
+  .panes { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+  .panes > div { flex: 1; min-width: 0; }
+  .panes canvas { height: 170px; }
+  .panelabel { font-family: system-ui, sans-serif; font-size: 0.72rem; color: var(--muted);
+    letter-spacing: 0.08em; margin: 0 0 0.3rem; }
+  #c-quant { height: 340px; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.4rem; }
+  input[type="range"] { width: 150px; accent-color: var(--data); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.4em; display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.85rem; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid); padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Foundations demo</p>
+    <h1>The Measure Playground</h1>
+    <p class="dek">Two ideas, made draggable: a &#963;-algebra is a <em>resolution</em> on the
+    space of outcomes, and expectation is an <em>area</em> under the quantile curve.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I &#183; Resolution</span>A &#963;-algebra is a pixelation</h2>
+    <p>The blob below is a sample space &#937;, and the colouring is a random variable
+    X(&#969;) &#8212; a number attached to every outcome. Drag the slider: at each resolution
+    you see not X itself but its <em>per-pixel average</em> &#8212; the best version of X that
+    this resolution can express. A random variable is <em>measurable</em> at a resolution
+    exactly when it is constant on each pixel: nothing of it is lost.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>&#937; coloured by X, seen at finite resolution</span>
+        <span class="legend"><span class="key"><span class="swatch"></span> low &#8594; high X</span></span>
+      </div>
+      <canvas id="c-blob" role="img" aria-label="A blob-shaped sample space colored by a random variable, rendered at an adjustable pixel resolution; coarse pixels show per-pixel averages."></canvas>
+      <div class="controls">
+        <label>resolution
+          <input id="s-res" type="range" min="1" max="7" step="1" value="3">
+          <span class="val" id="v-res">8&#215;8</span></label>
+      </div>
+      <figcaption>Coarse pixels = a small &#963;-algebra: few questions can be asked, and X is
+      replaced by its average on each cell. Fine pixels = a rich &#963;-algebra: X becomes
+      fully visible. (Averaging X over the pixels of a coarser resolution is exactly the
+      <em>conditional expectation</em> &#8212; the central object of this course, in a later
+      tutorial.)</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II &#183; Integration</span>Expectation is the area under the quantile curve</h2>
+    <p>Take &#937; = [0,1] with uniform mass and let X = Q(u) be the quantile (inverse-CDF)
+    map of a two-bump mixture. Then E[X] = &#8747;&#8320;&#185; Q(u)&#8201;du: the <em>signed area</em>
+    under the curve. Lebesgue's construction is the staircase: approximate Q by a simple
+    function (finitely many values), add value &#215; width, refine.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>Q(u) for the mixture &#960;&#183;N(&#8722;1,&#963;&#178;) + (1&#8722;&#960;)&#183;N(+1,&#963;&#178;)</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> Q(u)</span>
+          <span class="key"><span class="swatch lik"></span> staircase (simple function)</span>
+        </span>
+      </div>
+      <canvas id="c-quant" role="img" aria-label="Quantile curve of a two-component mixture with signed area shaded and a staircase simple-function approximation; readouts show the staircase sum converging to the exact mean."></canvas>
+      <div class="controls">
+        <label>&#960; <input id="s-pi" type="range" min="0.05" max="0.95" step="0.05" value="0.35"><span class="val" id="v-pi">0.35</span></label>
+        <label>&#963; <input id="s-sig" type="range" min="0.05" max="1.2" step="0.05" value="0.45"><span class="val" id="v-sig">0.45</span></label>
+        <label>steps <input id="s-k" type="range" min="1" max="8" step="1" value="3"><span class="val" id="v-k">8</span></label>
+      </div>
+      <div class="readout" id="r-quant"></div>
+      <figcaption>Slide &#963; toward 0 and the curve becomes the staircase of the two-point
+      distribution &#8212; whose expectation you can read off as two rectangles. Increase the
+      steps and watch the staircase sum converge to the exact mean E[X] = 1 &#8722; 2&#960;:
+      that convergence <em>is</em> the definition of the Lebesgue integral.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="takeaway"><strong>The two acts are one story.</strong> Probability is a measure
+    (area on &#937;); a random variable is a map out of &#937;; expectation is the integral of that
+    map against the measure &#8212; computable on the blob (Act I: average the colouring) or,
+    after transport to [0,1], as an area under a curve (Act II). Same number, two homes.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion tutorial on the <a href="https://acads-iit-jammu.github.io/diffusion-models-f26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  function setupCanvas(id, draw) {
+    const el = document.getElementById(id);
+    const ctx = el.getContext("2d");
+    const st = { el, ctx, w: 0, h: 0 };
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const r = el.getBoundingClientRect();
+      st.w = r.width; st.h = r.height;
+      el.width = Math.round(r.width * dpr); el.height = Math.round(r.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(st);
+    }
+    new ResizeObserver(resize).observe(el);
+    st.redraw = () => draw(st);
+    return st;
+  }
+
+  // ---------------- Act I: pixelated blob ----------------
+  const inBlob = (x, y) => {           // x,y in [-1.45,1.45]
+    const th = Math.atan2(y, x), rr = Math.hypot(x, y);
+    return rr <= 1 + 0.14 * Math.sin(3 * th) + 0.07 * Math.cos(5 * th);
+  };
+  const field = (x, y) => x + 0.35 * Math.sin(2.4 * y);   // the random variable X
+
+  let resPow = 3;   // grid = 2^resPow
+  const blob = setupCanvas("c-blob", (st) => {
+    const { ctx, w, h } = st;
+    ctx.clearRect(0, 0, w, h);
+    const S = Math.min(w, h) * 0.92;
+    const ox = w / 2, oy = h / 2;
+    const toPx = (x, y) => [ox + x / 1.45 * S / 2, oy - y / 1.45 * S / 2];
+    const K = Math.pow(2, resPow);
+    // clip to blob
+    ctx.save();
+    ctx.beginPath();
+    for (let i = 0; i <= 200; i++) {
+      const th = i / 200 * 2 * Math.PI;
+      const rr = 1 + 0.14 * Math.sin(3 * th) + 0.07 * Math.cos(5 * th);
+      const [px, py] = toPx(rr * Math.cos(th), rr * Math.sin(th));
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.clip();
+    // per-cell averages over a subsample
+    const heat = css("--heat").split(",").map((v) => +v.trim());
+    for (let i = 0; i < K; i++) for (let j = 0; j < K; j++) {
+      const x0 = -1.45 + 2.9 * i / K, y0 = -1.45 + 2.9 * j / K;
+      let sum = 0, n = 0;
+      const M = 4;
+      for (let a = 0; a < M; a++) for (let b = 0; b < M; b++) {
+        const x = x0 + (a + 0.5) / M * 2.9 / K, y = y0 + (b + 0.5) / M * 2.9 / K;
+        if (inBlob(x, y)) { sum += field(x, y); n++; }
+      }
+      if (!n) continue;
+      const v = (sum / n + 1.6) / 3.2;               // normalize to [0,1]
+      const [px, py] = toPx(x0, y0 + 2.9 / K);
+      const [qx, qy] = toPx(x0 + 2.9 / K, y0);
+      ctx.fillStyle = "rgba(" + heat[0] + "," + heat[1] + "," + heat[2] + "," + (0.12 + 0.78 * v) + ")";
+      ctx.fillRect(px, py, qx - px + 0.7, qy - py + 0.7);
+    }
+    ctx.restore();
+    // blob outline + grid lines over the blob
+    ctx.strokeStyle = css("--data");
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i <= 200; i++) {
+      const th = i / 200 * 2 * Math.PI;
+      const rr = 1 + 0.14 * Math.sin(3 * th) + 0.07 * Math.cos(5 * th);
+      const [px, py] = toPx(rr * Math.cos(th), rr * Math.sin(th));
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  });
+  const sRes = document.getElementById("s-res"), vRes = document.getElementById("v-res");
+  sRes.addEventListener("input", () => {
+    resPow = +sRes.value;
+    const K = Math.pow(2, resPow);
+    vRes.textContent = K + "\u00d7" + K;
+    blob.redraw();
+  });
+
+  // ---------------- Act II: quantile area ----------------
+  function erf(x) {
+    const s = x < 0 ? -1 : 1; x = Math.abs(x);
+    const t = 1 / (1 + 0.3275911 * x);
+    const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t
+      - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+    return s * y;
+  }
+  const Phi = (z) => 0.5 * (1 + erf(z / Math.SQRT2));
+  let PI_ = 0.35, SIG = 0.45, KPOW = 3;
+  const Fmix = (x) => PI_ * Phi((x + 1) / SIG) + (1 - PI_) * Phi((x - 1) / SIG);
+  function Qmix(u) {
+    let lo = -8, hi = 8;
+    for (let i = 0; i < 60; i++) {
+      const mid = (lo + hi) / 2;
+      if (Fmix(mid) < u) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  const rQuant = document.getElementById("r-quant");
+  const quant = setupCanvas("c-quant", (st) => {
+    const { ctx, w, h } = st;
+    const pad = { l: 14, r: 14, t: 14, b: 26 };
+    ctx.clearRect(0, 0, w, h);
+    const YM = 2.6;
+    const xToPx = (u) => pad.l + u * (w - pad.l - pad.r);
+    const yToPx = (q) => pad.t + (YM - q) / (2 * YM) * (h - pad.t - pad.b);
+    ctx.font = "11px system-ui, sans-serif";
+    for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+      ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(xToPx(t), pad.t); ctx.lineTo(xToPx(t), h - pad.b); ctx.stroke();
+      ctx.fillStyle = css("--muted"); ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText(String(t), xToPx(t), h - pad.b + 5);
+    }
+    ctx.strokeStyle = css("--axis");
+    ctx.beginPath(); ctx.moveTo(pad.l, yToPx(0)); ctx.lineTo(w - pad.r, yToPx(0)); ctx.stroke();
+    for (const q of [-1, 1]) {
+      ctx.strokeStyle = css("--grid");
+      ctx.beginPath(); ctx.moveTo(pad.l, yToPx(q)); ctx.lineTo(w - pad.r, yToPx(q)); ctx.stroke();
+    }
+    // signed area fill + curve
+    const N = 400;
+    ctx.beginPath();
+    ctx.moveTo(xToPx(0.001), yToPx(0));
+    for (let i = 0; i <= N; i++) {
+      const u = 0.001 + 0.998 * i / N;
+      ctx.lineTo(xToPx(u), yToPx(Math.max(-YM, Math.min(YM, Qmix(u)))));
+    }
+    ctx.lineTo(xToPx(0.999), yToPx(0));
+    ctx.closePath();
+    ctx.fillStyle = css("--data-soft");
+    ctx.fill();
+    ctx.strokeStyle = css("--data"); ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      const u = 0.001 + 0.998 * i / N;
+      const px = xToPx(u), py = yToPx(Math.max(-YM, Math.min(YM, Qmix(u))));
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    // staircase
+    const K = Math.pow(2, KPOW);
+    let sum = 0;
+    ctx.strokeStyle = css("--lik"); ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let k = 0; k < K; k++) {
+      const u0 = k / K, u1 = (k + 1) / K;
+      const q = Qmix((u0 + u1) / 2);
+      sum += q / K;
+      const qc = Math.max(-YM, Math.min(YM, q));
+      ctx.moveTo(xToPx(u0), yToPx(qc)); ctx.lineTo(xToPx(u1), yToPx(qc));
+    }
+    ctx.stroke();
+    const exact = 1 - 2 * PI_;
+    rQuant.innerHTML = "staircase sum (" + K + " steps): <b>" + sum.toFixed(4) +
+      "</b> &nbsp;&#8594;&nbsp; exact E[X] = 1 &#8722; 2&#960; = <b>" + exact.toFixed(4) + "</b>";
+  });
+  function bind(id, vid, set, fmt) {
+    const el = document.getElementById(id), v = document.getElementById(vid);
+    el.addEventListener("input", () => { set(+el.value); v.textContent = fmt(+el.value); quant.redraw(); });
+  }
+  bind("s-pi", "v-pi", (x) => { PI_ = x; }, (x) => x.toFixed(2));
+  bind("s-sig", "v-sig", (x) => { SIG = x; }, (x) => x.toFixed(2));
+  bind("s-k", "v-k", (x) => { KPOW = x; }, (x) => String(Math.pow(2, x)));
+
+  const redrawAll = () => { blob.redraw(); quant.redraw(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
+  new MutationObserver(redrawAll).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

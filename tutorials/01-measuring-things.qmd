@@ -1,0 +1,373 @@
+# Measuring Things — From Length to Probability {.unnumbered}
+
+*A standalone tutorial, and the first of two on the measure-theoretic view of
+probability. It assumes no exposure to measure theory. The story: how we measure
+length, area, and volume; why the Riemann integral is the wrong tool for probability;
+how Lebesgue's rearrangement fixes it; and how Kolmogorov used the resulting theory
+of measure to give probability a rigorous foundation. The sequel,
+[Joint, Marginal, Conditional — and Bayes](./02-joint-conditional-bayes.qmd),
+builds the multivariate picture on this footing.*
+
+::: {.callout-note}
+
+## Why this tutorial exists
+
+Every object in this course — density, likelihood, score, KL divergence,
+pushforward, transport map — is a measure-theoretic object. One can use them by
+rote, but the moment a formula surprises you (why is $P(X = x) = 0$ for every $x$
+yet the density is positive? what does $\mathbb{E}[x_0 \mid x_t]$ actually average
+over?), the only reliable footing is the measure-theoretic one. This tutorial
+builds that footing visually, with almost no machinery.
+
+:::
+
+## 1. How do we measure things?
+
+Start with questions a ruler can answer.
+
+- **Length.** The interval $[a, b]$ has length $b - a$. If a set is a disjoint
+  union of intervals, its length is the sum of the pieces.
+- **Area.** A rectangle has area width $\times$ height. For a curved region, we
+  tile it with many small rectangles and add; as the tiles shrink, the sum
+  converges to what we call the area.
+- **Volume.** Same idea, one dimension up: boxes, then sums of boxes, then limits.
+
+In each case the procedure is identical: a *measure* is a rule $m$ that assigns a
+non-negative number to a set, such that
+
+1. $m(\varnothing) = 0$ — nothing has measure zero;
+2. if $A_1, A_2, \dots$ are disjoint, then
+   $m\!\big(\bigcup_i A_i\big) = \sum_i m(A_i)$ — the whole is the sum of its
+   disjoint parts (*additivity*).
+
+Length, area, volume, mass, and — this is the punchline of the tutorial —
+*probability* are all instances of this one definition. Probability will simply be
+a measure whose total is $1$.
+
+But there is a catch, and it is not pedantry. Once $\Omega$ is uncountable (an
+interval, the plane, the space of images), one can construct sets so pathological
+that *no* additive rule can consistently assign them a size.^[The Vitali
+construction; the Banach–Tarski paradox is the three-dimensional version. Both use
+the axiom of choice to build sets no explicit formula can describe.] The
+resolution is not to fix the rule but to restrict the questions: we measure only a
+well-behaved family of sets, closed under the operations we need (complements,
+countable unions). That family is called a **$\sigma$-algebra**, and every set in
+it is called **measurable**. This single concession — *not every subset gets a
+size* — is the entire entrance fee of measure theory. Everything else is payoff.
+
+## 2. Two ways to integrate: strips versus slabs
+
+An integral is a measured total: the area under a curve, the average of a
+quantity, the expected value of a random variable. There are two ways to organize
+the computation, and the difference between them is the difference between
+seventeenth-century and twentieth-century analysis.
+
+![Riemann slices the domain into vertical strips; Lebesgue slices the range into horizontal slabs and asks how much of the domain lands in each.](figs/riemann-vs-lebesgue.svg){width=100%}
+
+**Riemann (strips).** Chop the *domain* (the $x$-axis) into small intervals; on
+each, approximate $f$ by a constant; add up rectangle areas; refine. This works
+beautifully when $f$ is continuous — nearby $x$'s have nearby $f(x)$'s, so the
+rectangles hug the curve.
+
+**Lebesgue (slabs).** Chop the *range* (the $y$-axis) into small levels; for each
+level $y$, ask *how much of the domain* is mapped near $y$ — that is, measure the
+set $\{x : f(x) \approx y\}$; multiply level by measure; add; refine. Lebesgue's
+own summary: to count coins, Riemann takes them in the order they sit on the
+table; Lebesgue first sorts them by denomination, then counts each pile.
+
+Why bother with the second way?
+
+- **It tolerates wild functions.** The indicator of the rationals on $[0,1]$
+  ($1$ on rationals, $0$ on irrationals) breaks Riemann completely — every strip
+  contains both values. Lebesgue shrugs: the set of rationals has measure $0$, the
+  set of irrationals has measure $1$, so the integral is
+  $1 \cdot 0 + 0 \cdot 1 = 0$.
+- **It only needs a measure.** The slab computation never uses the geometry of
+  the domain — only the ability to *measure* sets like $\{x: f(x) > y\}$. So the
+  same definition of integral works when the domain is an interval, a plane, a
+  space of images, or an abstract sample space with a probability on it. This is
+  exactly the generality probability needs.
+- **It has the strong limit theorems.** Interchanging limits and integrals — the
+  daily bread of this course, every time we differentiate a loss under an
+  expectation — is licensed by Lebesgue's convergence theorems, not Riemann's.
+
+The layer-cake picture makes the definition concrete for a non-negative $f$: the
+region under the graph is a stack of horizontal slabs, the slab at height $y$ has
+width $m(\{x: f(x) > y\})$, and
+
+$$
+\int f \, dm \;=\; \int_0^\infty m\big(\{x : f(x) > y\}\big)\, dy .
+$$
+
+![The layer-cake representation: the area under the curve is the total of horizontal slabs, each as wide as the set where the function exceeds that height.](figs/layer-cake.svg){width=88%}
+
+::: {.callout-tip}
+
+## Key takeaway
+
+An integral is a *measure-weighted sum of values*. Riemann organizes the sum by
+*where* you are (domain strips); Lebesgue organizes it by *what value* you see
+(range slabs). The Lebesgue organization needs nothing from the domain except a
+measure — which is precisely why probability, whose domains are abstract sample
+spaces, is built on it.
+
+:::
+
+## 3. Kolmogorov's move: probability *is* a measure
+
+Before 1933, probability was mathematically awkward: a calculus of gambling
+intuitions with no agreed definition of its basic objects. Kolmogorov's
+*Grundbegriffe* (1933) settled it with a single identification: a probability
+space is a measure space $(\Omega, \mathcal{F}, P)$ where
+
+- $\Omega$ is the **sample space** — the set of all outcomes of the experiment;
+- $\mathcal{F}$ is a $\sigma$-algebra of subsets of $\Omega$ — the **events**,
+  the questions we are allowed to ask;
+- $P$ is a measure on $\mathcal{F}$ with $P(\Omega) = 1$ — the **probability
+  measure**, total mass one.
+
+That is the entire definition. The axioms you may have met as a list
+(non-negativity, total mass one, additivity) are just the definition of a measure
+with the normalization $P(\Omega)=1$; every rule of probability
+($P(A^c) = 1 - P(A)$, inclusion–exclusion, the continuity of $P$ along monotone
+sequences of events) is a theorem about measures.
+
+::: {.callout-note}
+
+## What is probability, though? Three readings
+
+Kolmogorov's axioms say how probability *behaves*, deliberately not what it
+*means*. The meaning question predates the axioms and has never had a unanimous
+answer; three readings are worth knowing.
+
+- **Frequentist.** $P(A)$ is the long-run frequency of occurrence of $A$ in
+  independent repetitions of the experiment — the fraction of tosses that land
+  heads, in the limit. This grounds probability in data but struggles with
+  single-case events ("the probability this specific bridge fails").
+- **Fiducial** (Fisher). An attempt to transfer a probability statement from data
+  to an unknown parameter *without* assuming a prior — to read
+  "$P(\theta \in I \mid \text{data})$" out of the likelihood alone. Historically
+  influential, foundationally contested, and a useful reminder that not every
+  "probability of a parameter" one writes down is licensed by the axioms.
+- **Measure-theoretic** (the course's working stance). Probability is a
+  normalized measure; full stop. Whether a given application reads it as a
+  frequency, a degree of belief, or a modeling fiction is a question *outside*
+  the mathematics. This agnosticism is a feature: the same theorems serve every
+  interpretation.
+
+The axioms capture the behavior all readings agree on — which is exactly why the
+theory could finally be built.
+
+:::
+
+Two examples calibrate the definition.
+
+- **A die.** $\Omega = \{1,\dots,6\}$, $\mathcal{F}$ = all subsets, $P(A) =
+  |A|/6$. In finite worlds the $\sigma$-algebra is invisible — everything is
+  measurable — which is why elementary probability never mentions it.
+- **A uniform point in $[0,1]$.** $\Omega = [0,1]$, $\mathcal{F}$ = the Borel
+  sets (the $\sigma$-algebra generated by intervals), $P$ = length. Now
+  $P(\{\omega\}) = 0$ for every single outcome, yet $P([0,1]) = 1$: probability
+  lives on sets, not points. Every "paradox" of continuous probability — density
+  values above $1$, zero-probability events that happen — dissolves once
+  probability is read as measure, i.e. as generalized length.
+
+## 4. The blob: seeing $(\Omega, \mathcal{F}, P)$
+
+From here on, picture $\Omega$ as a blob of clay of total mass $1$. Events are
+regions of the blob; $P$ weighs regions; the $\sigma$-algebra is the list of
+regions we can weigh.
+
+![The blob: outcomes are points, events are regions, and the probability measure weighs regions. Intersections, unions, complements are literal geometry.](figs/blob-events.svg){width=92%}
+
+The $\sigma$-algebra deserves one more picture, because it is the one object
+students never get a picture of: a $\sigma$-algebra is a **resolution**. Pixelate
+the blob into a grid of cells. The events expressible at that resolution are
+exactly the unions of cells — a coarse grid can only ask coarse questions; a fine
+grid can ask fine ones. Refining the grid is enlarging the $\sigma$-algebra. (In
+the sequel, "information" will *be* a $\sigma$-algebra: what you know is which
+questions you can answer.)
+
+Play with this now — the first act of the demo below is exactly this picture.
+
+**Interactive demo** — [The Measure Playground](../materials/measure-playground.html){target="_blank"}
+
+<iframe src="../materials/measure-playground.html" width="100%" height="620" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: sigma-algebras as pixelation, expectation as area under the quantile curve"></iframe>
+
+## 5. Random variables: numbers painted on the blob
+
+A **random variable** is not random and is not a variable. It is a function
+
+$$
+X : \Omega \longrightarrow \mathbb{R},
+$$
+
+a number painted on each point of the blob. The randomness lives entirely in
+$P$; $X$ just reads off a numerical feature of the outcome.
+
+One condition is required, and the preimage picture makes it self-evident. To ask
+"what is the probability that $X \le t$?" we must *weigh* the set of outcomes for
+which that holds — the **preimage** $X^{-1}((-\infty, t]) = \{\omega : X(\omega)
+\le t\}$. So that set had better be in $\mathcal{F}$, i.e. weighable. A function
+with this property (for every $t$) is called **measurable**, and *measurable
+function* is the honest name for "random variable."
+
+![Measurability: the question "is X ≤ t?" is answered by weighing the preimage region on the blob. A random variable is a function whose preimages are weighable.](figs/preimage.svg){width=92%}
+
+In the pixelation picture: $X$ is measurable with respect to a given resolution
+exactly when $X$ is constant on each pixel — the resolution is fine enough to see
+$X$. Act I of the demo shows the in-between case: at a coarse resolution you do
+not see $X$ but its per-pixel average, a coarsened stand-in. (That stand-in has a
+name — *conditional expectation* — and it is the single most important object in
+this course. It gets its own treatment later; here it is enough to have seen it.)
+
+## 6. Pushforward: the distribution is the image of the mass
+
+Here is the move the whole course runs on. The map $X$ transports the blob's mass
+onto the real line: the probability that lands on a set $B \subseteq \mathbb{R}$
+is the mass of its preimage,
+
+$$
+\mu_X(B) \;=\; P\big(X^{-1}(B)\big) \;=\; P(X \in B).
+$$
+
+The measure $\mu_X$ on $\mathbb{R}$ is called the **pushforward** of $P$ under
+$X$ (written $X_\# P$), and it is exactly what elementary courses call *the
+distribution of* $X$. The CDF is $F_X(t) = \mu_X((-\infty,t])$; a *density* is a
+function $p_X$ reconstructing $\mu_X$ by integration, $\mu_X(B) = \int_B
+p_X(x)\,dx$, when such a function exists.
+
+Two consequences, both load-bearing later:
+
+- **The blob is forgettable.** Any two random variables with the same pushforward
+  are indistinguishable by probability statements about their values. This is why
+  probability courses can work with distributions and never mention $\Omega$ —
+  and why *we* may choose $\Omega$ freely, to be whatever is convenient.
+- **The canonical choice is $\Omega = [0,1]$.** Take $P$ = length on $[0,1]$ and
+  $X = Q$, the quantile function (inverse CDF) of any target distribution: then
+  $Q_\# (\text{uniform})$ *is* that distribution. Every 1-D distribution is the
+  pushforward of uniform mass through its quantile map — one blob serves all.
+
+![Sampling as transport: uniform mass on [0,1] pushed through the quantile map Q lands as the target distribution. Every 1-D distribution arises this way.](figs/pushforward-quantile.svg){width=100%}
+
+::: {.callout-tip}
+
+## Key takeaway
+
+*Sampling is transport.* A random draw from $\mu$ is uniform mass on $[0,1]$
+pushed through a map. Generative modeling — the subject of this course — is the
+same sentence with a harder source and a learned map: push simple noise through
+$G$ so that $G_\# (\text{noise}) \approx p_{\text{data}}$. The pushforward is not
+a technicality; it is the course's definition of "generate."
+
+:::
+
+## 7. Expectation: the Lebesgue integral, four ways
+
+The **expectation** of $X$ is its Lebesgue integral against $P$:
+
+$$
+\mathbb{E}[X] \;=\; \int_\Omega X(\omega)\, dP(\omega).
+$$
+
+Built in the standard four stages, each is a picture on the blob:
+
+1. **Indicators.** $X = \mathbf{1}_A$ (paint $1$ on region $A$, $0$ elsewhere):
+   $\mathbb{E}[\mathbf{1}_A] = P(A)$. *Expectation of a yes/no question is the
+   probability of yes.* This is the hinge between measure and integral.
+2. **Simple functions.** $X = \sum_k c_k \mathbf{1}_{A_k}$ (finitely many values,
+   one region per value): $\mathbb{E}[X] = \sum_k c_k P(A_k)$ — value times mass,
+   summed. This is Lebesgue's coin-sorting, verbatim.
+3. **Non-negative $X$.** Approximate from below by simple functions; take the
+   supremum. The layer-cake formula of §2 is this stage, drawn.
+4. **General $X$.** Split $X = X^+ - X^-$ and subtract, defined whenever
+   $\mathbb{E}|X| < \infty$.
+
+And by the pushforward, the abstract integral becomes the familiar ones — this
+one line is why the blob never appears in computations:
+
+$$
+\mathbb{E}[X] = \int_\Omega X \, dP
+= \int_{\mathbb{R}} x \, d\mu_X(x)
+= \begin{cases} \sum_x x\, P(X = x) & \text{(discrete)}\\[2pt]
+\int x\, p_X(x)\, dx & \text{(density)} \end{cases}
+$$
+
+There is one more home for the same number, and it is the one this course keeps
+returning to. Take the canonical blob $\Omega = [0,1]$ with $X = Q$: then
+
+$$
+\mathbb{E}[X] \;=\; \int_0^1 Q(u)\, du
+\;=\; \text{signed area under the quantile curve.}
+$$
+
+![Expectation as area: the integral of the quantile function over [0,1]. Left, a smooth mixture; right, a two-point distribution, where the area is two rectangles.](figs/quantile-area.svg){width=100%}
+
+For a two-point distribution taking values $-1$ and $+1$ with masses $\pi$ and
+$1-\pi$, the quantile curve is a staircase with one step, the area is two
+rectangles, and $\mathbb{E}[X] = (-1)\pi + (+1)(1-\pi) = 1 - 2\pi$ — read
+directly off the picture. Act II of the demo animates the whole construction:
+the staircase (a simple function) refines, its sum converges to the exact area,
+and sliding $\sigma \to 0$ morphs a smooth mixture into this staircase.
+
+### Properties, and where each one lives
+
+With the four-stage construction in hand, the standard properties sort into two
+piles: those *visible on the blob* and those that are *theorems of the limit
+stage*.
+
+| Property | Statement | Why |
+|---|---|---|
+| Linearity | $\mathbb{E}[aX + bY] = a\mathbb{E}[X] + b\mathbb{E}[Y]$ | Obvious for simple functions (regroup regions); survives the limit. Needs **no independence** — the most-used, least-appreciated fact in probability. |
+| Monotonicity | $X \le Y \Rightarrow \mathbb{E}[X] \le \mathbb{E}[Y]$ | Lower paint, lower total. |
+| Normalization | $\mathbb{E}[c] = c$ | The blob has mass 1. |
+| Indicator bridge | $\mathbb{E}[\mathbf{1}_A] = P(A)$ | Definition, stage 1. |
+| Null sets are invisible | $X = Y$ except on a set of measure $0$ $\Rightarrow \mathbb{E}[X] = \mathbb{E}[Y]$ | Regions of mass 0 contribute value $\times$ 0. |
+| Limit interchange | $X_n \to X$ $\Rightarrow$ $\mathbb{E}[X_n] \to \mathbb{E}[X]$ *under conditions* (monotone or dominated convergence) | The Lebesgue theory's crown jewels; **not** free, and the reason the theory wins. |
+
+The last row is the one to respect: every "differentiate under the integral sign"
+and every "swap the limit and the expectation" in this course is an appeal to
+dominated convergence. Riemann's theory has no comparably usable license.
+
+## 8. The dictionary, and what comes next
+
+| Measure theory | Probability | Picture |
+|---|---|---|
+| Measure space $(\Omega, \mathcal{F}, m)$ | Probability space $(\Omega, \mathcal{F}, P)$, $P(\Omega)=1$ | Blob of clay, mass 1 |
+| Measurable set | Event | Weighable region |
+| $\sigma$-algebra | Family of askable questions | Resolution / pixelation |
+| Measurable function | Random variable | Numbers painted on the blob |
+| Pushforward $X_\# P$ | Distribution of $X$ | Mass transported to $\mathbb{R}$ |
+| Lebesgue integral $\int X\, dP$ | Expectation $\mathbb{E}[X]$ | Value $\times$ mass, totaled; area under $Q$ |
+| Almost everywhere | Almost surely | Except on mass-0 dust |
+| Density (Radon–Nikodym derivative) | pdf $p_X$ | Mass per unit length |
+
+The sequel, [Joint, Marginal, Conditional — and Bayes](./02-joint-conditional-bayes.qmd),
+puts *two* numbers on the blob and develops joints as mountains, marginals as
+shadows, conditionals as renormalized slices, and Bayes' rule as the freedom to
+slice in either direction — the grammar in which every diffusion-model statement
+($p(x_t \mid x_0)$, $\mathbb{E}[x_0 \mid x_t]$, the posterior over mixture
+components) is written. A later installment will build likelihood, score, and KL
+divergence on the same footing.
+
+## Exercises
+
+1. Show from additivity alone that $P(A \cup B) = P(A) + P(B) - P(A \cap B)$.
+   (Cut the blob into three disjoint pieces.)
+2. On $\Omega = [0,1]$ with length, compute $\mathbb{E}[X]$ for
+   $X(\omega) = \mathbf{1}_{[0,1/2]}(\omega) - \mathbf{1}_{(1/2,1]}(\omega)$
+   twice: by stage 2 of the construction, and as an area under a staircase.
+3. The indicator of the rationals: verify that every Riemann sum on $[0,1]$ can
+   be made $0$ or $1$ by choice of sample points, while the Lebesgue integral
+   is $0$. Which axiom of the measure makes the rationals a null set?
+   *(Hint: cover the $n$-th rational by an interval of length
+   $\varepsilon/2^n$.)*
+4. Let $Q$ be the quantile function of the mixture in the demo. Explain, using
+   the pushforward, why `Q(rand())` is a correct sampler, and why *every* 1-D
+   sampler is secretly of this form.
+5. For the two-point distribution with masses $\pi$ (at $-1$) and $1-\pi$ (at
+   $+1$), draw the quantile staircase, shade the signed area, and confirm
+   $\mathbb{E}[X] = 1-2\pi$. Then check it against the demo's readout.
+6. In the pixelation picture, take a $2\times 2$ resolution of $[0,1]^2$ and
+   $X(\omega_1,\omega_2) = \omega_1$. Is $X$ measurable at this resolution? What
+   is its per-pixel average? At what resolutions does the answer change?

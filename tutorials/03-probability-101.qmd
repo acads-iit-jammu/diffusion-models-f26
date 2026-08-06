@@ -3,7 +3,7 @@
 *A standalone tutorial (used in [W02](../weeks/w02.qmd)): a self-contained refresher on the probability prerequisites of the
 course: sample spaces, random variables, joint and marginal distributions,
 conditioning, and expectation. Readers comfortable with these notions may proceed
-directly to [Distributions and Maximum Likelihood](./02-distributions-mle.qmd).*
+directly to [Distributions and Maximum Likelihood](./04-distributions-mle.qmd).*
 
 Probability theory is built on two distinct maps: the probability measure, which
 assigns numbers to events, and the random variable, which assigns numbers to
@@ -94,7 +94,7 @@ Three properties of densities deserve emphasis.
   neighborhoods.
 - The cumulative distribution function (CDF) $F(x) = \mathbb{P}(X \le x)$ applies
   to discrete and continuous variables alike, and its derivative, where it exists,
-  is the pdf. The CDF appears in [Generative AI, in Its Simplest Form](./04-genai-simplest-form.qmd) as the sampling map $F^{-1}$.
+  is the pdf. The CDF appears in [Generative AI, in Its Simplest Form](./06-genai-simplest-form.qmd) as the sampling map $F^{-1}$.
 
 ## Joint distributions
 
@@ -133,7 +133,7 @@ the origin of the term: $\mathbb{P}(\text{cloudy}) = 0.45$ and
 $\mathbb{P}(\text{rain}) = 0.25$. The operation is justified directly by the
 additivity axiom: the event "cloudy" is the disjoint union of "cloudy and rain" and
 "cloudy and no rain". Marginalization recurs throughout the course; in the mixture
-model of [Generative AI, in Its Simplest Form](./04-genai-simplest-form.qmd), the observed density
+model of [Generative AI, in Its Simplest Form](./06-genai-simplest-form.qmd), the observed density
 $p(x) = \sum_z p(z)\, p(x \mid z)$ is precisely the joint distribution of
 $(x, z)$ with the latent variable summed out.
 
@@ -165,7 +165,7 @@ data point and $y$ the noisy observation.
 $X$ and $Y$ are **independent** if $p(x, y) = p(x)\, p(y)$ for all $x, y$ —
 equivalently, if $p(y \mid x) = p(y)$, so that conditioning on $X$ conveys no
 information about $Y$. In the table, $0.20 \ne 0.45 \times 0.25$, so the two
-variables are dependent. The i.i.d. assumption underlying the likelihoods of [Distributions and Maximum Likelihood](./02-distributions-mle.qmd)
+variables are dependent. The i.i.d. assumption underlying the likelihoods of [Distributions and Maximum Likelihood](./04-distributions-mle.qmd)
 are an independence statement applied to repeated observations.
 
 ## Expectation
@@ -206,7 +206,7 @@ Two properties carry most of the weight in this course.
 Finally, the **conditional expectation** $\mathbb{E}[X \mid Y = y]$ is the mean of
 the conditional distribution of $X$ given $Y = y$, regarded as a function of $y$. It
 is the minimum-mean-squared-error prediction of $X$ from the observation $Y = y$
-(proved in [Distributions and Maximum Likelihood](./02-distributions-mle.qmd)), and the denoiser
+(proved in [Distributions and Maximum Likelihood](./04-distributions-mle.qmd)), and the denoiser
 $\mathbb{E}[x_0 \mid x_\sigma]$ of W01 is precisely a conditional expectation.
 
 ## Correspondence with this course

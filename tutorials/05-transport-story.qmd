@@ -3,7 +3,7 @@
 *An informal tutorial, for readers with no particular background. No proofs, few
 formulas — just the one idea that organizes all of generative modeling, told from
 the beginning. Its rigorous twin, with the history and the theorems, is
-[Generative Models as Transport: History and Validation](./08-transport-rigorous.qmd).*
+[Generative Models as Transport: History and Validation](./10-transport-rigorous.qmd).*
 
 ## The problem, without any symbols
 
@@ -149,7 +149,7 @@ ways. For the smooth-flow families — diffusion's deterministic sampler,
 normalizing flows, flow matching — the collapse is a **theorem**: a
 one-dimensional flow physically cannot cross itself, so the tie-breaker comes
 built in (this course proves the diffusion case in
-[The Deterministic Map, Proved](./06-map-proved.qmd)). For GANs and VAEs the
+[The Deterministic Map, Proved](./08-map-proved.qmd)). For GANs and VAEs the
 collapse is merely **available**: their training rules accept the rank map but
 do not prefer it — the folded forger and the blurry code are equally welcome.
 In one dimension the five philosophies *can* be one philosophy; only some of
@@ -187,7 +187,7 @@ do not lean on it:
 ## Where to go from here
 
 The rigorous twin of this tutorial —
-[Generative Models as Transport: History and Validation](./08-transport-rigorous.qmd)
+[Generative Models as Transport: History and Validation](./10-transport-rigorous.qmd)
 — replays this story with theorems, dates, and citations: who proved the rank
 trick unique, who invented each fix and when, what exactly is true about the
 "VAE encoder = CDF" slogan, and where the counterexamples live. And the rest of
