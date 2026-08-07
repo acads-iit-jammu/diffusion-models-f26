@@ -165,7 +165,9 @@
     x), the joint is not a mountain: it is <strong>two shelves</strong> of 1-D mass, one per
     value of z, weighted &#960; and 1&#8722;&#960;. <strong>Drag the slice line</strong>: it crosses both
     shelves, the two heights are renormalised into the posterior P(z&#8201;|&#8201;x) &#8212; and the
-    posterior mean of the shelf labels &#177;1 is the tanh denoiser of W01.</p>
+    posterior mean of the shelf labels &#177;1 is the tanh denoiser of W01, tanh(x/&#963;&#178;),
+    <em>when &#960; = &#189;</em>. Away from equal weights the prior tilts the posterior and the
+    denoiser picks up a shift, to tanh(x/&#963;&#178; + &#189;&#8201;log((1&#8722;&#960;)/&#960;)).</p>
 
     <figure>
       <div class="figlabel">
@@ -458,7 +460,11 @@
       ctx.fillText(String(t), toPx(t), h - padS.b + 5);
     }
     const yShelf = [h * 0.72, h * 0.34];           // z = -1 (bottom), z = +1 (top)
-    const amp = h * 0.30;
+    // Both shelves share one vertical scale, capped so the taller curve always
+    // fits: at small sigma the peak density exceeds 1 and a fixed amplitude
+    // would push the shelf off the canvas and across its neighbour.
+    const maxDens = Math.max(PI_, 1 - PI_) / (SIG * SQRT2PI);
+    const amp = h * 0.30 / Math.max(1, maxDens);
     const dens = [(x) => PI_ * nPdf(x, -1, SIG), (x) => (1 - PI_) * nPdf(x, 1, SIG)];
     const colors = [css("--data"), css("--lik")];
     const softs = [css("--data-soft"), css("--lik-soft")];
