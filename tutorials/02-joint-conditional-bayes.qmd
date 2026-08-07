@@ -104,12 +104,13 @@ this: it is *not* computable from the marginals either. It is joint information,
 one number's worth, which the shadows have thrown away along with everything
 else. A joint with
 prescribed marginals is called a **coupling** of them, and the set of couplings
-is enormous. Choosing a *particular* coupling of noise and data — a particular
-mountain over the (noise, data) plane — is precisely what a generative model
-does; the transport tutorials
+is enormous. Many generative constructions induce a coupling of noise and data — a particular
+mountain over the (noise, data) plane — and some, such as minibatch-OT flow
+matching, select one on purpose. The transport tutorials
 ([the intuitive story](./05-transport-story.qmd) and
-[the rigorous account](./10-transport-rigorous.qmd)) are entirely about which
-coupling to select. The mathematics of that choice starts here, with the fact
+[the rigorous account](./10-transport-rigorous.qmd)) study what *additional*
+structure picks out a map, a coupling, a kernel or a path; tutorial 10 is
+insistent that merely exhibiting a coupling explains less than it appears to. The mathematics of that choice starts here, with the fact
 that shadows do not determine the mountain.
 
 :::
@@ -142,14 +143,25 @@ $$
 lets you drag the slice line and watch both steps: the raw sliver (dashed) and
 its re-inflated version (solid).
 
-In blob language: conditioning on $X = x_0$ *restricts* the blob to the region
-$\{X = x_0\}$ and rescales $P$ so the restricted region has mass $1$. For an
-event $B$ with $P(B) > 0$ this is elementary division,
-$P(A \mid B) = P(A \cap B)/P(B)$. For $X = x_0$ with a continuous $X$ the
-conditioning event has probability zero, division is $0/0$ — and the density
-formula above quietly does something deeper: it defines the conditional as a
-*limit of thickened slices* $\{x_0 \le X \le x_0 + \varepsilon\}$ as
-$\varepsilon \to 0$.
+In blob language, for an event $B$ with $P(B) > 0$, conditioning genuinely does
+restrict the blob to $B$ and rescale: $P(A \mid B) = P(A \cap B)/P(B)$, ordinary
+division.
+
+For $X = x_0$ with a continuous $X$ that story is not available, and it is worth
+being exact about why. The fibre $\{X = x_0\}$ has mass **zero**; there is
+nothing to rescale, and $0/0$ is not a definition. So the displayed formula is
+not restriction-and-rescaling in disguise — it is a *new* object, and it comes
+with hypotheses. Assume the joint has a density that is continuous near $x_0$ and
+that $p(x_0) > 0$. Then the quotient defines a natural continuous version of the
+conditional density, and it is recovered as the limit of thickened slices
+$\{x_0 \le X \le x_0 + \varepsilon\}$ as $\varepsilon \to 0$.
+
+Two caveats to file away. The function $y \mapsto p(x_0, y)$ is a **density
+cross-section**, not a sliver of mass: its integral is the marginal *density*
+$p(x_0)$, not the probability of a zero-width strip. And in general — without the
+continuity assumption — a conditional law is a *disintegration*, pinned down only
+for $P_X$-almost every $x_0$, so different versions may disagree at any
+particular value.
 
 ::: {.callout-warning}
 
@@ -160,13 +172,19 @@ Because that limit is taken along shrinking *bands*, the answer can depend on th
 ways — say, as the vertical line $\{X = 0\}$ or as a diagonal-parameterized
 family that happens to collapse onto that same line — and the two shrinking
 procedures can yield *different* conditional distributions. This is the
-Borel–Kolmogorov paradox. The operational rule is simple: **a conditional
-distribution is well-defined relative to a chosen slicing variable** (formally: a
-chosen $\sigma$-algebra), not relative to the bare event. Always know *which
-variable* you are conditioning on. In this course the slicing variable is always
-explicit — $p(x_0 \mid x_t)$ slices along $x_t$ — so the paradox never bites;
-but it is why careful texts define conditionals via $\sigma$-algebras rather
-than via events.
+Borel–Kolmogorov paradox. The first half of the rule is simple: **a conditional
+distribution is defined relative to a chosen slicing variable** (formally: a
+chosen $\sigma$-algebra), never relative to the bare event. Always know *which
+variable* you are conditioning on.
+
+But naming the variable is not quite enough either, and it would be dishonest to
+stop there. Conditioning on $\sigma(X)$ determines the conditional law only for
+$P_X$-*almost every* value; at any single null value $x_0$ a regular conditional
+kernel may be redefined at will. So what actually keeps this course safe is not
+that the slicing variable is explicit — though it always is — but that Gaussian
+smoothing gives every $p(x_t \mid x_0)$ and $p_t$ a positive, smooth density.
+That supplies a canonical continuous version, and identities between conditionals
+should otherwise be read as holding almost everywhere.
 
 :::
 
@@ -245,7 +263,8 @@ Gaussians:
 
 $$
 P(z = +1 \mid x)
-= \frac{e^{-(x-1)^2/2\sigma^2}}{e^{-(x+1)^2/2\sigma^2} + e^{-(x-1)^2/2\sigma^2}}
+= \frac{\exp\!\big(\!-\tfrac{(x-1)^2}{2\sigma^2}\big)}
+       {\exp\!\big(\!-\tfrac{(x+1)^2}{2\sigma^2}\big) + \exp\!\big(\!-\tfrac{(x-1)^2}{2\sigma^2}\big)}
 = \frac{1}{1 + e^{-2x/\sigma^2}}
 = \operatorname{sigmoid}\!\left(\frac{2x}{\sigma^2}\right),
 $$
@@ -260,7 +279,10 @@ $$
 
 This sigmoid/tanh pair is the exact object that appears in
 [Two-Point Diffusion](./07-two-point-diffusion.qmd) as the optimal denoiser
-$\mathbb{E}[x_0 \mid x]$: what a denoiser computes *is* a posterior mean — a
+$\mathbb{E}[x_0 \mid x]$ — under the dictionary $z \leftrightarrow x_0$ and
+$x \leftrightarrow x_\sigma$, since $x = z + \sigma\varepsilon$ here is that
+tutorial's VE corruption $x_\sigma = x_0 + \sigma\varepsilon$. (Mind the letter:
+$z$ is the *clean label* here and the *noise* there.) Concretely: what a denoiser computes *is* a posterior mean — a
 slice through a joint of (clean, noisy), renormalized, then averaged. Seen from
 this tutorial, the W01 formula is one drag of the slice line in Act II.
 
@@ -283,10 +305,13 @@ is one of these four moves on some joint.
 Three objects belong to this storyline but deserve their own installment:
 **likelihood** (the conditional read as a function of the parameter, not the
 data), the **score** (the gradient of a log-density, i.e. of a log-slice), and
-**KL divergence** (a measure-theoretic comparison of two mountains). They are
-next in the sequence; for now, [Distributions and Maximum
-Likelihood](./04-distributions-mle.qmd) covers the working versions used in
-lecture.
+**KL divergence** (a measure-theoretic comparison of two mountains). Where each
+is actually picked up: likelihood in [Distributions and Maximum
+Likelihood](./04-distributions-mle.qmd), and the score in
+[Two-Point Diffusion](./07-two-point-diffusion.qmd) and
+[the probability-flow ODE](./09-probability-flow-ode.qmd). KL has no
+measure-theoretic treatment in the present sequence — it is used in lecture in
+its working form, and a proper installment is still owed.
 
 ## Exercises
 
@@ -294,26 +319,46 @@ lecture.
    nonzero entries of the joint as a $2 \times 3$ table, compute both marginals
    (shadow along each axis), and both conditional families. Verify Bayes' rule on
    $P(X = H \mid Y = 1)$.
-2. For the correlated Gaussian of Act I, verify by completing the square that the
-   vertical slice at $x_0$, renormalized, is
-   $\mathcal{N}(\rho x_0,\, 1 - \rho^2)$. Confirm both readings against the demo:
-   the slice's center moves with $x_0$ (unless $\rho = 0$) and its width does
-   not.
+2. The standard bivariate normal with correlation $|\rho| < 1$ has density
+   $$
+   p(x,y) = \frac{1}{2\pi\sqrt{1-\rho^2}}
+     \exp\!\Big(\!-\tfrac{x^2 - 2\rho x y + y^2}{2(1-\rho^2)}\Big).
+   $$
+   Verify by completing the square in $y$ that the vertical slice at $x_0$,
+   renormalized, is $\mathcal{N}(\rho x_0,\, 1 - \rho^2)$. Confirm both readings
+   against the demo: the slice's centre moves with $x_0$ (unless $\rho = 0$),
+   while its width is the same for every $x_0$.
 3. Construct two *different* joints on $\{0,1\}^2$ with both marginals uniform.
    (You have found two couplings of the same shadows. How many are there?)
 4. Show that if $p(x,y) = p(x)\,p(y)$ then every vertical slice, renormalized, is
    the same distribution $p(y)$ — independence means *the slices don't move*.
-   Check this in Act I at $\rho = 0$.
-5. Derive the sigmoid posterior above, keeping general $\pi$; show the effect of
-   $\pi \neq \tfrac12$ is an additive shift $\tfrac{\sigma^2}{2}\log
+   Check this in Act I at $\rho = 0$. Note carefully why that check is legitimate
+   here: the family is *jointly Gaussian*, and for jointly Gaussian pairs zero
+   correlation does imply independence. In general it does not — the four-lump
+   joint above is uncorrelated and dependent.
+5. Derive the sigmoid posterior above, keeping general $\pi \in (0,1)$; show the
+   effect of $\pi \neq \tfrac12$ is an additive shift $\tfrac{\sigma^2}{2}\log
    \tfrac{1-\pi}{\pi}$ in $x$. Watch the bars in Act II shift as you drag $\pi$.
-6. Compute $\mathbb{E}[\,\mathbb{E}[z \mid x]\,]$ for the two-shelf joint by
-   integrating the tanh against the mixture marginal — argue *without
-   computing any integral* that the answer must be $1 - 2\pi$. (This is the tower
-   property; it will become the workhorse identity of the course.)
+6. For general $\pi$ the posterior mean is the *shifted* tanh of Exercise 5,
+   $$
+   \mathbb{E}[z \mid x] = \tanh\!\Big(\tfrac{x}{\sigma^2}
+     + \tfrac12 \log \tfrac{1-\pi}{\pi}\Big),
+   $$
+   which reduces to $\tanh(x/\sigma^2)$ only at $\pi = \tfrac12$. Integrating
+   *that* against the mixture marginal gives
+   $\mathbb{E}[\,\mathbb{E}[z \mid x]\,]$ — and you should be able to name the
+   answer, $1 - 2\pi$, *without computing any integral*. (This is the tower
+   property; it will become the workhorse identity of the course. Check what goes
+   wrong if you integrate the unshifted $\tanh(x/\sigma^2)$ against an unequal
+   mixture.)
 7. *(Borel–Kolmogorov, lean.)* On the unit square with uniform mass, the event
-   "$Y = X$" has probability zero. Compare conditioning via horizontal bands
-   $\{|Y - x| \le \varepsilon\}$ at each $x$ with conditioning via diagonal bands
-   $\{|Y - X| \le \varepsilon\}$: both shrink to the same line, but the induced
-   distributions on the line differ. Which slicing variable does each choice
-   correspond to?
+   "$Y = X$" has probability zero. Two different variables vanish exactly on it:
+   $$
+   U = Y - X, \qquad V = \frac{Y - X}{1 + X}.
+   $$
+   Both band families $\{|U| \le \varepsilon\}$ and
+   $\{|V| \le \varepsilon\} = \{|Y - X| \le \varepsilon(1+X)\}$ shrink to the
+   same diagonal. Parameterising that diagonal by $x \in [0,1]$, show the first
+   induces the uniform limiting density $1$ and the second induces
+   $\tfrac{2(1+x)}{3}$. Same limiting set, different answers — so it is the
+   *variable*, not the event, that the conditional depends on.

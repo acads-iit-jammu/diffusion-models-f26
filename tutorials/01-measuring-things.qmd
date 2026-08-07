@@ -25,30 +25,51 @@ builds that footing visually, with almost no machinery.
 
 Start with questions a ruler can answer.
 
-- **Length.** The interval $[a, b]$ has length $b - a$. If a set is a disjoint
-  union of intervals, its length is the sum of the pieces.
+- **Length.** The interval $[a, b]$ has length $b - a$. If a set is a *finite or
+  countable* disjoint union of intervals, its length is the sum of the pieces.
+  (The qualifier is not fussiness: $[0,1]$ is an uncountable disjoint union of
+  single points, each of length zero.)
 - **Area.** A rectangle has area width $\times$ height. For a curved region, we
   tile it with many small rectangles and add; as the tiles shrink, the sum
   converges to what we call the area.
 - **Volume.** Same idea, one dimension up: boxes, then sums of boxes, then limits.
 
-In each case the procedure is identical: a *measure* is a rule $m$ that assigns a
-non-negative number to a set, such that
+In each case the procedure is identical. Fix a set $\Omega$ and a family
+$\mathcal{F}$ of subsets of it — the sets we are willing to size, about which
+more in a moment. A **measure** is a rule
+$m : \mathcal{F} \to [0, \infty]$ such that
 
-1. $m(\varnothing) = 0$ — nothing has measure zero;
-2. if $A_1, A_2, \dots$ are disjoint, then
-   $m\!\big(\bigcup_i A_i\big) = \sum_i m(A_i)$ — the whole is the sum of its
-   disjoint parts (*additivity*).
+1. $m(\varnothing) = 0$ — the empty set has measure zero. (Note the direction:
+   plenty of *non-empty* sets are also null, as §2's rationals will show.)
+2. **countable additivity** — if $A_1, A_2, \dots \in \mathcal{F}$ are pairwise
+   disjoint, then
+   $m\!\big(\bigcup_{i=1}^{\infty} A_i\big) = \sum_{i=1}^{\infty} m(A_i)$: the
+   whole is the sum of its disjoint parts, countably many at a time.
+
+Three details in that sentence are load-bearing and easy to skim past. The domain
+is $\mathcal{F}$, not every subset. The value $+\infty$ is allowed, which is what
+lets length and volume work on unbounded spaces. And the additivity is
+*countable*, not merely finite — the difference is the whole content of the
+letter $\sigma$, and §"What is not a $\sigma$-algebra" shows a family where
+exactly that difference bites.
 
 Length, area, volume, mass, and — this is the punchline of the tutorial —
 *probability* are all instances of this one definition. Probability will simply be
 a measure whose total is $1$.
 
 But there is a catch, and it is not pedantry. Once $\Omega$ is uncountable (an
-interval, the plane, the space of images), one can construct sets so pathological
-that *no* additive rule can consistently assign them a size.^[The Vitali
-construction; the Banach–Tarski paradox is the three-dimensional version. Both use
-the axiom of choice to build sets no explicit formula can describe.] The
+interval, the plane, the space of images), one can construct subsets that
+*ordinary length cannot size* — not because no measure whatever could, but
+because no **countably additive, translation-invariant** extension of length
+reaches them.^[The Vitali construction shows exactly this: there is no countably
+additive, translation-invariant extension of ordinary length defined on every
+subset of $\mathbb{R}$. Banach–Tarski is a related but distinct
+three-dimensional result about finite equidecomposition under rigid motions, not
+"the 3-D version" of Vitali. Both use some form of the axiom of choice, and the
+sets they produce are non-measurable.] Note the shape of the failure: it is the
+*measure* that cannot be extended, not the family that fails to be a
+$\sigma$-algebra — a distinction §"What is not a $\sigma$-algebra" returns to.
+The
 resolution is not to fix the rule but to restrict the questions: we measure only a
 well-behaved family of sets, closed under the operations we need (complements,
 countable unions). That family is called a **$\sigma$-algebra**, and every set in
@@ -60,7 +81,7 @@ size* — is the entire entrance fee of measure theory. Everything else is payof
 An integral is a measured total: the area under a curve, the average of a
 quantity, the expected value of a random variable. There are two ways to organize
 the computation, and the difference between them is the difference between
-seventeenth-century and twentieth-century analysis.
+nineteenth-century and twentieth-century analysis.
 
 ![Riemann slices the domain into vertical strips; Lebesgue slices the range into horizontal slabs and asks how much of the domain lands in each.](figs/riemann-vs-lebesgue.svg){width=100%}
 
@@ -115,9 +136,10 @@ spaces, is built on it.
 
 ## 3. Kolmogorov's move: probability *is* a measure
 
-Before 1933, probability was mathematically awkward: a calculus of gambling
-intuitions with no agreed definition of its basic objects. Kolmogorov's
-*Grundbegriffe* (1933) settled it with a single identification: a probability
+Before 1933 probability had results in abundance — Borel, Lebesgue, Markov and
+others had already built much of the machinery — but no agreed definition of its
+basic objects. Kolmogorov's *Grundbegriffe* (1933) unified that work into the
+standard framework with a single identification: a probability
 space is a measure space $(\Omega, \mathcal{F}, P)$ where
 
 - $\Omega$ is the **sample space** — the set of all outcomes of the experiment;
@@ -144,10 +166,12 @@ answer; three readings are worth knowing.
   independent repetitions of the experiment — the fraction of tosses that land
   heads, in the limit. This grounds probability in data but struggles with
   single-case events ("the probability this specific bridge fails").
-- **Fiducial** (Fisher). An attempt to transfer a probability statement from data
-  to an unknown parameter *without* assuming a prior — to read
-  "$P(\theta \in I \mid \text{data})$" out of the likelihood alone. Historically
-  influential, foundationally contested, and a useful reminder that not every
+- **Fiducial** (Fisher). Not a reading of what probability *is* so much as an
+  inferential programme, but worth knowing: an attempt to obtain a probability
+  statement about an unknown parameter *without* assuming a prior, by inverting a
+  sampling or pivotal relation between the data and the parameter. (Not, as is
+  sometimes said, by reading it off the likelihood alone.) Historically
+  influential, foundationally contested, and a standing reminder that not every
   "probability of a parameter" one writes down is licensed by the axioms.
 - **Measure-theoretic** (the course's working stance). Probability is a
   normalized measure; full stop. Whether a given application reads it as a
@@ -163,14 +187,15 @@ theory could finally be built.
 Two examples calibrate the definition.
 
 - **A die.** $\Omega = \{1,\dots,6\}$, $\mathcal{F}$ = all subsets, $P(A) =
-  |A|/6$. In finite worlds the $\sigma$-algebra is invisible — everything is
-  measurable — which is why elementary probability never mentions it.
+  |A|/6$. Here every subset is an event, which is why elementary probability
+  never mentions $\mathcal{F}$ — though note this is a *choice*: finite spaces
+  admit coarse $\sigma$-algebras too, and §4 will use one.
 - **A uniform point in $[0,1]$.** $\Omega = [0,1]$, $\mathcal{F}$ = the Borel
   sets (the $\sigma$-algebra generated by intervals), $P$ = length. Now
   $P(\{\omega\}) = 0$ for every single outcome, yet $P([0,1]) = 1$: probability
-  lives on sets, not points. Every "paradox" of continuous probability — density
-  values above $1$, zero-probability events that happen — dissolves once
-  probability is read as measure, i.e. as generalized length.
+  lives on sets, not points. The common puzzles of continuous probability — density
+  values above $1$, zero-probability events that nonetheless happen — dissolve
+  once probability is read as measure, i.e. as generalized length.
 
 ## 4. The blob: seeing $(\Omega, \mathcal{F}, P)$
 
@@ -186,11 +211,15 @@ The $\sigma$-algebra is the object students never get a picture of, and most of
 the confusion comes from the definition being asked to do *two different jobs*.
 Separate them first.
 
-- **The bookkeeping job.** The big $\mathcal{F}$ in the triple exists only
-  because §1 forced it: not every subset can be assigned a size, so we name in
-  advance the family that can. Here $\mathcal{F}$ is a technical fence, and in
-  every computation in this course it is as large as it is safe to make it. This
-  job needs no picture — it needs the fence, and then silence.
+- **The bookkeeping job.** The big $\mathcal{F}$ in the triple says which sets
+  $P$ is even defined on, and which maps count as measurable. §1 forced the issue:
+  ordinary length cannot reach every subset. In practice $\mathcal{F}$ is a
+  conventional ambient choice — Borel on $\mathbb{R}$, the product
+  $\sigma$-algebra on sequences, cylinder sets on path space — made once and then
+  kept in the background. (There is no canonical *largest* safe choice: on
+  $[0,1]$ we use the Borel sets even though length extends perfectly well to the
+  larger Lebesgue family.) This job needs no picture; it needs the fence, and
+  then silence.
 - **The information job.** A *sub*-$\sigma$-algebra $\mathcal{G} \subseteq
   \mathcal{F}$ models something else entirely: **partial knowledge**. Not what is
   weighable in principle, but what a particular observer can tell apart. This is
@@ -209,7 +238,7 @@ grid enlarges the $\sigma$-algebra.
 
 This picture is honest but *narrow*: it models a $\sigma$-algebra generated by a
 partition into finitely many positive-mass cells. Many of the $\sigma$-algebras
-in this course are not of that kind — $\sigma(X)$ for a continuous $X$ has no
+in this course are not of that kind — $\sigma(X)$ for an $X$ with nonatomic law has no
 positive-mass cells at all — so read the grid as a helpful special case, never as
 the definition.
 
@@ -239,7 +268,11 @@ nothing but the logic of answerable questions:
 | closed under complement | if the report settles $A$, it settles "not $A$" — same answer, negated |
 | closed under countable union | if it settles each of $A_1, A_2, \dots$, it settles "did at least one occur?" |
 
-Nothing more is required, and nothing less would do.
+This table translates the axioms into the language of questions; it does not
+*derive* them. In particular nothing in ordinary logic explains why the cutoff
+falls at **countably** many questions rather than finitely or arbitrarily many.
+Countable closure is an additional idealization, and it is chosen because it is
+exactly what limits, tail events and countably additive probability require.
 
 ::: {.callout-note}
 
@@ -275,13 +308,19 @@ is a *function of the report*:
 $$
 X \text{ is } \sigma(R)\text{-measurable}
 \quad\Longleftrightarrow\quad
-X = f(R) \text{ for some measurable } f .
+X = f \circ R \text{ for some measurable } f .
 $$
 
-This is the Doob–Dynkin lemma. Set it beside the pixel version — "$X$ is constant
+This is the Doob–Dynkin lemma. Precisely: let $R : (\Omega, \mathcal{F}) \to
+(S, \mathcal{S})$ be measurable and let $X$ be real-valued. Then $X$ is
+$\sigma(R)$-measurable if and only if $X = f \circ R$ for some
+$\mathcal{S}/\mathcal{B}(\mathbb{R})$-measurable $f : S \to \mathbb{R}$. No
+probability or integrability is involved; the report just needs a measurable
+space to land in, and $X$ needs real (or standard-Borel) values. Set it beside the pixel version — "$X$ is constant
 on each cell" — and note that the two agree wherever both apply, but the report
-version keeps working when the report is continuous and there are no cells to be
-constant on.
+version keeps working when the report has a nonatomic law and there is no finite
+positive-mass partition to be constant on. (Continuous reports still have fibres;
+what they lack is fibres of positive mass.)
 
 And when $X$ is *not* a function of the report, the best an observer can do is
 average $X$ over the outcomes the report fails to distinguish. For the parity
@@ -342,7 +381,10 @@ X : \Omega \longrightarrow \mathbb{R},
 $$
 
 a number painted on each point of the blob. The randomness lives entirely in
-$P$; $X$ just reads off a numerical feature of the outcome.
+$P$; $X$ just reads off a numerical feature of the outcome. (A **random vector**
+is the same thing with values in $\mathbb{R}^d$ — equivalently, a map all of
+whose coordinates are random variables. Images will be random vectors with
+$d$ in the hundreds.)
 
 One condition is required, and the preimage picture makes it self-evident. To ask
 "what is the probability that $X \le t$?" we must *weigh* the set of outcomes for
@@ -370,6 +412,13 @@ same four lines each — sample space, $\sigma$-algebra, probability measure,
 random variable — so that the abstractions have somewhere to live. Read the
 remarks: each example exists to make one point the others cannot.
 
+Two warnings. A few remarks run slightly ahead of the text and use *pushforward*,
+*density* and *expectation*, which §§7–8 build properly; take them on trust for
+now. And "fully specified" is an aspiration for the first five: MNIST's
+population reading and the path-space law are deliberately schematic, because in
+those cases the whole point is that we posit the measure rather than construct
+it.
+
 ### Discrete
 
 **(1) One roll of a fair die.**
@@ -394,8 +443,9 @@ sixty-four.
 
 *Remark.* For any **countable** $\Omega$ you may always take $\mathcal{F} =
 2^\Omega$, every function is a random variable, and measurability is vacuous. The
-$\sigma$-algebra only begins to bite when $\Omega$ is uncountable — which is the
-next example.
+$\sigma$-algebra only begins to bite *in its bookkeeping role* when $\Omega$ is
+uncountable — which is the next example. Its information role is alive even here:
+the parity report of §4 lives on a six-point space.
 
 **(3) An infinite sequence of coin flips.**
 
@@ -441,8 +491,11 @@ one-dimensional distribution you like.
 $X = \Phi^{-1}$ (defined on $(0,1)$, a set of full measure, since
 $\Phi^{-1}(0) = -\infty$ and $\Phi^{-1}(1) = +\infty$; fix any value at the two
 endpoints). Different sample space, different measure, different function —
-*identical distribution*. Nothing downstream can tell them apart, which is the
-"blob is forgettable" principle in one line.
+*identical distribution*. No downstream calculation that depends only on the
+**law** of $X$ can tell them apart — which is the "blob is forgettable" principle
+in one line. Calculations that depend on more than the law (how $X$ is coupled to
+another variable, what filtration it sits in) are of course not covered; tutorial
+10 makes a point of this.
 
 ### Real data
 
@@ -455,9 +508,11 @@ endpoints). Different sample space, different measure, different function —
 - $P(\{i\}) = 1/60000$ — draw an index uniformly.
 - $X(i) \in \{0,\dots,255\}^{784}$, the image; $Y(i) \in \{0,\dots,9\}$, the label.
 
-This is the **empirical distribution**, and it is not an approximation to
-something else — it is exactly the measure that empirical risk minimization
-integrates against. The label report $\sigma(Y)$ contains $2^{10} = 1024$ events,
+Its joint pushforward is the **empirical distribution**. It plays two roles at
+once, and they are worth separating: it is exactly the measure that ordinary
+empirical risk minimization integrates against, *and* it is an estimator of the
+population law in (b), in the same way that empirical risk estimates population
+risk. The label report $\sigma(Y)$ contains $2^{10} = 1024$ events,
 and $\mathbb{E}[X \mid Y]$ is a genuinely familiar object: the ten class-average
 images, the blurry mean "$7$".
 
@@ -466,7 +521,7 @@ images, the blurry mean "$7$".
 - $\Omega$ = an abstract space of handwriting events, never constructed.
 - $X : \Omega \to \mathbb{R}^{784}$ the rendering map, and $p_{\text{data}} =
   X_\# P$ the thing we actually want to model.
-- The $60000$ images are i.i.d. draws from it.
+- The $60000$ images are *modelled* as i.i.d. draws from it.
 
 We never build this $\Omega$, and by §7 we never need to: only the pushforward
 enters any computation.
@@ -524,7 +579,9 @@ data law and reaches the same conclusion.)
 
 - $\Omega = C([0,T]; \mathbb{R}^d)$, the continuous paths.
 - $\mathcal{F} = \sigma(\text{cylinder sets})$, generated by the evaluations
-  $\omega \mapsto \omega(t)$.
+  $\omega \mapsto \omega(t)$ — and on this space that family coincides with the
+  Borel $\sigma$-algebra of the sup-norm, with rational times already sufficient
+  to generate it.
 - $P$ = the law of the forward process (Wiener measure, for pure Brownian
   motion).
 - $X_t(\omega) = \omega(t)$ — each time $t$ gives a random variable, the whole
@@ -625,7 +682,7 @@ Two consequences, both load-bearing later:
 
 *Sampling is transport.* A random draw from $\mu$ is uniform mass on $[0,1]$
 pushed through a map. Generative modeling — the subject of this course — is the
-same sentence with a harder source and a learned map: push simple noise through
+same sentence in higher dimension with a learned map: push simple noise through
 $G$ so that $G_\# (\text{noise}) \approx p_{\text{data}}$. The pushforward is not
 a technicality; it is the course's definition of "generate."
 
@@ -694,9 +751,13 @@ stage*.
 | Null sets are invisible | $X = Y$ except on a set of measure $0$ $\Rightarrow \mathbb{E}[X] = \mathbb{E}[Y]$ | Regions of mass 0 contribute value $\times$ 0. |
 | Limit interchange | $X_n \to X$ $\Rightarrow$ $\mathbb{E}[X_n] \to \mathbb{E}[X]$ *under conditions* (monotone or dominated convergence) | The Lebesgue theory's crown jewels; **not** free, and the reason the theory wins. |
 
-The last row is the one to respect: every "differentiate under the integral sign"
+The last row is the one to respect. Every "differentiate under the integral sign"
 and every "swap the limit and the expectation" in this course is an appeal to
-dominated convergence. Riemann's theory has no comparably usable license.
+*some* theorem whose hypotheses have to be checked — often dominated convergence,
+but sometimes a Leibniz rule, domination of difference quotients, Fubini–Tonelli,
+or uniform convergence. Riemann's theory is not without interchange theorems
+either (uniform convergence gives one). What Lebesgue's theory offers is markedly
+more flexible hypotheses, which is why it is the one everyone reaches for.
 
 ## 9. The dictionary, and what comes next
 
@@ -725,15 +786,20 @@ divergence on the same footing.
    (Cut the blob into three disjoint pieces.)
 2. On $\Omega = [0,1]$ with length, compute $\mathbb{E}[X]$ for
    $X(\omega) = \mathbf{1}_{[0,1/2]}(\omega) - \mathbf{1}_{(1/2,1]}(\omega)$
-   twice: by stage 2 of the construction, and as an area under a staircase.
+   twice: by stage 2 of the construction, and as an area under a staircase. Note
+   that $X$ itself steps $+1$ then $-1$ while its quantile function steps $-1$
+   then $+1$ — the two are different functions with the same integral. Why must
+   that be so?
 3. The indicator of the rationals: verify that every Riemann sum on $[0,1]$ can
    be made $0$ or $1$ by choice of sample points, while the Lebesgue integral
    is $0$. Which axiom of the measure makes the rationals a null set?
    *(Hint: cover the $n$-th rational by an interval of length
    $\varepsilon/2^n$.)*
 4. Let $Q$ be the quantile function of the mixture in the demo. Explain, using
-   the pushforward, why `Q(rand())` is a correct sampler, and why *every* 1-D
-   sampler is secretly of this form.
+   the pushforward, why `Q(rand())` is a correct sampler for *every*
+   one-dimensional law. Then show the sampling map is **not** unique: if $U$ is
+   uniform so is $1 - U$, so $Q(1 - U)$ is an equally correct and generally
+   different sampler. What extra condition singles $Q$ out?
 5. For the two-point distribution with masses $\pi$ (at $-1$) and $1-\pi$ (at
    $+1$), draw the quantile staircase, shade the signed area, and confirm
    $\mathbb{E}[X] = 1-2\pi$. Then check it against the demo's readout.
@@ -752,13 +818,15 @@ divergence on the same footing.
 8. *(Specify a space.)* Write out $(\Omega, \mathcal{F}, P)$ and one random
    variable, in the four-line format of §6, for each of: (a) drawing a card from
    a standard deck; (b) the arrival time of the next bus, modelled as
-   Exponential$(\lambda)$; (c) a $256 \times 256$ RGB image as literally stored in
-   a file. For (c), is $\Omega$ finite? Is $2^\Omega$ an acceptable
-   $\sigma$-algebra? Is it a *useful* one?
+   Exponential$(\lambda)$; (c) an uncompressed $256 \times 256$ RGB image at 8 bits per channel. For (c),
+   is $\Omega$ finite? Is $2^\Omega$ an acceptable $\sigma$-algebra? Is it a
+   *useful* one? Note that fixing the file format pins down $\Omega$ but not $P$
+   — choose a $P$ and say what it models.
 9. *(Failures.)* For each family, say which axiom fails and give the witness:
    (a) $\{\varnothing, \{1,2\}, \{2,3\}, \Omega\}$ on $\Omega = \{1,2,3\}$;
    (b) the open subsets of $\mathbb{R}$; (c) the countable subsets of
-   $\mathbb{R}$; (d) the countable **and** co-countable subsets of $\mathbb{R}$.
+   $\mathbb{R}$; (d) the sets that are countable **or** co-countable in
+   $\mathbb{R}$.
    One of these four *is* a $\sigma$-algebra — which, and why does it not help
    us measure length?
 10. *(Why noise creates the score.)* Let $\mu$ be the uniform distribution on the

@@ -209,7 +209,11 @@ unchanged, and each becomes a module of the course:
    $\operatorname{Var}(x_\sigma) = \operatorname{Var}(x_0) + \sigma^2$ for any
    data distribution with finite variance (independence of $z$ and $x_0$ is all
    you need — zero mean is not required).
-3. **Unequal weights.** Let $\mathbb{P}(x_0 = +1) = \pi$ with $0 < \pi < 1$. Show
+3. **Unequal weights.** Let $\mathbb{P}(x_0 = +1) = \pi$ with $0 < \pi < 1$.
+   *(Convention warning: this is the opposite of tutorials
+   [01](./01-measuring-things.qmd) and [02](./02-joint-conditional-bayes.qmd),
+   which set $\pi = \mathbb{P}(-1)$. The formulas differ by $\pi \to 1 - \pi$;
+   check which one you are reading.)* Show
    $\mathbb{E}[x_0 \mid x] = \tanh\!\big(\tfrac{x}{\sigma^2} + \tfrac12 \log\tfrac{\pi}{1-\pi}\big)$
    — the denoiser acquires a *bias*. Check that as $\sigma \to \infty$ this tends to
    $2\pi - 1$, the prior mean, and work out what happens in the degenerate cases

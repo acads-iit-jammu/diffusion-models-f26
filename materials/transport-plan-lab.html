@@ -133,8 +133,8 @@
       <canvas id="c-flow" role="img" aria-label="Sankey-style diagram: the source histogram on top, the target below, and ribbons showing how much mass moves between each pair of bins under the optimal transport plan."></canvas>
 
       <div class="controls">
-        <span>p</span><span class="seg" id="sl-p"></span>
-        <span>q</span><span class="seg" id="sl-q"></span>
+        <span>p weights</span><span class="seg" id="sl-p"></span>
+        <span>q weights</span><span class="seg" id="sl-q"></span>
       </div>
       <div class="controls" style="border-top:0; padding-top:0">
         <span class="seg" id="seg-preset" role="group" aria-label="Preset histogram pairs"></span>
@@ -322,11 +322,17 @@
       const l = document.createElement("label");
       l.innerHTML = "<span>" + BINS[i] + "</span>";
       const s = document.createElement("input");
-      s.type = "range"; s.min = "1"; s.max = "60"; s.step = "1";
+      s.type = "range"; s.min = "0"; s.max = "60"; s.step = "1";
       s.value = String(Math.round(v * 100));
-      s.setAttribute("aria-label", host.id === "sl-p" ? "source mass in bin " + BINS[i]
-                                                      : "target mass in bin " + BINS[i]);
-      s.addEventListener("input", () => { arr[i] = +s.value / 100; render(); });
+      s.setAttribute("aria-label",
+        (host.id === "sl-p" ? "source" : "target") + " relative weight for bin " + BINS[i] +
+        " (all four are renormalised to sum to one)");
+      s.addEventListener("input", () => {
+        arr[i] = +s.value / 100;
+        // Never allow an all-zero vector: back out the change that caused it.
+        if (arr.reduce((a, b) => a + b, 0) <= 0) { arr[i] = 0.01; s.value = "1"; }
+        render();
+      });
       l.appendChild(s); host.appendChild(l);
       arr.el = arr.el || []; arr.el[i] = s;
     });
@@ -443,23 +449,41 @@
   function matrixTable(M, hi) {
     let h = "<table><tr><th class='lbl'>from \\ to</th>";
     for (const b of BINS) h += "<th>" + b + "</th>";
+    if (hi) h += "<th>row sum = p</th>";
     h += "</tr>";
     for (let i = 0; i < N; i++) {
       h += "<tr><td class='lbl'>" + BINS[i] + "</td>";
+      let rowSum = 0;
       for (let j = 0; j < N; j++) {
         const v = M[i][j];
+        rowSum += v;
         const on = hi && v > 1e-9;
         h += "<td style=\"" + (on ? "background:rgba(" + css("--heat") + "," +
           (0.10 + 0.55 * Math.min(v / 0.5, 1)).toFixed(3) + ")" : "") + "\">" +
           (hi ? (v > 1e-9 ? fmt(v) : "·") : fmt(v, 2)) + "</td>";
       }
+      if (hi) h += "<td><b>" + fmt(rowSum) + "</b></td>";
       h += "</tr>";
+    }
+    if (hi) {
+      h += "<tr><td class='lbl'>col sum = q</td>";
+      for (let j = 0; j < N; j++) {
+        let c = 0;
+        for (let i = 0; i < N; i++) c += M[i][j];
+        h += "<td><b>" + fmt(c) + "</b></td>";
+      }
+      h += "<td>1.000</td></tr>";
     }
     return h + "</table>";
   }
 
   function render() {
     const p = norm(pRaw), q = norm(qRaw);
+    // The thumbs are weights; what matters is the normalised mass, so say it.
+    for (let i = 0; i < N; i++) {
+      if (pRaw.el) pRaw.el[i].setAttribute("aria-valuetext", BINS[i] + " mass " + fmt(p[i]));
+      if (qRaw.el) qRaw.el[i].setAttribute("aria-valuetext", BINS[i] + " mass " + fmt(q[i]));
+    }
     const cur = COSTS.find((c) => c.key === costKey);
     Array.from(segCost.children).forEach((b, i) =>
       b.setAttribute("aria-pressed", String(COSTS[i].key === costKey)));

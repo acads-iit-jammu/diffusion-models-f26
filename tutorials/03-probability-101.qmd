@@ -5,6 +5,19 @@ course: sample spaces, random variables, joint and marginal distributions,
 conditioning, and expectation. Readers comfortable with these notions may proceed
 directly to [Distributions and Maximum Likelihood](./04-distributions-mle.qmd).*
 
+::: {.callout-note}
+## An optional pre-measure refresher
+
+This tutorial deliberately works at the elementary level: it treats arbitrary
+subsets as events and splits the world into "discrete" and "continuous". That is
+the standard undergraduate presentation and is entirely serviceable for the
+computations in lecture — but it is *less* precise than
+[Measuring Things](./01-measuring-things.qmd) and
+[Joint, Marginal, Conditional](./02-joint-conditional-bayes.qmd), which build the
+same objects on a $\sigma$-algebra and cover mixed and singular laws too. If you
+have read those, treat this one as revision and keep their definitions.
+:::
+
 Probability theory is built on two distinct maps: the probability measure, which
 assigns numbers to events, and the random variable, which assigns numbers to
 outcomes. Distinguishing the two carefully at the outset prevents most of the common

@@ -169,7 +169,7 @@
       value of X &#8212; that is, when X is a function of the report. Otherwise the best the
       observer can do &#8212; in the mean-squared-error sense &#8212; is the box average, which is the <em>conditional expectation</em>
       E[X&#8201;|&#8201;report]. Note the last line: however coarse or fine the report, the
-      average of the box averages is always the same number. That is the tower property,
+      <em>probability-weighted</em> average of the box averages is always the same number. That is the tower property,
       and it is the workhorse identity of this course.</figcaption>
     </figure>
   </section>
@@ -193,13 +193,18 @@
       <div class="controls">
         <label>&#960; <input id="s-pi" type="range" min="0.05" max="0.95" step="0.05" value="0.35"><span class="val" id="v-pi">0.35</span></label>
         <label>&#963; <input id="s-sig" type="range" min="0.05" max="1.2" step="0.05" value="0.45"><span class="val" id="v-sig">0.45</span></label>
-        <label>steps <input id="s-k" type="range" min="1" max="8" step="1" value="3"><span class="val" id="v-k">8</span></label>
+        <label>steps <input id="s-k" type="range" min="1" max="11" step="1" value="3"><span class="val" id="v-k">8</span></label>
       </div>
       <div class="readout" id="r-quant"></div>
       <figcaption>Slide &#963; toward 0 and the curve becomes the staircase of the two-point
       distribution &#8212; whose expectation you can read off as two rectangles. Increase the
-      steps and watch the staircase sum converge to the exact mean E[X] = 1 &#8722; 2&#960;:
-      that convergence <em>is</em> the definition of the Lebesgue integral.</figcaption>
+      steps and watch the staircase sum approach the exact mean E[X] = 1 &#8722; 2&#960;.
+      Two honest caveats. This is a <em>midpoint</em> simple-function approximation, so the
+      approach need not be monotone and it is slow near a near-jump (at small &#963; even 256
+      steps leaves visible error) &#8212; Lebesgue's own construction instead approximates
+      from below by range-quantised simple functions. And what it demonstrates is that
+      value&#8202;&#215;&#8202;measure sums converge to the integral, which is the
+      <em>content</em> of the construction rather than its definition.</figcaption>
     </figure>
   </section>
 
@@ -241,8 +246,8 @@
   }
 
   // ---------------- Act I: the roster and the report ----------------
-  // Eight equally likely outcomes. Marks are chosen so that every report's
-  // box averages themselves average to 66 - the tower property, visibly.
+  // Eight equally likely outcomes. The tower identity below holds for ANY marks;
+  // these are merely chosen so the box averages come out as round numbers.
   const ROSTER = [
     { nm: "Aarav",  sec: "A", hos: "hosteller", x: 72 },
     { nm: "Bhavya", sec: "A", hos: "hosteller", x: 68 },
@@ -393,8 +398,22 @@
   let PI_ = 0.35, SIG = 0.45, KPOW = 3;
   const Fmix = (x) => PI_ * Phi((x + 1) / SIG) + (1 - PI_) * Phi((x - 1) / SIG);
   function Qmix(u) {
+    // At pi = 1/2 the mixture is symmetric about 0, so Q(u) = -Q(1-u) exactly.
+    // Use it: between the two modes at small sigma both Gaussian tails underflow
+    // and Fmix is numerically a flat 0.5, so a bare bisection for u = 0.5 lands
+    // at an arbitrary point of that plateau instead of the true median 0.
+    if (Math.abs(PI_ - 0.5) < 1e-12) {
+      if (Math.abs(u - 0.5) < 1e-12) return 0;
+      if (u > 0.5) return -Qmix(1 - u);
+    }
     let lo = -8, hi = 8;
-    for (let i = 0; i < 60; i++) {
+    // Widen if the fixed bracket ever fails to straddle, rather than silently
+    // returning an endpoint.
+    let guard = 0;
+    while (Fmix(lo) > u && guard++ < 40) lo *= 2;
+    guard = 0;
+    while (Fmix(hi) < u && guard++ < 40) hi *= 2;
+    for (let i = 0; i < 80; i++) {
       const mid = (lo + hi) / 2;
       if (Fmix(mid) < u) lo = mid; else hi = mid;
     }
@@ -406,7 +425,11 @@
     const { ctx, w, h } = st;
     const pad = { l: 14, r: 14, t: 14, b: 26 };
     ctx.clearRect(0, 0, w, h);
-    const YM = 2.6;
+    // Fit the vertical range to the quantiles actually drawn, so that the
+    // rectangles on screen are the ones the readout adds up. A fixed range
+    // clipped the curve while the sum used unclipped values, and the reported
+    // number could not be read off the picture.
+    const YM = Math.max(1.25, Math.abs(Qmix(0.001)), Math.abs(Qmix(0.999))) * 1.06;
     const xToPx = (u) => pad.l + u * (w - pad.l - pad.r);
     const yToPx = (q) => pad.t + (YM - q) / (2 * YM) * (h - pad.t - pad.b);
     ctx.font = "11px system-ui, sans-serif";
@@ -457,7 +480,8 @@
     ctx.stroke();
     const exact = 1 - 2 * PI_;
     rQuant.innerHTML = "staircase sum (" + K + " steps): <b>" + sum.toFixed(4) +
-      "</b> &nbsp;&#8594;&nbsp; exact E[X] = 1 &#8722; 2&#960; = <b>" + exact.toFixed(4) + "</b>";
+      "</b> &nbsp;&#8594;&nbsp; exact E[X] = 1 &#8722; 2&#960; = <b>" + exact.toFixed(4) +
+      "</b> &nbsp;&#183;&nbsp; error <b>" + Math.abs(sum - exact).toExponential(1) + "</b>";
   });
   function bind(id, vid, set, fmt) {
     const el = document.getElementById(id), v = document.getElementById(vid);

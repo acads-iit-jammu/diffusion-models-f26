@@ -136,7 +136,7 @@
           <span class="key"><span class="swatch lik"></span> p(x | y)</span>
         </span>
       </div>
-      <canvas id="c-joint" aria-label="Heatmap of a joint density - either a correlated bivariate Gaussian or one of three arrangements of Gaussian lumps - with marginal curves along the edges and two draggable slice lines."></canvas>
+      <canvas id="c-joint" role="img" aria-describedby="kbd-hint" aria-label="Heatmap of a joint density - either a correlated bivariate Gaussian or one of three arrangements of Gaussian lumps - with marginal curves along the edges and two draggable slice lines."></canvas>
       <div class="panes">
         <div>
           <p class="panelabel" id="lbl-v">slice at x = 0.5 &#8212; raw sliver vs conditional p(y | x)</p>
@@ -153,6 +153,8 @@
         <span class="seg" id="seg-shape" role="group" aria-label="Choose the joint's shape"></span>
       </div>
       <div class="readout" id="r-joint"></div>
+      <p class="readout" id="kbd-hint">Keyboard: focus a panel, then use &#8592;&#8594; to move
+      the vertical slice and &#8593;&#8595; the horizontal one (hold Shift for larger steps).</p>
       <figcaption>Bayes&#8217; rule is visible here as bookkeeping: vertical ribbons weighted by the
       x-shadow rebuild the same mountain as horizontal ribbons weighted by the y-shadow &#8212;
       p(y|x)&#8201;p(x) = p(x,y) = p(x|y)&#8201;p(y). Slicing is swappable; that is the whole rule.
@@ -321,6 +323,8 @@
   }
 
   const padJ = { l: 30, r: 46, t: 40, b: 24 };
+  let dragAxis = "v";
+  const clampL = (v) => Math.max(-L, Math.min(L, v));
   function jx(st, x) { return padJ.l + (x + L) / (2 * L) * (st.w - padJ.l - padJ.r); }
   function jy(st, y) { return padJ.t + (L - y) / (2 * L) * (st.h - padJ.t - padJ.b); }
 
@@ -358,12 +362,17 @@
     ctx.beginPath(); ctx.moveTo(jx(st, x0), padJ.t); ctx.lineTo(jx(st, x0), h - padJ.b); ctx.stroke();
     ctx.strokeStyle = css("--lik");
     ctx.beginPath(); ctx.moveTo(padJ.l, jy(st, y0)); ctx.lineTo(w - padJ.r, jy(st, y0)); ctx.stroke();
-  }, (st, ev) => {
+  }, (st, ev, isDown) => {
     const r = st.el.getBoundingClientRect();
     const px = ev.clientX - r.left, py = ev.clientY - r.top;
-    const dV = Math.abs(px - jx(st, x0)), dH = Math.abs(py - jy(st, y0));
-    if (dV <= dH) x0 = Math.max(-L, Math.min(L, -L + (px - padJ.l) / (st.w - padJ.l - padJ.r) * 2 * L));
-    else y0 = Math.max(-L, Math.min(L, L - (py - padJ.t) / (st.h - padJ.t - padJ.b) * 2 * L));
+    // Choose the axis once, when the gesture starts, and keep it for the whole
+    // drag. Re-deciding on every move let a stroke jump to the other slice line
+    // as soon as the pointer wandered nearer to it.
+    if (isDown) {
+      dragAxis = Math.abs(px - jx(st, x0)) <= Math.abs(py - jy(st, y0)) ? "v" : "h";
+    }
+    if (dragAxis === "v") x0 = clampL(-L + (px - padJ.l) / (st.w - padJ.l - padJ.r) * 2 * L);
+    else y0 = clampL(L - (py - padJ.t) / (st.h - padJ.t - padJ.b) * 2 * L);
     redrawAct1();
   });
 
@@ -415,6 +424,24 @@
   const ph = setupCanvas("c-condh", (st) => condPanel(st, false));
   const lblV = document.getElementById("lbl-v"), lblH = document.getElementById("lbl-h");
   const rJoint = document.getElementById("r-joint");
+
+  // The slice lines were pointer-only. Left/right move the vertical slice,
+  // up/down the horizontal one; Home/End jump to the extremes.
+  jview.el.tabIndex = 0;
+  jview.el.addEventListener("keydown", (ev) => {
+    const step = ev.shiftKey ? 0.5 : 0.1;
+    let used = true;
+    switch (ev.key) {
+      case "ArrowLeft":  x0 = clampL(x0 - step); break;
+      case "ArrowRight": x0 = clampL(x0 + step); break;
+      case "ArrowDown":  y0 = clampL(y0 - step); break;
+      case "ArrowUp":    y0 = clampL(y0 + step); break;
+      case "Home":       x0 = -L; y0 = -L; break;
+      case "End":        x0 = L;  y0 = L;  break;
+      default: used = false;
+    }
+    if (used) { ev.preventDefault(); redrawAct1(); }
+  });
 
   const SHAPES = [
     { key: "one",  label: "one Gaussian" },
@@ -541,6 +568,18 @@
     xs = Math.max(-XL, Math.min(XL, -XL + (px - padS.l) / (st.w - padS.l - padS.r) * 2 * XL));
     shelf.redraw();
   });
+  shelf.el.tabIndex = 0;
+  shelf.el.addEventListener("keydown", (ev) => {
+    const step = ev.shiftKey ? 0.5 : 0.1, XL = 4;
+    let used = true;
+    if (ev.key === "ArrowLeft") xs = Math.max(-XL, xs - step);
+    else if (ev.key === "ArrowRight") xs = Math.min(XL, xs + step);
+    else if (ev.key === "Home") xs = -XL;
+    else if (ev.key === "End") xs = XL;
+    else used = false;
+    if (used) { ev.preventDefault(); shelf.redraw(); }
+  });
+
   function bind(id, vid, set, fmt) {
     const el = document.getElementById(id), v = document.getElementById(vid);
     el.addEventListener("input", () => { set(+el.value); v.textContent = fmt(+el.value); shelf.redraw(); });

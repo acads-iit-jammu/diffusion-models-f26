@@ -438,8 +438,11 @@ spends the rest of its time learning.
 2. Take $p = (0.4, 0.1, 0.1, 0.4)$ and $q = (0.1, 0.4, 0.4, 0.1)$. Compute the
    optimal plan and cost by hand for $C_{ij} = |i-j|$, using the CDF formula.
    Then predict, before clicking, which routes the demo will use.
-3. Show that the independent coupling $\gamma_{ij} = p_i q_j$ is always feasible,
-   and give an example where it is also *optimal*. (What must $C$ look like?)
+3. Show that the independent coupling $\gamma_{ij} = p_i q_j$ is always feasible.
+   Then show that if $C_{ij} = a_i + b_j$ for any vectors $a, b$ — an *additively
+   separable* price list — then **every** coupling has the same cost
+   $\sum_i a_i p_i + \sum_j b_j q_j$, so the independent one is optimal along with
+   all the others. ($C \equiv 0$ is the special case $a = b = 0$.)
 4. Prove that a vertex of the $m \times n$ transportation polytope has at most
    $m + n - 1$ non-zero entries. *(Hint: a cycle among the used routes lets you
    push mass around it in either direction at no change to the marginals.)*
@@ -448,15 +451,23 @@ spends the rest of its time learning.
    and show $\operatorname{OT}_C(\mu,\rho) = 4 > 1 + 1 =
    \operatorname{OT}_C(\mu,\nu) + \operatorname{OT}_C(\nu,\rho)$. Then explain
    why $W_2 = \sqrt{\operatorname{OT}_C}$ *is* a metric.
-6. *(Concave costs.)* With $C_{ij} = \sqrt{|i-j|}$, find $p, q$ for which the
-   optimal plan is **not** monotone, and describe in words what the optimal plan
-   prefers to do instead. Why does convexity of $c$ rule this out?
+6. *(Concave costs.)* Take $C_{ij} = \sqrt{|i-j|}$ with
+   $p = (\tfrac12, \tfrac12, 0, 0)$ and $q = (0, \tfrac12, \tfrac12, 0)$. Show the
+   order-preserving plan costs $1$, while leaving $B$ in place and sending
+   $A \to C$ costs $\sqrt2/2 \approx 0.707$. Describe in words what the cheaper
+   plan prefers. Then explain why a *convex* displacement cost permits the
+   uncrossing exchange that rules this out, and why *strict* convexity makes
+   crossings strictly worse.
 7. *(The Jacobian is not the cost.)* Let $p = q = \mathcal{N}(0, I_2)$ on
    $\mathbb{R}^2$. Show that both $T = \mathrm{id}$ and $T = R_\theta$, any
-   rotation, satisfy the change-of-variables equation and push $p$ to $q$.
-   Compute the quadratic transport cost of each. Which does maximum likelihood
-   prefer, and which does optimal transport prefer?
+   rotation, satisfy the change-of-variables equation and push $p$ to $q$. Using
+   the convention $c(x,y) = \tfrac12\lVert x - y\rVert^2$ of §5, show the cost of
+   $R_\theta$ is $2(1 - \cos\theta) = 4\sin^2(\theta/2)$, minimised uniquely at
+   $\theta = 0$. Which does population maximum likelihood prefer, and which does
+   quadratic optimal transport prefer?
 8. *(Dynamic form.)* For $p = \mathcal{N}(0,1)$ and $q = \mathcal{N}(\mu, 1)$ in
-   one dimension, guess the optimal velocity field $v_t$, verify it satisfies the
-   continuity equation, and compute its kinetic energy. Check the total against
-   $W_2^2 = \mu^2$.
+   one dimension, verify that the pair $p_t = \mathcal{N}(t\mu, 1)$ with the
+   *constant* velocity field $v_t(x) = \mu$ satisfies the continuity equation and
+   both endpoint conditions. Compute its action $\int_0^1\!\int \mu^2 p_t = \mu^2$
+   and check it against $W_2^2(p,q) = \mu^2$. Why is it plausible that no other
+   admissible pair does better?
