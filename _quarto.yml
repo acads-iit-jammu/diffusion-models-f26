@@ -15,6 +15,7 @@ project:
     - materials/sampling-as-a-map.html
     - materials/measure-playground.html
     - materials/joint-slicer.html
+    - materials/transport-plan-lab.html
     - materials/img/**
 
 book:
@@ -73,6 +74,7 @@ book:
         - tutorials/08-map-proved.qmd
         - tutorials/09-probability-flow-ode.qmd
         - tutorials/10-transport-rigorous.qmd
+        - tutorials/11-discrete-transport.qmd
     - resources.qmd
 
 format:

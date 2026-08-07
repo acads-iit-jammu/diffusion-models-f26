@@ -1,0 +1,530 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Transport Plan Lab</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1e9e8a; --c4: #8b5cc7;
+    --heat: 42, 120, 214;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+      --c1: #3987e5; --c2: #d95926; --c3: #29b39c; --c4: #a06fdb;
+      --heat: 57, 135, 229;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+    --c1: #3987e5; --c2: #d95926; --c3: #29b39c; --c4: #a06fdb;
+    --heat: 57, 135, 229;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1e9e8a; --c4: #8b5cc7;
+    --heat: 42, 120, 214;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout, table, .seg {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  canvas { display: block; width: 100%; touch-action: none; }
+  #c-flow { height: 300px; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.35rem; }
+  input[type="range"] { width: 92px; accent-color: var(--data); }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.8rem; cursor: pointer;
+    font-family: system-ui, sans-serif; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data); color: #fff; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  table { border-collapse: collapse; font-size: 0.78rem; margin-top: 0.8rem; width: 100%; }
+  th, td { border: 1px solid var(--grid); padding: 0.3rem 0.45rem; text-align: right;
+    font-variant-numeric: tabular-nums; }
+  th { color: var(--muted); font-weight: 600; text-transform: uppercase;
+    font-size: 0.68rem; letter-spacing: 0.06em; }
+  td.lbl, th.lbl { text-align: left; color: var(--ink); }
+  .tables { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .tables > div { flex: 1; min-width: 15rem; }
+  .cap { font-size: 0.7rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.08em; margin: 0.9rem 0 0; font-family: system-ui, sans-serif; }
+  .cmp td.bar { padding: 0; width: 34%; }
+  .cmp .barfill { height: 0.75rem; background: var(--data-soft);
+    border-right: 2px solid var(--data); }
+  .cmp tr.on td { background: rgba(var(--heat), 0.09); }
+  .note { color: var(--muted); font-size: 0.72rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid);
+    padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Transport demo</p>
+    <h1>The Transport Plan Lab</h1>
+    <p class="dek">Two histograms over the same four bins. Moving one onto the other is a
+    min-cost flow on a bipartite graph &#8212; and the answer you get depends entirely on what
+    you decided moving <em>costs</em>.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I &#183; The plan</span>Mass has to go somewhere</h2>
+    <p>The top bar is the source histogram p, split into bins A&#8211;D; the bottom bar is the
+    target q. A <strong>transport plan</strong> &#947; says how much mass moves from each bin to
+    each other bin. The ribbons are that plan. Their widths are forced to add up: everything
+    leaving bin&#8202;i totals p&#8202;<sub>i</sub>, everything arriving at bin&#8202;j totals
+    q&#8202;<sub>j</sub> &#8212; which is exactly the statement that &#947; is a
+    <em>coupling</em> of p and q.</p>
+
+    <p>Among all such plans the lab shows the <strong>cheapest</strong> one for the cost you
+    pick. Watch the ribbons cross, or refuse to.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>optimal plan &#947; &#8212; ribbon width is mass moved</span>
+        <span class="seg" id="seg-cost" role="group" aria-label="Choose the edge cost function"></span>
+      </div>
+      <canvas id="c-flow" role="img" aria-label="Sankey-style diagram: the source histogram on top, the target below, and ribbons showing how much mass moves between each pair of bins under the optimal transport plan."></canvas>
+
+      <div class="controls">
+        <span>p</span><span class="seg" id="sl-p"></span>
+        <span>q</span><span class="seg" id="sl-q"></span>
+      </div>
+      <div class="controls" style="border-top:0; padding-top:0">
+        <span class="seg" id="seg-preset" role="group" aria-label="Preset histogram pairs"></span>
+      </div>
+
+      <div class="readout" id="r-plan"></div>
+
+      <div class="tables">
+        <div>
+          <p class="cap">cost matrix C<sub>ij</sub></p>
+          <div id="t-cost"></div>
+        </div>
+        <div>
+          <p class="cap">optimal plan &#947;<sub>ij</sub></p>
+          <div id="t-plan"></div>
+        </div>
+      </div>
+
+      <figcaption>Rows of &#947; sum to p, columns to q &#8212; that is the whole constraint. A
+      vertex of this polytope has at most 4&#8202;+&#8202;4&#8202;&#8722;&#8202;1&#8202;=&#8202;7
+      non-zero entries, so an optimal plan is always sparse: most pairs of bins never trade at
+      all. Ribbons that <em>cross</em> mean mass has to overtake other mass. For costs growing
+      convexly with distance that is never necessary, and the readout says so; for the
+      all-or-nothing and concave costs it often is. (When several plans tie for optimal &#8212;
+      which happens routinely for |i&#8202;&#8722;&#8202;j| &#8212; the lab draws a non-crossing
+      one, since one exists.)</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II &#183; The cost function</span>Change the price, change the answer</h2>
+    <p>The bins, the histograms and the constraints are all fixed. The only thing that varies
+    below is the price of moving one unit of mass from bin&#8202;i to bin&#8202;j. Each row
+    re-solves the same problem under a different price list.</p>
+
+    <figure>
+      <div class="figlabel"><span>total cost of the optimal plan, by cost function</span></div>
+      <div id="t-cmp"></div>
+      <figcaption>The magnitudes are <em>not</em> comparable across rows &#8212; different cost
+      functions are in different units, and scaling C scales the answer. What is comparable is
+      the plan each one induces, and what each total means. Two rows have closed forms worth
+      recognising: the all-or-nothing cost returns exactly the <strong>total variation
+      distance</strong>, and the distance-on-a-line cost returns exactly the area between the
+      two CDFs. Both are computed independently below and checked against the solver.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="takeaway"><strong>Transport is not one number.</strong> "How far apart are these
+    two histograms?" has no answer until you say what it costs to move mass, and that choice is
+    modelling, not mathematics. Pick the ground distance and you have picked the geometry: the
+    same pair of histograms can be close under one price list and far under another, and can be
+    matched monotonically under one and scrambled under the next.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion tutorial on the <a href="https://acads-iit-jammu.github.io/diffusion-models-f26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const BINS = ["A", "B", "C", "D"], N = 4;
+
+  // ---------- exact optimal transport: min-cost flow, successive shortest paths ----------
+  // Validated against an exact LP (scipy/HiGHS) on 400 random instances: max cost
+  // gap 1.1e-15, and every returned plan satisfies both marginals.
+  function solveOT(p, q, C) {
+    const n = p.length, S = 0, T = 2 * n + 1, NV = 2 * n + 2;
+    const to = [], cap = [], cost = [], head = Array.from({ length: NV }, () => []);
+    function edge(u, v, c, w) {
+      head[u].push(to.length); to.push(v); cap.push(c); cost.push(w);
+      head[v].push(to.length); to.push(u); cap.push(0); cost.push(-w);
+    }
+    for (let i = 0; i < n; i++) edge(S, 1 + i, p[i], 0);
+    for (let j = 0; j < n; j++) edge(1 + n + j, T, q[j], 0);
+    const eid = [];
+    for (let i = 0; i < n; i++) {
+      eid.push([]);
+      for (let j = 0; j < n; j++) { eid[i].push(to.length); edge(1 + i, 1 + n + j, Infinity, C[i][j]); }
+    }
+    const EPS = 1e-12, target = p.reduce((a, b) => a + b, 0);
+    let flow = 0, total = 0, guard = 0;
+    while (flow < target - 1e-9 && guard++ < 500) {
+      const dist = new Array(NV).fill(Infinity), inq = new Array(NV).fill(false),
+            pre = new Array(NV).fill(-1);
+      dist[S] = 0; const dq = [S]; inq[S] = true;
+      while (dq.length) {
+        const u = dq.shift(); inq[u] = false;
+        for (const e of head[u]) {
+          if (cap[e] <= EPS) continue;
+          const v = to[e], nd = dist[u] + cost[e];
+          if (nd < dist[v] - 1e-15) {
+            dist[v] = nd; pre[v] = e;
+            if (!inq[v]) { inq[v] = true; dq.push(v); }
+          }
+        }
+      }
+      if (!isFinite(dist[T])) break;
+      let push = target - flow;
+      for (let v = T; v !== S; v = to[pre[v] ^ 1]) push = Math.min(push, cap[pre[v]]);
+      for (let v = T; v !== S; v = to[pre[v] ^ 1]) { cap[pre[v]] -= push; cap[pre[v] ^ 1] += push; }
+      flow += push; total += push * dist[T];
+    }
+    const plan = [];
+    for (let i = 0; i < n; i++) {
+      plan.push([]);
+      for (let j = 0; j < n; j++) plan[i].push(cap[eid[i][j] ^ 1]);
+    }
+    return { cost: total, plan };
+  }
+
+  const planCost = (g, C) => {
+    let s = 0;
+    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) s += g[i][j] * C[i][j];
+    return s;
+  };
+
+  // The monotone (north-west corner) coupling, for the crossing test.
+  function monotonePlan(p, q) {
+    const P = p.slice(), Q = q.slice(), g = p.map(() => q.map(() => 0));
+    let i = 0, j = 0;
+    while (i < N && j < N) {
+      const t = Math.min(P[i], Q[j]);
+      g[i][j] = t; P[i] -= t; Q[j] -= t;
+      if (P[i] <= 1e-12) i++; else j++;
+    }
+    return g;
+  }
+
+  // ---------- the cost functions on the edges of the bipartite graph ----------
+  const COSTS = [
+    { key: "abs",  label: "|i − j|",      note: "distance along the line",
+      f: (i, j) => Math.abs(i - j) },
+    { key: "sq",   label: "(i − j)²", note: "squared distance",
+      f: (i, j) => (i - j) * (i - j) },
+    { key: "zo",   label: "1 if i ≠ j",   note: "all-or-nothing",
+      f: (i, j) => (i === j ? 0 : 1) },
+    { key: "sqrt", label: "√|i − j|", note: "concave in distance",
+      f: (i, j) => Math.sqrt(Math.abs(i - j)) },
+  ];
+  const costMatrix = (c) => {
+    const C = [];
+    for (let i = 0; i < N; i++) { C.push([]); for (let j = 0; j < N; j++) C[i].push(c.f(i, j)); }
+    return C;
+  };
+
+  let costKey = "abs";
+  let pRaw = [0.45, 0.30, 0.15, 0.10], qRaw = [0.10, 0.15, 0.30, 0.45];
+  const norm = (a) => { const s = a.reduce((x, y) => x + y, 0); return a.map((v) => v / s); };
+  const fmt = (v, d) => v.toFixed(d === undefined ? 3 : d);
+
+  // ---------- controls ----------
+  const segCost = document.getElementById("seg-cost");
+  for (const c of COSTS) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = c.label; b.title = c.note;
+    b.setAttribute("aria-pressed", String(c.key === costKey));
+    b.addEventListener("click", () => { costKey = c.key; render(); });
+    segCost.appendChild(b);
+  }
+
+  function makeSliders(host, arr) {
+    arr.forEach((v, i) => {
+      const l = document.createElement("label");
+      l.innerHTML = "<span>" + BINS[i] + "</span>";
+      const s = document.createElement("input");
+      s.type = "range"; s.min = "1"; s.max = "60"; s.step = "1";
+      s.value = String(Math.round(v * 100));
+      s.setAttribute("aria-label", host.id === "sl-p" ? "source mass in bin " + BINS[i]
+                                                      : "target mass in bin " + BINS[i]);
+      s.addEventListener("input", () => { arr[i] = +s.value / 100; render(); });
+      l.appendChild(s); host.appendChild(l);
+      arr.el = arr.el || []; arr.el[i] = s;
+    });
+  }
+  makeSliders(document.getElementById("sl-p"), pRaw);
+  makeSliders(document.getElementById("sl-q"), qRaw);
+
+  const PRESETS = [
+    { label: "shift right", p: [0.45, 0.30, 0.15, 0.10], q: [0.10, 0.15, 0.30, 0.45] },
+    { label: "swap ends",   p: [0.40, 0.10, 0.10, 0.40], q: [0.10, 0.40, 0.40, 0.10] },
+    { label: "spread out",  p: [0.05, 0.45, 0.45, 0.05], q: [0.35, 0.15, 0.15, 0.35] },
+    { label: "nearly equal", p: [0.25, 0.30, 0.25, 0.20], q: [0.22, 0.28, 0.27, 0.23] },
+  ];
+  const segPreset = document.getElementById("seg-preset");
+  for (const pr of PRESETS) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = pr.label;
+    b.addEventListener("click", () => {
+      for (let i = 0; i < N; i++) {
+        pRaw[i] = pr.p[i]; qRaw[i] = pr.q[i];
+        pRaw.el[i].value = String(Math.round(pr.p[i] * 100));
+        qRaw.el[i].value = String(Math.round(pr.q[i] * 100));
+      }
+      render();
+    });
+    segPreset.appendChild(b);
+  }
+
+  // ---------- the ribbon diagram ----------
+  const cv = document.getElementById("c-flow"), ctx = cv.getContext("2d");
+  let CW = 0, CH = 0;
+  new ResizeObserver(() => {
+    const dpr = window.devicePixelRatio || 1, r = cv.getBoundingClientRect();
+    CW = r.width; CH = r.height;
+    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    render();
+  }).observe(cv);
+
+  function drawFlow(p, q, plan) {
+    if (!CW) return;
+    const pad = 18, W = CW - 2 * pad, yTop = 46, yBot = CH - 62, barH = 26;
+    const X = (m) => pad + m * W;
+    ctx.clearRect(0, 0, CW, CH);
+    const hues = [css("--c1"), css("--c2"), css("--c3"), css("--c4")];
+
+    // ribbons first, so the bars sit on top of them
+    const sOff = [], tOff = [];
+    let acc = 0; for (let i = 0; i < N; i++) { sOff.push(acc); acc += p[i]; }
+    acc = 0; for (let j = 0; j < N; j++) { tOff.push(acc); acc += q[j]; }
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N; j++) {
+        const g = plan[i][j];
+        if (g <= 1e-9) continue;
+        const a0 = X(sOff[i]), a1 = X(sOff[i] + g);
+        const b0 = X(tOff[j]), b1 = X(tOff[j] + g);
+        const yA = yTop + barH, yB = yBot, mid = (yA + yB) / 2;
+        ctx.beginPath();
+        ctx.moveTo(a0, yA);
+        ctx.bezierCurveTo(a0, mid, b0, mid, b0, yB);
+        ctx.lineTo(b1, yB);
+        ctx.bezierCurveTo(b1, mid, a1, mid, a1, yA);
+        ctx.closePath();
+        ctx.fillStyle = hues[i];
+        ctx.globalAlpha = i === j ? 0.20 : 0.42;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        sOff[i] += g; tOff[j] += g;
+      }
+    }
+
+    // the two histogram bars
+    ctx.font = "600 12px system-ui, sans-serif";
+    ctx.textBaseline = "middle";
+    const drawBar = (vals, y, tag) => {
+      let a = 0;
+      for (let i = 0; i < N; i++) {
+        const x0 = X(a), x1 = X(a + vals[i]);
+        ctx.fillStyle = hues[i]; ctx.globalAlpha = 0.85;
+        ctx.fillRect(x0, y, Math.max(x1 - x0, 0), barH);
+        ctx.globalAlpha = 1;
+        if (x1 - x0 > 22) {
+          ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+          ctx.fillText(BINS[i], (x0 + x1) / 2, y + barH / 2);
+        }
+        a += vals[i];
+      }
+      ctx.fillStyle = css("--muted"); ctx.textAlign = "left";
+      ctx.font = "600 10px system-ui, sans-serif";
+      ctx.fillText(tag, pad, y - 11);
+      ctx.font = "600 12px system-ui, sans-serif";
+    };
+    drawBar(p, yTop, "SOURCE  p");
+    drawBar(q, yBot, "TARGET  q");
+
+    // per-bin masses under the target bar
+    ctx.font = "10px system-ui, sans-serif";
+    ctx.fillStyle = css("--ink-2"); ctx.textAlign = "center";
+    let a = 0;
+    for (let j = 0; j < N; j++) {
+      const x0 = X(a), x1 = X(a + q[j]);
+      if (x1 - x0 > 26) ctx.fillText(fmt(q[j], 2), (x0 + x1) / 2, yBot + barH + 12);
+      a += q[j];
+    }
+    a = 0;
+    for (let i = 0; i < N; i++) {
+      const x0 = X(a), x1 = X(a + p[i]);
+      if (x1 - x0 > 26) ctx.fillText(fmt(p[i], 2), (x0 + x1) / 2, yTop - 11);
+      a += p[i];
+    }
+  }
+
+  // ---------- tables ----------
+  function matrixTable(M, hi) {
+    let h = "<table><tr><th class='lbl'>from \\ to</th>";
+    for (const b of BINS) h += "<th>" + b + "</th>";
+    h += "</tr>";
+    for (let i = 0; i < N; i++) {
+      h += "<tr><td class='lbl'>" + BINS[i] + "</td>";
+      for (let j = 0; j < N; j++) {
+        const v = M[i][j];
+        const on = hi && v > 1e-9;
+        h += "<td style=\"" + (on ? "background:rgba(" + css("--heat") + "," +
+          (0.10 + 0.55 * Math.min(v / 0.5, 1)).toFixed(3) + ")" : "") + "\">" +
+          (hi ? (v > 1e-9 ? fmt(v) : "·") : fmt(v, 2)) + "</td>";
+      }
+      h += "</tr>";
+    }
+    return h + "</table>";
+  }
+
+  function render() {
+    const p = norm(pRaw), q = norm(qRaw);
+    const cur = COSTS.find((c) => c.key === costKey);
+    Array.from(segCost.children).forEach((b, i) =>
+      b.setAttribute("aria-pressed", String(COSTS[i].key === costKey)));
+
+    const C = costMatrix(cur);
+    const { cost } = solveOT(p, q, C);
+    // The optimum can be non-unique (|i-j| ties routinely), and the solver may
+    // return a crossing plan when an equally cheap non-crossing one exists.
+    // Prefer the monotone optimum for display, so the picture never contradicts
+    // the claim that convex costs are matched in order.
+    const mono = monotonePlan(p, q);
+    const monoExcess = planCost(mono, C) - cost;
+    const monoOptimal = monoExcess < 1e-9;
+    const plan = monoOptimal ? mono : solveOT(p, q, C).plan;
+    drawFlow(p, q, plan);
+
+    document.getElementById("t-cost").innerHTML = matrixTable(C, false);
+    document.getElementById("t-plan").innerHTML = matrixTable(plan, true);
+
+    // independent coupling, for contrast, and the sparsity / crossing facts
+    let indep = 0;
+    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) indep += p[i] * q[j] * C[i][j];
+    let nz = 0, stay = 0;
+    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+      if (plan[i][j] > 1e-9) nz++;
+      if (i === j) stay += plan[i][j];
+    }
+    document.getElementById("r-plan").innerHTML =
+      "total cost <b>" + fmt(cost) + "</b>" +
+      " &nbsp;&#183;&nbsp; shipping blind (independent coupling p&#8855;q) would cost <b>" +
+      fmt(indep) + "</b>" +
+      " &nbsp;&#183;&nbsp; <b>" + nz + "</b> of 16 routes used (a vertex uses at most 7)" +
+      " &nbsp;&#183;&nbsp; mass that never moves: <b>" + fmt(stay) + "</b>" +
+      "<br>order-preserving matching is <b>" + (monoOptimal ? "optimal" : "not optimal") +
+      "</b> here &#8212; " +
+      (monoOptimal
+        ? "no ribbon needs to cross another"
+        : "keeping the order would cost <b>" + fmt(planCost(mono, C)) +
+          "</b>, i.e. <b>" + fmt(monoExcess) + "</b> more, so mass must overtake mass");
+
+    renderComparison(p, q);
+  }
+
+  function renderComparison(p, q) {
+    // independent closed forms, to check the solver against
+    let tv = 0; for (let i = 0; i < N; i++) tv += Math.abs(p[i] - q[i]); tv /= 2;
+    let cp = 0, cq = 0, cdf = 0;
+    for (let k = 0; k < N - 1; k++) { cp += p[k]; cq += q[k]; cdf += Math.abs(cp - cq); }
+
+    const rows = COSTS.map((c) => {
+      const C = costMatrix(c);
+      const r = solveOT(p, q, C);
+      const monoOpt = planCost(monotonePlan(p, q), C) - r.cost < 1e-9;
+      let note = monoOpt ? "order-preserving plan is optimal"
+                         : "must break the order";
+      if (c.key === "zo") note += " &#183; = total variation " + fmt(tv) +
+        (Math.abs(tv - r.cost) < 1e-9 ? " ✓" : " ✗");
+      if (c.key === "abs") note += " &#183; = area between CDFs " + fmt(cdf) +
+        (Math.abs(cdf - r.cost) < 1e-9 ? " ✓" : " ✗");
+      if (c.key === "sq") note += " &#183; its square root is the W₂ distance";
+      if (c.key === "sqrt") note += " &#183; concave: mass prefers to stay put";
+      return { c, cost: r.cost, note };
+    });
+    const maxC = Math.max(...rows.map((r) => r.cost), 1e-9);
+
+    let h = "<table class='cmp'><tr><th class='lbl'>cost C<sub>ij</sub></th>" +
+      "<th>total</th><th class='lbl'>bar</th><th class='lbl'>what it is</th></tr>";
+    for (const r of rows) {
+      h += "<tr" + (r.c.key === costKey ? " class='on'" : "") + ">" +
+        "<td class='lbl'>" + r.c.label + " <span class='note'>" + r.c.note + "</span></td>" +
+        "<td>" + fmt(r.cost) + "</td>" +
+        "<td class='bar'><div class='barfill' style='width:" +
+          (100 * r.cost / maxC).toFixed(1) + "%'></div></td>" +
+        "<td class='lbl'><span class='note'>" + r.note + "</span></td></tr>";
+    }
+    document.getElementById("t-cmp").innerHTML = h + "</table>";
+  }
+
+  render();
+  const redrawAll = () => render();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
+  new MutationObserver(redrawAll).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

@@ -1,0 +1,387 @@
+# Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass {.unnumbered}
+
+*A standalone tutorial. The transport tutorials so far have been about the
+continuum — [the intuitive story](./05-transport-story.qmd) and
+[the rigorous account](./10-transport-rigorous.qmd). This one puts transport on a
+finite ground set, where it becomes a linear program you can solve exactly, and
+where the one modelling decision that drives everything — **what does it cost to
+move mass?** — is out in the open. Earth Mover's Distance, Word Mover's Distance,
+and the Wasserstein distances in generative modelling are all this one problem.
+The closing section answers the question this setting always provokes: when the
+bins dissolve into a continuous density and the Jacobian shows up, what plays the
+role of the cost, and what plays the role of the transporter?*
+
+## 1. Two histograms, one question
+
+Fix four bins $A, B, C, D$ — they can be greyscale levels, vocabulary items,
+mesh cells, cluster centroids, anything. Put two probability mass functions on
+them:
+
+$$
+p = (p_A, p_B, p_C, p_D), \qquad q = (q_A, q_B, q_C, q_D),
+\qquad \textstyle\sum_i p_i = \sum_j q_j = 1 .
+$$
+
+Now ask how to turn $p$ into $q$ by *moving mass around*. A **transport plan** is
+a table $\gamma_{ij} \ge 0$ recording how much mass travels from bin $i$ to bin
+$j$, and it is a legal plan exactly when nothing is created or destroyed:
+
+$$
+\underbrace{\sum_j \gamma_{ij} = p_i}_{\text{all of bin } i \text{ leaves}},
+\qquad
+\underbrace{\sum_i \gamma_{ij} = q_j}_{\text{bin } j \text{ receives exactly } q_j} .
+$$
+
+::: {.callout-tip}
+
+## You have already met this object
+
+Those two conditions say the non-negative table $\gamma$ has row sums $p$ and
+column sums $q$ — that is, **$\gamma$ is a joint distribution whose two marginals
+are $p$ and $q$**. A transport plan *is* a coupling, in the exact sense of
+[Joint, Marginal, Conditional](./02-joint-conditional-bayes.qmd): the mountain
+whose two shadows are $p$ and $q$.
+
+So everything from that tutorial applies verbatim, including the part that
+matters most here: **there are many couplings.** The shadows do not determine the
+mountain, so the constraints alone do not determine the plan. Something else has
+to choose, and that something is the cost.
+
+:::
+
+The set of legal plans is never empty — the **independent coupling**
+$\gamma_{ij} = p_i q_j$ always qualifies — and it is a convex polytope, the
+*transportation polytope*. Optimal transport is the problem of picking the
+cheapest point in it.
+
+## 2. The linear program, and why it is a flow
+
+Let $C_{ij} \ge 0$ be the price of moving one unit of mass from bin $i$ to bin
+$j$. Then the total bill for a plan is $\langle \gamma, C\rangle = \sum_{ij}
+\gamma_{ij} C_{ij}$, and the **Kantorovich problem** is
+
+$$
+\operatorname{OT}_C(p,q) \;=\; \min_{\gamma \ge 0}\; \sum_{i,j} \gamma_{ij} C_{ij}
+\quad \text{subject to} \quad
+\sum_j \gamma_{ij} = p_i, \;\; \sum_i \gamma_{ij} = q_j .
+$$
+
+Linear objective, linear constraints, non-negative variables: a linear program.
+But it is a linear program of a very particular kind. Draw the bins twice — once
+as sources, once as sinks — and join every source to every sink. Then $\gamma$ is
+a **flow** on that bipartite graph: $p_i$ is supply at source $i$, $q_j$ is demand
+at sink $j$, $C_{ij}$ is the per-unit cost on edge $i \to j$, and we want the
+cheapest flow meeting all demands. This is the classical **transportation
+problem**, and it is solved by min-cost-flow machinery — network simplex, the
+Hungarian algorithm in the assignment special case, auction algorithms —
+rather than by a general-purpose LP solver.
+
+Two structural facts are worth carrying around.
+
+**Sparsity.** The constraint matrix here is totally unimodular, and a vertex
+(basic feasible solution) of an $m \times n$ transportation polytope has at most
+$m + n - 1$ non-zero entries. For our $4 \times 4$ problem that is **7 of the 16
+routes**. An optimal plan is always sparse: most pairs of bins never trade. The
+demo below shows the count live.
+
+**Duality, as prices.** The dual of the program above is
+
+$$
+\max_{f, g} \;\; \sum_i f_i\, p_i + \sum_j g_j\, q_j
+\qquad \text{subject to} \qquad f_i + g_j \le C_{ij} \;\; \text{for all } i,j,
+$$
+
+which has an irresistible reading. Imagine a shipping contractor who offers to
+collect a unit at bin $i$ for a fee $f_i$ and deliver it at bin $j$ for $g_j$.
+The constraint says the contractor can never charge more than it would cost you
+to move the mass yourself. Duality says that, at the optimum, the contractor's
+best total take equals your cheapest shipping bill exactly. When $C$ is a metric
+this specialises to the **Kantorovich–Rubinstein** form, $\operatorname{OT}_C =
+\sup_{\text{1-Lipschitz } f} \sum_i f_i (p_i - q_i)$ — the form a Wasserstein GAN
+critic approximates.
+
+## 3. The cost function is the modelling decision
+
+Here is the point of the whole tutorial. The bins, the histograms, and the
+constraints are fixed. Change only the price list $C$ and you get a different
+optimal plan, a different total, and — this is the part that surprises people —
+a different *kind of geometry* on the space of histograms.
+
+Four price lists, all built from the bin index distance $d = |i-j|$:
+
+| $C_{ij}$ | Name | Optimal total is | Plan |
+|---|---|---|---|
+| $\lvert i - j\rvert$ | distance on a line | $W_1$, the **Earth Mover's Distance** | monotone |
+| $(i-j)^2$ | squared distance | $W_2^2$ (its square root is $W_2$) | monotone |
+| $\mathbf{1}[i \ne j]$ | all-or-nothing | the **total variation distance** | typically not monotone |
+| $\sqrt{\lvert i-j \rvert}$ | concave in distance | no standard name | mass prefers to stay put |
+
+Three of these deserve a proof sketch, because each is a small surprise.
+
+**All-or-nothing gives total variation.** If every move costs the same regardless
+of distance, the only thing worth optimising is *how much you move at all*. You
+can leave $\min(p_i, q_i)$ in place in each bin, and everything else must move,
+so
+
+$$
+\operatorname{OT}_{\mathbf{1}[i \ne j]}(p,q)
+= 1 - \sum_i \min(p_i, q_i)
+= \tfrac12 \sum_i |p_i - q_i|
+= \mathrm{TV}(p,q).
+$$
+
+Total variation is optimal transport with a cost that has no sense of distance —
+which is exactly why TV is so brutal a distance between distributions with
+disjoint supports, and why generative modelling reaches for Wasserstein instead.
+
+**Distance-on-a-line gives the area between the CDFs.** With bins ordered on a
+line, the optimum is the monotone (quantile) coupling, and
+
+$$
+W_1(p,q) \;=\; \sum_{k} \big| F_p(k) - F_q(k) \big| ,
+$$
+
+the total gap between the two cumulative distributions. This is the discrete
+image of the inverse-CDF transport that
+[The Map, Proved](./08-map-proved.qmd) builds in the continuum: the same map, on
+a finite ground set.
+
+**Convex costs never cross; concave costs do.** For any cost $c(|i-j|)$ with $c$
+*convex*, the monotone coupling is optimal — mass keeps its order, and in the
+ribbon picture no ribbon crosses another. For $c$ *concave*, the structure flips:
+moving one unit a long way is cheaper than moving two units half as far, so the
+optimal plan leaves common mass untouched and ships the residue in long jumps.
+The plans genuinely differ; the demo flags which case you are in.
+
+::: {.callout-warning}
+
+## When is the answer a distance?
+
+Not always. If $C$ is itself a metric on the ground set ($C_{ii}=0$, symmetric,
+triangle inequality), then $\operatorname{OT}_C$ is a metric on the simplex of
+histograms — this is the $W_1$/EMD case, and it is what earns EMD the word
+"distance." Drop any of those conditions and you may keep a useful number while
+losing the guarantees: $(i-j)^2$ is *not* a metric on bins, and correspondingly
+$W_2^2$ does not satisfy the triangle inequality — only its square root $W_2$
+does. A cost with $C_{ii} \neq 0$ will not even vanish when $p = q$.
+
+The demo reports totals under all four price lists at once. Their **magnitudes
+are not comparable** — different units, and scaling $C$ scales the answer.
+What is comparable is the plan each induces and the ordering each imposes on
+pairs of histograms.
+
+:::
+
+**Interactive demo** — [The Transport Plan Lab](../materials/transport-plan-lab.html){target="_blank"}
+
+<iframe src="../materials/transport-plan-lab.html" width="100%" height="680" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: optimal transport between two four-bin histograms, with selectable edge cost functions, the optimal plan as a ribbon diagram, and a comparison of total cost across cost functions"></iframe>
+
+## 4. Plans versus maps: Kantorovich versus Monge
+
+Monge asked the question first, in 1781, and asked a harder version of it. He
+wanted a **map**: a rule $T$ sending each source location to a single destination,
+with total cost $\sum_i p_i\, C_{i, T(i)}$. Kantorovich's 1942 relaxation allows
+mass at one location to *split* across several destinations — that is what the
+table $\gamma$ permits and a function $T$ does not.
+
+The relaxation is not a technicality; without it the problem can have no solution
+at all. Take $p = (\tfrac12, \tfrac12, 0, 0)$ and $q = (\tfrac13, \tfrac13,
+\tfrac13, 0)$. No map works: bin $A$ holds mass $\tfrac12$, every target bin wants
+at most $\tfrac13$, so $A$'s mass *must* be split. A plan handles this without
+comment; a map cannot exist.
+
+This is the discrete shadow of the atomic obstruction in
+[Generative Models as Transport](./10-transport-rigorous.qmd): a deterministic
+map cannot split an atom. Generation *into* an atomic target is always fine;
+deterministic encoding *out of* an atomic source is what fails. Kantorovich's
+plans are the repair, and they are why the modern theory is stated in terms of
+couplings rather than maps.
+
+## 5. From bins to densities: what replaces the cost, and the transporter
+
+Now let the bins dissolve. Replace the finite ground set by $\mathbb{R}^d$, the
+histograms by densities $p$ and $q$, and ask the same question. A natural first
+thought is that the change-of-variables formula is what defines transport here:
+if $T$ is a smooth invertible map pushing $p$ onto $q$, then
+
+$$
+p(x) \;=\; q\big(T(x)\big)\, \big|\det \nabla T(x)\big| .
+$$
+
+That formula is indeed central — but it is worth being precise about *which* role
+it plays, because this is the most common confusion in the subject.
+
+::: {.callout-important}
+
+## The Jacobian is the constraint, not the cost
+
+Look back at §1. The discrete problem had two separate ingredients:
+
+1. **Constraints** — row sums $p$, column sums $q$: "$\gamma$ is a coupling."
+2. **Objective** — $\sum \gamma_{ij} C_{ij}$: "and it is the cheapest one."
+
+In the continuum the Jacobian equation above is ingredient **1**, and nothing
+else. It is precisely the statement $T_\# p = q$ — *this map is a valid
+transport* — written in densities. It is the continuous form of "the row sums and
+column sums come out right."
+
+It says nothing whatever about cost. Just as infinitely many couplings satisfy
+the marginal constraints, infinitely many maps satisfy the Jacobian equation, and
+the Jacobian cannot prefer one to another. You still need to name a price.
+
+:::
+
+So the dictionary is:
+
+| Discrete (this tutorial) | Continuous, static | Continuous, dynamic |
+|---|---|---|
+| bins $i, j$ | points $x, y \in \mathbb{R}^d$ | a path of densities $p_t$ |
+| $p_i$, $q_j$ | densities $p$, $q$ | endpoints $p_0 = p$, $p_1 = q$ |
+| plan $\gamma_{ij} \ge 0$ | coupling measure $\gamma(dx,dy)$ | velocity field $v_t(x)$ |
+| row/column sums | $T_\# p = q$, i.e. the **Jacobian equation** | **continuity equation** $\partial_t p_t + \nabla\!\cdot(p_t v_t) = 0$ |
+| cost matrix $C_{ij}$ | cost function $c(x,y)$ | kinetic energy density $\lVert v_t(x)\rVert^2$ |
+| $\sum_{ij}\gamma_{ij}C_{ij}$ | $\iint c(x,y)\, d\gamma$ | $\int_0^1\!\!\int \lVert v_t\rVert^2 p_t \,dx\,dt$ |
+| min-cost flow | Monge–Kantorovich problem | Benamou–Brenier problem |
+
+Three consequences, all of them load-bearing for this course.
+
+**The transporter is a velocity field.** In the dynamic (Benamou–Brenier) form,
+
+$$
+W_2^2(p,q) \;=\; \min_{(p_t, v_t)} \int_0^1\!\!\int_{\mathbb{R}^d}
+\lVert v_t(x)\rVert^2 \, p_t(x)\,dx\,dt
+\quad\text{subject to}\quad
+\partial_t p_t + \nabla\!\cdot(p_t v_t) = 0,
+$$
+
+the unknown is not a matrix and not a map but a **time-dependent vector field**;
+the map is recovered as the flow of that field. The continuity equation is the
+*infinitesimal* Jacobian equation — along a trajectory $\dot\Phi_t = v_t(\Phi_t)$,
+the Jacobian obeys $\frac{d}{dt}\log\det\nabla\Phi_t = (\nabla\!\cdot v_t)\circ
+\Phi_t$, which is the same bookkeeping in derivative form. This is exactly the
+object that flow matching regresses onto and that the
+[probability-flow ODE](./09-probability-flow-ode.qmd) integrates. *Learning a
+velocity field is learning a transporter*, and the kinetic energy is its cost.
+
+**Quadratic cost has a canonical answer.** For $c(x,y) = \tfrac12\lVert
+x-y\rVert^2$, Brenier's theorem (1991) says the optimal map is the gradient of a
+convex function, $T = \nabla\varphi$. Substituting into the Jacobian equation
+gives the **Monge–Ampère equation**
+
+$$
+p(x) \;=\; q\big(\nabla\varphi(x)\big)\, \det\big(\nabla^2\varphi(x)\big),
+$$
+
+the constraint and the cost finally in one place. Note what each contributed: the
+Jacobian equation supplied the equation, and the cost supplied the restriction to
+*gradients of convex functions* — the higher-dimensional replacement for
+"monotone," and the reason $W_2$ generalises the quantile map.
+
+**Maximum likelihood is not a transport cost.** A normalizing flow trains on
+
+$$
+\log p_{\text{model}}(x) = \log q\big(T(x)\big) + \log\big|\det \nabla T(x)\big| ,
+$$
+
+and the Jacobian term sits squarely in the *objective* — which invites the
+reading that flows are doing optimal transport. They are not. That term is
+enforcing normalization, i.e. the constraint; it does not price displacement. Two
+maps $T$ and $T \circ S$, where $S$ is any map preserving $p$, push $p$ to the
+same $q$ and are worth exactly the same likelihood, while having wildly different
+transport costs. Maximum likelihood identifies the *density*; it does not select
+a map. To get the optimal map you have to add a transport cost on purpose — which
+is what OT-regularised flows and minibatch-OT couplings in flow matching do, and
+why they straighten trajectories that likelihood training leaves tangled.
+
+## 6. Computing it, at realistic sizes
+
+The $4 \times 4$ lab is solved exactly by min-cost flow. Real problems are bigger,
+and three routes matter.
+
+- **Network simplex / Hungarian.** Exact, and the right answer for moderate $n$.
+  Roughly $O(n^3 \log n)$ for the transportation problem; the Hungarian algorithm
+  is the $O(n^3)$ special case when both histograms are uniform with equal atoms,
+  so the plan is a permutation.
+- **Entropic regularisation (Sinkhorn).** Add $\varepsilon \sum_{ij}\gamma_{ij}
+  (\log \gamma_{ij} - 1)$ to the objective. The problem becomes strictly convex,
+  and its solution has the form $\gamma = \operatorname{diag}(u)\, K
+  \operatorname{diag}(v)$ with $K = e^{-C/\varepsilon}$, found by alternately
+  rescaling rows and columns. Each iteration is a matrix–vector product: $O(n^2)$,
+  GPU-friendly, and differentiable, which is why it dominates in machine learning
+  (Cuturi, 2013). The regulariser interpolates between the two couplings we have
+  already met: as $\varepsilon \to 0$ it recovers the sharp optimal plan, and as
+  $\varepsilon \to \infty$ it relaxes to the independent coupling $p q^{\top}$ —
+  the "shipping blind" baseline reported in the demo.
+- **Sliced and low-rank approximations.** Project to one dimension, where the
+  answer is the sorted-order formula of §3, and average over projections. Cheap,
+  and exact in the only dimension where transport is exactly solvable — which is
+  the same reason this course starts in 1-D.
+
+## 7. Where this shows up
+
+- **Earth Mover's Distance.** Rubner, Tomasi and Guibas introduced EMD for image
+  retrieval: represent an image by a signature of colour clusters, let $C$ be
+  distance in colour space, and compare images by transport cost. Robust to the
+  binning artefacts that wreck bin-by-bin distances like $\chi^2$ — because EMD
+  knows that adjacent bins are *nearly the same*, and TV does not.
+- **Word Mover's Distance.** Kusner and coauthors applied the same idea to text:
+  a document is a histogram over its vocabulary, and $C_{ij}$ is the Euclidean
+  distance between word embeddings $i$ and $j$. Document distance is then the
+  cheapest way to transport one bag of words onto another. This is the
+  "fixed vocabulary on both sides" setting exactly — and it shows what the cost
+  matrix buys you: semantics enters *only* through $C$.
+- **Generative modelling.** Wasserstein GANs optimise the dual form of $W_1$ with
+  a Lipschitz-constrained critic. FID scores samples with a closed-form $W_2$
+  between Gaussians fitted to Inception features. Minibatch-OT couplings in flow
+  matching pick which noise sample is paired with which data sample, straightening
+  the paths a model has to learn. And the course's central claim — generative
+  modelling *is* transport — is the statement that all of these are choosing a
+  coupling between a simple distribution and a complicated one.
+
+::: {.callout-tip}
+
+## Key takeaway
+
+Transport has two ingredients and they do different jobs. The **constraints** say
+which plans are legal: row and column sums on a finite ground set, the Jacobian
+equation for a map between densities, the continuity equation for a flow. They
+never single out an answer, because couplings are plentiful — the lesson of
+[many mountains, same shadows](./02-joint-conditional-bayes.qmd). The **cost**
+is what selects, and it is a modelling choice, not a mathematical given. Choose
+$\mathbf{1}[i \ne j]$ and you have total variation; choose $|i-j|$ and you have
+Earth Mover; choose embedding distance and you have Word Mover; choose
+$\lVert v\rVert^2$ along a path and you have the velocity field this course
+spends the rest of its time learning.
+
+:::
+
+## Exercises
+
+1. Verify the total-variation identity directly: show
+   $1 - \sum_i \min(p_i,q_i) = \tfrac12\sum_i |p_i - q_i|$ for any two PMFs, and
+   explain why the plan "leave $\min(p_i,q_i)$ in place" is optimal for the
+   all-or-nothing cost. Confirm against the demo's readout.
+2. Take $p = (0.4, 0.1, 0.1, 0.4)$ and $q = (0.1, 0.4, 0.4, 0.1)$. Compute the
+   optimal plan and cost by hand for $C_{ij} = |i-j|$, using the CDF formula.
+   Then predict, before clicking, which routes the demo will use.
+3. Show that the independent coupling $\gamma_{ij} = p_i q_j$ is always feasible,
+   and give an example where it is also *optimal*. (What must $C$ look like?)
+4. Prove that a vertex of the $m \times n$ transportation polytope has at most
+   $m + n - 1$ non-zero entries. *(Hint: a cycle among the used routes lets you
+   push mass around it in either direction at no change to the marginals.)*
+5. Exhibit two histograms and a cost $C$ with $C_{ii} = 0$ and symmetry but
+   *violating* the triangle inequality, such that $\operatorname{OT}_C$ violates
+   the triangle inequality on histograms. Then explain why $W_2^2$ is not a
+   metric but $W_2$ is.
+6. *(Concave costs.)* With $C_{ij} = \sqrt{|i-j|}$, find $p, q$ for which the
+   optimal plan is **not** monotone, and describe in words what the optimal plan
+   prefers to do instead. Why does convexity of $c$ rule this out?
+7. *(The Jacobian is not the cost.)* Let $p = q = \mathcal{N}(0, I_2)$ on
+   $\mathbb{R}^2$. Show that both $T = \mathrm{id}$ and $T = R_\theta$, any
+   rotation, satisfy the change-of-variables equation and push $p$ to $q$.
+   Compute the quadratic transport cost of each. Which does maximum likelihood
+   prefer, and which does optimal transport prefer?
+8. *(Dynamic form.)* For $p = \mathcal{N}(0,1)$ and $q = \mathcal{N}(\mu, 1)$ in
+   one dimension, guess the optimal velocity field $v_t$, verify it satisfies the
+   continuity equation, and compute its kinetic energy. Check the total against
+   $W_2^2 = \mu^2$.
