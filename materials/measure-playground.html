@@ -68,7 +68,6 @@
   .legend .swatch { width: 14px; height: 0; border-top: 2.5px solid var(--data); border-radius: 2px; }
   .legend .swatch.lik { border-top-color: var(--lik); }
   canvas { display: block; width: 100%; touch-action: none; }
-  #c-blob { height: 360px; }
   .panes { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
   .panes > div { flex: 1; min-width: 0; }
   .panes canvas { height: 170px; }
@@ -91,6 +90,36 @@
   .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
     color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
   .takeaway strong { color: var(--ink); }
+
+  /* ---- Act I: the roster ---- */
+  .roster { font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; gap: 0.5rem; }
+  .grp { border: 1px solid var(--grid); border-radius: 8px; padding: 0.5rem 0.6rem;
+    background: rgba(var(--heat), 0.045); }
+  .grp-head { display: flex; justify-content: space-between; align-items: baseline;
+    gap: 0.8rem; font-size: 0.74rem; color: var(--muted); margin-bottom: 0.4rem;
+    letter-spacing: 0.06em; text-transform: uppercase; }
+  .grp-head b { color: var(--data); font-variant-numeric: tabular-nums;
+    text-transform: none; letter-spacing: 0; font-size: 0.95rem; }
+  .rows { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .row { display: flex; align-items: baseline; gap: 0.45rem; font-size: 0.8rem;
+    border: 1px solid var(--ring); border-radius: 6px; padding: 0.25rem 0.5rem;
+    background: var(--surface); }
+  .row .nm { color: var(--ink); }
+  .row .xv { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .row .cm { font-variant-numeric: tabular-nums; color: var(--data); font-weight: 600; }
+  .seg { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data);
+    color: #fff; }
+  .sigma { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.74rem;
+    color: var(--ink-2); background: var(--surface); border: 1px solid var(--grid);
+    border-radius: 8px; padding: 0.55rem 0.7rem; margin-top: 0.75rem;
+    overflow-wrap: anywhere; }
+  .qz { font-family: system-ui, sans-serif; font-size: 0.82rem; margin-top: 0.75rem;
+    display: flex; flex-direction: column; gap: 0.3rem; }
+  .qz div { display: flex; gap: 0.5rem; align-items: baseline; }
+  .qz .yes { color: var(--data); font-weight: 700; }
+  .qz .no  { color: var(--lik); font-weight: 700; }
   footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid); padding-top: 1.25rem; }
   footer a { color: var(--ink-2); }
 </style>
@@ -99,34 +128,49 @@
   <header>
     <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Foundations demo</p>
     <h1>The Measure Playground</h1>
-    <p class="dek">Two ideas, made draggable: a &#963;-algebra is a <em>resolution</em> on the
-    space of outcomes, and expectation is an <em>area</em> under the quantile curve.</p>
+    <p class="dek">Two ideas, made concrete: a &#963;-algebra is <em>what a report tells you</em>,
+    and expectation is an <em>area</em> under the quantile curve.</p>
   </header>
 
   <section>
-    <h2><span class="act">Act I &#183; Resolution</span>A &#963;-algebra is a pixelation</h2>
-    <p>The blob below is a sample space &#937;, and the colouring is a random variable
-    X(&#969;) &#8212; a number attached to every outcome. Drag the slider: at each resolution
-    you see not X itself but its <em>per-pixel average</em> &#8212; the best version of X that
-    this resolution can express. A random variable is <em>measurable</em> at a resolution
-    exactly when it is constant on each pixel: nothing of it is lost.</p>
+    <h2><span class="act">Act I &#183; Information</span>A &#963;-algebra is what a report tells you</h2>
+    <p>Forget abstract shapes. Here is a concrete sample space: eight students, one of
+    whom is picked at random, so each outcome &#969; has probability &#8539;. The random
+    variable X is the marks column &#8212; a number attached to every outcome.</p>
+
+    <p>Now suppose you do not get to see <em>which</em> student was picked. You are handed
+    only a <strong>report</strong>. Choose what the report says, and read off the three
+    things that follow: which students it cannot tell apart, exactly which events it
+    settles (that list <em>is</em> the &#963;-algebra), and the best estimate of X it
+    supports.</p>
 
     <figure>
       <div class="figlabel">
-        <span>&#937; coloured by X, seen at finite resolution</span>
-        <span class="legend"><span class="key"><span class="swatch"></span> low &#8594; high X</span></span>
+        <span>&#937; = eight students, each with probability &#8539;</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> E[X | report]</span>
+        </span>
       </div>
-      <canvas id="c-blob" role="img" aria-label="A blob-shaped sample space colored by a random variable, rendered at an adjustable pixel resolution; coarse pixels show per-pixel averages."></canvas>
-      <div class="controls">
-        <label>resolution
-          <input id="s-res" type="range" min="1" max="7" step="1" value="3">
-          <span class="val" id="v-res">8&#215;8</span></label>
+
+      <div class="controls" style="margin-top:0; padding-top:0; border-top:0">
+        <span>the report says:</span>
+        <span class="seg" id="seg-report" role="group" aria-label="Choose what the report reveals"></span>
       </div>
-      <figcaption>Coarse pixels = a small &#963;-algebra: few questions can be asked, and X is
-      replaced by its average on each cell. Fine pixels = a rich &#963;-algebra: X becomes
-      fully visible. (Averaging X over the pixels of a coarser resolution is exactly the
-      <em>conditional expectation</em> &#8212; the central object of this course, in a later
-      tutorial.)</figcaption>
+
+      <div class="roster" id="roster" aria-live="polite"></div>
+
+      <div class="sigma" id="sigma-list"></div>
+      <div class="qz" id="quiz"></div>
+      <div class="readout" id="r-tower"></div>
+
+      <figcaption>Each box is one thing the report can say; the students inside it are
+      <em>indistinguishable</em> to an observer who sees only that report. X is
+      <em>measurable</em> with respect to the report exactly when every box holds a single
+      value of X &#8212; that is, when X is a function of the report. Otherwise the best the
+      observer can do is the box average, which is the <em>conditional expectation</em>
+      E[X&#8201;|&#8201;report]. Note the last line: however coarse or fine the report, the
+      average of the box averages is always the same number. That is the tower property,
+      and it is the workhorse identity of this course.</figcaption>
     </figure>
   </section>
 
@@ -160,10 +204,12 @@
   </section>
 
   <section>
-    <p class="takeaway"><strong>The two acts are one story.</strong> Probability is a measure
-    (area on &#937;); a random variable is a map out of &#937;; expectation is the integral of that
-    map against the measure &#8212; computable on the blob (Act I: average the colouring) or,
-    after transport to [0,1], as an area under a curve (Act II). Same number, two homes.</p>
+    <p class="takeaway"><strong>The two acts are one story.</strong> A random variable is a
+    number attached to each outcome, and expectation is its measure-weighted total. Act I
+    computes it where the outcomes live &#8212; value &#215; probability, box by box &#8212; and
+    shows that a &#963;-algebra is just a record of which outcomes an observer can tell apart.
+    Act II computes the same number after transporting the mass to [0,1], where it becomes
+    an area under the quantile curve. Same number, two homes.</p>
   </section>
 
   <footer>
@@ -194,70 +240,146 @@
     return st;
   }
 
-  // ---------------- Act I: pixelated blob ----------------
-  const inBlob = (x, y) => {           // x,y in [-1.45,1.45]
-    const th = Math.atan2(y, x), rr = Math.hypot(x, y);
-    return rr <= 1 + 0.14 * Math.sin(3 * th) + 0.07 * Math.cos(5 * th);
-  };
-  const field = (x, y) => x + 0.35 * Math.sin(2.4 * y);   // the random variable X
+  // ---------------- Act I: the roster and the report ----------------
+  // Eight equally likely outcomes. Marks are chosen so that every report's
+  // box averages themselves average to 66 - the tower property, visibly.
+  const ROSTER = [
+    { nm: "Aarav",  sec: "A", hos: "hosteller", x: 72 },
+    { nm: "Bhavya", sec: "A", hos: "hosteller", x: 68 },
+    { nm: "Chetan", sec: "A", hos: "day scholar", x: 55 },
+    { nm: "Divya",  sec: "A", hos: "day scholar", x: 61 },
+    { nm: "Esha",   sec: "B", hos: "hosteller", x: 84 },
+    { nm: "Farhan", sec: "B", hos: "hosteller", x: 78 },
+    { nm: "Gita",   sec: "B", hos: "day scholar", x: 47 },
+    { nm: "Harsh",  sec: "B", hos: "day scholar", x: 63 },
+  ];
 
-  let resPow = 3;   // grid = 2^resPow
-  const blob = setupCanvas("c-blob", (st) => {
-    const { ctx, w, h } = st;
-    ctx.clearRect(0, 0, w, h);
-    const S = Math.min(w, h) * 0.92;
-    const ox = w / 2, oy = h / 2;
-    const toPx = (x, y) => [ox + x / 1.45 * S / 2, oy - y / 1.45 * S / 2];
-    const K = Math.pow(2, resPow);
-    // clip to blob
-    ctx.save();
-    ctx.beginPath();
-    for (let i = 0; i <= 200; i++) {
-      const th = i / 200 * 2 * Math.PI;
-      const rr = 1 + 0.14 * Math.sin(3 * th) + 0.07 * Math.cos(5 * th);
-      const [px, py] = toPx(rr * Math.cos(th), rr * Math.sin(th));
-      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  const REPORTS = [
+    { key: "none",  label: "nothing",            of: () => "no information at all" },
+    { key: "sec",   label: "the section",        of: (r) => "section " + r.sec },
+    { key: "hos",   label: "hosteller or not",   of: (r) => r.hos },
+    { key: "both",  label: "section + hosteller", of: (r) => "section " + r.sec + ", " + r.hos },
+    { key: "all",   label: "the name",           of: (r) => r.nm },
+  ];
+
+  // Questions used to make "settled by the report" concrete.
+  const QUESTIONS = [
+    { q: "Was the student in section B?",        ev: (r) => r.sec === "B" },
+    { q: "Was the student a hosteller?",         ev: (r) => r.hos === "hosteller" },
+    { q: "Did the student score above 70?",      ev: (r) => r.x > 70 },
+    { q: "Was it Gita?",                         ev: (r) => r.nm === "Gita" },
+  ];
+
+  let reportKey = "sec";
+
+  // Group the roster into the report's indistinguishability classes, in first
+  // appearance order.
+  function classesFor(rep) {
+    const order = [], byLabel = new Map();
+    for (const r of ROSTER) {
+      const L = rep.of(r);
+      if (!byLabel.has(L)) { byLabel.set(L, []); order.push(L); }
+      byLabel.get(L).push(r);
     }
-    ctx.closePath();
-    ctx.clip();
-    // per-cell averages over a subsample
-    const heat = css("--heat").split(",").map((v) => +v.trim());
-    for (let i = 0; i < K; i++) for (let j = 0; j < K; j++) {
-      const x0 = -1.45 + 2.9 * i / K, y0 = -1.45 + 2.9 * j / K;
-      let sum = 0, n = 0;
-      const M = 4;
-      for (let a = 0; a < M; a++) for (let b = 0; b < M; b++) {
-        const x = x0 + (a + 0.5) / M * 2.9 / K, y = y0 + (b + 0.5) / M * 2.9 / K;
-        if (inBlob(x, y)) { sum += field(x, y); n++; }
+    return order.map((L) => ({ label: L, members: byLabel.get(L) }));
+  }
+
+  const mean = (rows) => rows.reduce((s, r) => s + r.x, 0) / rows.length;
+  const fmt = (v) => (Math.round(v * 100) / 100).toString();
+
+  const elSeg = document.getElementById("seg-report");
+  const elRoster = document.getElementById("roster");
+  const elSigma = document.getElementById("sigma-list");
+  const elQuiz = document.getElementById("quiz");
+  const elTower = document.getElementById("r-tower");
+
+  for (const rep of REPORTS) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = rep.label;
+    b.setAttribute("aria-pressed", String(rep.key === reportKey));
+    b.addEventListener("click", () => { reportKey = rep.key; renderAct1(); });
+    elSeg.appendChild(b);
+  }
+
+  function renderAct1() {
+    const rep = REPORTS.find((r) => r.key === reportKey);
+    const cls = classesFor(rep);
+
+    Array.from(elSeg.children).forEach((b, i) =>
+      b.setAttribute("aria-pressed", String(REPORTS[i].key === reportKey)));
+
+    // the boxes, each holding the students the report cannot separate
+    elRoster.textContent = "";
+    for (const c of cls) {
+      const m = mean(c.members);
+      const box = document.createElement("div");
+      box.className = "grp";
+      const head = document.createElement("div");
+      head.className = "grp-head";
+      const left = document.createElement("span");
+      left.textContent = "report says: " + c.label;
+      const right = document.createElement("span");
+      right.innerHTML = "E[X | report] = <b>" + fmt(m) + "</b>";
+      head.append(left, right);
+      const rows = document.createElement("div");
+      rows.className = "rows";
+      for (const r of c.members) {
+        const d = document.createElement("div");
+        d.className = "row";
+        d.innerHTML = '<span class="nm">' + r.nm + '</span>' +
+          '<span class="xv">X = ' + r.x + '</span>' +
+          '<span class="cm">&#8594; ' + fmt(m) + '</span>';
+        rows.appendChild(d);
       }
-      if (!n) continue;
-      const v = (sum / n + 1.6) / 3.2;               // normalize to [0,1]
-      const [px, py] = toPx(x0, y0 + 2.9 / K);
-      const [qx, qy] = toPx(x0 + 2.9 / K, y0);
-      ctx.fillStyle = "rgba(" + heat[0] + "," + heat[1] + "," + heat[2] + "," + (0.12 + 0.78 * v) + ")";
-      ctx.fillRect(px, py, qx - px + 0.7, qy - py + 0.7);
+      box.append(head, rows);
+      elRoster.appendChild(box);
     }
-    ctx.restore();
-    // blob outline + grid lines over the blob
-    ctx.strokeStyle = css("--data");
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    for (let i = 0; i <= 200; i++) {
-      const th = i / 200 * 2 * Math.PI;
-      const rr = 1 + 0.14 * Math.sin(3 * th) + 0.07 * Math.cos(5 * th);
-      const [px, py] = toPx(rr * Math.cos(th), rr * Math.sin(th));
-      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+
+    // the sigma-algebra, enumerated when it is small enough to read
+    const k = cls.length, total = Math.pow(2, k);
+    let txt = "\u03c3(report) = every union of boxes: 2^" + k + " = " + total +
+      " events, out of the 2^8 = 256 subsets of \u03a9.";
+    if (k <= 4) {
+      const names = cls.map((c, i) => String.fromCharCode(67 + i)); // C, D, E, F
+      const subsets = [];
+      for (let m = 0; m < total; m++) {
+        const parts = names.filter((_, i) => m & (1 << i));
+        subsets.push(parts.length ? parts.join("\u222a") : "\u2205");
+      }
+      txt += "\n  boxes: " + cls.map((c, i) => names[i] + " = {" +
+        c.members.map((r) => r.nm).join(", ") + "}").join(";  ");
+      txt += "\n  \u03c3(report) = { " + subsets.join(", ") + " }";
     }
-    ctx.closePath();
-    ctx.stroke();
-  });
-  const sRes = document.getElementById("s-res"), vRes = document.getElementById("v-res");
-  sRes.addEventListener("input", () => {
-    resPow = +sRes.value;
-    const K = Math.pow(2, resPow);
-    vRes.textContent = K + "\u00d7" + K;
-    blob.redraw();
-  });
+    elSigma.textContent = txt;
+    elSigma.style.whiteSpace = "pre-wrap";
+
+    // which questions the report settles: settled iff constant on every box
+    elQuiz.textContent = "";
+    for (const Q of QUESTIONS) {
+      const settled = cls.every((c) => c.members.every((r) => Q.ev(r) === Q.ev(c.members[0])));
+      const d = document.createElement("div");
+      d.innerHTML = '<span class="' + (settled ? "yes" : "no") + '">' +
+        (settled ? "\u2713" : "\u2717") + "</span><span>" + Q.q + " &#8212; " +
+        (settled ? "settled by the report" : "not settled: some box holds both answers") +
+        "</span>";
+      elQuiz.appendChild(d);
+    }
+
+    // measurability, and the tower property
+    const measurable = cls.every((c) => c.members.every((r) => r.x === c.members[0].x));
+    const overall = mean(ROSTER);
+    const avgOfAvgs = cls.reduce((s, c) => s + mean(c.members) * c.members.length, 0) / ROSTER.length;
+    elTower.innerHTML =
+      "X is " + (measurable ? "<b>measurable</b>" : "<b>not measurable</b>") +
+      " with respect to this report &#8212; " +
+      (measurable
+        ? "every box holds a single value of X, so X is a function of the report."
+        : "some box holds two different values of X, so X is not a function of the report.") +
+      "<br>E[ E[X | report] ] = <b>" + fmt(avgOfAvgs) + "</b> = E[X] = <b>" + fmt(overall) +
+      "</b> &nbsp;(the tower property, for every choice of report).";
+  }
+  renderAct1();
 
   // ---------------- Act II: quantile area ----------------
   function erf(x) {
@@ -345,7 +467,7 @@
   bind("s-sig", "v-sig", (x) => { SIG = x; }, (x) => x.toFixed(2));
   bind("s-k", "v-k", (x) => { KPOW = x; }, (x) => String(Math.pow(2, x)));
 
-  const redrawAll = () => { blob.redraw(); quant.redraw(); };
+  const redrawAll = () => { quant.redraw(); };
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
   new MutationObserver(redrawAll).observe(document.documentElement, {
     attributes: true, attributeFilter: ["data-theme"] });

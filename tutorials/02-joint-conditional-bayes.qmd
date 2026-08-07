@@ -60,7 +60,39 @@ This forgetting is a one-way street with a name you will meet again:
 The map from joints to marginal pairs is **many-to-one**. Fix both shadows to be
 standard normal; then *every* correlation $\rho \in (-1, 1)$ gives a different
 mountain casting those same two shadows (Act I of the demo below — drag $\rho$
-and watch the mountain twist while the shadows stand still). A joint with
+and watch the mountain twist while the shadows stand still).
+
+Twisting one ellipse is the mild version of the point. Here is the version you
+cannot argue with. Put four round Gaussian lumps of width $s$ at the corners
+$(\pm a, \pm a)$, and build three joints by placing mass on them differently:
+
+$$
+\begin{aligned}
+p_{\nearrow}(x,y) &= \tfrac12 N_{(-a,-a)} + \tfrac12 N_{(+a,+a)}, \\
+p_{\searrow}(x,y) &= \tfrac12 N_{(-a,+a)} + \tfrac12 N_{(+a,-a)}, \\
+p_{\boxplus}(x,y) &= \tfrac14 \big( N_{(-a,-a)} + N_{(+a,+a)} + N_{(-a,+a)} + N_{(+a,-a)} \big).
+\end{aligned}
+$$
+
+Every one of them puts mass $\tfrac12$ near $x = -a$ and mass $\tfrac12$ near
+$x = +a$, and likewise in $y$. So all three have the **identical** pair of
+shadows — the same two-bump curve
+
+$$
+p(x) \;=\; \tfrac12\, \mathcal{N}(x; -a, s^2) + \tfrac12\, \mathcal{N}(x; +a, s^2)
+$$
+
+on each axis. Yet one is two lumps on the rising diagonal, one is two lumps on
+the falling diagonal, and one is four lumps in a square. Their correlations are
+$+\tfrac{a^2}{a^2 + s^2}$, $-\tfrac{a^2}{a^2 + s^2}$ and $0$ — strongly positive,
+strongly negative, and exactly zero. The third is independent; the first two are
+about as dependent as a pair can be.
+
+Click through the three in Act I of the demo and watch the shadow curves on the
+edges: they do not so much as flicker. Nothing you can compute from the marginals
+alone — not the means, not the variances, not the shapes, and as the four-lump
+case shows, not the correlation either — distinguishes joints this different. A
+joint with
 prescribed marginals is called a **coupling** of them, and the set of couplings
 is enormous. Choosing a *particular* coupling of noise and data — a particular
 mountain over the (noise, data) plane — is precisely what a generative model

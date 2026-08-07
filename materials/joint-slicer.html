@@ -84,6 +84,9 @@
   button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
     border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.85rem; cursor: pointer; }
   button:hover { border-color: var(--muted); }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data);
+    color: #fff; }
   button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
   .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
   .readout b { color: var(--ink); }
@@ -106,12 +109,22 @@
 
   <section>
     <h2><span class="act">Act I &#183; The mountain</span>Shadows that never move, slices that do</h2>
-    <p>The heatmap is a correlated Gaussian joint p(x,&#8202;y). The curves on the edges are its
-    two <em>marginals</em> &#8212; the shadows. <strong>Drag the &#961; slider</strong>: the mountain
+    <p>The heatmap is a joint p(x,&#8202;y). The curves on the edges are its two
+    <em>marginals</em> &#8212; the shadows. <strong>Drag the &#961; slider</strong>: the mountain
     twists, but the shadows do not move &#8212; many mountains cast the same shadows (this is the
     coupling-underdeterminacy of the transport tutorials). <strong>Drag the slice lines</strong>:
     each panel shows the raw slice (a sliver of mass) and the same slice renormalised to unit
     area &#8212; the conditional distribution.</p>
+
+    <p>Twisting one ellipse is the mild version of the point. <strong>Click through
+    &#8220;two blobs &#8599;&#8221;, &#8220;two blobs &#8600;&#8221; and &#8220;four
+    blobs&#8221;</strong> for the strong one. Each puts round lumps at the corners
+    (&#177;1.25,&#8202;&#177;1.25); each therefore puts half its mass near x = &#8722;1.25 and half
+    near x = +1.25, and the same in y &#8212; so all three have <em>exactly</em> the same pair
+    of shadows. Watch the edge curves as you switch: they do not move at all. But the
+    mountains could hardly differ more, and their correlations are +0.86, &#8722;0.86 and
+    <em>zero</em>. The four-blob one is genuinely independent; the other two are strongly
+    dependent. Not the marginals, and not even the correlation, can tell them apart.</p>
 
     <figure>
       <div class="figlabel">
@@ -135,10 +148,14 @@
       <div class="controls">
         <label>&#961; <input id="s-rho" type="range" min="-0.9" max="0.9" step="0.05" value="0.6">
           <span class="val" id="v-rho">0.60</span></label>
+        <span class="seg" id="seg-shape" role="group" aria-label="Choose the joint's shape"></span>
       </div>
+      <div class="readout" id="r-joint"></div>
       <figcaption>Bayes&#8217; rule is visible here as bookkeeping: vertical ribbons weighted by the
       x-shadow rebuild the same mountain as horizontal ribbons weighted by the y-shadow &#8212;
-      p(y|x)&#8201;p(x) = p(x,y) = p(x|y)&#8201;p(y). Slicing is swappable; that is the whole rule.</figcaption>
+      p(y|x)&#8201;p(x) = p(x,y) = p(x|y)&#8201;p(y). Slicing is swappable; that is the whole rule.
+      Both shapes have identical N(0,&#8201;1) shadows, so no amount of staring at the marginals
+      can tell them apart: the shadows genuinely do not determine the mountain.</figcaption>
     </figure>
   </section>
 
@@ -214,17 +231,53 @@
     return st;
   }
 
-  // ---------------- Act I: correlated Gaussian joint ----------------
+  // ---------------- Act I: joints that share their shadows ----------------
   const L = 3.2;
-  let RHO = 0.6, x0 = 0.5, y0 = 0.5;
-  const joint = (x, y) => {
-    const d = 1 - RHO * RHO;
-    return Math.exp(-(x * x - 2 * RHO * x * y + y * y) / (2 * d)) / (2 * Math.PI * Math.sqrt(d));
+  let RHO = 0.6, x0 = 0.5, y0 = 0.5, SHAPE = "diag";
+
+  // A single zero-mean bivariate normal with unit variances and correlation r.
+  const biv = (x, y, r) => {
+    const d = 1 - r * r;
+    return Math.exp(-(x * x - 2 * r * x * y + y * y) / (2 * d)) / (2 * Math.PI * Math.sqrt(d));
   };
+
+  // The blob family: isotropic lumps of width S centred at (+/-A, +/-A).
+  // Putting equal mass on the two main-diagonal lumps, on the two
+  // anti-diagonal lumps, or on all four gives three visibly different joints
+  // whose x- and y-marginals are the SAME two-bump curve in every case,
+  // because each choice puts mass 1/2 at x = -A and 1/2 at x = +A (likewise
+  // in y). Correlation runs +, -, 0 across the three.
+  const A = 1.25, S = 0.5;
+  const lump = (x, y, mx, my) =>
+    Math.exp(-((x - mx) ** 2 + (y - my) ** 2) / (2 * S * S)) / (2 * Math.PI * S * S);
+
+  const joint = (x, y) => {
+    switch (SHAPE) {
+      case "one":  return biv(x, y, RHO);
+      case "diag": return 0.5 * lump(x, y, -A, -A) + 0.5 * lump(x, y, A, A);
+      case "anti": return 0.5 * lump(x, y, -A, A) + 0.5 * lump(x, y, A, -A);
+      default:     return 0.25 * (lump(x, y, -A, -A) + lump(x, y, A, A) +
+                                  lump(x, y, -A, A) + lump(x, y, A, -A));
+    }
+  };
+
+  // The shadows, in closed form. Identical for diag/anti/four by construction;
+  // they are drawn from this function rather than hard-coded, so the claim
+  // "the shadows do not move" is something the picture actually demonstrates.
+  const marg = (t) =>
+    SHAPE === "one" ? nPdf(t, 0, 1)
+                    : 0.5 * nPdf(t, -A, S) + 0.5 * nPdf(t, A, S);
+
+  // Correlation: rho for the single Gaussian; +/-A^2/(A^2+S^2) or 0 for the blobs.
+  const corrOf = () =>
+    SHAPE === "one" ? RHO
+    : SHAPE === "diag" ? A * A / (A * A + S * S)
+    : SHAPE === "anti" ? -A * A / (A * A + S * S)
+    : 0;
 
   let heatCanvas = null, heatKey = "";
   function buildHeat() {
-    const key = css("--heat") + "-" + RHO.toFixed(3);
+    const key = css("--heat") + "-" + SHAPE + "-" + RHO.toFixed(3);
     if (heatKey === key) return;
     heatKey = key;
     const n = 180;
@@ -260,19 +313,20 @@
     ctx.drawImage(heatCanvas, padJ.l, padJ.t, w - padJ.l - padJ.r, h - padJ.t - padJ.b);
     ctx.strokeStyle = css("--axis"); ctx.lineWidth = 1;
     ctx.strokeRect(padJ.l, padJ.t, w - padJ.l - padJ.r, h - padJ.t - padJ.b);
-    // marginal shadows: standard normals along top (x) and right (y), fixed
+    // marginal shadows along top (x) and right (y), drawn from marg() itself
+    const mScale = 30 / nPdf(0, 0, S);   // same pixel scale for every shape
     ctx.strokeStyle = css("--muted"); ctx.lineWidth = 1.6;
     ctx.beginPath();
     for (let i = 0; i <= 200; i++) {
       const x = -L + 2 * L * i / 200;
-      const px = jx(st, x), py = padJ.t - 4 - nPdf(x, 0, 1) * 66;
+      const px = jx(st, x), py = padJ.t - 4 - marg(x) * mScale;
       i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
     }
     ctx.stroke();
     ctx.beginPath();
     for (let i = 0; i <= 200; i++) {
       const y = -L + 2 * L * i / 200;
-      const px = w - padJ.r + 4 + nPdf(y, 0, 1) * 66, py = jy(st, y);
+      const px = w - padJ.r + 4 + marg(y) * mScale, py = jy(st, y);
       i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
     }
     ctx.stroke();
@@ -305,17 +359,22 @@
     ctx.textAlign = "center"; ctx.textBaseline = "top";
     for (const t of [-2, 0, 2]) ctx.fillText(String(t), toPx(t), h - pad.b + 4);
     const color = vertical ? css("--data") : css("--lik");
-    const condM = vertical ? RHO * x0 : RHO * y0;
-    const condS = Math.sqrt(1 - RHO * RHO);
-    const peak = nPdf(0, 0, Math.min(condS, 0.5));
+    const peak = SHAPE === "one"
+      ? nPdf(0, 0, Math.min(Math.sqrt(1 - RHO * RHO), 0.5))
+      : nPdf(0, 0, S) * 1.05;
     const yToPx = (v) => h - pad.b - Math.min(v / peak, 1) * (h - pad.t - pad.b) * 0.94;
+    // The conditional is the slice divided by the marginal at the slice
+    // position - computed, not substituted from a closed form, so it stays
+    // correct for every shape including the two-humped blob conditionals.
+    const at = vertical ? x0 : y0;
+    const slice = (v) => (vertical ? joint(x0, v) : joint(v, y0));
+    const mAt = Math.max(marg(at), 1e-12);
     // raw sliver (joint values along the slice), dashed muted
     ctx.strokeStyle = css("--muted"); ctx.setLineDash([3, 3]); ctx.lineWidth = 1.4;
     ctx.beginPath();
     for (let i = 0; i <= 200; i++) {
       const v = -L + 2 * L * i / 200;
-      const jv = vertical ? joint(x0, v) : joint(v, y0);
-      const px = toPx(v), py = yToPx(jv);
+      const px = toPx(v), py = yToPx(slice(v));
       i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
     }
     ctx.stroke(); ctx.setLineDash([]);
@@ -324,7 +383,7 @@
     ctx.beginPath();
     for (let i = 0; i <= 200; i++) {
       const v = -L + 2 * L * i / 200;
-      const px = toPx(v), py = yToPx(nPdf(v, condM, condS));
+      const px = toPx(v), py = yToPx(slice(v) / mAt);
       i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
     }
     ctx.stroke();
@@ -336,9 +395,47 @@
   const pv = setupCanvas("c-condv", (st) => condPanel(st, true));
   const ph = setupCanvas("c-condh", (st) => condPanel(st, false));
   const lblV = document.getElementById("lbl-v"), lblH = document.getElementById("lbl-h");
+  const rJoint = document.getElementById("r-joint");
+
+  const SHAPES = [
+    { key: "diag", label: "two blobs ↗" },
+    { key: "anti", label: "two blobs ↘" },
+    { key: "four", label: "four blobs" },
+    { key: "one",  label: "one Gaussian" },
+  ];
+  const segShape = document.getElementById("seg-shape");
+  for (const s of SHAPES) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = s.label;
+    b.setAttribute("aria-pressed", String(s.key === SHAPE));
+    b.addEventListener("click", () => {
+      SHAPE = s.key;
+      Array.from(segShape.children).forEach((c, i) =>
+        c.setAttribute("aria-pressed", String(SHAPES[i].key === SHAPE)));
+      redrawAct1();
+    });
+    segShape.appendChild(b);
+  }
+
   function redrawAct1() {
     lblV.textContent = "slice at x = " + x0.toFixed(1) + " \u2014 raw sliver vs conditional p(y | x)";
     lblH.textContent = "slice at y = " + y0.toFixed(1) + " \u2014 raw sliver vs conditional p(x | y)";
+    const corr = corrOf();
+    const blob = SHAPE !== "one";
+    rJoint.innerHTML =
+      "shadows: " +
+      (blob
+        ? "<b>&#189;N(&#8722;1.25, 0.5&#178;) + &#189;N(+1.25, 0.5&#178;)</b> on both axes &#8212; " +
+          "<b>identical for all three blob shapes</b>"
+        : "<b>N(0,&#8201;1)</b> on both axes, for every &#961;") +
+      " &nbsp;&#183;&nbsp; Corr(X,&#8202;Y) = <b>" + corr.toFixed(2) + "</b>" +
+      " &nbsp;&#183;&nbsp; " +
+      (SHAPE === "four"
+        ? "independent: every slice is the same two-humped curve, wherever you cut"
+        : SHAPE === "one" && Math.abs(RHO) < 1e-9
+          ? "independent (a jointly Gaussian pair with zero correlation is independent)"
+          : "dependent: the slice moves with the slice line");
     jview.redraw(); pv.redraw(); ph.redraw();
   }
   const sRho = document.getElementById("s-rho"), vRho = document.getElementById("v-rho");
@@ -423,6 +520,8 @@
   }
   bind("s-pi", "v-pi", (x) => { PI_ = x; }, (x) => x.toFixed(2));
   bind("s-sig", "v-sig", (x) => { SIG = x; }, (x) => x.toFixed(2));
+
+  redrawAct1();
 
   const redrawAll = () => { heatKey = ""; redrawAct1(); shelf.redraw(); };
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
