@@ -241,6 +241,33 @@ nothing but the logic of answerable questions:
 
 Nothing more is required, and nothing less would do.
 
+::: {.callout-note}
+
+## The honest version of "settles"
+
+Read literally, "the events the report settles" means the events whose answer is
+determined by $R(\omega)$ — that is, the sets that are unions of level sets of
+$R$. When $R$ has **countably many possible answers**, as in every example in
+this tutorial and in the demo below, that collection is exactly $\sigma(R)$ and
+the gloss is precise.
+
+For a report with a continuum of answers it is too generous. Take $R(\omega) =
+\omega$ on $[0,1]$: its level sets are single points, so *every* subset of
+$[0,1]$ is a union of them, and "settled" would mean all of $2^{[0,1]}$ — which
+§1 has already told us is too big to carry a length. The definition that works in
+general keeps only the sets built from measurable questions about the answer,
+
+$$
+\sigma(R) \;=\; \big\{\, R^{-1}(B) \;:\; B \text{ Borel} \,\big\},
+$$
+
+and this is the definition to hold onto. The intuition — *what the report lets
+you decide* — survives intact; the fine print is that "decide" must itself be
+asked measurably. The same caveat is why measurability of $R$ had to be assumed
+in the first place.
+
+:::
+
 The report picture also gives the cleanest statement of measurability there is. A
 quantity can be computed by an observer who sees only the report exactly when it
 is a *function of the report*:
