@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Generative Models as Transport: History and Validation – ID-5-02 (TO)</title>
+<title>The World’s Smallest Diffusion Model – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +64,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../resources.html" rel="next">
-<link href="../tutorials/07-probability-flow-ode.html" rel="prev">
+<link href="../tutorials/08-map-proved.html" rel="next">
+<link href="../tutorials/06-genai-simplest-form.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +144,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/08-transport-rigorous.html">Generative Models as Transport: History and Validation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/05-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/07-two-point-diffusion.html">The World’s Smallest Diffusion Model</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -291,13 +325,25 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/01-measuring-things.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/02-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/03-probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability 101 — A Refresher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/04-distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
@@ -314,38 +360,44 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/05-transport-story.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Moving Distributions: The Transport Story</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/06-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/07-two-point-diffusion.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/08-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/09-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/10-transport-rigorous.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-discrete-transport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
   </div>
 </li>
       </ul>
@@ -366,23 +418,22 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-thesis-and-two-category-errors-to-avoid" id="toc-the-thesis-and-two-category-errors-to-avoid" class="nav-link active" data-scroll-target="#the-thesis-and-two-category-errors-to-avoid">The thesis, and two category errors to avoid</a></li>
-  <li><a href="#dimension-one-the-complete-theory-of-order-compatible-transport" id="toc-dimension-one-the-complete-theory-of-order-compatible-transport" class="nav-link" data-scroll-target="#dimension-one-the-complete-theory-of-order-compatible-transport">Dimension one: the complete theory of order-compatible transport</a></li>
-  <li><a href="#dimension-two-and-above-underdeterminacy-and-the-selection-principles" id="toc-dimension-two-and-above-underdeterminacy-and-the-selection-principles" class="nav-link" data-scroll-target="#dimension-two-and-above-underdeterminacy-and-the-selection-principles">Dimension two and above: underdeterminacy, and the selection principles</a></li>
-  <li><a href="#the-1-d-coincidences-stratified-by-epistemic-status" id="toc-the-1-d-coincidences-stratified-by-epistemic-status" class="nav-link" data-scroll-target="#the-1-d-coincidences-stratified-by-epistemic-status">The 1-D coincidences, stratified by epistemic status</a></li>
-  <li><a href="#what-breaks-upstairs-the-misleading-intuitions-inventory" id="toc-what-breaks-upstairs-the-misleading-intuitions-inventory" class="nav-link" data-scroll-target="#what-breaks-upstairs-the-misleading-intuitions-inventory">What breaks upstairs: the misleading-intuitions inventory</a></li>
-  <li><a href="#a-short-history-as-the-pedagogys-spine" id="toc-a-short-history-as-the-pedagogys-spine" class="nav-link" data-scroll-target="#a-short-history-as-the-pedagogys-spine">A short history, as the pedagogy’s spine</a></li>
-  <li><a href="#the-refined-thesis" id="toc-the-refined-thesis" class="nav-link" data-scroll-target="#the-refined-thesis">The refined thesis</a></li>
-  <li><a href="#sources" id="toc-sources" class="nav-link" data-scroll-target="#sources">Sources</a></li>
+  <li><a href="#the-dataset" id="toc-the-dataset" class="nav-link active" data-scroll-target="#the-dataset">The dataset</a></li>
+  <li><a href="#forward-process-noise-melts-the-data" id="toc-forward-process-noise-melts-the-data" class="nav-link" data-scroll-target="#forward-process-noise-melts-the-data">Forward process: noise melts the data</a></li>
+  <li><a href="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" id="toc-denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="nav-link" data-scroll-target="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</a></li>
+  <li><a href="#the-score-function-a-preview-of-module-4" id="toc-the-score-function-a-preview-of-module-4" class="nav-link" data-scroll-target="#the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</a></li>
+  <li><a href="#reverse-process-run-the-diffusion-backwards" id="toc-reverse-process-run-the-diffusion-backwards" class="nav-link" data-scroll-target="#reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</a></li>
+  <li><a href="#why-the-course-exists-what-breaks-for-images" id="toc-why-the-course-exists-what-breaks-for-images" class="nav-link" data-scroll-target="#why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/08-transport-rigorous.html">Generative Models as Transport: History and Validation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/05-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/07-two-point-diffusion.html">The World’s Smallest Diffusion Model</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Generative Models as Transport: History and Validation</h1>
+<h1 class="title">The World’s Smallest Diffusion Model</h1>
 </div>
 
 
@@ -399,193 +450,160 @@ window.Quarto = {
 </header>
 
 
-<p><em>The rigorous twin of <a href="../tutorials/03-transport-story.html">Moving Distributions: The Transport Story</a>. This tutorial states the transport view of generative modeling precisely, traces its history, and validates — or corrects — each of its claims against theorems and the literature. Every load-bearing citation below was checked against its source; the two adversarial review passes that shaped this document flagged, in particular, two category errors that the folklore version of the thesis commits, and both are repaired here.</em></p>
-<section id="the-thesis-and-two-category-errors-to-avoid" class="level2">
-<h2 class="anchored" data-anchor-id="the-thesis-and-two-category-errors-to-avoid">The thesis, and two category errors to avoid</h2>
-<p>The folklore version of the transport view says: <em>generative modeling is fundamentally transport; in 1-D the inverse CDF solves it completely and all model families coincide there; in higher dimension the transport is no longer unique, and VAEs, GANs, flows, and diffusion models are different general constructions.</em> This is close to right — and wrong in two instructive ways.</p>
-<p><strong>Category error 1: representation is not explanation.</strong> On standard Borel spaces, <em>essentially every</em> distribution is the pushforward of a uniform random variable by some measurable map; a stochastic sampler becomes a deterministic one after adjoining its auxiliary noise to the source. “Every generative model is a transport” is therefore nearly tautological — a <em>representation</em> available for anything, not a characterization of anything. What the transport language genuinely does not capture: tractability of the <strong>likelihood</strong> (flows buy it with Jacobians, the probability-flow ODE with divergence integration, VAEs with an evidence bound, GANs not at all); <strong>conditioning</strong> (a coherent family <span class="math inline">\(p(dx \mid c)\)</span> is more structure than an endpoint map); <strong>stochastic kernels</strong> (a VAE decoder is a Markov kernel, not a map, and its encoder approximates a posterior kernel, not an inverse); and — decisively for what follows — <strong>coupling identification</strong>: two maps can have identical pushforwards and completely different input–output correspondences. Matching the endpoint law does not identify the map.</p>
-<p><strong>Category error 2: 1-D uniqueness is a property of a <em>selection rule</em>, not of dimension.</strong> Even on the real line, transport is wildly nonunique: both <span class="math inline">\(u \mapsto u\)</span> and <span class="math inline">\(u \mapsto 1-u\)</span> carry <span class="math inline">\(\mathrm{Uniform}(0,1)\)</span> to itself, and composing any generator with a source-preserving map changes nothing about the output law. What dimension one possesses is a <em>uniquely privileged selection</em>: the total order, and with it the requirement “order-preserving,” which singles out one map. Higher dimensions do not lose transport; they lose the privileged tie-breaker.</p>
-<p>With both corrections made, the thesis survives in a sharper form, stated at the end of this tutorial. The body earns it.</p>
+<p><em>Standalone tutorial accompanying <a href="../weeks/w01.html">W01</a>. Interactive version: <a href="../materials/two-point-diffusion-demo.html">live demo</a> — every figure in this note, animated.</em></p>
+<p>Diffusion models generate images from pure noise. Before we spend forty lectures on the mathematics, this note builds a <strong>complete diffusion model with a dataset of two points</strong> — small enough that every quantity the course will later approximate with a neural network can be computed <em>exactly</em>, with nothing beyond Bayes’ rule.</p>
+<section id="the-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="the-dataset">The dataset</h2>
+<p>Our data distribution puts equal mass on two points:</p>
+<p><span class="math display">\[
+p_{\text{data}}(x_0) \;=\; \tfrac{1}{2}\,\delta(x_0 + 1) \;+\; \tfrac{1}{2}\,\delta(x_0 - 1),
+\qquad x_0 \in \{-1, +1\}.
+\]</span></p>
+<p>Generative modeling asks: given samples from <span class="math inline">\(p_{\text{data}}\)</span>, produce <em>more</em> samples. For this dataset the answer is a coin flip — which is exactly why it is the right dataset: the machinery becomes transparent.</p>
 </section>
-<section id="dimension-one-the-complete-theory-of-order-compatible-transport" class="level2">
-<h2 class="anchored" data-anchor-id="dimension-one-the-complete-theory-of-order-compatible-transport">Dimension one: the complete theory of order-compatible transport</h2>
-<p>Fix probability measures <span class="math inline">\(\mu, \nu\)</span> on <span class="math inline">\(\mathbb{R}\)</span> with CDFs <span class="math inline">\(F_\mu, F_\nu\)</span> and quantile functions <span class="math inline">\(Q_\mu(u) = \inf\{x : F_\mu(x) \ge u\}\)</span> (generalized inverses, defined for <em>all</em> laws, atoms included).</p>
-<p><strong>Fact 1 (generation always works — atoms included).</strong> <span class="math inline">\(Q_{\nu\#}\,
-\mathrm{Uniform}(0,1) = \nu\)</span> for <em>every</em> law <span class="math inline">\(\nu\)</span> on <span class="math inline">\(\mathbb{R}\)</span>. The quantile coupling <span class="math inline">\(\gamma^\uparrow = (Q_\mu, Q_\nu)_\#\, \mathrm{Leb}_{(0,1)}\)</span> exists for arbitrary <span class="math inline">\(\mu, \nu\)</span> and is the canonical order-preserving (comonotone) coupling. (Standard; see Santambrogio, <em>Optimal Transport for Applied Mathematicians</em>, Ch. 2.)</p>
-<p><strong>Fact 2 (uniqueness, under the order selection, for atomless sources).</strong> If <span class="math inline">\(\mu\)</span> is atomless, then <span class="math inline">\(T = Q_\nu \circ F_\mu\)</span> is the unique nondecreasing map with <span class="math inline">\(T_\# \mu = \nu\)</span>, up to <span class="math inline">\(\mu\)</span>-null sets. The target may be atomic — this course’s two-point distribution is generated by exactly such a map, and the full proof is in <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a> (Theorem 1 and Propositions 2 and 7 there).</p>
-<p><strong>Fact 3 (optimality, for free).</strong> The same monotone map is optimal for <em>every</em> convex displacement cost <span class="math inline">\(c(x - y)\)</span> — a universality that is essentially one-dimensional and will <em>fail</em> upstairs.</p>
-<p><strong>Fact 4 (the honest direction of the atomic caveat).</strong> The failure mode is not generation into atomic targets — that always works — but deterministic <em>encoding out of</em> atomic sources: a source atom cannot be split by a map, so no deterministic encoder carries atomic data onto a continuous prior. The canonical repair is stochastic — Rüschendorf’s <em>distributional transform</em> <span class="math inline">\(U = F_\mu(X^-) + V\,(F_\mu(X) - F_\mu(X^-))\)</span> with <span class="math inline">\(V \sim \mathrm{Uniform}(0,1)\)</span> independent, which is exactly uniform even when <span class="math inline">\(X\)</span> has atoms. (Randomized rank-breaking of ties: the coin flip of the informal tutorial.)</p>
-<p>So the precise sense in which dimension one is “completely understood”: <strong>order-compatible transport on the line has an explicit, generalized-quantile solution in all cases.</strong> Not solved by this: transport under other selections, statistical estimation, or learnability — distinctions that matter below.</p>
+<section id="forward-process-noise-melts-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="forward-process-noise-melts-the-data">Forward process: noise melts the data</h2>
+<p>Corrupt a clean sample with Gaussian noise of size <span class="math inline">\(\sigma\)</span>:</p>
+<p><span class="math display">\[
+x_\sigma \;=\; x_0 + \sigma z, \qquad z \sim \mathcal{N}(0, 1) \text{ independent of } x_0.
+\]</span></p>
+<p>Since <span class="math inline">\(x_0 = \pm 1\)</span> with probability <span class="math inline">\(\tfrac12\)</span> each, the density of the corrupted sample is a two-component Gaussian mixture:</p>
+<p><span class="math display">\[
+p_\sigma(x) \;=\; \tfrac{1}{2}\,\mathcal{N}(x;\, -1,\, \sigma^2)
+\;+\; \tfrac{1}{2}\,\mathcal{N}(x;\, +1,\, \sigma^2).
+\]</span></p>
+<p>Two facts, both visible in the demo:</p>
+<ul>
+<li><strong>Small <span class="math inline">\(\sigma\)</span>:</strong> two sharp bumps at <span class="math inline">\(\pm 1\)</span> — the data is intact.</li>
+<li><strong>Large <span class="math inline">\(\sigma\)</span>:</strong> the bumps merge. Indeed <span class="math inline">\(\mathbb{E}[x_\sigma] = 0\)</span> and <span class="math inline">\(\operatorname{Var}(x_\sigma) = \mathbb{E}[x_0^2] + \sigma^2 = 1 + \sigma^2\)</span>, and for <span class="math inline">\(\sigma \gtrsim 3\)</span> the mixture is indistinguishable in practice from <span class="math inline">\(\mathcal{N}(0,\, 1 + \sigma^2)\)</span> — at <span class="math inline">\(\sigma = 3\)</span> its excess kurtosis is only <span class="math inline">\(-0.02\)</span>. (It is never <em>exactly</em> Gaussian at finite <span class="math inline">\(\sigma\)</span>; the precise statement is <span class="math inline">\(x_\sigma / \sqrt{1+\sigma^2} \Rightarrow \mathcal{N}(0,1)\)</span> as <span class="math inline">\(\sigma \to \infty\)</span>.)</li>
+</ul>
+<p>This is the first design principle of diffusion models: <strong>destroying structure is easy, fully understood, and ends somewhere known</strong> (a Gaussian), no matter what the data was.</p>
 </section>
-<section id="dimension-two-and-above-underdeterminacy-and-the-selection-principles" class="level2">
-<h2 class="anchored" data-anchor-id="dimension-two-and-above-underdeterminacy-and-the-selection-principles">Dimension two and above: underdeterminacy, and the selection principles</h2>
-<p>Endpoint marginals never determine a coupling: if <span class="math inline">\(T_\# \rho = \mu\)</span> and <span class="math inline">\(S_\# \rho = \rho\)</span>, then <span class="math inline">\((T \circ S)_\# \rho = \mu\)</span>. In <span class="math inline">\(d \ge 2\)</span> the supply of source-preserving maps <span class="math inline">\(S\)</span> is enormous, and — the genuine loss — no total order exists to privilege one choice. There is a second, subtler underdeterminacy at the level of <em>dynamics</em>: for the continuity equation <span class="math inline">\(\partial_t p + \nabla\!\cdot(p v) = 0\)</span>, if <span class="math inline">\(v\)</span> transports the path <span class="math inline">\(\{p_t\}\)</span> then so does <span class="math inline">\(v + w\)</span> for any <span class="math inline">\(w\)</span> with <span class="math inline">\(\nabla\!\cdot(p w) = 0\)</span> — weighted divergence-free “gauge” fields, abundant in <span class="math inline">\(d \ge 2\)</span>, invisible in <span class="math inline">\(d = 1\)</span> (no room to swirl on a line). Even a prescribed marginal path does not determine particle trajectories; a <em>current</em> must be chosen too.</p>
-<p>Each classical and each modern construction is a <strong>selection principle</strong> — something added to the marginal-matching requirement to pin down a map, a coupling, or a path. The audit table (each row’s qualification is part of the claim):</p>
+<section id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="level2">
+<h2 class="anchored" data-anchor-id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</h2>
+<p>Now invert: we observe a noisy <span class="math inline">\(x_\sigma = x\)</span> and want the clean <span class="math inline">\(x_0\)</span>. The best guess under squared error is the <strong>posterior mean</strong> <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma = x]\)</span> (we will prove this optimality claim in Module 1; for now, take it).</p>
+<p>The posterior over the two candidates follows from Bayes’ rule:</p>
+<p><span class="math display">\[
+\mathbb{P}(x_0 = +1 \mid x)
+= \frac{\tfrac12\,\mathcal{N}(x; +1, \sigma^2)}
+       {\tfrac12\,\mathcal{N}(x; +1, \sigma^2) + \tfrac12\,\mathcal{N}(x; -1, \sigma^2)}
+= \frac{1}{1 + \exp\!\big(-\tfrac{2x}{\sigma^2}\big)}
+= \operatorname{sigmoid}\!\Big(\frac{2x}{\sigma^2}\Big),
+\]</span></p>
+<p>where the middle step divides through by <span class="math inline">\(\mathcal{N}(x; +1, \sigma^2)\)</span> and uses <span class="math inline">\(\exp\!\big(-\tfrac{(x+1)^2}{2\sigma^2}\big) \big/ \exp\!\big(-\tfrac{(x-1)^2}{2\sigma^2}\big)
+= \exp\!\big(-\tfrac{2x}{\sigma^2}\big)\)</span>. Therefore</p>
+<p><span class="math display">\[
+\boxed{\;\mathbb{E}[x_0 \mid x_\sigma = x]
+= (+1)\,\mathbb{P}(+1 \mid x) + (-1)\,\mathbb{P}(-1 \mid x)
+= \tanh\!\Big(\frac{x}{\sigma^2}\Big).\;}
+\]</span></p>
+<p>The optimal denoiser is a <strong>tanh</strong> — an activation function you already know, produced by nothing but probability. Sanity-check its two regimes:</p>
+<ul>
+<li><span class="math inline">\(\sigma \to 0\)</span>: <span class="math inline">\(\tanh(x/\sigma^2)\)</span> becomes a hard step — snap to the nearer data point.</li>
+<li><span class="math inline">\(\sigma \to \infty\)</span>: <span class="math inline">\(\tanh(x/\sigma^2) \approx x/\sigma^2 \to 0\)</span> — the observation is all noise, so the best guess is the prior mean <span class="math inline">\(0\)</span>.</li>
+</ul>
+</section>
+<section id="the-score-function-a-preview-of-module-4" class="level2">
+<h2 class="anchored" data-anchor-id="the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</h2>
+<p>Differentiate <span class="math inline">\(\log p_\sigma\)</span> directly. With <span class="math inline">\(\varphi_\pm(x) = \mathcal{N}(x; \pm 1, \sigma^2)\)</span> and <span class="math inline">\(\varphi_\pm'(x) = -\tfrac{x \mp 1}{\sigma^2}\varphi_\pm(x)\)</span>,</p>
+<p><span class="math display">\[
+\nabla_x \log p_\sigma(x)
+= \frac{\tfrac12\varphi_-'(x) + \tfrac12\varphi_+'(x)}{p_\sigma(x)}
+= -\frac{x - \mathbb{E}[x_0 \mid x]}{\sigma^2}
+= \frac{\tanh\!\big(\tfrac{x}{\sigma^2}\big) - x}{\sigma^2}.
+\]</span></p>
+<p>Rearranged, this is <strong>Tweedie’s formula</strong>, one of the two or three most important identities of the course:</p>
+<p><span class="math display">\[
+\mathbb{E}[x_0 \mid x_\sigma = x] \;=\; x + \sigma^2\, \nabla_x \log p_\sigma(x).
+\]</span></p>
+<p><em>Denoising and knowing the score are the same thing</em> — for additive Gaussian noise of known size <span class="math inline">\(\sigma\)</span>, which is exactly the diffusion setting. The score <span class="math inline">\(\nabla_x \log p_\sigma\)</span> points from <span class="math inline">\(x\)</span> toward where the (noised) data is denser; the denoiser just moves by <span class="math inline">\(\sigma^2\)</span> times the score. One caveat: the score is a <em>local</em> quantity — at <span class="math inline">\(x = 0\)</span> it vanishes by symmetry even though, in the two-bump regime, <span class="math inline">\(x = 0\)</span> is a density <em>minimum</em>. It is an unstable equilibrium: the reverse dynamics leave a particle sitting exactly there alone, and push a particle on either side away toward the nearer mode.</p>
+</section>
+<section id="reverse-process-run-the-diffusion-backwards" class="level2">
+<h2 class="anchored" data-anchor-id="reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</h2>
+<p>Generation now works by <em>annealing</em>: start from pure noise at a large <span class="math inline">\(\sigma_{\max}\)</span>, and lower <span class="math inline">\(\sigma\)</span> along a grid <span class="math inline">\(\sigma_{\max} = \sigma_0 &gt; \sigma_1 &gt; \cdots &gt; \sigma_K \approx 0\)</span>, nudging the sample along the score at every step. (We write <span class="math inline">\(y_k\)</span> for the reverse iterate at noise level <span class="math inline">\(\sigma_k\)</span>, keeping <span class="math inline">\(x_0\)</span> reserved for the clean data point; <span class="math inline">\(y_0\)</span> is pure noise and <span class="math inline">\(y_K\)</span> is the generated sample.)</p>
+<p><span class="math display">\[
+y_{k+1} \;=\; y_k \;+\; \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\,
+\nabla_y \log p_{\sigma_k}(y_k)
+\;=\; y_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\cdot
+\frac{\tanh\!\big(y_k/\sigma_k^2\big) - y_k}{\sigma_k^2}.
+\]</span></p>
+<p>This deterministic rule is the explicit Euler discretization of the <strong>probability-flow ODE</strong> in the variance clock <span class="math inline">\(\tau = \sigma^2\)</span>. (Strictly, to speak of dynamics <em>across</em> noise levels we couple them: <span class="math inline">\(x_\tau = x_0 + w_\tau\)</span> with <span class="math inline">\(w\)</span> a Brownian motion — Module 5 makes this precise; nothing below needs it yet.) The stochastic variant both <strong>doubles the score drift and injects fresh independent noise</strong> at each step,</p>
+<p><span class="math display">\[
+y_{k+1} = y_k + \big(\sigma_k^2 - \sigma_{k+1}^2\big)\,\nabla_y \log p_{\sigma_k}(y_k)
++ \sqrt{\sigma_k^2 - \sigma_{k+1}^2}\; z_k, \qquad z_k \sim \mathcal{N}(0,1)
+\text{ i.i.d.},
+\]</span></p>
+<p>giving the Euler–Maruyama discretization of the <strong>reverse-time SDE</strong>. Where these updates <em>come from</em> is the business of Modules 5–6 (Fokker–Planck, reverse-time dynamics); today we only need to <em>watch them work</em>: a cloud of particles started from <span class="math inline">\(\mathcal{N}(0,\, 1+\sigma_{\max}^2)\)</span> splits, condenses, and lands within <span class="math inline">\(\approx \sigma_{\min}\)</span> of <span class="math inline">\(\{-1, +1\}\)</span>, in equal proportions up to sampling error.</p>
+<p>To be honest about the word “exact”: the <em>formulas</em> are exact, but the sampler carries four small approximations — we initialize from the moment-matched Gaussian rather than the true mixture <span class="math inline">\(p_{\sigma_{\max}}\)</span> (indistinguishable at <span class="math inline">\(\sigma_{\max} = 3\)</span>, but not equal); we stop at <span class="math inline">\(\sigma_{\min} = 10^{-2} &gt; 0\)</span>, so samples end a hair’s width from the atoms; the Euler steps discretize the flow; and any finite run has sampling noise. Each vanishes in the appropriate limit — and every one of them has a counterpart in real diffusion models.</p>
+<p>The full sampler, with no neural network anywhere:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(y, s2):                 <span class="co"># ∇ log p_σ(y), exact for the two-point data</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (np.tanh(y <span class="op">/</span> s2) <span class="op">-</span> y) <span class="op">/</span> s2</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>smax, smin, K, N <span class="op">=</span> <span class="fl">3.0</span>, <span class="fl">1e-2</span>, <span class="dv">500</span>, <span class="dv">100_000</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sig <span class="op">=</span> smax <span class="op">*</span> (smin <span class="op">/</span> smax) <span class="op">**</span> (np.arange(K <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> K)    <span class="co"># geometric σ grid</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> smax<span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> np.random.randn(N)           <span class="co"># start from pure noise</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):                                       <span class="co"># probability-flow ODE</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> sig[k]<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> sig[k <span class="op">+</span> <span class="dv">1</span>]<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    y <span class="op">+=</span> <span class="fl">0.5</span> <span class="op">*</span> d <span class="op">*</span> score(y, sig[k]<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>err <span class="op">=</span> np.<span class="bu">abs</span>(np.<span class="bu">abs</span>(y) <span class="op">-</span> <span class="dv">1</span>).<span class="bu">max</span>()      <span class="co"># worst distance to the nearest data point</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(err, (y <span class="op">&gt;</span> <span class="dv">0</span>).mean())   <span class="co"># ≈ 0 and ≈ 0.5, up to σ_min + discretization + sampling</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="why-the-course-exists-what-breaks-for-images" class="level2">
+<h2 class="anchored" data-anchor-id="why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</h2>
+<p>Everything above was exact because the posterior mean had a formula. For images there is no usable one. (Exercise 4 gives a closed form for any <em>finite</em> training set — but a sampler built on it can only ever reproduce the training points; what we actually want is the posterior mean under the unknown <em>population</em> distribution.) Nor can it be tabulated: a <span class="math inline">\(64 \times 64\)</span> RGB image lives in a space of <span class="math inline">\(256^{12288}\)</span> configurations, and the data occupies a vanishingly thin filament of it (Module 1: the curse of dimensionality). The entire role of the neural network in a diffusion model is to <strong>approximate the map <span class="math inline">\((x, \sigma) \mapsto \mathbb{E}[x_0 \mid x]\)</span></strong> — to be the tanh we can no longer derive. Every other ingredient of this note survives unchanged, and each becomes a module of the course:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 50%">
+<col style="width: 50%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Construction</th>
-<th>What selects</th>
-<th>Essential qualification</th>
+<th>In this note</th>
+<th>In the course</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Brenier / optimal transport</strong></td>
-<td>minimize squared displacement</td>
-<td>unique map <span class="math inline">\(T = \nabla \phi\)</span>, <span class="math inline">\(\phi\)</span> convex, for absolutely continuous sources with second moments — canonical <em>relative to Euclidean quadratic geometry</em> (Brenier 1991; McCann 1995)</td>
+<td>The “produce more samples” problem; why direct density estimation fails</td>
+<td>M1 — Foundations of generative modeling</td>
 </tr>
 <tr class="even">
-<td><strong>Knothe–Rosenblatt</strong></td>
-<td>sequential conditional quantiles</td>
-<td>unique monotone <em>triangular</em> map after fixing a coordinate order; not rotation-invariant, generally not optimal (Rosenblatt 1952; Knothe 1957; Carlier–Galichon–Santambrogio 2009)</td>
+<td>Gaussian mixture, conditioning, <span class="math inline">\(\operatorname{Var} = 1+\sigma^2\)</span></td>
+<td>M2 — Gaussians and noise accumulation</td>
 </tr>
 <tr class="odd">
-<td><strong>Autoregressive flows</strong></td>
-<td>triangular architecture + likelihood</td>
-<td>an expressive monotone triangular flow can recover KR; permuted stacks need not equal any single KR map (Irons et al.&nbsp;2022)</td>
+<td>The discrete <span class="math inline">\(\sigma\)</span> grid; denoising as the training target</td>
+<td>M3 — DDPM framework</td>
 </tr>
 <tr class="even">
-<td><strong>General normalizing flows</strong></td>
-<td>architecture, orientation, optimization</td>
-<td>maximum likelihood identifies the <em>density</em>, not the map</td>
+<td><span class="math inline">\(\nabla_x \log p_\sigma\)</span>, Tweedie’s formula</td>
+<td>M4 — Score matching and denoising</td>
 </tr>
 <tr class="odd">
-<td><strong>Diffusion / probability-flow ODE</strong></td>
-<td>forward SDE + schedule + score + <strong>choice of current</strong></td>
-<td>the path <span class="math inline">\(\{p_t\}\)</span> alone does not fix the velocity in <span class="math inline">\(d \ge 2\)</span>; the gradient-form (curl-free relative to <span class="math inline">\(p\)</span>) current is part of the selection</td>
+<td>The <span class="math inline">\(\sigma\)</span>-continuum, densities evolving with <span class="math inline">\(\sigma\)</span></td>
+<td>M5 — SDEs and Fokker–Planck</td>
 </tr>
 <tr class="even">
-<td><strong>Flow matching / rectified flow</strong></td>
-<td>endpoint coupling + interpolant + regression</td>
-<td>different couplings/interpolants give different fields with identical endpoints (Lipman et al.&nbsp;2023; Liu et al.&nbsp;2023)</td>
-</tr>
-<tr class="odd">
-<td><strong>GAN</strong></td>
-<td><em>none</em></td>
-<td>any transport fooling the discriminator is accepted; even WGAN’s optimal-transport problem lives between the real and generated laws in data space — it does not select a latent-to-data map (Goodfellow et al.&nbsp;2014; Arjovsky et al.&nbsp;2017)</td>
-</tr>
-<tr class="even">
-<td><strong>VAE</strong></td>
-<td>ELBO + prior + decoder noise + architecture</td>
-<td>selects a generally <em>nonidentifiable</em> joint model and posterior kernel, not a Monge map</td>
-</tr>
-<tr class="odd">
-<td><strong>Schrödinger bridge</strong></td>
-<td>path-space relative entropy to a reference process</td>
-<td>the principled <em>stochastic</em> transport selection (Léonard 2014)</td>
+<td>The reverse update and the probability-flow ODE</td>
+<td>M6 — Reverse-time dynamics</td>
 </tr>
 </tbody>
 </table>
-<p>And the statistics community, needing multivariate quantiles for its own reasons, ran the same route: the <strong>center-outward distribution functions</strong> of Chernozhukov–Galichon–Hallin–Henry (2017) and Hallin et al.&nbsp;(2021, <a href="https://arxiv.org/abs/1806.01238">arXiv:1806.01238</a>) <em>define</em> the multivariate CDF as the Brenier map to a reference spherical law — canonical relative to that chosen reference geometry, not choice-free. The lesson of the whole table in one line: <strong>beyond dimension one, “the transport” is a category mistake; only “the transport selected by ⟨rule⟩” is well-posed.</strong></p>
 </section>
-<section id="the-1-d-coincidences-stratified-by-epistemic-status" class="level2">
-<h2 class="anchored" data-anchor-id="the-1-d-coincidences-stratified-by-epistemic-status">The 1-D coincidences, stratified by epistemic status</h2>
-<p>The folklore says “all families coincide with the quantile map in 1-D.” The truth splits three ways, and the split is the pedagogy.</p>
-<p><strong>Theorem-level (all exact scalar ODE samplers — one proof covers them).</strong> Let <span class="math inline">\(\{p_t\}\)</span> be a smooth positive scalar density path with velocity <span class="math inline">\(v\)</span> solving the continuity equation with zero flux at <span class="math inline">\(-\infty\)</span>. Then <span class="math inline">\(\partial_t F_t = -p_t v_t\)</span>, and along any characteristic <span class="math inline">\(\dot X = v_t(X)\)</span>: <span class="math inline">\(\frac{d}{dt} F_t(X_t) = 0\)</span> — quantile labels are conserved, so the endpoint map is the quantile transport. This single argument covers the diffusion probability-flow ODE (proved in full, with numerics, in <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a>), continuous normalizing flows, flow matching, and rectified flow <em>at the exact/population level</em>; the distinctions among them are about how <span class="math inline">\(p_t\)</span> and <span class="math inline">\(v_t\)</span> are chosen and estimated, not about the exact 1-D endpoint. Monotone discrete-time flows join by Fact 2 directly. (Practical training adds estimation and integration error — conditionality of practice, not of mathematics.)</p>
-<p><strong>Available-but-not-selected (GANs).</strong> An explicit counterexample: with <span class="math inline">\(U \sim \mathrm{Uniform}(0,1)\)</span>, the tent map <span class="math inline">\(s(u) = 2u \wedge (2 - 2u)\)</span> preserves uniformity, so <span class="math inline">\(Q_\mu(s(U))\)</span> generates <span class="math inline">\(\mu\)</span> <em>exactly</em> — and is not the quantile map. No idealized adversarial objective can distinguish it from <span class="math inline">\(Q_\mu(U)\)</span>: marginal matching leaves the generator unidentified. The coincidence is available to a GAN and never implied by its training.</p>
-<p><strong>Available-only-in-a-singular-idealization (VAEs).</strong> The precise proposition: if data and latent are scalar and atomless, the prior has continuous strictly increasing CDF <span class="math inline">\(H\)</span>, the encoder <span class="math inline">\(E\)</span> and decoder <span class="math inline">\(D\)</span> are <em>deterministic</em>, mutually inverse a.e., aggregate-matched ($E_# = $ prior), <em>nondecreasing</em>, and exactly optimized, then Fact 2 forces <span class="math inline">\(E = H^{-1} \circ F_\mu\)</span> and <span class="math inline">\(D = Q_\mu \circ H\)</span> — with a uniform prior, literally <span class="math inline">\(E = F_\mu\)</span>, <span class="math inline">\(D = Q_\mu\)</span>. Every hypothesis earns its place: drop monotonicity and the decreasing solution (and worse) appears; and a <em>strict</em> VAE cannot even enter this idealization — a deterministic encoder against a continuous prior has infinite KL penalty (<span class="math inline">\(\mathrm{KL}(\mathcal{N}(E(x), \sigma^2) \,\|\, \mathcal{N}(0,1)) \to \infty\)</span> as <span class="math inline">\(\sigma \downarrow 0\)</span>), and an expressive decoder admits <em>posterior collapse</em> (<span class="math inline">\(p_\theta(x \mid z) = p_{\text{data}}\)</span>, encoder carrying no information) which fits the marginal perfectly with no CDF anywhere. Identifiability theory does not rescue the slogan: the identifiable-VAE results of Khemakhem et al.&nbsp;(2020) require auxiliary observed variables and structured priors, deliver identification only up to linear/permutation ambiguities, and do not apply to the ordinary unconditional VAE — consistent with the classical nonidentifiability of nonlinear ICA (Hyvärinen–Pajunen 1999) and the impossibility results for unsupervised disentanglement (Locatello et al. 2019). The idealized object is better named a <em>monotone scalar normalizing flow</em> (or a Wasserstein-autoencoder-style construction, whose objective — Tolstikhin et al.&nbsp;2018 — does regularize the aggregate encoding, unlike the VAE’s). The slogan “the encoder is the CDF” is a theorem about that idealized object and a <em>false statement about VAE training</em>.</p>
-<p>The three-way split generalizes into the distinction this tutorial exists to teach:</p>
-<blockquote class="blockquote">
-<p>For any generative method, ask three separate questions. <strong>(1) Existence:</strong> can it represent a transport achieving the target law? <strong>(2) Selection:</strong> does its construction single out <em>which</em> transport? <strong>(3) Identification:</strong> does its <em>training objective</em> actually enforce that selection? In 1-D, exact scalar ODE methods answer yes–yes–yes (order is built into non-crossing); GANs answer yes–no–no; VAEs answer yes–no–no with an extra obstruction (kernels, not maps). The families feel identical in 1-D only if one asks question (1) alone.</p>
-</blockquote>
-</section>
-<section id="what-breaks-upstairs-the-misleading-intuitions-inventory" class="level2">
-<h2 class="anchored" data-anchor-id="what-breaks-upstairs-the-misleading-intuitions-inventory">What breaks upstairs: the misleading-intuitions inventory</h2>
-<p>Each entry is a 1-D truth that fails in <span class="math inline">\(d \ge 2\)</span> — with the failure’s certificate.</p>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
 <ol type="1">
-<li><strong>“Transport is unique.”</strong> Never was — uniqueness belonged to the order selection, which does not exist upstairs.</li>
-<li><strong>“Non-crossing implies the canonical map.”</strong> In <span class="math inline">\(d \ge 2\)</span> trajectories can rotate and swirl without intersecting; orientation-preserving diffeomorphisms need not be (cyclically) monotone or optimal.</li>
-<li><strong>“A gradient velocity field integrates to a gradient map.”</strong> False: time-ordered products of symmetric Jacobians lose symmetry when Hessians at different times fail to commute. This is precisely the mechanism of <strong>Lavenant–Santambrogio (2022)</strong> (<a href="https://hal.science/hal-04134092">Appl. Math. Lett.</a>): a smooth two-dimensional example where the Fokker–Planck flow map is a perfectly valid transport to the Gaussian and <em>not</em> the Brenier map — written to refute a published conjecture (Khrulkov–Oseledets 2022) that assumed otherwise. The 1-D coincidence misled professionals in print.</li>
-<li><strong>“The marginal path determines the particle paths.”</strong> Only on the line, where zero-flux kills the ambiguity. Upstairs, divergence-free currents are a genuine gauge freedom; the diffusion velocity is a <em>choice</em> of current.</li>
-<li><strong>“Componentwise CDFs are a multivariate rank.”</strong> They uniformize marginals and leave the entire dependence structure (the copula) untouched; Rosenblatt’s transform fixes this at the price of coordinate-order dependence.</li>
-<li><strong>“Monotone becomes meaningless.”</strong> It becomes <em>plural</em>: coordinatewise isotonicity, monotone operators, triangular monotonicity, and cyclic monotonicity are inequivalent notions — and different selection principles commit to different ones (Brenier: cyclic; KR: triangular).</li>
-<li><strong>“One map is optimal for all convex costs.”</strong> Essentially one-dimensional. Upstairs the selected map depends on the cost and the geometry.</li>
-<li><strong>“Low-dimensional pictures scale.”</strong> <span class="math inline">\(\|Z\| \approx \sqrt{d}\)</span> for <span class="math inline">\(Z \sim \mathcal{N}(0, I_d)\)</span> — mass lives on shells, not at the mode; and empirical transport estimation suffers dimension-dependent rates of order <span class="math inline">\(n^{-1/d}\)</span> (Weed–Bach 2019). The 1-D laboratory is a laboratory, not a scale model.</li>
+<li>Fill in the algebra for <span class="math inline">\(\mathbb{P}(x_0 = +1 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> and <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh(x/\sigma^2)\)</span>.</li>
+<li>Show <span class="math inline">\(\operatorname{Var}(x_\sigma) = 1 + \sigma^2\)</span>, and more generally <span class="math inline">\(\operatorname{Var}(x_\sigma) = \operatorname{Var}(x_0) + \sigma^2\)</span> for any data distribution with finite variance (independence of <span class="math inline">\(z\)</span> and <span class="math inline">\(x_0\)</span> is all you need — zero mean is not required).</li>
+<li><strong>Unequal weights.</strong> Let <span class="math inline">\(\mathbb{P}(x_0 = +1) = \pi\)</span> with <span class="math inline">\(0 &lt; \pi &lt; 1\)</span>. <em>(Convention warning: this is the opposite of tutorials <a href="../tutorials/01-measuring-things.html">01</a> and <a href="../tutorials/02-joint-conditional-bayes.html">02</a>, which set <span class="math inline">\(\pi = \mathbb{P}(-1)\)</span>. The formulas differ by <span class="math inline">\(\pi \to 1 - \pi\)</span>; check which one you are reading.)</em> Show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh\!\big(\tfrac{x}{\sigma^2} + \tfrac12 \log\tfrac{\pi}{1-\pi}\big)\)</span> — the denoiser acquires a <em>bias</em>. Check that as <span class="math inline">\(\sigma \to \infty\)</span> this tends to <span class="math inline">\(2\pi - 1\)</span>, the prior mean, and work out what happens in the degenerate cases <span class="math inline">\(\pi \in \{0, 1\}\)</span> by taking limits.</li>
+<li><strong>More points.</strong> For data uniform on <span class="math inline">\(\{a_1, \dots, a_m\}\)</span>, show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \sum_i a_i\, w_i(x)\)</span> with <span class="math inline">\(w_i(x) \propto \exp\!\big(\tfrac{a_i x}{\sigma^2} - \tfrac{a_i^2}{2\sigma^2}\big)
+\propto \exp\!\big(-\tfrac{(x - a_i)^2}{2\sigma^2}\big)\)</span> — a <em>softmax</em> with Gaussian-kernel weights. (So the optimal denoiser for a finite dataset under Gaussian corruption is attention-like: an RBF-weighted average of the training points. For non-uniform weights <span class="math inline">\(\pi_i\)</span>, each logit gains <span class="math inline">\(\log \pi_i\)</span>.)</li>
+<li>Run the sampler above with the SDE update instead of the ODE. Compare the RMS distance of the final samples to the nearest data point for both, as a function of <span class="math inline">\(K\)</span> and of <span class="math inline">\(\sigma_{\min}\)</span>. (You should find that increasing <span class="math inline">\(K\)</span> removes discretization error but both samplers retain a terminal width <span class="math inline">\(\approx \sigma_{\min}\)</span> — lowering <span class="math inline">\(\sigma_{\min}\)</span>, not raising <span class="math inline">\(K\)</span>, is what sharpens the atoms.)</li>
 </ol>
-</section>
-<section id="a-short-history-as-the-pedagogys-spine" class="level2">
-<h2 class="anchored" data-anchor-id="a-short-history-as-the-pedagogys-spine">A short history, as the pedagogy’s spine</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Year</th>
-<th>Event</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1781</td>
-<td>Monge poses the transport problem (déblais et remblais)</td>
-</tr>
-<tr class="even">
-<td>1942</td>
-<td>Kantorovich relaxes maps to couplings — transport becomes tractable</td>
-</tr>
-<tr class="odd">
-<td>1952 / 1957</td>
-<td>Rosenblatt’s transformation; Knothe’s rearrangement — the coordinate-order selection</td>
-</tr>
-<tr class="even">
-<td>1991 / 1995</td>
-<td>Brenier’s polar factorization; McCann’s refinements — the cost selection, uniqueness restored in <span class="math inline">\(d \ge 2\)</span></td>
-</tr>
-<tr class="odd">
-<td>2013–2014</td>
-<td>VAEs (Kingma–Welling); GANs (Goodfellow et al.) — learned transports with variational and adversarial objectives, no map selection</td>
-</tr>
-<tr class="even">
-<td>2015–2017</td>
-<td>Normalizing flows mature (Rezende–Mohamed; autoregressive = triangular ≈ KR); WGAN imports the OT <em>metric</em> (not the OT map)</td>
-</tr>
-<tr class="odd">
-<td>2015–2021</td>
-<td>Diffusion: nonequilibrium thermodynamics (Sohl-Dickstein et al.), DDPM (Ho et al.), score SDE and probability-flow ODE (Song et al.) — the dynamic selection</td>
-</tr>
-<tr class="even">
-<td>2017–2021</td>
-<td>Statistics rebuilds the CDF via transport: Monge–Kantorovich depth, center-outward distribution functions (Chernozhukov et al.; Hallin et al.)</td>
-</tr>
-<tr class="odd">
-<td>2022</td>
-<td>Khrulkov–Oseledets conjecture the diffusion flow is OT; <strong>Lavenant–Santambrogio refute it</strong> — the 1-D coincidence formally dies in <span class="math inline">\(d \ge 2\)</span></td>
-</tr>
-<tr class="even">
-<td>2022–2023</td>
-<td>Flow matching (Lipman et al.), rectified flow (Liu et al.), stochastic interpolants (Albergo–Boffi–Vanden-Eijnden) — the coupling-and-interpolant selection made explicit</td>
-</tr>
-</tbody>
-</table>
-<p>The pedagogy of this course tracks that history in miniature: quantiles first, then the loss of order, then the selections — and the stochastic-interpolant viewpoint, in which coupling, interpolant, velocity, and noise are all explicit choices, is where the modern account closes the loop.</p>
-</section>
-<section id="the-refined-thesis" class="level2">
-<h2 class="anchored" data-anchor-id="the-refined-thesis">The refined thesis</h2>
-<div class="callout callout-style-simple callout-important no-icon callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-What we actually teach
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Many generative samplers can be represented as maps or stochastic kernels carrying a reference law to the model law — a useful common language, not a complete characterization of generative modeling. On the real line, the total order selects a canonical quantile coupling; for atomless sources it is induced by the unique nondecreasing map, which is simultaneously optimal for every convex displacement cost. Other transports exist even there. In higher dimensions, endpoint marginals underdetermine both the coupling and the dynamics, so additional structure — a cost and its geometry (Brenier), a coordinate order (Knothe–Rosenblatt, autoregressive flows), a forward corruption process together with a choice of probability current (diffusion), an endpoint coupling and interpolant (flow matching, rectified flow, stochastic interpolants), path-space entropy (Schrödinger bridges), or merely an architecture and an objective (GANs, VAEs) — selects the construction. Exact scalar ODE samplers necessarily implement the quantile map, because non-crossing on a line <em>is</em> the order selection; adversarial and variational objectives do not select it, and stochastic decoders and reverse SDEs are kernels, not inverse maps. Dimension one is therefore a <strong>laboratory for separating four questions</strong> — endpoint matching, transport selection, dynamics, and learnability — not a setting in which the model families are intrinsically identical.</p>
-</div>
-</div>
-</section>
-<section id="sources" class="level2">
-<h2 class="anchored" data-anchor-id="sources">Sources</h2>
-<p>Brenier, <em>Comm. Pure Appl. Math.</em> 44 (1991) · McCann, <em>Duke Math. J.</em> 80 (1995) · Rosenblatt, <em>Ann. Math. Statist.</em> 23 (1952) · Knothe (1957) · Carlier–Galichon–Santambrogio (<a href="https://arxiv.org/abs/0810.4153">arXiv:0810.4153</a>) · Santambrogio, <em>Optimal Transport for Applied Mathematicians</em> (2015) · Chernozhukov–Galichon–Hallin–Henry, <em>Ann. Statist.</em> (2017) · Hallin–del Barrio–Cuesta-Albertos–Matrán, <em>Ann. Statist.</em> (2021; <a href="https://arxiv.org/abs/1806.01238">arXiv:1806.01238</a>) · Rüschendorf, <em>J. Statist. Plann. Inference</em> (2009) · Kingma–Welling (<a href="https://arxiv.org/abs/1312.6114">arXiv:1312.6114</a>) · Goodfellow et al. (<a href="https://arxiv.org/abs/1406.2661">arXiv:1406.2661</a>) · Arjovsky et al., ICML 2017 · Tolstikhin et al., WAE (<a href="https://arxiv.org/abs/1711.01558">arXiv:1711.01558</a>) · Khemakhem et al., AISTATS 2020 · Hyvärinen–Pajunen, <em>Neural Networks</em> (1999) · Locatello et al., ICML 2019 · Sohl-Dickstein et al., ICML 2015 · Ho et al. (<a href="https://arxiv.org/abs/2006.11239">arXiv:2006.11239</a>) · Song et al. (<a href="https://arxiv.org/abs/2011.13456">arXiv:2011.13456</a>) · Lipman et al., ICLR 2023 (<a href="https://arxiv.org/abs/2210.02747">arXiv:2210.02747</a>) · Liu et al., ICLR 2023 (<a href="https://arxiv.org/abs/2209.03003">arXiv:2209.03003</a>) · Liu, <em>Rectified Flow: A Marginal Preserving Approach to Optimal Transport</em> (<a href="https://arxiv.org/abs/2209.14577">arXiv:2209.14577</a>) · Albergo–Boffi–Vanden-Eijnden, JMLR 2025 (<a href="https://arxiv.org/abs/2303.08797">arXiv:2303.08797</a>) · Baptista–Marzouk–Zahm, <em>Found. Comput. Math.</em> (2023; <a href="https://arxiv.org/abs/2009.10303">arXiv:2009.10303</a>) · Irons et al., AISTATS 2022 · Khrulkov–Oseledets (<a href="https://arxiv.org/abs/2202.07477">arXiv:2202.07477</a>) · <strong>Lavenant–Santambrogio</strong>, <em>Appl. Math. Lett.</em> 133 (2022; <a href="https://hal.science/hal-04134092">HAL</a>) · Léonard, <em>DCDS</em> (2014) · Weed–Bach, <em>Bernoulli</em> (2019; <a href="https://arxiv.org/abs/1707.00087">arXiv:1707.00087</a>).</p>
 
 
 </section>
@@ -1018,13 +1036,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/07-probability-flow-ode.html" class="pagination-link" aria-label="The Probability-Flow ODE">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The Probability-Flow ODE</span>
+      <a href="../tutorials/06-genai-simplest-form.html" class="pagination-link" aria-label="Generative AI, in Its Simplest Form">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Generative AI, in Its Simplest Form</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../resources.html" class="pagination-link" aria-label="Resources">
-        <span class="nav-page-text">Resources</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/08-map-proved.html" class="pagination-link" aria-label="The Deterministic Map, Proved">
+        <span class="nav-page-text">The Deterministic Map, Proved</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -1,0 +1,499 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Measure Playground</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+      --heat: 57, 135, 229;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+    --heat: 57, 135, 229;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  .math { font-style: italic; white-space: nowrap; }
+  sub, sup { line-height: 0; font-size: 0.68em; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  .legend { display: flex; gap: 1.1rem; font-size: 0.74rem; color: var(--ink-2);
+    text-transform: none; letter-spacing: 0; }
+  .legend .key { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend .swatch { width: 14px; height: 0; border-top: 2.5px solid var(--data); border-radius: 2px; }
+  .legend .swatch.lik { border-top-color: var(--lik); }
+  canvas { display: block; width: 100%; touch-action: none; }
+  .panes { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+  .panes > div { flex: 1; min-width: 0; }
+  .panes canvas { height: 170px; }
+  .panelabel { font-family: system-ui, sans-serif; font-size: 0.72rem; color: var(--muted);
+    letter-spacing: 0.08em; margin: 0 0 0.3rem; }
+  #c-quant { height: 340px; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.4rem; }
+  input[type="range"] { width: 150px; accent-color: var(--data); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.4em; display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.85rem; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+
+  /* ---- Act I: the roster ---- */
+  .roster { font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; gap: 0.5rem; }
+  .grp { border: 1px solid var(--grid); border-radius: 8px; padding: 0.5rem 0.6rem;
+    background: rgba(var(--heat), 0.045); }
+  .grp-head { display: flex; justify-content: space-between; align-items: baseline;
+    gap: 0.8rem; font-size: 0.74rem; color: var(--muted); margin-bottom: 0.4rem;
+    letter-spacing: 0.06em; text-transform: uppercase; }
+  .grp-head b { color: var(--data); font-variant-numeric: tabular-nums;
+    text-transform: none; letter-spacing: 0; font-size: 0.95rem; }
+  .rows { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .row { display: flex; align-items: baseline; gap: 0.45rem; font-size: 0.8rem;
+    border: 1px solid var(--ring); border-radius: 6px; padding: 0.25rem 0.5rem;
+    background: var(--surface); }
+  .row .nm { color: var(--ink); }
+  .row .xv { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .row .cm { font-variant-numeric: tabular-nums; color: var(--data); font-weight: 600; }
+  .seg { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data);
+    color: #fff; }
+  .sigma { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.74rem;
+    color: var(--ink-2); background: var(--surface); border: 1px solid var(--grid);
+    border-radius: 8px; padding: 0.55rem 0.7rem; margin-top: 0.75rem;
+    overflow-wrap: anywhere; }
+  .qz { font-family: system-ui, sans-serif; font-size: 0.82rem; margin-top: 0.75rem;
+    display: flex; flex-direction: column; gap: 0.3rem; }
+  .qz div { display: flex; gap: 0.5rem; align-items: baseline; }
+  .qz .yes { color: var(--data); font-weight: 700; }
+  .qz .no  { color: var(--lik); font-weight: 700; }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid); padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Foundations demo</p>
+    <h1>The Measure Playground</h1>
+    <p class="dek">Two ideas, made concrete: a &#963;-algebra is <em>what a report tells you</em>,
+    and expectation is an <em>area</em> under the quantile curve.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I &#183; Information</span>A &#963;-algebra is what a report tells you</h2>
+    <p>Forget abstract shapes. Here is a concrete sample space: eight students, one of
+    whom is picked at random, so each outcome &#969; has probability &#8539;. The random
+    variable X is the marks column &#8212; a number attached to every outcome.</p>
+
+    <p>Now suppose you do not get to see <em>which</em> student was picked. You are handed
+    only a <strong>report</strong>. Choose what the report says, and read off the three
+    things that follow: which students it cannot tell apart, exactly which events it
+    settles (that list <em>is</em> the &#963;-algebra), and the best estimate of X it
+    supports.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>&#937; = eight students, each with probability &#8539;</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> E[X | report]</span>
+        </span>
+      </div>
+
+      <div class="controls" style="margin-top:0; padding-top:0; border-top:0">
+        <span>the report says:</span>
+        <span class="seg" id="seg-report" role="group" aria-label="Choose what the report reveals"></span>
+      </div>
+
+      <div class="roster" id="roster" aria-live="polite"></div>
+
+      <div class="sigma" id="sigma-list"></div>
+      <div class="qz" id="quiz"></div>
+      <div class="readout" id="r-tower"></div>
+
+      <figcaption>Each box is one thing the report can say; the students inside it are
+      <em>indistinguishable</em> to an observer who sees only that report. X is
+      <em>measurable</em> with respect to the report exactly when every box holds a single
+      value of X &#8212; that is, when X is a function of the report. Otherwise the best the
+      observer can do &#8212; in the mean-squared-error sense &#8212; is the box average, which is the <em>conditional expectation</em>
+      E[X&#8201;|&#8201;report]. Note the last line: however coarse or fine the report, the
+      <em>probability-weighted</em> average of the box averages is always the same number. That is the tower property,
+      and it is the workhorse identity of this course.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II &#183; Integration</span>Expectation is the area under the quantile curve</h2>
+    <p>Take &#937; = [0,1] with uniform mass and let X = Q(u) be the quantile (inverse-CDF)
+    map of a two-bump mixture. Then E[X] = &#8747;&#8320;&#185; Q(u)&#8201;du: the <em>signed area</em>
+    under the curve. Lebesgue's construction is the staircase: approximate Q by a simple
+    function (finitely many values), add value &#215; width, refine.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>Q(u) for the mixture &#960;&#183;N(&#8722;1,&#963;&#178;) + (1&#8722;&#960;)&#183;N(+1,&#963;&#178;)</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> Q(u)</span>
+          <span class="key"><span class="swatch lik"></span> staircase (simple function)</span>
+        </span>
+      </div>
+      <canvas id="c-quant" role="img" aria-label="Quantile curve of a two-component mixture with signed area shaded and a staircase simple-function approximation; readouts show the staircase sum converging to the exact mean."></canvas>
+      <div class="controls">
+        <label>&#960; <input id="s-pi" type="range" min="0.05" max="0.95" step="0.05" value="0.35"><span class="val" id="v-pi">0.35</span></label>
+        <label>&#963; <input id="s-sig" type="range" min="0.05" max="1.2" step="0.05" value="0.45"><span class="val" id="v-sig">0.45</span></label>
+        <label>steps <input id="s-k" type="range" min="1" max="11" step="1" value="3"><span class="val" id="v-k">8</span></label>
+      </div>
+      <div class="readout" id="r-quant"></div>
+      <figcaption>Slide &#963; toward 0 and the curve becomes the staircase of the two-point
+      distribution &#8212; whose expectation you can read off as two rectangles. Increase the
+      steps and watch the staircase sum approach the exact mean E[X] = 1 &#8722; 2&#960;.
+      Two honest caveats. This is a <em>midpoint</em> simple-function approximation, so the
+      approach need not be monotone and it is slow near a near-jump (at small &#963; even 256
+      steps leaves visible error) &#8212; Lebesgue's own construction instead approximates
+      from below by range-quantised simple functions. And what it demonstrates is that
+      value&#8202;&#215;&#8202;measure sums converge to the integral, which is the
+      <em>content</em> of the construction rather than its definition.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="takeaway"><strong>The two acts are one story.</strong> A random variable is a
+    number attached to each outcome, and expectation is its measure-weighted total. Act I
+    computes it where the outcomes live &#8212; value &#215; probability, box by box &#8212; and
+    shows that a &#963;-algebra is just a record of which outcomes an observer can tell apart.
+    Act II computes the same number after transporting the mass to [0,1], where it becomes
+    an area under the quantile curve. Same number, two homes.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion tutorial on the <a href="https://acads-iit-jammu.github.io/diffusion-models-f26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  function setupCanvas(id, draw) {
+    const el = document.getElementById(id);
+    const ctx = el.getContext("2d");
+    const st = { el, ctx, w: 0, h: 0 };
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const r = el.getBoundingClientRect();
+      st.w = r.width; st.h = r.height;
+      el.width = Math.round(r.width * dpr); el.height = Math.round(r.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(st);
+    }
+    new ResizeObserver(resize).observe(el);
+    st.redraw = () => draw(st);
+    return st;
+  }
+
+  // ---------------- Act I: the roster and the report ----------------
+  // Eight equally likely outcomes. The tower identity below holds for ANY marks;
+  // these are merely chosen so the box averages come out as round numbers.
+  const ROSTER = [
+    { nm: "Aarav",  sec: "A", hos: "hosteller", x: 72 },
+    { nm: "Bhavya", sec: "A", hos: "hosteller", x: 68 },
+    { nm: "Chetan", sec: "A", hos: "day scholar", x: 55 },
+    { nm: "Divya",  sec: "A", hos: "day scholar", x: 61 },
+    { nm: "Esha",   sec: "B", hos: "hosteller", x: 84 },
+    { nm: "Farhan", sec: "B", hos: "hosteller", x: 78 },
+    { nm: "Gita",   sec: "B", hos: "day scholar", x: 47 },
+    { nm: "Harsh",  sec: "B", hos: "day scholar", x: 63 },
+  ];
+
+  const REPORTS = [
+    { key: "none",  label: "nothing",            of: () => "no information at all" },
+    { key: "sec",   label: "the section",        of: (r) => "section " + r.sec },
+    { key: "hos",   label: "hosteller or not",   of: (r) => r.hos },
+    { key: "both",  label: "section + hosteller", of: (r) => "section " + r.sec + ", " + r.hos },
+    { key: "all",   label: "the name",           of: (r) => r.nm },
+  ];
+
+  // Questions used to make "settled by the report" concrete.
+  const QUESTIONS = [
+    { q: "Was the student in section B?",        ev: (r) => r.sec === "B" },
+    { q: "Was the student a hosteller?",         ev: (r) => r.hos === "hosteller" },
+    { q: "Did the student score above 70?",      ev: (r) => r.x > 70 },
+    { q: "Was it Gita?",                         ev: (r) => r.nm === "Gita" },
+  ];
+
+  let reportKey = "sec";
+
+  // Group the roster into the report's indistinguishability classes, in first
+  // appearance order.
+  function classesFor(rep) {
+    const order = [], byLabel = new Map();
+    for (const r of ROSTER) {
+      const L = rep.of(r);
+      if (!byLabel.has(L)) { byLabel.set(L, []); order.push(L); }
+      byLabel.get(L).push(r);
+    }
+    return order.map((L) => ({ label: L, members: byLabel.get(L) }));
+  }
+
+  const mean = (rows) => rows.reduce((s, r) => s + r.x, 0) / rows.length;
+  const fmt = (v) => (Math.round(v * 100) / 100).toString();
+
+  const elSeg = document.getElementById("seg-report");
+  const elRoster = document.getElementById("roster");
+  const elSigma = document.getElementById("sigma-list");
+  const elQuiz = document.getElementById("quiz");
+  const elTower = document.getElementById("r-tower");
+
+  for (const rep of REPORTS) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = rep.label;
+    b.setAttribute("aria-pressed", String(rep.key === reportKey));
+    b.addEventListener("click", () => { reportKey = rep.key; renderAct1(); });
+    elSeg.appendChild(b);
+  }
+
+  function renderAct1() {
+    const rep = REPORTS.find((r) => r.key === reportKey);
+    const cls = classesFor(rep);
+
+    Array.from(elSeg.children).forEach((b, i) =>
+      b.setAttribute("aria-pressed", String(REPORTS[i].key === reportKey)));
+
+    // the boxes, each holding the students the report cannot separate
+    elRoster.textContent = "";
+    for (const c of cls) {
+      const m = mean(c.members);
+      const box = document.createElement("div");
+      box.className = "grp";
+      const head = document.createElement("div");
+      head.className = "grp-head";
+      const left = document.createElement("span");
+      left.textContent = "report says: " + c.label;
+      const right = document.createElement("span");
+      right.innerHTML = "E[X | report] = <b>" + fmt(m) + "</b>";
+      head.append(left, right);
+      const rows = document.createElement("div");
+      rows.className = "rows";
+      for (const r of c.members) {
+        const d = document.createElement("div");
+        d.className = "row";
+        d.innerHTML = '<span class="nm">' + r.nm + '</span>' +
+          '<span class="xv">X = ' + r.x + '</span>' +
+          '<span class="cm">&#8594; ' + fmt(m) + '</span>';
+        rows.appendChild(d);
+      }
+      box.append(head, rows);
+      elRoster.appendChild(box);
+    }
+
+    // the sigma-algebra, enumerated when it is small enough to read
+    const k = cls.length, total = Math.pow(2, k);
+    let txt = "\u03c3(report) = every union of boxes: 2^" + k + " = " + total +
+      " events, out of the 2^8 = 256 subsets of \u03a9.";
+    if (k <= 4) {
+      const names = cls.map((c, i) => String.fromCharCode(67 + i)); // C, D, E, F
+      const subsets = [];
+      for (let m = 0; m < total; m++) {
+        const parts = names.filter((_, i) => m & (1 << i));
+        subsets.push(parts.length ? parts.join("\u222a") : "\u2205");
+      }
+      txt += "\n  boxes: " + cls.map((c, i) => names[i] + " = {" +
+        c.members.map((r) => r.nm).join(", ") + "}").join(";  ");
+      txt += "\n  \u03c3(report) = { " + subsets.join(", ") + " }";
+    }
+    elSigma.textContent = txt;
+    elSigma.style.whiteSpace = "pre-wrap";
+
+    // which questions the report settles: settled iff constant on every box
+    elQuiz.textContent = "";
+    for (const Q of QUESTIONS) {
+      const settled = cls.every((c) => c.members.every((r) => Q.ev(r) === Q.ev(c.members[0])));
+      const d = document.createElement("div");
+      d.innerHTML = '<span class="' + (settled ? "yes" : "no") + '">' +
+        (settled ? "\u2713" : "\u2717") + "</span><span>" + Q.q + " &#8212; " +
+        (settled ? "settled by the report" : "not settled: some box holds both answers") +
+        "</span>";
+      elQuiz.appendChild(d);
+    }
+
+    // measurability, and the tower property
+    const measurable = cls.every((c) => c.members.every((r) => r.x === c.members[0].x));
+    const overall = mean(ROSTER);
+    const avgOfAvgs = cls.reduce((s, c) => s + mean(c.members) * c.members.length, 0) / ROSTER.length;
+    elTower.innerHTML =
+      "X is " + (measurable ? "<b>measurable</b>" : "<b>not measurable</b>") +
+      " with respect to this report &#8212; " +
+      (measurable
+        ? "every box holds a single value of X, so X is a function of the report."
+        : "some box holds two different values of X, so X is not a function of the report.") +
+      "<br>E[ E[X | report] ] = <b>" + fmt(avgOfAvgs) + "</b> = E[X] = <b>" + fmt(overall) +
+      "</b> &nbsp;(the tower property, for every choice of report).";
+  }
+  renderAct1();
+
+  // ---------------- Act II: quantile area ----------------
+  function erf(x) {
+    const s = x < 0 ? -1 : 1; x = Math.abs(x);
+    const t = 1 / (1 + 0.3275911 * x);
+    const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t
+      - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+    return s * y;
+  }
+  const Phi = (z) => 0.5 * (1 + erf(z / Math.SQRT2));
+  let PI_ = 0.35, SIG = 0.45, KPOW = 3;
+  const Fmix = (x) => PI_ * Phi((x + 1) / SIG) + (1 - PI_) * Phi((x - 1) / SIG);
+  function Qmix(u) {
+    // At pi = 1/2 the mixture is symmetric about 0, so Q(u) = -Q(1-u) exactly.
+    // Use it: between the two modes at small sigma both Gaussian tails underflow
+    // and Fmix is numerically a flat 0.5, so a bare bisection for u = 0.5 lands
+    // at an arbitrary point of that plateau instead of the true median 0.
+    if (Math.abs(PI_ - 0.5) < 1e-12) {
+      if (Math.abs(u - 0.5) < 1e-12) return 0;
+      if (u > 0.5) return -Qmix(1 - u);
+    }
+    let lo = -8, hi = 8;
+    // Widen if the fixed bracket ever fails to straddle, rather than silently
+    // returning an endpoint.
+    let guard = 0;
+    while (Fmix(lo) > u && guard++ < 40) lo *= 2;
+    guard = 0;
+    while (Fmix(hi) < u && guard++ < 40) hi *= 2;
+    for (let i = 0; i < 80; i++) {
+      const mid = (lo + hi) / 2;
+      if (Fmix(mid) < u) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  const rQuant = document.getElementById("r-quant");
+  const quant = setupCanvas("c-quant", (st) => {
+    const { ctx, w, h } = st;
+    const pad = { l: 14, r: 14, t: 14, b: 26 };
+    ctx.clearRect(0, 0, w, h);
+    // Fit the vertical range to the quantiles actually drawn, so that the
+    // rectangles on screen are the ones the readout adds up. A fixed range
+    // clipped the curve while the sum used unclipped values, and the reported
+    // number could not be read off the picture.
+    const YM = Math.max(1.25, Math.abs(Qmix(0.001)), Math.abs(Qmix(0.999))) * 1.06;
+    const xToPx = (u) => pad.l + u * (w - pad.l - pad.r);
+    const yToPx = (q) => pad.t + (YM - q) / (2 * YM) * (h - pad.t - pad.b);
+    ctx.font = "11px system-ui, sans-serif";
+    for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+      ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(xToPx(t), pad.t); ctx.lineTo(xToPx(t), h - pad.b); ctx.stroke();
+      ctx.fillStyle = css("--muted"); ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText(String(t), xToPx(t), h - pad.b + 5);
+    }
+    ctx.strokeStyle = css("--axis");
+    ctx.beginPath(); ctx.moveTo(pad.l, yToPx(0)); ctx.lineTo(w - pad.r, yToPx(0)); ctx.stroke();
+    for (const q of [-1, 1]) {
+      ctx.strokeStyle = css("--grid");
+      ctx.beginPath(); ctx.moveTo(pad.l, yToPx(q)); ctx.lineTo(w - pad.r, yToPx(q)); ctx.stroke();
+    }
+    // signed area fill + curve
+    const N = 400;
+    ctx.beginPath();
+    ctx.moveTo(xToPx(0.001), yToPx(0));
+    for (let i = 0; i <= N; i++) {
+      const u = 0.001 + 0.998 * i / N;
+      ctx.lineTo(xToPx(u), yToPx(Math.max(-YM, Math.min(YM, Qmix(u)))));
+    }
+    ctx.lineTo(xToPx(0.999), yToPx(0));
+    ctx.closePath();
+    ctx.fillStyle = css("--data-soft");
+    ctx.fill();
+    ctx.strokeStyle = css("--data"); ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      const u = 0.001 + 0.998 * i / N;
+      const px = xToPx(u), py = yToPx(Math.max(-YM, Math.min(YM, Qmix(u))));
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    // staircase
+    const K = Math.pow(2, KPOW);
+    let sum = 0;
+    ctx.strokeStyle = css("--lik"); ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let k = 0; k < K; k++) {
+      const u0 = k / K, u1 = (k + 1) / K;
+      const q = Qmix((u0 + u1) / 2);
+      sum += q / K;
+      const qc = Math.max(-YM, Math.min(YM, q));
+      ctx.moveTo(xToPx(u0), yToPx(qc)); ctx.lineTo(xToPx(u1), yToPx(qc));
+    }
+    ctx.stroke();
+    const exact = 1 - 2 * PI_;
+    rQuant.innerHTML = "staircase sum (" + K + " steps): <b>" + sum.toFixed(4) +
+      "</b> &nbsp;&#8594;&nbsp; exact E[X] = 1 &#8722; 2&#960; = <b>" + exact.toFixed(4) +
+      "</b> &nbsp;&#183;&nbsp; error <b>" + Math.abs(sum - exact).toExponential(1) + "</b>";
+  });
+  function bind(id, vid, set, fmt) {
+    const el = document.getElementById(id), v = document.getElementById(vid);
+    el.addEventListener("input", () => { set(+el.value); v.textContent = fmt(+el.value); quant.redraw(); });
+  }
+  bind("s-pi", "v-pi", (x) => { PI_ = x; }, (x) => x.toFixed(2));
+  bind("s-sig", "v-sig", (x) => { SIG = x; }, (x) => x.toFixed(2));
+  bind("s-k", "v-k", (x) => { KPOW = x; }, (x) => String(Math.pow(2, x)));
+
+  const redrawAll = () => { quant.redraw(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
+  new MutationObserver(redrawAll).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

@@ -1,0 +1,597 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Joint Slicer</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+      --heat: 57, 135, 229;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+    --heat: 57, 135, 229;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  .math { font-style: italic; white-space: nowrap; }
+  sub, sup { line-height: 0; font-size: 0.68em; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  .legend { display: flex; gap: 1.1rem; font-size: 0.74rem; color: var(--ink-2);
+    text-transform: none; letter-spacing: 0; }
+  .legend .key { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend .swatch { width: 14px; height: 0; border-top: 2.5px solid var(--data); border-radius: 2px; }
+  .legend .swatch.lik { border-top-color: var(--lik); }
+  canvas { display: block; width: 100%; touch-action: none; }
+  #c-joint { height: 340px; }
+  .panes { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+  .panes > div { flex: 1; min-width: 0; }
+  .panes canvas { height: 170px; }
+  .panelabel { font-family: system-ui, sans-serif; font-size: 0.72rem; color: var(--muted);
+    letter-spacing: 0.08em; margin: 0 0 0.3rem; }
+  #c-shelf { height: 340px; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.4rem; }
+  input[type="range"] { width: 150px; accent-color: var(--data); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.4em; display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.85rem; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data);
+    color: #fff; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid); padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Foundations demo</p>
+    <h1>The Joint Slicer</h1>
+    <p class="dek">A joint distribution is a mountain of probability mass. Marginals are its
+    shadows; conditionals are its slices, re-inflated; and Bayes&#8217; rule is the licence to
+    slice in either direction.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I &#183; The mountain</span>Shadows that never move, slices that do</h2>
+    <p>The heatmap is a joint p(x,&#8202;y). The curves on the edges are its two
+    <em>marginals</em> &#8212; the shadows. <strong>Drag the &#961; slider</strong>: the mountain
+    twists, but the shadows do not move &#8212; many mountains cast the same shadows (this is the
+    coupling-underdeterminacy of the transport tutorials). <strong>Drag the slice lines</strong>:
+    each panel shows the raw slice (a sliver of mass) and the same slice renormalised to unit
+    area &#8212; the conditional distribution.</p>
+
+    <p>Twisting one ellipse is the mild version of the point. <strong>Click through
+    &#8220;two blobs &#8599;&#8221;, &#8220;two blobs &#8600;&#8221; and &#8220;four
+    blobs&#8221;</strong> for the strong one. Each puts round lumps at the corners
+    (&#177;1.25,&#8202;&#177;1.25); each therefore puts mass &#189; at x = &#8722;1.25 and &#189;
+    at x = +1.25, and the same in y &#8212; so all three have <em>exactly</em> the same pair
+    of shadows. Watch the edge curves as you switch: they do not move at all. But the
+    mountains could hardly differ more, and their correlations are +0.86, &#8722;0.86 and
+    <em>zero</em>: the four-blob one is genuinely independent, the other two strongly
+    dependent. Nothing computable from the marginals tells them apart &#8212; and note that
+    the correlation is not computable from the marginals either. It is joint information the
+    shadows discarded.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>p(x, y) with marginals on the edges &#8212; drag the slice lines</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> p(y | x)</span>
+          <span class="key"><span class="swatch lik"></span> p(x | y)</span>
+        </span>
+      </div>
+      <canvas id="c-joint" role="img" aria-describedby="kbd-hint" aria-label="Heatmap of a joint density - either a correlated bivariate Gaussian or one of three arrangements of Gaussian lumps - with marginal curves along the edges and two draggable slice lines."></canvas>
+      <div class="panes">
+        <div>
+          <p class="panelabel" id="lbl-v">slice at x = 0.5 &#8212; raw sliver vs conditional p(y | x)</p>
+          <canvas id="c-condv" aria-label="Vertical slice of the joint: the raw slice and its renormalized version, the conditional of y given x."></canvas>
+        </div>
+        <div>
+          <p class="panelabel" id="lbl-h">slice at y = 0.5 &#8212; raw sliver vs conditional p(x | y)</p>
+          <canvas id="c-condh" aria-label="Horizontal slice of the joint: the raw slice and its renormalized version, the conditional of x given y."></canvas>
+        </div>
+      </div>
+      <div class="controls">
+        <label>&#961; <input id="s-rho" type="range" min="-0.9" max="0.9" step="0.05" value="0.6">
+          <span class="val" id="v-rho">0.60</span></label>
+        <span class="seg" id="seg-shape" role="group" aria-label="Choose the joint's shape"></span>
+      </div>
+      <div class="readout" id="r-joint"></div>
+      <p class="readout" id="kbd-hint">Keyboard: focus a panel, then use &#8592;&#8594; to move
+      the vertical slice and &#8593;&#8595; the horizontal one (hold Shift for larger steps).</p>
+      <figcaption>Bayes&#8217; rule is visible here as bookkeeping: vertical ribbons weighted by the
+      x-shadow rebuild the same mountain as horizontal ribbons weighted by the y-shadow &#8212;
+      p(y|x)&#8201;p(x) = p(x,y) = p(x|y)&#8201;p(y). Slicing is swappable; that is the whole rule.
+      The shadows are fixed <em>within</em> each family: dragging &#961; leaves the single
+      Gaussian's N(0,&#8201;1) shadows alone, and switching among the three blob shapes leaves
+      their common two-bump shadows alone. (Moving between the two families does change the
+      shadows &#8212; one central bump versus two side bumps.) Within a family, no amount of
+      staring at the marginals can tell the mountains apart.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II &#183; The shelves</span>A mixed joint, and W01&#8217;s posterior born from a slice</h2>
+    <p>When one variable is discrete (the latent coin z) and one continuous (the observation
+    x), the joint is not a mountain: it is <strong>two shelves</strong> of 1-D mass, one per
+    value of z, weighted &#960; and 1&#8722;&#960;. <strong>Drag the slice line</strong>: it crosses both
+    shelves, the two heights are renormalised into the posterior P(z&#8201;|&#8201;x) &#8212; and the
+    posterior mean of the shelf labels &#177;1 is the tanh denoiser of W01, tanh(x/&#963;&#178;),
+    <em>when &#960; = &#189;</em>. Away from equal weights the prior tilts the posterior and the
+    denoiser picks up a shift, to tanh(x/&#963;&#178; + &#189;&#8201;log((1&#8722;&#960;)/&#960;)).</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>the joint of (z, x): two shelves &#8212; drag the slice</span>
+        <span class="legend">
+          <span class="key"><span class="swatch"></span> z = &#8722;1 shelf (mass &#960;)</span>
+          <span class="key"><span class="swatch lik"></span> z = +1 shelf (mass 1&#8722;&#960;)</span>
+        </span>
+      </div>
+      <canvas id="c-shelf" aria-label="A mixed joint drawn as two shelves of one-dimensional density; a draggable vertical slice crosses both shelves and posterior bars show the renormalized heights."></canvas>
+      <div class="controls">
+        <label>&#960; <input id="s-pi" type="range" min="0.1" max="0.9" step="0.05" value="0.5"><span class="val" id="v-pi">0.50</span></label>
+        <label>&#963; <input id="s-sig" type="range" min="0.2" max="1.4" step="0.05" value="0.6"><span class="val" id="v-sig">0.60</span></label>
+      </div>
+      <div class="readout" id="r-shelf"></div>
+      <figcaption>The slice-and-renormalise you just did <em>is</em> Bayes&#8217; rule on a mixed
+      joint &#8212; and with &#960; = &#189; it reproduces, bar for bar, the sigmoid posterior and tanh
+      denoiser derived in W01. Conditioning is geometry.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="takeaway"><strong>One object, three readings.</strong> The joint is the complete
+    description; marginals are its lossy shadows (many joints per shadow-pair); conditionals
+    are its slices made into distributions. Bayes&#8217; rule adds nothing new &#8212; it states that
+    the two ways of slicing the same object must agree.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion tutorial on the <a href="https://acads-iit-jammu.github.io/diffusion-models-f26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const SQRT2PI = Math.sqrt(2 * Math.PI);
+  const nPdf = (v, m, s) => Math.exp(-((v - m) ** 2) / (2 * s * s)) / (s * SQRT2PI);
+
+  function setupCanvas(id, draw, onDrag) {
+    const el = document.getElementById(id);
+    const ctx = el.getContext("2d");
+    const st = { el, ctx, w: 0, h: 0 };
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const r = el.getBoundingClientRect();
+      st.w = r.width; st.h = r.height;
+      el.width = Math.round(r.width * dpr); el.height = Math.round(r.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(st);
+    }
+    new ResizeObserver(resize).observe(el);
+    if (onDrag) {
+      let active = false;
+      el.addEventListener("pointerdown", (ev) => { active = true; el.setPointerCapture(ev.pointerId); onDrag(st, ev, true); });
+      el.addEventListener("pointermove", (ev) => { if (active) onDrag(st, ev, false); });
+      el.addEventListener("pointerup", () => { active = false; });
+      el.addEventListener("pointercancel", () => { active = false; });
+    }
+    st.redraw = () => draw(st);
+    return st;
+  }
+
+  // ---------------- Act I: joints that share their shadows ----------------
+  const L = 3.2;
+  let RHO = 0.6, x0 = 0.5, y0 = 0.5, SHAPE = "one";
+
+  // A single zero-mean bivariate normal with unit variances and correlation r.
+  const biv = (x, y, r) => {
+    const d = 1 - r * r;
+    return Math.exp(-(x * x - 2 * r * x * y + y * y) / (2 * d)) / (2 * Math.PI * Math.sqrt(d));
+  };
+
+  // The blob family: isotropic lumps of width S centred at (+/-A, +/-A).
+  // Putting equal mass on the two main-diagonal lumps, on the two
+  // anti-diagonal lumps, or on all four gives three visibly different joints
+  // whose x- and y-marginals are the SAME two-bump curve in every case,
+  // because each choice puts mass 1/2 at x = -A and 1/2 at x = +A (likewise
+  // in y). Correlation runs +, -, 0 across the three.
+  const A = 1.25, S = 0.5;
+  const lump = (x, y, mx, my) =>
+    Math.exp(-((x - mx) ** 2 + (y - my) ** 2) / (2 * S * S)) / (2 * Math.PI * S * S);
+
+  const joint = (x, y) => {
+    switch (SHAPE) {
+      case "one":  return biv(x, y, RHO);
+      case "diag": return 0.5 * lump(x, y, -A, -A) + 0.5 * lump(x, y, A, A);
+      case "anti": return 0.5 * lump(x, y, -A, A) + 0.5 * lump(x, y, A, -A);
+      default:     return 0.25 * (lump(x, y, -A, -A) + lump(x, y, A, A) +
+                                  lump(x, y, -A, A) + lump(x, y, A, -A));
+    }
+  };
+
+  // The shadows, in closed form. Identical for diag/anti/four by construction;
+  // they are drawn from this function rather than hard-coded, so the claim
+  // "the shadows do not move" is something the picture actually demonstrates.
+  const marg = (t) =>
+    SHAPE === "one" ? nPdf(t, 0, 1)
+                    : 0.5 * nPdf(t, -A, S) + 0.5 * nPdf(t, A, S);
+
+  // Correlation: rho for the single Gaussian; +/-A^2/(A^2+S^2) or 0 for the blobs.
+  const corrOf = () =>
+    SHAPE === "one" ? RHO
+    : SHAPE === "diag" ? A * A / (A * A + S * S)
+    : SHAPE === "anti" ? -A * A / (A * A + S * S)
+    : 0;
+
+  let heatCanvas = null, heatKey = "";
+  function buildHeat() {
+    const key = css("--heat") + "-" + SHAPE + "-" + RHO.toFixed(3);
+    if (heatKey === key) return;
+    heatKey = key;
+    const n = 180;
+    const off = document.createElement("canvas");
+    off.width = n; off.height = n;
+    const octx = off.getContext("2d");
+    const img = octx.createImageData(n, n);
+    const [hr, hg, hb] = css("--heat").split(",").map((v) => +v.trim());
+    // Normalise by the grid maximum, found by a first pass. Using joint(0,0)
+    // would be wrong for every blob shape: the origin sits in the valley
+    // between the lumps, so the true peaks would clamp opaque and the gaps
+    // that make the shapes distinguishable would fill in.
+    const vals = new Float64Array(n * n);
+    let peak = 0;
+    for (let r = 0; r < n; r++) {
+      const y = L - 2 * L * r / (n - 1);
+      for (let c = 0; c < n; c++) {
+        const v = joint(-L + 2 * L * c / (n - 1), y);
+        vals[r * n + c] = v;
+        if (v > peak) peak = v;
+      }
+    }
+    if (peak <= 0) peak = 1;
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        const a = Math.pow(vals[r * n + c] / peak, 0.7) * 0.85;
+        const i = (r * n + c) * 4;
+        img.data[i] = hr; img.data[i + 1] = hg; img.data[i + 2] = hb;
+        img.data[i + 3] = Math.round(Math.min(a, 1) * 255);
+      }
+    }
+    octx.putImageData(img, 0, 0);
+    heatCanvas = off;
+  }
+
+  const padJ = { l: 30, r: 46, t: 40, b: 24 };
+  let dragAxis = "v";
+  const clampL = (v) => Math.max(-L, Math.min(L, v));
+  function jx(st, x) { return padJ.l + (x + L) / (2 * L) * (st.w - padJ.l - padJ.r); }
+  function jy(st, y) { return padJ.t + (L - y) / (2 * L) * (st.h - padJ.t - padJ.b); }
+
+  const jview = setupCanvas("c-joint", (st) => {
+    const { ctx, w, h } = st;
+    ctx.clearRect(0, 0, w, h);
+    buildHeat();
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(heatCanvas, padJ.l, padJ.t, w - padJ.l - padJ.r, h - padJ.t - padJ.b);
+    ctx.strokeStyle = css("--axis"); ctx.lineWidth = 1;
+    ctx.strokeRect(padJ.l, padJ.t, w - padJ.l - padJ.r, h - padJ.t - padJ.b);
+    // marginal shadows along top (x) and right (y), drawn from marg() itself
+    const mScale = 30 / nPdf(0, 0, S);   // same pixel scale for every shape
+    ctx.strokeStyle = css("--muted"); ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    for (let i = 0; i <= 200; i++) {
+      const x = -L + 2 * L * i / 200;
+      const px = jx(st, x), py = padJ.t - 4 - marg(x) * mScale;
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    for (let i = 0; i <= 200; i++) {
+      const y = -L + 2 * L * i / 200;
+      const px = w - padJ.r + 4 + marg(y) * mScale, py = jy(st, y);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.fillStyle = css("--muted");
+    ctx.font = "10px system-ui, sans-serif";
+    ctx.textAlign = "left"; ctx.textBaseline = "top";
+    ctx.fillText("the shadows (marginals) never move", padJ.l + 4, 2);
+    // slice lines
+    ctx.strokeStyle = css("--data"); ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(jx(st, x0), padJ.t); ctx.lineTo(jx(st, x0), h - padJ.b); ctx.stroke();
+    ctx.strokeStyle = css("--lik");
+    ctx.beginPath(); ctx.moveTo(padJ.l, jy(st, y0)); ctx.lineTo(w - padJ.r, jy(st, y0)); ctx.stroke();
+  }, (st, ev, isDown) => {
+    const r = st.el.getBoundingClientRect();
+    const px = ev.clientX - r.left, py = ev.clientY - r.top;
+    // Choose the axis once, when the gesture starts, and keep it for the whole
+    // drag. Re-deciding on every move let a stroke jump to the other slice line
+    // as soon as the pointer wandered nearer to it.
+    if (isDown) {
+      dragAxis = Math.abs(px - jx(st, x0)) <= Math.abs(py - jy(st, y0)) ? "v" : "h";
+    }
+    if (dragAxis === "v") x0 = clampL(-L + (px - padJ.l) / (st.w - padJ.l - padJ.r) * 2 * L);
+    else y0 = clampL(L - (py - padJ.t) / (st.h - padJ.t - padJ.b) * 2 * L);
+    redrawAct1();
+  });
+
+  function condPanel(st, vertical) {
+    const { ctx, w, h } = st;
+    const pad = { l: 10, r: 10, t: 8, b: 20 };
+    ctx.clearRect(0, 0, w, h);
+    const toPx = (v) => pad.l + (v + L) / (2 * L) * (w - pad.l - pad.r);
+    ctx.strokeStyle = css("--axis"); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, h - pad.b); ctx.lineTo(w - pad.r, h - pad.b); ctx.stroke();
+    ctx.font = "10px system-ui, sans-serif"; ctx.fillStyle = css("--muted");
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (const t of [-2, 0, 2]) ctx.fillText(String(t), toPx(t), h - pad.b + 4);
+    const color = vertical ? css("--data") : css("--lik");
+    const peak = SHAPE === "one"
+      ? nPdf(0, 0, Math.min(Math.sqrt(1 - RHO * RHO), 0.5))
+      : nPdf(0, 0, S) * 1.05;
+    const yToPx = (v) => h - pad.b - Math.min(v / peak, 1) * (h - pad.t - pad.b) * 0.94;
+    // The conditional is the slice divided by the marginal at the slice
+    // position - computed, not substituted from a closed form, so it stays
+    // correct for every shape including the two-humped blob conditionals.
+    const at = vertical ? x0 : y0;
+    const slice = (v) => (vertical ? joint(x0, v) : joint(v, y0));
+    const mAt = Math.max(marg(at), 1e-12);
+    // raw sliver (joint values along the slice), dashed muted
+    ctx.strokeStyle = css("--muted"); ctx.setLineDash([3, 3]); ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    for (let i = 0; i <= 200; i++) {
+      const v = -L + 2 * L * i / 200;
+      const px = toPx(v), py = yToPx(slice(v));
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+    // renormalized conditional
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i <= 200; i++) {
+      const v = -L + 2 * L * i / 200;
+      const px = toPx(v), py = yToPx(slice(v) / mAt);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.fillStyle = css("--ink-2");
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "left"; ctx.textBaseline = "top";
+    ctx.fillText("dashed: raw sliver (tiny mass)  solid: renormalised", pad.l + 2, pad.t);
+  }
+  const pv = setupCanvas("c-condv", (st) => condPanel(st, true));
+  const ph = setupCanvas("c-condh", (st) => condPanel(st, false));
+  const lblV = document.getElementById("lbl-v"), lblH = document.getElementById("lbl-h");
+  const rJoint = document.getElementById("r-joint");
+
+  // The slice lines were pointer-only. Left/right move the vertical slice,
+  // up/down the horizontal one; Home/End jump to the extremes.
+  jview.el.tabIndex = 0;
+  jview.el.addEventListener("keydown", (ev) => {
+    const step = ev.shiftKey ? 0.5 : 0.1;
+    let used = true;
+    switch (ev.key) {
+      case "ArrowLeft":  x0 = clampL(x0 - step); break;
+      case "ArrowRight": x0 = clampL(x0 + step); break;
+      case "ArrowDown":  y0 = clampL(y0 - step); break;
+      case "ArrowUp":    y0 = clampL(y0 + step); break;
+      case "Home":       x0 = -L; y0 = -L; break;
+      case "End":        x0 = L;  y0 = L;  break;
+      default: used = false;
+    }
+    if (used) { ev.preventDefault(); redrawAct1(); }
+  });
+
+  const SHAPES = [
+    { key: "one",  label: "one Gaussian" },
+    { key: "diag", label: "two blobs ↗" },
+    { key: "anti", label: "two blobs ↘" },
+    { key: "four", label: "four blobs" },
+  ];
+  const segShape = document.getElementById("seg-shape");
+  for (const s of SHAPES) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = s.label;
+    b.setAttribute("aria-pressed", String(s.key === SHAPE));
+    b.addEventListener("click", () => {
+      SHAPE = s.key;
+      Array.from(segShape.children).forEach((c, i) =>
+        c.setAttribute("aria-pressed", String(SHAPES[i].key === SHAPE)));
+      redrawAct1();
+    });
+    segShape.appendChild(b);
+  }
+
+  function redrawAct1() {
+    // rho only parameterises the single Gaussian; disable it for the blob family
+    // rather than let it move a number that changes nothing on screen.
+    sRho.disabled = SHAPE !== "one";
+    sRho.title = SHAPE === "one" ? "" : "applies to the single Gaussian only";
+    lblV.textContent = "slice at x = " + x0.toFixed(1) + " \u2014 raw sliver vs conditional p(y | x)";
+    lblH.textContent = "slice at y = " + y0.toFixed(1) + " \u2014 raw sliver vs conditional p(x | y)";
+    const corr = corrOf();
+    const blob = SHAPE !== "one";
+    rJoint.innerHTML =
+      "shadows: " +
+      (blob
+        ? "<b>&#189;N(&#8722;1.25, 0.5&#178;) + &#189;N(+1.25, 0.5&#178;)</b> on both axes &#8212; " +
+          "<b>identical for all three blob shapes</b>"
+        : "<b>N(0,&#8201;1)</b> on both axes, for every &#961;") +
+      " &nbsp;&#183;&nbsp; Corr(X,&#8202;Y) = <b>" + corr.toFixed(2) + "</b>" +
+      " &nbsp;&#183;&nbsp; " +
+      (SHAPE === "four"
+        ? "independent: every slice is the same two-humped curve, wherever you cut"
+        : SHAPE === "one" && Math.abs(RHO) < 1e-9
+          ? "independent (a jointly Gaussian pair with zero correlation is independent)"
+          : "dependent: the slice moves with the slice line");
+    jview.redraw(); pv.redraw(); ph.redraw();
+  }
+  const sRho = document.getElementById("s-rho"), vRho = document.getElementById("v-rho");
+  sRho.addEventListener("input", () => { RHO = +sRho.value; vRho.textContent = RHO.toFixed(2); redrawAct1(); });
+
+  // ---------------- Act II: two shelves ----------------
+  let PI_ = 0.5, SIG = 0.6, xs = 0.4;
+  const rShelf = document.getElementById("r-shelf");
+  const padS = { l: 14, r: 14, t: 14, b: 26 };
+  const shelf = setupCanvas("c-shelf", (st) => {
+    const { ctx, w, h } = st;
+    ctx.clearRect(0, 0, w, h);
+    const XL = 4;
+    const toPx = (x) => padS.l + (x + XL) / (2 * XL) * (w - padS.l - padS.r);
+    ctx.font = "11px system-ui, sans-serif";
+    for (const t of [-4, -2, 0, 2, 4]) {
+      ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(toPx(t), padS.t); ctx.lineTo(toPx(t), h - padS.b); ctx.stroke();
+      ctx.fillStyle = css("--muted"); ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText(String(t), toPx(t), h - padS.b + 5);
+    }
+    const yShelf = [h * 0.72, h * 0.34];           // z = -1 (bottom), z = +1 (top)
+    // Both shelves share one vertical scale, capped so the taller curve always
+    // fits: at small sigma the peak density exceeds 1 and a fixed amplitude
+    // would push the shelf off the canvas and across its neighbour.
+    const maxDens = Math.max(PI_, 1 - PI_) / (SIG * SQRT2PI);
+    const amp = h * 0.30 / Math.max(1, maxDens);
+    const dens = [(x) => PI_ * nPdf(x, -1, SIG), (x) => (1 - PI_) * nPdf(x, 1, SIG)];
+    const colors = [css("--data"), css("--lik")];
+    const softs = [css("--data-soft"), css("--lik-soft")];
+    for (let k = 0; k < 2; k++) {
+      ctx.strokeStyle = css("--muted"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(padS.l, yShelf[k]); ctx.lineTo(w - padS.r, yShelf[k]); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(toPx(-XL), yShelf[k]);
+      for (let i = 0; i <= 240; i++) {
+        const x = -XL + 2 * XL * i / 240;
+        ctx.lineTo(toPx(x), yShelf[k] - dens[k](x) * amp);
+      }
+      ctx.lineTo(toPx(XL), yShelf[k]);
+      ctx.closePath();
+      ctx.fillStyle = softs[k]; ctx.fill();
+      ctx.strokeStyle = colors[k]; ctx.lineWidth = 1.8; ctx.stroke();
+    }
+    ctx.fillStyle = css("--ink-2");
+    ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+    ctx.fillText("z = +1 shelf", padS.l + 4, yShelf[1] - 4);
+    ctx.fillText("z = \u22121 shelf", padS.l + 4, yShelf[0] - 4);
+    // slice
+    ctx.strokeStyle = css("--ink"); ctx.lineWidth = 1.4; ctx.setLineDash([5, 4]);
+    ctx.beginPath(); ctx.moveTo(toPx(xs), padS.t); ctx.lineTo(toPx(xs), h - padS.b); ctx.stroke();
+    ctx.setLineDash([]);
+    const h1 = dens[0](xs), h2 = dens[1](xs);
+    for (const [k, hh] of [[0, h1], [1, h2]]) {
+      ctx.strokeStyle = colors[k]; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(toPx(xs), yShelf[k]); ctx.lineTo(toPx(xs), yShelf[k] - hh * amp); ctx.stroke();
+    }
+    // posterior bars, top-right
+    const pPlus = h2 / (h1 + h2);
+    const bx = w - padS.r - 120, by = padS.t + 6, bw = 44, bh = 52;
+    ctx.fillStyle = css("--data-soft");
+    ctx.fillRect(bx, by + bh * pPlus, bw, bh * (1 - pPlus));
+    ctx.fillStyle = css("--lik-soft");
+    ctx.fillRect(bx + bw + 10, by + bh * (1 - pPlus), bw, bh * pPlus);
+    ctx.strokeStyle = css("--axis");
+    ctx.strokeRect(bx, by, bw, bh); ctx.strokeRect(bx + bw + 10, by, bw, bh);
+    ctx.fillStyle = css("--ink-2");
+    ctx.font = "10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillText("P(\u22121|x)", bx + bw / 2, by + bh + 3);
+    ctx.fillText("P(+1|x)", bx + bw + 10 + bw / 2, by + bh + 3);
+    const mean = (1 - pPlus) * (-1) + pPlus * (+1);
+    rShelf.innerHTML = "x = " + xs.toFixed(2) +
+      " &nbsp;&#183;&nbsp; P(z=+1|x) = <b>" + pPlus.toFixed(3) +
+      "</b> &nbsp;&#183;&nbsp; posterior mean E[z|x] = <b>" + mean.toFixed(3) + "</b>" +
+      (Math.abs(PI_ - 0.5) < 1e-9 ? " = tanh(x/\u03c3\u00b2) = " + Math.tanh(xs / (SIG * SIG)).toFixed(3) : "");
+  }, (st, ev) => {
+    const r = st.el.getBoundingClientRect();
+    const px = ev.clientX - r.left;
+    const XL = 4;
+    xs = Math.max(-XL, Math.min(XL, -XL + (px - padS.l) / (st.w - padS.l - padS.r) * 2 * XL));
+    shelf.redraw();
+  });
+  shelf.el.tabIndex = 0;
+  shelf.el.addEventListener("keydown", (ev) => {
+    const step = ev.shiftKey ? 0.5 : 0.1, XL = 4;
+    let used = true;
+    if (ev.key === "ArrowLeft") xs = Math.max(-XL, xs - step);
+    else if (ev.key === "ArrowRight") xs = Math.min(XL, xs + step);
+    else if (ev.key === "Home") xs = -XL;
+    else if (ev.key === "End") xs = XL;
+    else used = false;
+    if (used) { ev.preventDefault(); shelf.redraw(); }
+  });
+
+  function bind(id, vid, set, fmt) {
+    const el = document.getElementById(id), v = document.getElementById(vid);
+    el.addEventListener("input", () => { set(+el.value); v.textContent = fmt(+el.value); shelf.redraw(); });
+  }
+  bind("s-pi", "v-pi", (x) => { PI_ = x; }, (x) => x.toFixed(2));
+  bind("s-sig", "v-sig", (x) => { SIG = x; }, (x) => x.toFixed(2));
+
+  redrawAct1();
+
+  const redrawAll = () => { heatKey = ""; redrawAct1(); shelf.redraw(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
+  new MutationObserver(redrawAll).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

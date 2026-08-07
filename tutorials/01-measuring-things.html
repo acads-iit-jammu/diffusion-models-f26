@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Measuring Things — From Length to Probability – ID-5-02 (TO)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/02-joint-conditional-bayes.html" rel="next">
+<link href="../weeks/w17.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Measuring Things — From Length to Probability</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">ID-5-02 (TO)</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Syllabus</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assignments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Weekly Notes</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W01: Generative Modeling I</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W02: Generative Modeling II</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W03: High Dimensions &amp; Gaussians</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W04: Gaussian Calculus &amp; Markov Chains</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W05: Noise Accumulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w06.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W06: DDPM I</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w07.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W07: DDPM II</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w08.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W08: Score Matching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w09.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W09: Mid-Semester Examinations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W10: Denoising Score Matching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W11: Brownian Motion &amp; SDEs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W12: Fokker–Planck</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w13.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W13: Continuous Forward Equation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w14.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W14: Reverse-time Drift</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w15.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W15: Information Flow &amp; Probability Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w16.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W16: Holiday Week</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weeks/w17.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">W17: Flows, Applications &amp; Wrap-up</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials · Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/01-measuring-things.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/02-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/03-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Probability 101 — A Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials · Diffusion Models</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Deterministic Map, Proved</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/09-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-discrete-transport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resources</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#how-do-we-measure-things" id="toc-how-do-we-measure-things" class="nav-link active" data-scroll-target="#how-do-we-measure-things">1. How do we measure things?</a></li>
+  <li><a href="#two-ways-to-integrate-strips-versus-slabs" id="toc-two-ways-to-integrate-strips-versus-slabs" class="nav-link" data-scroll-target="#two-ways-to-integrate-strips-versus-slabs">2. Two ways to integrate: strips versus slabs</a></li>
+  <li><a href="#kolmogorovs-move-probability-is-a-measure" id="toc-kolmogorovs-move-probability-is-a-measure" class="nav-link" data-scroll-target="#kolmogorovs-move-probability-is-a-measure">3. Kolmogorov’s move: probability <em>is</em> a measure</a></li>
+  <li><a href="#the-blob-seeing-omega-mathcalf-p" id="toc-the-blob-seeing-omega-mathcalf-p" class="nav-link" data-scroll-target="#the-blob-seeing-omega-mathcalf-p">4. The blob: seeing <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span></a>
+  <ul class="collapse">
+  <li><a href="#two-jobs-and-two-pictures" id="toc-two-jobs-and-two-pictures" class="nav-link" data-scroll-target="#two-jobs-and-two-pictures">Two jobs, and two pictures</a></li>
+  </ul></li>
+  <li><a href="#random-variables-numbers-painted-on-the-blob" id="toc-random-variables-numbers-painted-on-the-blob" class="nav-link" data-scroll-target="#random-variables-numbers-painted-on-the-blob">5. Random variables: numbers painted on the blob</a></li>
+  <li><a href="#a-gallery-probability-spaces-fully-specified" id="toc-a-gallery-probability-spaces-fully-specified" class="nav-link" data-scroll-target="#a-gallery-probability-spaces-fully-specified">6. A gallery: probability spaces, fully specified</a>
+  <ul class="collapse">
+  <li><a href="#discrete" id="toc-discrete" class="nav-link" data-scroll-target="#discrete">Discrete</a></li>
+  <li><a href="#continuous" id="toc-continuous" class="nav-link" data-scroll-target="#continuous">Continuous</a></li>
+  <li><a href="#real-data" id="toc-real-data" class="nav-link" data-scroll-target="#real-data">Real data</a></li>
+  </ul></li>
+  <li><a href="#what-is-not-a-sigma-algebra" id="toc-what-is-not-a-sigma-algebra" class="nav-link" data-scroll-target="#what-is-not-a-sigma-algebra">What is <em>not</em> a <span class="math inline">\(\sigma\)</span>-algebra</a></li>
+  <li><a href="#pushforward-the-distribution-is-the-image-of-the-mass" id="toc-pushforward-the-distribution-is-the-image-of-the-mass" class="nav-link" data-scroll-target="#pushforward-the-distribution-is-the-image-of-the-mass">7. Pushforward: the distribution is the image of the mass</a></li>
+  <li><a href="#expectation-the-lebesgue-integral-four-ways" id="toc-expectation-the-lebesgue-integral-four-ways" class="nav-link" data-scroll-target="#expectation-the-lebesgue-integral-four-ways">8. Expectation: the Lebesgue integral, four ways</a>
+  <ul class="collapse">
+  <li><a href="#properties-and-where-each-one-lives" id="toc-properties-and-where-each-one-lives" class="nav-link" data-scroll-target="#properties-and-where-each-one-lives">Properties, and where each one lives</a></li>
+  </ul></li>
+  <li><a href="#the-dictionary-and-what-comes-next" id="toc-the-dictionary-and-what-comes-next" class="nav-link" data-scroll-target="#the-dictionary-and-what-comes-next">9. The dictionary, and what comes next</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Measuring Things — From Length to Probability</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Measuring Things — From Length to Probability</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>A standalone tutorial, and the first of two on the measure-theoretic view of probability. It assumes no exposure to measure theory. The story: how we measure length, area, and volume; why the Riemann integral is the wrong tool for probability; how Lebesgue’s rearrangement fixes it; and how Kolmogorov used the resulting theory of measure to give probability a rigorous foundation. The sequel, <a href="../tutorials/02-joint-conditional-bayes.html">Joint, Marginal, Conditional — and Bayes</a>, builds the multivariate picture on this footing.</em></p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why this tutorial exists
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every object in this course — density, likelihood, score, KL divergence, pushforward, transport map — is a measure-theoretic object. One can use them by rote, but the moment a formula surprises you (why is <span class="math inline">\(P(X = x) = 0\)</span> for every <span class="math inline">\(x\)</span> yet the density is positive? what does <span class="math inline">\(\mathbb{E}[x_0 \mid x_t]\)</span> actually average over?), the only reliable footing is the measure-theoretic one. This tutorial builds that footing visually, with almost no machinery.</p>
+</div>
+</div>
+<section id="how-do-we-measure-things" class="level2">
+<h2 class="anchored" data-anchor-id="how-do-we-measure-things">1. How do we measure things?</h2>
+<p>Start with questions a ruler can answer.</p>
+<ul>
+<li><strong>Length.</strong> The interval <span class="math inline">\([a, b]\)</span> has length <span class="math inline">\(b - a\)</span>. If a set is a <em>finite or countable</em> disjoint union of intervals, its length is the sum of the pieces. (The qualifier is not fussiness: <span class="math inline">\([0,1]\)</span> is an uncountable disjoint union of single points, each of length zero.)</li>
+<li><strong>Area.</strong> A rectangle has area width <span class="math inline">\(\times\)</span> height. For a curved region, we tile it with many small rectangles and add; as the tiles shrink, the sum converges to what we call the area.</li>
+<li><strong>Volume.</strong> Same idea, one dimension up: boxes, then sums of boxes, then limits.</li>
+</ul>
+<p>In each case the procedure is identical. Fix a set <span class="math inline">\(\Omega\)</span> and a family <span class="math inline">\(\mathcal{F}\)</span> of subsets of it — the sets we are willing to size, about which more in a moment. A <strong>measure</strong> is a rule <span class="math inline">\(m : \mathcal{F} \to [0, \infty]\)</span> such that</p>
+<ol type="1">
+<li><span class="math inline">\(m(\varnothing) = 0\)</span> — the empty set has measure zero. (Note the direction: plenty of <em>non-empty</em> sets are also null, as §2’s rationals will show.)</li>
+<li><strong>countable additivity</strong> — if <span class="math inline">\(A_1, A_2, \dots \in \mathcal{F}\)</span> are pairwise disjoint, then <span class="math inline">\(m\!\big(\bigcup_{i=1}^{\infty} A_i\big) = \sum_{i=1}^{\infty} m(A_i)\)</span>: the whole is the sum of its disjoint parts, countably many at a time.</li>
+</ol>
+<p>Three details in that sentence are load-bearing and easy to skim past. The domain is <span class="math inline">\(\mathcal{F}\)</span>, not every subset. The value <span class="math inline">\(+\infty\)</span> is allowed, which is what lets length and volume work on unbounded spaces. And the additivity is <em>countable</em>, not merely finite — the difference is the whole content of the letter <span class="math inline">\(\sigma\)</span>, and §“What is not a <span class="math inline">\(\sigma\)</span>-algebra” shows a family where exactly that difference bites.</p>
+<p>Length, area, volume, mass, and — this is the punchline of the tutorial — <em>probability</em> are all instances of this one definition. Probability will simply be a measure whose total is <span class="math inline">\(1\)</span>.</p>
+<p>But there is a catch, and it is not pedantry. Once <span class="math inline">\(\Omega\)</span> is uncountable (an interval, the plane, the space of images), one can construct subsets that <em>ordinary length cannot size</em> — not because no measure whatever could, but because no <strong>countably additive, translation-invariant</strong> extension of length reaches them.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> Note the shape of the failure: it is the <em>measure</em> that cannot be extended, not the family that fails to be a <span class="math inline">\(\sigma\)</span>-algebra — a distinction §“What is not a <span class="math inline">\(\sigma\)</span>-algebra” returns to. The resolution is not to fix the rule but to restrict the questions: we measure only a well-behaved family of sets, closed under the operations we need (complements, countable unions). That family is called a <strong><span class="math inline">\(\sigma\)</span>-algebra</strong>, and every set in it is called <strong>measurable</strong>. This single concession — <em>not every subset gets a size</em> — is the entire entrance fee of measure theory. Everything else is payoff.</p>
+</section>
+<section id="two-ways-to-integrate-strips-versus-slabs" class="level2">
+<h2 class="anchored" data-anchor-id="two-ways-to-integrate-strips-versus-slabs">2. Two ways to integrate: strips versus slabs</h2>
+<p>An integral is a measured total: the area under a curve, the average of a quantity, the expected value of a random variable. There are two ways to organize the computation, and the difference between them is the difference between nineteenth-century and twentieth-century analysis.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/riemann-vs-lebesgue.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Riemann slices the domain into vertical strips; Lebesgue slices the range into horizontal slabs and asks how much of the domain lands in each.</figcaption>
+</figure>
+</div>
+<p><strong>Riemann (strips).</strong> Chop the <em>domain</em> (the <span class="math inline">\(x\)</span>-axis) into small intervals; on each, approximate <span class="math inline">\(f\)</span> by a constant; add up rectangle areas; refine. This works beautifully when <span class="math inline">\(f\)</span> is continuous — nearby <span class="math inline">\(x\)</span>’s have nearby <span class="math inline">\(f(x)\)</span>’s, so the rectangles hug the curve.</p>
+<p><strong>Lebesgue (slabs).</strong> Chop the <em>range</em> (the <span class="math inline">\(y\)</span>-axis) into small levels; for each level <span class="math inline">\(y\)</span>, ask <em>how much of the domain</em> is mapped near <span class="math inline">\(y\)</span> — that is, measure the set <span class="math inline">\(\{x : f(x) \approx y\}\)</span>; multiply level by measure; add; refine. Lebesgue’s own summary: to count coins, Riemann takes them in the order they sit on the table; Lebesgue first sorts them by denomination, then counts each pile.</p>
+<p>Why bother with the second way?</p>
+<ul>
+<li><strong>It tolerates wild functions.</strong> The indicator of the rationals on <span class="math inline">\([0,1]\)</span> (<span class="math inline">\(1\)</span> on rationals, <span class="math inline">\(0\)</span> on irrationals) breaks Riemann completely — every strip contains both values. Lebesgue shrugs: the set of rationals has measure <span class="math inline">\(0\)</span>, the set of irrationals has measure <span class="math inline">\(1\)</span>, so the integral is <span class="math inline">\(1 \cdot 0 + 0 \cdot 1 = 0\)</span>.</li>
+<li><strong>It only needs a measure.</strong> The slab computation never uses the geometry of the domain — only the ability to <em>measure</em> sets like <span class="math inline">\(\{x: f(x) &gt; y\}\)</span>. So the same definition of integral works when the domain is an interval, a plane, a space of images, or an abstract sample space with a probability on it. This is exactly the generality probability needs.</li>
+<li><strong>It has the strong limit theorems.</strong> Interchanging limits and integrals — the daily bread of this course, every time we differentiate a loss under an expectation — is licensed by Lebesgue’s convergence theorems, not Riemann’s.</li>
+</ul>
+<p>The layer-cake picture makes the definition concrete for a non-negative <span class="math inline">\(f\)</span>: the region under the graph is a stack of horizontal slabs, the slab at height <span class="math inline">\(y\)</span> has width <span class="math inline">\(m(\{x: f(x) &gt; y\})\)</span>, and</p>
+<p><span class="math display">\[
+\int f \, dm \;=\; \int_0^\infty m\big(\{x : f(x) &gt; y\}\big)\, dy .
+\]</span></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/layer-cake.svg" class="img-fluid figure-img" style="width:88.0%"></p>
+<figcaption>The layer-cake representation: the area under the curve is the total of horizontal slabs, each as wide as the set where the function exceeds that height.</figcaption>
+</figure>
+</div>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key takeaway
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An integral is a <em>measure-weighted sum of values</em>. Riemann organizes the sum by <em>where</em> you are (domain strips); Lebesgue organizes it by <em>what value</em> you see (range slabs). The Lebesgue organization needs nothing from the domain except a measure — which is precisely why probability, whose domains are abstract sample spaces, is built on it.</p>
+</div>
+</div>
+</section>
+<section id="kolmogorovs-move-probability-is-a-measure" class="level2">
+<h2 class="anchored" data-anchor-id="kolmogorovs-move-probability-is-a-measure">3. Kolmogorov’s move: probability <em>is</em> a measure</h2>
+<p>Before 1933 probability had results in abundance — Borel, Lebesgue, Markov and others had already built much of the machinery — but no agreed definition of its basic objects. Kolmogorov’s <em>Grundbegriffe</em> (1933) unified that work into the standard framework with a single identification: a probability space is a measure space <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> where</p>
+<ul>
+<li><span class="math inline">\(\Omega\)</span> is the <strong>sample space</strong> — the set of all outcomes of the experiment;</li>
+<li><span class="math inline">\(\mathcal{F}\)</span> is a <span class="math inline">\(\sigma\)</span>-algebra of subsets of <span class="math inline">\(\Omega\)</span> — the <strong>events</strong>, the questions we are allowed to ask;</li>
+<li><span class="math inline">\(P\)</span> is a measure on <span class="math inline">\(\mathcal{F}\)</span> with <span class="math inline">\(P(\Omega) = 1\)</span> — the <strong>probability measure</strong>, total mass one.</li>
+</ul>
+<p>That is the entire definition. The axioms you may have met as a list (non-negativity, total mass one, additivity) are just the definition of a measure with the normalization <span class="math inline">\(P(\Omega)=1\)</span>; every rule of probability (<span class="math inline">\(P(A^c) = 1 - P(A)\)</span>, inclusion–exclusion, the continuity of <span class="math inline">\(P\)</span> along monotone sequences of events) is a theorem about measures.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What is probability, though? Three readings
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Kolmogorov’s axioms say how probability <em>behaves</em>, deliberately not what it <em>means</em>. The meaning question predates the axioms and has never had a unanimous answer; three readings are worth knowing.</p>
+<ul>
+<li><strong>Frequentist.</strong> <span class="math inline">\(P(A)\)</span> is the long-run frequency of occurrence of <span class="math inline">\(A\)</span> in independent repetitions of the experiment — the fraction of tosses that land heads, in the limit. This grounds probability in data but struggles with single-case events (“the probability this specific bridge fails”).</li>
+<li><strong>Fiducial</strong> (Fisher). Not a reading of what probability <em>is</em> so much as an inferential programme, but worth knowing: an attempt to obtain a probability statement about an unknown parameter <em>without</em> assuming a prior, by inverting a sampling or pivotal relation between the data and the parameter. (Not, as is sometimes said, by reading it off the likelihood alone.) Historically influential, foundationally contested, and a standing reminder that not every “probability of a parameter” one writes down is licensed by the axioms.</li>
+<li><strong>Measure-theoretic</strong> (the course’s working stance). Probability is a normalized measure; full stop. Whether a given application reads it as a frequency, a degree of belief, or a modeling fiction is a question <em>outside</em> the mathematics. This agnosticism is a feature: the same theorems serve every interpretation.</li>
+</ul>
+<p>The axioms capture the behavior all readings agree on — which is exactly why the theory could finally be built.</p>
+</div>
+</div>
+<p>Two examples calibrate the definition.</p>
+<ul>
+<li><strong>A die.</strong> <span class="math inline">\(\Omega = \{1,\dots,6\}\)</span>, <span class="math inline">\(\mathcal{F}\)</span> = all subsets, <span class="math inline">\(P(A) =
+|A|/6\)</span>. Here every subset is an event, which is why elementary probability never mentions <span class="math inline">\(\mathcal{F}\)</span> — though note this is a <em>choice</em>: finite spaces admit coarse <span class="math inline">\(\sigma\)</span>-algebras too, and §4 will use one.</li>
+<li><strong>A uniform point in <span class="math inline">\([0,1]\)</span>.</strong> <span class="math inline">\(\Omega = [0,1]\)</span>, <span class="math inline">\(\mathcal{F}\)</span> = the Borel sets (the <span class="math inline">\(\sigma\)</span>-algebra generated by intervals), <span class="math inline">\(P\)</span> = length. Now <span class="math inline">\(P(\{\omega\}) = 0\)</span> for every single outcome, yet <span class="math inline">\(P([0,1]) = 1\)</span>: probability lives on sets, not points. The common puzzles of continuous probability — density values above <span class="math inline">\(1\)</span>, zero-probability events that nonetheless happen — dissolve once probability is read as measure, i.e.&nbsp;as generalized length.</li>
+</ul>
+</section>
+<section id="the-blob-seeing-omega-mathcalf-p" class="level2">
+<h2 class="anchored" data-anchor-id="the-blob-seeing-omega-mathcalf-p">4. The blob: seeing <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span></h2>
+<p>From here on, picture <span class="math inline">\(\Omega\)</span> as a blob of clay of total mass <span class="math inline">\(1\)</span>. Events are regions of the blob; <span class="math inline">\(P\)</span> weighs regions; the <span class="math inline">\(\sigma\)</span>-algebra is the list of regions we can weigh.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/blob-events.svg" class="img-fluid figure-img" style="width:92.0%"></p>
+<figcaption>The blob: outcomes are points, events are regions, and the probability measure weighs regions. Intersections, unions, complements are literal geometry.</figcaption>
+</figure>
+</div>
+<section id="two-jobs-and-two-pictures" class="level3">
+<h3 class="anchored" data-anchor-id="two-jobs-and-two-pictures">Two jobs, and two pictures</h3>
+<p>The <span class="math inline">\(\sigma\)</span>-algebra is the object students never get a picture of, and most of the confusion comes from the definition being asked to do <em>two different jobs</em>. Separate them first.</p>
+<ul>
+<li><strong>The bookkeeping job.</strong> The big <span class="math inline">\(\mathcal{F}\)</span> in the triple says which sets <span class="math inline">\(P\)</span> is even defined on, and which maps count as measurable. §1 forced the issue: ordinary length cannot reach every subset. In practice <span class="math inline">\(\mathcal{F}\)</span> is a conventional ambient choice — Borel on <span class="math inline">\(\mathbb{R}\)</span>, the product <span class="math inline">\(\sigma\)</span>-algebra on sequences, cylinder sets on path space — made once and then kept in the background. (There is no canonical <em>largest</em> safe choice: on <span class="math inline">\([0,1]\)</span> we use the Borel sets even though length extends perfectly well to the larger Lebesgue family.) This job needs no picture; it needs the fence, and then silence.</li>
+<li><strong>The information job.</strong> A <em>sub</em>-<span class="math inline">\(\sigma\)</span>-algebra <span class="math inline">\(\mathcal{G} \subseteq
+\mathcal{F}\)</span> models something else entirely: <strong>partial knowledge</strong>. Not what is weighable in principle, but what a particular observer can tell apart. This is the job that matters for the rest of the course, and this is what deserves a picture.</li>
+</ul>
+<p>Two pictures of the information job follow. They are the same mathematics; use whichever makes a given statement obvious.</p>
+<section id="picture-a-a-resolution" class="level4">
+<h4 class="anchored" data-anchor-id="picture-a-a-resolution">Picture A — a resolution</h4>
+<p>Pixelate the blob into a grid of cells and agree to describe outcomes only cell-by-cell. The events you can then express are exactly the unions of cells: a coarse grid asks coarse questions, a fine grid asks fine ones, and refining the grid enlarges the <span class="math inline">\(\sigma\)</span>-algebra.</p>
+<p>This picture is honest but <em>narrow</em>: it models a <span class="math inline">\(\sigma\)</span>-algebra generated by a partition into finitely many positive-mass cells. Many of the <span class="math inline">\(\sigma\)</span>-algebras in this course are not of that kind — <span class="math inline">\(\sigma(X)\)</span> for an <span class="math inline">\(X\)</span> with nonatomic law has no positive-mass cells at all — so read the grid as a helpful special case, never as the definition.</p>
+</section>
+<section id="picture-b-a-report" class="level4">
+<h4 class="anchored" data-anchor-id="picture-b-a-report">Picture B — a report</h4>
+<p>Here is the picture that survives the general case. You never see the outcome <span class="math inline">\(\omega\)</span>. What reaches you is a <strong>report</strong> about it — some function <span class="math inline">\(R\)</span> evaluated at <span class="math inline">\(\omega\)</span>, and nothing else. Then</p>
+<blockquote class="blockquote">
+<p><span class="math inline">\(\sigma(R)\)</span> is the collection of events that the report settles.</p>
+</blockquote>
+<p>Roll a die, and suppose you are told only whether the result is odd or even. You cannot answer “was it a 3?”, because <span class="math inline">\(1\)</span>, <span class="math inline">\(3\)</span> and <span class="math inline">\(5\)</span> produce an identical report. You can answer “was it odd?”. Write down <em>everything</em> the report settles:</p>
+<p><span class="math display">\[
+\sigma(R) \;=\; \big\{\; \varnothing,\;\; \{1,3,5\},\;\; \{2,4,6\},\;\; \Omega \;\big\}
+\]</span></p>
+<p>— four events, out of the <span class="math inline">\(2^6 = 64\)</span> subsets of <span class="math inline">\(\Omega\)</span>. That list is a <span class="math inline">\(\sigma\)</span>-algebra, and now the axioms stop looking arbitrary, because they are nothing but the logic of answerable questions:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Axiom</th>
+<th>What it says about a report</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\Omega, \varnothing \in \mathcal{G}\)</span></td>
+<td>“did <em>something</em> happen?” needs no report to answer</td>
+</tr>
+<tr class="even">
+<td>closed under complement</td>
+<td>if the report settles <span class="math inline">\(A\)</span>, it settles “not <span class="math inline">\(A\)</span>” — same answer, negated</td>
+</tr>
+<tr class="odd">
+<td>closed under countable union</td>
+<td>if it settles each of <span class="math inline">\(A_1, A_2, \dots\)</span>, it settles “did at least one occur?”</td>
+</tr>
+</tbody>
+</table>
+<p>This table translates the axioms into the language of questions; it does not <em>derive</em> them. In particular nothing in ordinary logic explains why the cutoff falls at <strong>countably</strong> many questions rather than finitely or arbitrarily many. Countable closure is an additional idealization, and it is chosen because it is exactly what limits, tail events and countably additive probability require.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The honest version of “settles”
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Read literally, “the events the report settles” means the events whose answer is determined by <span class="math inline">\(R(\omega)\)</span> — that is, the sets that are unions of level sets of <span class="math inline">\(R\)</span>. When <span class="math inline">\(R\)</span> has <strong>countably many possible answers</strong>, as in every example in this tutorial and in the demo below, that collection is exactly <span class="math inline">\(\sigma(R)\)</span> and the gloss is precise.</p>
+<p>For a report with a continuum of answers it is too generous. Take <span class="math inline">\(R(\omega) =
+\omega\)</span> on <span class="math inline">\([0,1]\)</span>: its level sets are single points, so <em>every</em> subset of <span class="math inline">\([0,1]\)</span> is a union of them, and “settled” would mean all of <span class="math inline">\(2^{[0,1]}\)</span> — which §1 has already told us is too big to carry a length. The definition that works in general keeps only the sets built from measurable questions about the answer,</p>
+<p><span class="math display">\[
+\sigma(R) \;=\; \big\{\, R^{-1}(B) \;:\; B \text{ Borel} \,\big\},
+\]</span></p>
+<p>and this is the definition to hold onto. The intuition — <em>what the report lets you decide</em> — survives intact; the fine print is that “decide” must itself be asked measurably. The same caveat is why measurability of <span class="math inline">\(R\)</span> had to be assumed in the first place.</p>
+</div>
+</div>
+<p>The report picture also gives the cleanest statement of measurability there is. A quantity can be computed by an observer who sees only the report exactly when it is a <em>function of the report</em>:</p>
+<p><span class="math display">\[
+X \text{ is } \sigma(R)\text{-measurable}
+\quad\Longleftrightarrow\quad
+X = f \circ R \text{ for some measurable } f .
+\]</span></p>
+<p>This is the Doob–Dynkin lemma. Precisely: let <span class="math inline">\(R : (\Omega, \mathcal{F}) \to
+(S, \mathcal{S})\)</span> be measurable and let <span class="math inline">\(X\)</span> be real-valued. Then <span class="math inline">\(X\)</span> is <span class="math inline">\(\sigma(R)\)</span>-measurable if and only if <span class="math inline">\(X = f \circ R\)</span> for some <span class="math inline">\(\mathcal{S}/\mathcal{B}(\mathbb{R})\)</span>-measurable <span class="math inline">\(f : S \to \mathbb{R}\)</span>. No probability or integrability is involved; the report just needs a measurable space to land in, and <span class="math inline">\(X\)</span> needs real (or standard-Borel) values. Set it beside the pixel version — “<span class="math inline">\(X\)</span> is constant on each cell” — and note that the two agree wherever both apply, but the report version keeps working when the report has a nonatomic law and there is no finite positive-mass partition to be constant on. (Continuous reports still have fibres; what they lack is fibres of positive mass.)</p>
+<p>And when <span class="math inline">\(X\)</span> is <em>not</em> a function of the report, the best an observer can do is average <span class="math inline">\(X\)</span> over the outcomes the report fails to distinguish. For the parity report and <span class="math inline">\(X(\omega) = \omega\)</span>,</p>
+<p><span class="math display">\[
+\mathbb{E}[X \mid R] =
+\begin{cases}
+(1+3+5)/3 = 3 &amp; \text{if the report says odd},\\
+(2+4+6)/3 = 4 &amp; \text{if the report says even}.
+\end{cases}
+\]</span></p>
+<p>That average is <strong>conditional expectation</strong>: itself a function of the report — a <span class="math inline">\(\sigma(R)\)</span>-measurable random variable. In general, for <span class="math inline">\(X \in L^1(P)\)</span>, <span class="math inline">\(\mathbb{E}[X \mid \mathcal{G}]\)</span> is defined as the almost-surely unique <span class="math inline">\(\mathcal{G}\)</span>-measurable integrable <span class="math inline">\(W\)</span> with <span class="math inline">\(\int_A W\, dP = \int_A X\, dP\)</span> for every <span class="math inline">\(A \in \mathcal{G}\)</span>: <em>it has the same integral as <span class="math inline">\(X\)</span> over every event the observer can ask about.</em> For a partition into positive-mass cells this reduces to the cell averages above, <span class="math inline">\(W|_{C} = \int_C X\,dP / P(C)\)</span>; on null cells the definition imposes nothing, which is why “almost surely unique” is the strongest uniqueness available.</p>
+<p>Calling it the <em>closest</em> such function needs a loss to be named. Under squared error, and for <span class="math inline">\(X \in L^2\)</span>, it is exactly right — <span class="math inline">\(\mathbb{E}[X \mid \mathcal{G}]\)</span> is the orthogonal projection of <span class="math inline">\(X\)</span> onto the <span class="math inline">\(\mathcal{G}\)</span>-measurable functions, hence the minimum-mean-squared-error predictor. Under absolute error the best predictor is a conditional <em>median</em> instead. Every “best denoiser” claim in this course is the squared-error one.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why Picture B is the one to keep
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In a diffusion model the report is the noisy sample <span class="math inline">\(x_t\)</span>. A denoiser is <em>required to be a function of <span class="math inline">\(x_t\)</span></em> — it is handed nothing else — and that requirement is exactly the statement that it is <span class="math inline">\(\sigma(x_t)\)</span>-measurable. The best denoiser is then the average of the clean signals consistent with what was seen, <span class="math inline">\(\mathbb{E}[x_0 \mid x_t]\)</span>. W01’s <span class="math inline">\(\tanh\)</span> formula is this paragraph, computed for a two-point dataset.</p>
+</div>
+</div>
+<p>Act I of the demo below is Picture B, made concrete: eight students, a report you choose, and — displayed in full — the list of events that report settles, which questions it leaves open, and the conditional expectation it supports.</p>
+<p><strong>Interactive demo</strong> — <a href="../materials/measure-playground.html" target="_blank">The Measure Playground</a></p>
+<iframe src="../materials/measure-playground.html" width="100%" height="620" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: a sigma-algebra as what a report tells you, and expectation as area under the quantile curve">
+</iframe>
+</section>
+</section>
+</section>
+<section id="random-variables-numbers-painted-on-the-blob" class="level2">
+<h2 class="anchored" data-anchor-id="random-variables-numbers-painted-on-the-blob">5. Random variables: numbers painted on the blob</h2>
+<p>A <strong>random variable</strong> is not random and is not a variable. It is a function</p>
+<p><span class="math display">\[
+X : \Omega \longrightarrow \mathbb{R},
+\]</span></p>
+<p>a number painted on each point of the blob. The randomness lives entirely in <span class="math inline">\(P\)</span>; <span class="math inline">\(X\)</span> just reads off a numerical feature of the outcome. (A <strong>random vector</strong> is the same thing with values in <span class="math inline">\(\mathbb{R}^d\)</span> — equivalently, a map all of whose coordinates are random variables. Images will be random vectors with <span class="math inline">\(d\)</span> in the hundreds.)</p>
+<p>One condition is required, and the preimage picture makes it self-evident. To ask “what is the probability that <span class="math inline">\(X \le t\)</span>?” we must <em>weigh</em> the set of outcomes for which that holds — the <strong>preimage</strong> <span class="math inline">\(X^{-1}((-\infty, t]) = \{\omega : X(\omega)
+\le t\}\)</span>. So that set had better be in <span class="math inline">\(\mathcal{F}\)</span>, i.e.&nbsp;weighable. A function with this property (for every <span class="math inline">\(t\)</span>) is called <strong>measurable</strong>, and <em>measurable function</em> is the honest name for “random variable.”</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/preimage.svg" class="img-fluid figure-img" style="width:92.0%"></p>
+<figcaption>Measurability: the question “is X ≤ t?” is answered by weighing the preimage region on the blob. A random variable is a function whose preimages are weighable.</figcaption>
+</figure>
+</div>
+<p>This is the same condition as §4’s, in the form it takes for the big <span class="math inline">\(\mathcal{F}\)</span>: measurability is the demand that the questions we want to ask about <span class="math inline">\(X\)</span> land inside the family we are allowed to weigh. Against a <em>sub</em>-algebra <span class="math inline">\(\sigma(R)\)</span> it becomes the sharper statement met there — <span class="math inline">\(X\)</span> is <span class="math inline">\(\sigma(R)\)</span>-measurable exactly when <span class="math inline">\(X\)</span> is a function of the report — and when it is not, what remains is the average <span class="math inline">\(\mathbb{E}[X \mid R]\)</span> over outcomes the report cannot separate. Act I of the demo is that whole progression: pick a coarse report and <span class="math inline">\(X\)</span> is invisible behind its box averages; pick the finest and <span class="math inline">\(X\)</span> is exactly recovered.</p>
+</section>
+<section id="a-gallery-probability-spaces-fully-specified" class="level2">
+<h2 class="anchored" data-anchor-id="a-gallery-probability-spaces-fully-specified">6. A gallery: probability spaces, fully specified</h2>
+<p>Everything so far has been definitions. Here are seven spaces written out in the same four lines each — sample space, <span class="math inline">\(\sigma\)</span>-algebra, probability measure, random variable — so that the abstractions have somewhere to live. Read the remarks: each example exists to make one point the others cannot.</p>
+<p>Two warnings. A few remarks run slightly ahead of the text and use <em>pushforward</em>, <em>density</em> and <em>expectation</em>, which §§7–8 build properly; take them on trust for now. And “fully specified” is an aspiration for the first five: MNIST’s population reading and the path-space law are deliberately schematic, because in those cases the whole point is that we posit the measure rather than construct it.</p>
+<section id="discrete" class="level3">
+<h3 class="anchored" data-anchor-id="discrete">Discrete</h3>
+<p><strong>(1) One roll of a fair die.</strong></p>
+<ul>
+<li><span class="math inline">\(\Omega = \{1,2,3,4,5,6\}\)</span>.</li>
+<li><span class="math inline">\(\mathcal{F} = 2^\Omega\)</span>, all <span class="math inline">\(64\)</span> subsets.</li>
+<li><span class="math inline">\(P(A) = |A|/6\)</span>.</li>
+<li><span class="math inline">\(X(\omega) = \omega\)</span>, the face shown.</li>
+</ul>
+<p><em>Remark.</em> Every subset is an event, which is why elementary courses can omit <span class="math inline">\(\mathcal{F}\)</span> entirely. But the coarse sub-algebras are still there and still useful: the parity report of §4 generates <span class="math inline">\(\sigma(R) = \{\varnothing, \{1,3,5\}, \{2,4,6\}, \Omega\}\)</span>, four events out of sixty-four.</p>
+<p><strong>(2) Flipping until the first head.</strong></p>
+<ul>
+<li><span class="math inline">\(\Omega = \{1, 2, 3, \dots\}\)</span>, the index of the first head. Countably infinite.</li>
+<li><span class="math inline">\(\mathcal{F} = 2^\Omega\)</span>.</li>
+<li><span class="math inline">\(P(\{n\}) = 2^{-n}\)</span>, which sums to <span class="math inline">\(1\)</span> — <em>countable</em> additivity earning its keep.</li>
+<li><span class="math inline">\(X(\omega) = \omega\)</span>, the number of flips; <span class="math inline">\(\mathbb{E}[X] = \sum_n n 2^{-n} = 2\)</span>.</li>
+</ul>
+<p><em>Remark.</em> For any <strong>countable</strong> <span class="math inline">\(\Omega\)</span> you may always take <span class="math inline">\(\mathcal{F} =
+2^\Omega\)</span>, every function is a random variable, and measurability is vacuous. The <span class="math inline">\(\sigma\)</span>-algebra only begins to bite <em>in its bookkeeping role</em> when <span class="math inline">\(\Omega\)</span> is uncountable — which is the next example. Its information role is alive even here: the parity report of §4 lives on a six-point space.</p>
+<p><strong>(3) An infinite sequence of coin flips.</strong></p>
+<ul>
+<li><span class="math inline">\(\Omega = \{0,1\}^{\mathbb{N}}\)</span>, all infinite binary sequences. Uncountable.</li>
+<li><span class="math inline">\(\mathcal{F} = \sigma(\text{cylinder sets})\)</span>, generated by the events <span class="math inline">\(\{\omega : \omega_1 = a_1, \dots, \omega_n = a_n\}\)</span> — the events decided by finitely many flips.</li>
+<li><span class="math inline">\(P\)</span> = the Bernoulli<span class="math inline">\((\tfrac12)\)</span> product measure, fixed by <span class="math inline">\(P(\text{cylinder}) = 2^{-n}\)</span>.</li>
+<li><span class="math inline">\(X(\omega) = \lim_{n} \frac1n \sum_{i \le n} \omega_i\)</span> where that limit exists, and <span class="math inline">\(X(\omega) = 0\)</span> otherwise — a genuine function on all of <span class="math inline">\(\Omega\)</span>. The strong law says <span class="math inline">\(X = \tfrac12\)</span> almost surely; the sequences with no limiting frequency form a measurable set of probability <span class="math inline">\(0\)</span>.</li>
+</ul>
+<p><em>Remark.</em> Here <span class="math inline">\(\mathcal{F} \subsetneq 2^\Omega\)</span> strictly: the product <span class="math inline">\(\sigma\)</span>-algebra is generated by countably many cylinders and is far smaller than the set of all subsets. The natural sub-algebras <span class="math inline">\(\mathcal{F}_n =
+\sigma(\omega_1,\dots,\omega_n)\)</span> — “what you know after <span class="math inline">\(n\)</span> flips” — grow with <span class="math inline">\(n\)</span>. That increasing family is a <strong>filtration</strong>, and it is Picture B with a clock attached.</p>
+</section>
+<section id="continuous" class="level3">
+<h3 class="anchored" data-anchor-id="continuous">Continuous</h3>
+<p><strong>(4) A uniform point in <span class="math inline">\([0,1]\)</span>.</strong></p>
+<ul>
+<li><span class="math inline">\(\Omega = [0,1]\)</span>.</li>
+<li><span class="math inline">\(\mathcal{F} = \mathcal{B}([0,1])\)</span>, the Borel sets — generated by the intervals.</li>
+<li><span class="math inline">\(P\)</span> = length.</li>
+<li><span class="math inline">\(X(\omega) = \omega\)</span>; or <span class="math inline">\(X = Q\)</span>, the quantile function of any target law.</li>
+</ul>
+<p><em>Remark.</em> <span class="math inline">\(P(\{\omega\}) = 0\)</span> for every single <span class="math inline">\(\omega\)</span>, yet <span class="math inline">\(P(\Omega) = 1\)</span>. This is the canonical blob of §7 below: with <span class="math inline">\(X = Q\)</span>, the pushforward is <em>any</em> one-dimensional distribution you like.</p>
+<p><strong>(5) A standard Gaussian.</strong></p>
+<ul>
+<li><span class="math inline">\(\Omega = \mathbb{R}\)</span>.</li>
+<li><span class="math inline">\(\mathcal{F} = \mathcal{B}(\mathbb{R})\)</span>.</li>
+<li><span class="math inline">\(P(A) = \int_A \frac{1}{\sqrt{2\pi}} e^{-x^2/2}\,dx\)</span>.</li>
+<li><span class="math inline">\(X(\omega) = \omega\)</span>.</li>
+</ul>
+<p><em>Remark.</em> Compare with taking <span class="math inline">\(\Omega = [0,1]\)</span>, <span class="math inline">\(P\)</span> = length, and <span class="math inline">\(X = \Phi^{-1}\)</span> (defined on <span class="math inline">\((0,1)\)</span>, a set of full measure, since <span class="math inline">\(\Phi^{-1}(0) = -\infty\)</span> and <span class="math inline">\(\Phi^{-1}(1) = +\infty\)</span>; fix any value at the two endpoints). Different sample space, different measure, different function — <em>identical distribution</em>. No downstream calculation that depends only on the <strong>law</strong> of <span class="math inline">\(X\)</span> can tell them apart — which is the “blob is forgettable” principle in one line. Calculations that depend on more than the law (how <span class="math inline">\(X\)</span> is coupled to another variable, what filtration it sits in) are of course not covered; tutorial 10 makes a point of this.</p>
+</section>
+<section id="real-data" class="level3">
+<h3 class="anchored" data-anchor-id="real-data">Real data</h3>
+<p><strong>(6) MNIST.</strong> Three honest set-ups, and the differences matter.</p>
+<p><em>(a) The dataset itself, as a probability space.</em></p>
+<ul>
+<li><span class="math inline">\(\Omega = \{1, 2, \dots, 60000\}\)</span>, the training indices.</li>
+<li><span class="math inline">\(\mathcal{F} = 2^\Omega\)</span>.</li>
+<li><span class="math inline">\(P(\{i\}) = 1/60000\)</span> — draw an index uniformly.</li>
+<li><span class="math inline">\(X(i) \in \{0,\dots,255\}^{784}\)</span>, the image; <span class="math inline">\(Y(i) \in \{0,\dots,9\}\)</span>, the label.</li>
+</ul>
+<p>Its joint pushforward is the <strong>empirical distribution</strong>. It plays two roles at once, and they are worth separating: it is exactly the measure that ordinary empirical risk minimization integrates against, <em>and</em> it is an estimator of the population law in (b), in the same way that empirical risk estimates population risk. The label report <span class="math inline">\(\sigma(Y)\)</span> contains <span class="math inline">\(2^{10} = 1024\)</span> events, and <span class="math inline">\(\mathbb{E}[X \mid Y]\)</span> is a genuinely familiar object: the ten class-average images, the blurry mean “<span class="math inline">\(7\)</span>”.</p>
+<p><em>(b) The population we wish we had.</em></p>
+<ul>
+<li><span class="math inline">\(\Omega\)</span> = an abstract space of handwriting events, never constructed.</li>
+<li><span class="math inline">\(X : \Omega \to \mathbb{R}^{784}\)</span> the rendering map, and <span class="math inline">\(p_{\text{data}} =
+X_\# P\)</span> the thing we actually want to model.</li>
+<li>The <span class="math inline">\(60000\)</span> images are <em>modelled</em> as i.i.d. draws from it.</li>
+</ul>
+<p>We never build this <span class="math inline">\(\Omega\)</span>, and by §7 we never need to: only the pushforward enters any computation.</p>
+<p><em>(c) Pixel space as the sample space.</em> As literally stored, MNIST lives in <span class="math inline">\(\Omega = \{0,\dots,255\}^{784}\)</span> — which is <strong>finite</strong>, with about <span class="math inline">\(10^{1888}\)</span> elements. So <span class="math inline">\(\mathcal{F} = 2^\Omega\)</span> is perfectly legitimate and <span class="math inline">\(p_{\text{data}}\)</span> is an honest pmf. Modelled instead as continuous, <span class="math inline">\(\Omega = [0,1]^{784}\)</span> with <span class="math inline">\(\mathcal{F}\)</span> Borel, and something important changes.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why adding noise is a measure-theoretic act
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Take the continuous reading, <span class="math inline">\(\Omega = \mathbb{R}^{784}\)</span> with Lebesgue as the reference. The <strong>manifold hypothesis</strong> says <span class="math inline">\(p_{\text{data}}\)</span> concentrates on a set of far lower dimension than <span class="math inline">\(784\)</span> — a set of Lebesgue measure <strong>zero</strong>. A measure that puts mass <span class="math inline">\(1\)</span> on a Lebesgue-null set is <em>singular</em>: by Radon–Nikodym it has <strong>no density at all</strong>. There is no function <span class="math inline">\(p_{\text{data}}(x)\)</span> to differentiate, so the score <span class="math inline">\(\nabla_x \log p_{\text{data}}(x)\)</span> does not exist as a function on <span class="math inline">\(\mathbb{R}^{784}\)</span>.</p>
+<p>Now convolve with <span class="math inline">\(\mathcal{N}(0, \sigma^2 I)\)</span> — which is precisely the forward process, <span class="math inline">\(x_\sigma = x_0 + \sigma z\)</span>. For <em>any</em> probability measure <span class="math inline">\(\mu\)</span>,</p>
+<p><span class="math display">\[
+p_\sigma(x) = \int \frac{1}{(2\pi\sigma^2)^{d/2}}
+  e^{-\lVert x - y\rVert^2 / 2\sigma^2} \, d\mu(y)
+\]</span></p>
+<p>is smooth and strictly positive everywhere. The blurred law is absolutely continuous no matter how singular <span class="math inline">\(\mu\)</span> was, so it <em>has</em> a density, and the score exists and is smooth.</p>
+<p>Two cases are worth separating. The <strong>empirical</strong> law — the finitely many stored images — is supported on finitely many points, hence singular in <span class="math inline">\(\mathbb{R}^{784}\)</span> whatever one believes about manifolds; here the <span class="math inline">\(t=0\)</span> score certainly does not exist. For the <strong>population</strong> law the conclusion needs the manifold hypothesis in its exact form, <span class="math inline">\(\mu(M) = 1\)</span> for some lower-dimensional <span class="math inline">\(M\)</span>; the looser “on or near a manifold” version permits a full-dimensional law with a perfectly good density.</p>
+<p>So the honest statement is: wherever <span class="math inline">\(p_0\)</span> is singular, Gaussian corruption is what brings the object we differentiate into existence; and where <span class="math inline">\(p_0\)</span> is already smooth and full-dimensional, the noise regularizes a score that existed but was badly behaved. Either way it explains why diffusion learns <span class="math inline">\(\nabla \log
+p_t\)</span> for <span class="math inline">\(t &gt; 0\)</span> and never <span class="math inline">\(\nabla \log p_0\)</span>. (Stated here for the additive VE corruption <span class="math inline">\(x_\sigma = x_0 + \sigma z\)</span>; the VP convention convolves a rescaled data law and reaches the same conclusion.)</p>
+</div>
+</div>
+<p><strong>(7) A diffusion path.</strong> The course’s own probability space.</p>
+<ul>
+<li><span class="math inline">\(\Omega = C([0,T]; \mathbb{R}^d)\)</span>, the continuous paths.</li>
+<li><span class="math inline">\(\mathcal{F} = \sigma(\text{cylinder sets})\)</span>, generated by the evaluations <span class="math inline">\(\omega \mapsto \omega(t)\)</span> — and on this space that family coincides with the Borel <span class="math inline">\(\sigma\)</span>-algebra of the sup-norm, with rational times already sufficient to generate it.</li>
+<li><span class="math inline">\(P\)</span> = the law of the forward process (Wiener measure, for pure Brownian motion).</li>
+<li><span class="math inline">\(X_t(\omega) = \omega(t)\)</span> — each time <span class="math inline">\(t\)</span> gives a random variable, the whole family being the process.</li>
+</ul>
+<p><em>Remark.</em> An outcome here is an entire trajectory, which is exactly the situation <span class="math inline">\(\sigma\)</span>-algebras were invented for: <span class="math inline">\(\Omega\)</span> is a function space, and “all subsets” is hopeless. The filtration <span class="math inline">\(\mathcal{F}_t = \sigma(X_s : s \le t)\)</span> is everything known by time <span class="math inline">\(t\)</span> — the <em>whole history</em>, including <span class="math inline">\(X_0\)</span>. A denoiser handed only the current noisy sample is held to something stricter: it must be <span class="math inline">\(\sigma(X_t)\)</span>-measurable, and <span class="math inline">\(\sigma(X_t) \subseteq \mathcal{F}_t\)</span>. The distinction matters, since an <span class="math inline">\(\mathcal{F}_t\)</span>-measurable rule would be allowed to peek at the clean signal it is supposed to be recovering.</p>
+</section>
+</section>
+<section id="what-is-not-a-sigma-algebra" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-not-a-sigma-algebra">What is <em>not</em> a <span class="math inline">\(\sigma\)</span>-algebra</h2>
+<p>The axioms are easiest to feel by watching them fail. Throughout, <span class="math inline">\(\Omega = \{1,2,3,4\}\)</span> unless stated.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Candidate</th>
+<th>Fails</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\{\varnothing, \{1\}, \Omega\}\)</span></td>
+<td>complement</td>
+<td><span class="math inline">\(\{1\}^c = \{2,3,4\}\)</span> is missing</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\big\{\varnothing, \Omega, \{1,2\}, \{3,4\}, \{2,3\}, \{1,4\}\big\}\)</span></td>
+<td>union</td>
+<td>closed under complement, but <span class="math inline">\(\{1,2\} \cup \{2,3\} = \{1,2,3\}\)</span> is missing</td>
+</tr>
+<tr class="odd">
+<td>the partition <span class="math inline">\(\big\{\{1,2\},\{3,4\}\big\}\)</span> alone</td>
+<td>almost everything</td>
+<td>no <span class="math inline">\(\varnothing\)</span>, no <span class="math inline">\(\Omega\)</span>; it <em>generates</em> the <span class="math inline">\(\sigma\)</span>-algebra <span class="math inline">\(\{\varnothing,\{1,2\},\{3,4\},\Omega\}\)</span></td>
+</tr>
+<tr class="even">
+<td>the intervals of <span class="math inline">\(\mathbb{R}\)</span></td>
+<td>both</td>
+<td><span class="math inline">\([0,1]^c\)</span> is not an interval; <span class="math inline">\([0,1]\cup[2,3]\)</span> is not an interval</td>
+</tr>
+<tr class="odd">
+<td>the finite subsets of <span class="math inline">\(\mathbb{N}\)</span></td>
+<td><span class="math inline">\(\Omega\)</span>, complement, countable union</td>
+<td><span class="math inline">\(\mathbb{N} \notin\)</span>; <span class="math inline">\(\{1\}^c\)</span> is infinite; <span class="math inline">\(\bigcup_n \{n\} = \mathbb{N}\)</span></td>
+</tr>
+<tr class="even">
+<td>the finite <strong>and</strong> cofinite subsets of <span class="math inline">\(\mathbb{N}\)</span></td>
+<td><em>countable</em> union</td>
+<td>see below</td>
+</tr>
+</tbody>
+</table>
+<p>That last row is the one to remember, because it is the only one that isolates the letter <span class="math inline">\(\sigma\)</span>. Call a set cofinite if its complement is finite. The finite-or-cofinite sets are closed under complement (the two families swap) and under <em>finite</em> unions, so they form an <strong>algebra</strong> — everything a <span class="math inline">\(\sigma\)</span>-algebra asks for except one word. But</p>
+<p><span class="math display">\[
+\{2, 4, 6, \dots\} \;=\; \{2\} \cup \{4\} \cup \{6\} \cup \cdots
+\]</span></p>
+<p>is a <em>countable</em> union of finite sets that is neither finite nor cofinite (both it and its complement are infinite). So the family is an algebra and not a <span class="math inline">\(\sigma\)</span>-algebra. What the <span class="math inline">\(\sigma\)</span> buys is <strong>closure under countable unions</strong>, which is what keeps limits and tail events measurable in the first place. Do not confuse it with <em>countable additivity</em>, which is a separate axiom — one about the measure <span class="math inline">\(P\)</span>, saying how it distributes over such unions once they are known to be events.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+One correction worth making explicitly
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is tempting to conclude from §1 that <span class="math inline">\(2^\Omega\)</span> “fails” for <span class="math inline">\(\Omega =
+\mathbb{R}\)</span>. It does not: <strong><span class="math inline">\(2^\Omega\)</span> is a <span class="math inline">\(\sigma\)</span>-algebra for every <span class="math inline">\(\Omega\)</span></strong>, trivially, since it contains everything. The problem is not with the family, it is with the <em>measure</em>. What Vitali’s construction shows is that no countably additive, translation-invariant extension of ordinary length can be defined on all of <span class="math inline">\(2^{\mathbb{R}}\)</span>. We restrict to the Borel or Lebesgue sets not because larger families break the axioms of a <span class="math inline">\(\sigma\)</span>-algebra, but because length cannot survive on them.</p>
+<p>Note also that a <strong>topology</strong> is not generally a <span class="math inline">\(\sigma\)</span>-algebra — open sets are closed under arbitrary unions but not under complements — even though the Borel <span class="math inline">\(\sigma\)</span>-algebra is the one <em>generated</em> by a topology.</p>
+</div>
+</div>
+</section>
+<section id="pushforward-the-distribution-is-the-image-of-the-mass" class="level2">
+<h2 class="anchored" data-anchor-id="pushforward-the-distribution-is-the-image-of-the-mass">7. Pushforward: the distribution is the image of the mass</h2>
+<p>Here is the move the whole course runs on. The map <span class="math inline">\(X\)</span> transports the blob’s mass onto the real line: the probability that lands on a set <span class="math inline">\(B \subseteq \mathbb{R}\)</span> is the mass of its preimage,</p>
+<p><span class="math display">\[
+\mu_X(B) \;=\; P\big(X^{-1}(B)\big) \;=\; P(X \in B).
+\]</span></p>
+<p>The measure <span class="math inline">\(\mu_X\)</span> on <span class="math inline">\(\mathbb{R}\)</span> is called the <strong>pushforward</strong> of <span class="math inline">\(P\)</span> under <span class="math inline">\(X\)</span> (written <span class="math inline">\(X_\# P\)</span>), and it is exactly what elementary courses call <em>the distribution of</em> <span class="math inline">\(X\)</span>. The CDF is <span class="math inline">\(F_X(t) = \mu_X((-\infty,t])\)</span>; a <em>density</em> is a function <span class="math inline">\(p_X\)</span> reconstructing <span class="math inline">\(\mu_X\)</span> by integration, <span class="math inline">\(\mu_X(B) = \int_B
+p_X(x)\,dx\)</span>, when such a function exists.</p>
+<p>Two consequences, both load-bearing later:</p>
+<ul>
+<li><strong>The blob is forgettable.</strong> Any two random variables with the same pushforward are indistinguishable by probability statements about their values. This is why probability courses can work with distributions and never mention <span class="math inline">\(\Omega\)</span> — and why <em>we</em> may choose <span class="math inline">\(\Omega\)</span> freely, to be whatever is convenient.</li>
+<li><strong>The canonical choice is <span class="math inline">\(\Omega = [0,1]\)</span>.</strong> Take <span class="math inline">\(P\)</span> = length on <span class="math inline">\([0,1]\)</span> and <span class="math inline">\(X = Q\)</span>, the quantile function (inverse CDF) of any target distribution: then <span class="math inline">\(Q_\# (\text{uniform})\)</span> <em>is</em> that distribution. Every 1-D distribution is the pushforward of uniform mass through its quantile map — one blob serves all.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/pushforward-quantile.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Sampling as transport: uniform mass on [0,1] pushed through the quantile map Q lands as the target distribution. Every 1-D distribution arises this way.</figcaption>
+</figure>
+</div>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key takeaway
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><em>Sampling is transport.</em> A random draw from <span class="math inline">\(\mu\)</span> is uniform mass on <span class="math inline">\([0,1]\)</span> pushed through a map. Generative modeling — the subject of this course — is the same sentence in higher dimension with a learned map: push simple noise through <span class="math inline">\(G\)</span> so that <span class="math inline">\(G_\# (\text{noise}) \approx p_{\text{data}}\)</span>. The pushforward is not a technicality; it is the course’s definition of “generate.”</p>
+</div>
+</div>
+</section>
+<section id="expectation-the-lebesgue-integral-four-ways" class="level2">
+<h2 class="anchored" data-anchor-id="expectation-the-lebesgue-integral-four-ways">8. Expectation: the Lebesgue integral, four ways</h2>
+<p>The <strong>expectation</strong> of <span class="math inline">\(X\)</span> is its Lebesgue integral against <span class="math inline">\(P\)</span>:</p>
+<p><span class="math display">\[
+\mathbb{E}[X] \;=\; \int_\Omega X(\omega)\, dP(\omega).
+\]</span></p>
+<p>Built in the standard four stages, each is a picture on the blob:</p>
+<ol type="1">
+<li><strong>Indicators.</strong> <span class="math inline">\(X = \mathbf{1}_A\)</span> (paint <span class="math inline">\(1\)</span> on region <span class="math inline">\(A\)</span>, <span class="math inline">\(0\)</span> elsewhere): <span class="math inline">\(\mathbb{E}[\mathbf{1}_A] = P(A)\)</span>. <em>Expectation of a yes/no question is the probability of yes.</em> This is the hinge between measure and integral.</li>
+<li><strong>Simple functions.</strong> <span class="math inline">\(X = \sum_k c_k \mathbf{1}_{A_k}\)</span> (finitely many values, one region per value): <span class="math inline">\(\mathbb{E}[X] = \sum_k c_k P(A_k)\)</span> — value times mass, summed. This is Lebesgue’s coin-sorting, verbatim.</li>
+<li><strong>Non-negative <span class="math inline">\(X\)</span>.</strong> Approximate from below by simple functions; take the supremum. The layer-cake formula of §2 is this stage, drawn.</li>
+<li><strong>General <span class="math inline">\(X\)</span>.</strong> Split <span class="math inline">\(X = X^+ - X^-\)</span> and subtract, defined whenever <span class="math inline">\(\mathbb{E}|X| &lt; \infty\)</span>.</li>
+</ol>
+<p>And by the pushforward, the abstract integral becomes the familiar ones — this one line is why the blob never appears in computations:</p>
+<p><span class="math display">\[
+\mathbb{E}[X] = \int_\Omega X \, dP
+= \int_{\mathbb{R}} x \, d\mu_X(x)
+= \begin{cases} \sum_x x\, P(X = x) &amp; \text{(discrete)}\\[2pt]
+\int x\, p_X(x)\, dx &amp; \text{(density)} \end{cases}
+\]</span></p>
+<p>There is one more home for the same number, and it is the one this course keeps returning to. Take the canonical blob <span class="math inline">\(\Omega = [0,1]\)</span> with <span class="math inline">\(X = Q\)</span>: then</p>
+<p><span class="math display">\[
+\mathbb{E}[X] \;=\; \int_0^1 Q(u)\, du
+\;=\; \text{signed area under the quantile curve.}
+\]</span></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/quantile-area.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Expectation as area: the integral of the quantile function over [0,1]. Left, a smooth mixture; right, a two-point distribution, where the area is two rectangles.</figcaption>
+</figure>
+</div>
+<p>For a two-point distribution taking values <span class="math inline">\(-1\)</span> and <span class="math inline">\(+1\)</span> with masses <span class="math inline">\(\pi\)</span> and <span class="math inline">\(1-\pi\)</span>, the quantile curve is a staircase with one step, the area is two rectangles, and <span class="math inline">\(\mathbb{E}[X] = (-1)\pi + (+1)(1-\pi) = 1 - 2\pi\)</span> — read directly off the picture. Act II of the demo animates the whole construction: the staircase (a simple function) refines, its sum converges to the exact area, and sliding <span class="math inline">\(\sigma \to 0\)</span> morphs a smooth mixture into this staircase.</p>
+<section id="properties-and-where-each-one-lives" class="level3">
+<h3 class="anchored" data-anchor-id="properties-and-where-each-one-lives">Properties, and where each one lives</h3>
+<p>With the four-stage construction in hand, the standard properties sort into two piles: those <em>visible on the blob</em> and those that are <em>theorems of the limit stage</em>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property</th>
+<th>Statement</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linearity</td>
+<td><span class="math inline">\(\mathbb{E}[aX + bY] = a\mathbb{E}[X] + b\mathbb{E}[Y]\)</span></td>
+<td>Obvious for simple functions (regroup regions); survives the limit. Needs <strong>no independence</strong> — the most-used, least-appreciated fact in probability.</td>
+</tr>
+<tr class="even">
+<td>Monotonicity</td>
+<td><span class="math inline">\(X \le Y \Rightarrow \mathbb{E}[X] \le \mathbb{E}[Y]\)</span></td>
+<td>Lower paint, lower total.</td>
+</tr>
+<tr class="odd">
+<td>Normalization</td>
+<td><span class="math inline">\(\mathbb{E}[c] = c\)</span></td>
+<td>The blob has mass 1.</td>
+</tr>
+<tr class="even">
+<td>Indicator bridge</td>
+<td><span class="math inline">\(\mathbb{E}[\mathbf{1}_A] = P(A)\)</span></td>
+<td>Definition, stage 1.</td>
+</tr>
+<tr class="odd">
+<td>Null sets are invisible</td>
+<td><span class="math inline">\(X = Y\)</span> except on a set of measure <span class="math inline">\(0\)</span> <span class="math inline">\(\Rightarrow \mathbb{E}[X] = \mathbb{E}[Y]\)</span></td>
+<td>Regions of mass 0 contribute value <span class="math inline">\(\times\)</span> 0.</td>
+</tr>
+<tr class="even">
+<td>Limit interchange</td>
+<td><span class="math inline">\(X_n \to X\)</span> <span class="math inline">\(\Rightarrow\)</span> <span class="math inline">\(\mathbb{E}[X_n] \to \mathbb{E}[X]\)</span> <em>under conditions</em> (monotone or dominated convergence)</td>
+<td>The Lebesgue theory’s crown jewels; <strong>not</strong> free, and the reason the theory wins.</td>
+</tr>
+</tbody>
+</table>
+<p>The last row is the one to respect. Every “differentiate under the integral sign” and every “swap the limit and the expectation” in this course is an appeal to <em>some</em> theorem whose hypotheses have to be checked — often dominated convergence, but sometimes a Leibniz rule, domination of difference quotients, Fubini–Tonelli, or uniform convergence. Riemann’s theory is not without interchange theorems either (uniform convergence gives one). What Lebesgue’s theory offers is markedly more flexible hypotheses, which is why it is the one everyone reaches for.</p>
+</section>
+</section>
+<section id="the-dictionary-and-what-comes-next" class="level2">
+<h2 class="anchored" data-anchor-id="the-dictionary-and-what-comes-next">9. The dictionary, and what comes next</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Measure theory</th>
+<th>Probability</th>
+<th>Picture</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Measure space <span class="math inline">\((\Omega, \mathcal{F}, m)\)</span></td>
+<td>Probability space <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span>, <span class="math inline">\(P(\Omega)=1\)</span></td>
+<td>Blob of clay, mass 1</td>
+</tr>
+<tr class="even">
+<td>Measurable set</td>
+<td>Event</td>
+<td>Weighable region</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\sigma\)</span>-algebra</td>
+<td>Family of askable questions</td>
+<td>What a report settles</td>
+</tr>
+<tr class="even">
+<td>Measurable function</td>
+<td>Random variable</td>
+<td>Numbers painted on the blob</td>
+</tr>
+<tr class="odd">
+<td>Pushforward <span class="math inline">\(X_\# P\)</span></td>
+<td>Distribution of <span class="math inline">\(X\)</span></td>
+<td>Mass transported to <span class="math inline">\(\mathbb{R}\)</span></td>
+</tr>
+<tr class="even">
+<td>Lebesgue integral <span class="math inline">\(\int X\, dP\)</span></td>
+<td>Expectation <span class="math inline">\(\mathbb{E}[X]\)</span></td>
+<td>Value <span class="math inline">\(\times\)</span> mass, totaled; area under <span class="math inline">\(Q\)</span></td>
+</tr>
+<tr class="odd">
+<td>Almost everywhere</td>
+<td>Almost surely</td>
+<td>Except on mass-0 dust</td>
+</tr>
+<tr class="even">
+<td>Density (Radon–Nikodym derivative)</td>
+<td>pdf <span class="math inline">\(p_X\)</span></td>
+<td>Mass per unit length</td>
+</tr>
+</tbody>
+</table>
+<p>The sequel, <a href="../tutorials/02-joint-conditional-bayes.html">Joint, Marginal, Conditional — and Bayes</a>, puts <em>two</em> numbers on the blob and develops joints as mountains, marginals as shadows, conditionals as renormalized slices, and Bayes’ rule as the freedom to slice in either direction — the grammar in which every diffusion-model statement (<span class="math inline">\(p(x_t \mid x_0)\)</span>, <span class="math inline">\(\mathbb{E}[x_0 \mid x_t]\)</span>, the posterior over mixture components) is written. A later installment will build likelihood, score, and KL divergence on the same footing.</p>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Show from additivity alone that <span class="math inline">\(P(A \cup B) = P(A) + P(B) - P(A \cap B)\)</span>. (Cut the blob into three disjoint pieces.)</li>
+<li>On <span class="math inline">\(\Omega = [0,1]\)</span> with length, compute <span class="math inline">\(\mathbb{E}[X]\)</span> for <span class="math inline">\(X(\omega) = \mathbf{1}_{[0,1/2]}(\omega) - \mathbf{1}_{(1/2,1]}(\omega)\)</span> twice: by stage 2 of the construction, and as an area under a staircase. Note that <span class="math inline">\(X\)</span> itself steps <span class="math inline">\(+1\)</span> then <span class="math inline">\(-1\)</span> while its quantile function steps <span class="math inline">\(-1\)</span> then <span class="math inline">\(+1\)</span> — the two are different functions with the same integral. Why must that be so?</li>
+<li>The indicator of the rationals: verify that every Riemann sum on <span class="math inline">\([0,1]\)</span> can be made <span class="math inline">\(0\)</span> or <span class="math inline">\(1\)</span> by choice of sample points, while the Lebesgue integral is <span class="math inline">\(0\)</span>. Which axiom of the measure makes the rationals a null set? <em>(Hint: cover the <span class="math inline">\(n\)</span>-th rational by an interval of length <span class="math inline">\(\varepsilon/2^n\)</span>.)</em></li>
+<li>Let <span class="math inline">\(Q\)</span> be the quantile function of the mixture in the demo. Explain, using the pushforward, why <code>Q(rand())</code> is a correct sampler for <em>every</em> one-dimensional law. Then show the sampling map is <strong>not</strong> unique: if <span class="math inline">\(U\)</span> is uniform so is <span class="math inline">\(1 - U\)</span>, so <span class="math inline">\(Q(1 - U)\)</span> is an equally correct and generally different sampler. What extra condition singles <span class="math inline">\(Q\)</span> out?</li>
+<li>For the two-point distribution with masses <span class="math inline">\(\pi\)</span> (at <span class="math inline">\(-1\)</span>) and <span class="math inline">\(1-\pi\)</span> (at <span class="math inline">\(+1\)</span>), draw the quantile staircase, shade the signed area, and confirm <span class="math inline">\(\mathbb{E}[X] = 1-2\pi\)</span>. Then check it against the demo’s readout.</li>
+<li>Take <span class="math inline">\(\Omega = [0,1]^2\)</span> with uniform area as the measure, the <span class="math inline">\(2 \times 2\)</span> quadrant partition as the resolution, and <span class="math inline">\(X(\omega_1,\omega_2) = \omega_1\)</span>. Is <span class="math inline">\(X\)</span> measurable with respect to this resolution? Compute its average on each cell. Then show that <em>no</em> finite grid makes <span class="math inline">\(X\)</span> measurable, and say precisely what does happen to the cell averages as the dyadic grids refine.</li>
+<li><em>(The report picture.)</em> Roll two distinguishable dice, so <span class="math inline">\(\Omega = \{1,\dots,6\}^2\)</span> with all <span class="math inline">\(36\)</span> outcomes equally likely, and let the report be the <strong>sum</strong>. How many values can the report take, and hence how many events does <span class="math inline">\(\sigma(R)\)</span> contain, out of the <span class="math inline">\(2^{36}\)</span> subsets of <span class="math inline">\(\Omega\)</span>? Is the first die’s value a function of the report? Compute <span class="math inline">\(\mathbb{E}[\,\omega_1 \mid R = 5\,]\)</span>, and then explain — without computing anything — why <span class="math inline">\(\mathbb{E}[\,\omega_1 \mid R\,]\)</span> must equal <span class="math inline">\(R/2\)</span>.</li>
+<li><em>(Specify a space.)</em> Write out <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> and one random variable, in the four-line format of §6, for each of: (a) drawing a card from a standard deck; (b) the arrival time of the next bus, modelled as Exponential<span class="math inline">\((\lambda)\)</span>; (c) an uncompressed <span class="math inline">\(256 \times 256\)</span> RGB image at 8 bits per channel. For (c), is <span class="math inline">\(\Omega\)</span> finite? Is <span class="math inline">\(2^\Omega\)</span> an acceptable <span class="math inline">\(\sigma\)</span>-algebra? Is it a <em>useful</em> one? Note that fixing the file format pins down <span class="math inline">\(\Omega\)</span> but not <span class="math inline">\(P\)</span> — choose a <span class="math inline">\(P\)</span> and say what it models.</li>
+<li><em>(Failures.)</em> For each family, say which axiom fails and give the witness:
+<ol type="a">
+<li><span class="math inline">\(\{\varnothing, \{1,2\}, \{2,3\}, \Omega\}\)</span> on <span class="math inline">\(\Omega = \{1,2,3\}\)</span>;</li>
+<li>the open subsets of <span class="math inline">\(\mathbb{R}\)</span>; (c) the countable subsets of <span class="math inline">\(\mathbb{R}\)</span>; (d) the sets that are countable <strong>or</strong> co-countable in <span class="math inline">\(\mathbb{R}\)</span>. One of these four <em>is</em> a <span class="math inline">\(\sigma\)</span>-algebra — which, and why does it not help us measure length?</li>
+</ol></li>
+<li><em>(Why noise creates the score.)</em> Let <span class="math inline">\(\mu\)</span> be the uniform distribution on the unit circle in <span class="math inline">\(\mathbb{R}^2\)</span>. Show <span class="math inline">\(\mu\)</span> has no density with respect to Lebesgue measure on <span class="math inline">\(\mathbb{R}^2\)</span>, so <span class="math inline">\(\nabla \log p\)</span> is undefined. Then write down <span class="math inline">\(p_\sigma\)</span> for <span class="math inline">\(\mu * \mathcal{N}(0, \sigma^2 I)\)</span> as an integral, argue it is strictly positive and smooth everywhere, and describe what happens to <span class="math inline">\(\nabla \log p_\sigma\)</span> near the circle as <span class="math inline">\(\sigma \to 0\)</span>.</li>
+<li><em>(Refinement.)</em> Let <span class="math inline">\(R\)</span> be a report and <span class="math inline">\(R'\)</span> a <em>finer</em> one, meaning every event <span class="math inline">\(\sigma(R)\)</span> settles is also settled by <span class="math inline">\(\sigma(R')\)</span>. Show <span class="math inline">\(\sigma(R) \subseteq \sigma(R')\)</span>, and explain in the roster demo’s terms why <span class="math inline">\(\mathbb{E}\big[\,\mathbb{E}[X \mid R'] \;\big|\; R\,\big] = \mathbb{E}[X \mid R]\)</span> — averaging a fine answer down to a coarse report gives the coarse answer. (This is the tower property in the form the course actually uses.)</li>
+</ol>
+
+
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>The Vitali construction shows exactly this: there is no countably additive, translation-invariant extension of ordinary length defined on every subset of <span class="math inline">\(\mathbb{R}\)</span>. Banach–Tarski is a related but distinct three-dimensional result about finite equidecomposition under rigid motions, not “the 3-D version” of Vitali. Both use some form of the axiom of choice, and the sets they produce are non-measurable.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/acads-iit-jammu\.github\.io\/diffusion-models-f26");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../weeks/w17.html" class="pagination-link" aria-label="W17: Flows, Applications &amp; Wrap-up">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">W17: Flows, Applications &amp; Wrap-up</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../tutorials/02-joint-conditional-bayes.html" class="pagination-link" aria-label="Joint, Marginal, Conditional — and Bayes">
+        <span class="nav-page-text">Joint, Marginal, Conditional — and Bayes</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
