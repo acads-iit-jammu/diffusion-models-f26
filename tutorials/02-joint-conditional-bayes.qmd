@@ -60,11 +60,15 @@ This forgetting is a one-way street with a name you will meet again:
 The map from joints to marginal pairs is **many-to-one**. Fix both shadows to be
 standard normal; then *every* correlation $\rho \in (-1, 1)$ gives a different
 mountain casting those same two shadows (Act I of the demo below — drag $\rho$
-and watch the mountain twist while the shadows stand still).
+and watch the mountain twist while the shadows stand still). Those are only the
+*jointly Gaussian* couplings of two standard normals; that pair admits many
+non-Gaussian couplings too.
 
 Twisting one ellipse is the mild version of the point. Here is the version you
-cannot argue with. Put four round Gaussian lumps of width $s$ at the corners
-$(\pm a, \pm a)$, and build three joints by placing mass on them differently:
+cannot argue with. Write $N_{(u,v)}(x,y) = \mathcal{N}(x; u, s^2)\,
+\mathcal{N}(y; v, s^2)$ for a round Gaussian lump of width $s$ centred at
+$(u,v)$, fix $a > s > 0$, and put lumps at the four corners $(\pm a, \pm a)$.
+Build three joints by placing mass on them differently:
 
 $$
 \begin{aligned}
@@ -74,9 +78,11 @@ p_{\boxplus}(x,y) &= \tfrac14 \big( N_{(-a,-a)} + N_{(+a,+a)} + N_{(-a,+a)} + N_
 \end{aligned}
 $$
 
-Every one of them puts mass $\tfrac12$ near $x = -a$ and mass $\tfrac12$ near
-$x = +a$, and likewise in $y$. So all three have the **identical** pair of
-shadows — the same two-bump curve
+Integrating $N_{(u,v)}$ over $y$ leaves exactly $\mathcal{N}(x; u, s^2)$, so each
+joint's $x$-marginal is the weighted sum of its lumps' $x$-factors. In every one
+of the three, the total weight sitting at $u = -a$ is $\tfrac12$ and at $u = +a$
+is $\tfrac12$ — and likewise in $y$. So all three have the **identical** pair of
+shadows, exactly and not approximately: the same two-bump curve
 
 $$
 p(x) \;=\; \tfrac12\, \mathcal{N}(x; -a, s^2) + \tfrac12\, \mathcal{N}(x; +a, s^2)
@@ -85,14 +91,18 @@ $$
 on each axis. Yet one is two lumps on the rising diagonal, one is two lumps on
 the falling diagonal, and one is four lumps in a square. Their correlations are
 $+\tfrac{a^2}{a^2 + s^2}$, $-\tfrac{a^2}{a^2 + s^2}$ and $0$ — strongly positive,
-strongly negative, and exactly zero. The third is independent; the first two are
-about as dependent as a pair can be.
+strongly negative, and exactly zero (using $\operatorname{Var}(X) = a^2 + s^2$).
+The third is genuinely independent — it is the product of its marginals. The
+first two are dependent, with correlation magnitude approaching $1$ as $a/s$
+grows.
 
 Click through the three in Act I of the demo and watch the shadow curves on the
-edges: they do not so much as flicker. Nothing you can compute from the marginals
-alone — not the means, not the variances, not the shapes, and as the four-lump
-case shows, not the correlation either — distinguishes joints this different. A
-joint with
+edges: they do not so much as flicker. Nothing computed from the marginals alone
+— not their means, not their variances, not their complete one-dimensional shapes
+— distinguishes joints this different. And note where the correlation sits in
+this: it is *not* computable from the marginals either. It is joint information,
+one number's worth, which the shadows have thrown away along with everything
+else. A joint with
 prescribed marginals is called a **coupling** of them, and the set of couplings
 is enormous. Choosing a *particular* coupling of noise and data — a particular
 mountain over the (noise, data) plane — is precisely what a generative model

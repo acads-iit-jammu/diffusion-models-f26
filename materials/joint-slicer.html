@@ -119,12 +119,14 @@
     <p>Twisting one ellipse is the mild version of the point. <strong>Click through
     &#8220;two blobs &#8599;&#8221;, &#8220;two blobs &#8600;&#8221; and &#8220;four
     blobs&#8221;</strong> for the strong one. Each puts round lumps at the corners
-    (&#177;1.25,&#8202;&#177;1.25); each therefore puts half its mass near x = &#8722;1.25 and half
-    near x = +1.25, and the same in y &#8212; so all three have <em>exactly</em> the same pair
+    (&#177;1.25,&#8202;&#177;1.25); each therefore puts mass &#189; at x = &#8722;1.25 and &#189;
+    at x = +1.25, and the same in y &#8212; so all three have <em>exactly</em> the same pair
     of shadows. Watch the edge curves as you switch: they do not move at all. But the
     mountains could hardly differ more, and their correlations are +0.86, &#8722;0.86 and
-    <em>zero</em>. The four-blob one is genuinely independent; the other two are strongly
-    dependent. Not the marginals, and not even the correlation, can tell them apart.</p>
+    <em>zero</em>: the four-blob one is genuinely independent, the other two strongly
+    dependent. Nothing computable from the marginals tells them apart &#8212; and note that
+    the correlation is not computable from the marginals either. It is joint information the
+    shadows discarded.</p>
 
     <figure>
       <div class="figlabel">
@@ -134,7 +136,7 @@
           <span class="key"><span class="swatch lik"></span> p(x | y)</span>
         </span>
       </div>
-      <canvas id="c-joint" aria-label="Heatmap of a correlated bivariate Gaussian with marginal curves along the edges and two draggable slice lines."></canvas>
+      <canvas id="c-joint" aria-label="Heatmap of a joint density - either a correlated bivariate Gaussian or one of three arrangements of Gaussian lumps - with marginal curves along the edges and two draggable slice lines."></canvas>
       <div class="panes">
         <div>
           <p class="panelabel" id="lbl-v">slice at x = 0.5 &#8212; raw sliver vs conditional p(y | x)</p>
@@ -154,8 +156,11 @@
       <figcaption>Bayes&#8217; rule is visible here as bookkeeping: vertical ribbons weighted by the
       x-shadow rebuild the same mountain as horizontal ribbons weighted by the y-shadow &#8212;
       p(y|x)&#8201;p(x) = p(x,y) = p(x|y)&#8201;p(y). Slicing is swappable; that is the whole rule.
-      Both shapes have identical N(0,&#8201;1) shadows, so no amount of staring at the marginals
-      can tell them apart: the shadows genuinely do not determine the mountain.</figcaption>
+      The shadows are fixed <em>within</em> each family: dragging &#961; leaves the single
+      Gaussian's N(0,&#8201;1) shadows alone, and switching among the three blob shapes leaves
+      their common two-bump shadows alone. (Moving between the two families does change the
+      shadows &#8212; one central bump versus two side bumps.) Within a family, no amount of
+      staring at the marginals can tell the mountains apart.</figcaption>
     </figure>
   </section>
 
@@ -235,7 +240,7 @@
 
   // ---------------- Act I: joints that share their shadows ----------------
   const L = 3.2;
-  let RHO = 0.6, x0 = 0.5, y0 = 0.5, SHAPE = "diag";
+  let RHO = 0.6, x0 = 0.5, y0 = 0.5, SHAPE = "one";
 
   // A single zero-mean bivariate normal with unit variances and correlation r.
   const biv = (x, y, r) => {
@@ -288,15 +293,27 @@
     const octx = off.getContext("2d");
     const img = octx.createImageData(n, n);
     const [hr, hg, hb] = css("--heat").split(",").map((v) => +v.trim());
-    const peak = joint(0, 0);
+    // Normalise by the grid maximum, found by a first pass. Using joint(0,0)
+    // would be wrong for every blob shape: the origin sits in the valley
+    // between the lumps, so the true peaks would clamp opaque and the gaps
+    // that make the shapes distinguishable would fill in.
+    const vals = new Float64Array(n * n);
+    let peak = 0;
     for (let r = 0; r < n; r++) {
       const y = L - 2 * L * r / (n - 1);
       for (let c = 0; c < n; c++) {
-        const x = -L + 2 * L * c / (n - 1);
-        const a = Math.pow(joint(x, y) / peak, 0.7) * 0.8;
+        const v = joint(-L + 2 * L * c / (n - 1), y);
+        vals[r * n + c] = v;
+        if (v > peak) peak = v;
+      }
+    }
+    if (peak <= 0) peak = 1;
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        const a = Math.pow(vals[r * n + c] / peak, 0.7) * 0.85;
         const i = (r * n + c) * 4;
         img.data[i] = hr; img.data[i + 1] = hg; img.data[i + 2] = hb;
-        img.data[i + 3] = Math.round(a * 255);
+        img.data[i + 3] = Math.round(Math.min(a, 1) * 255);
       }
     }
     octx.putImageData(img, 0, 0);
@@ -400,10 +417,10 @@
   const rJoint = document.getElementById("r-joint");
 
   const SHAPES = [
+    { key: "one",  label: "one Gaussian" },
     { key: "diag", label: "two blobs ↗" },
     { key: "anti", label: "two blobs ↘" },
     { key: "four", label: "four blobs" },
-    { key: "one",  label: "one Gaussian" },
   ];
   const segShape = document.getElementById("seg-shape");
   for (const s of SHAPES) {
@@ -421,6 +438,10 @@
   }
 
   function redrawAct1() {
+    // rho only parameterises the single Gaussian; disable it for the blob family
+    // rather than let it move a number that changes nothing on screen.
+    sRho.disabled = SHAPE !== "one";
+    sRho.title = SHAPE === "one" ? "" : "applies to the single Gaussian only";
     lblV.textContent = "slice at x = " + x0.toFixed(1) + " \u2014 raw sliver vs conditional p(y | x)";
     lblH.textContent = "slice at y = " + y0.toFixed(1) + " \u2014 raw sliver vs conditional p(x | y)";
     const corr = corrOf();

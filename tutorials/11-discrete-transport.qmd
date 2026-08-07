@@ -78,11 +78,17 @@ rather than by a general-purpose LP solver.
 
 Two structural facts are worth carrying around.
 
-**Sparsity.** The constraint matrix here is totally unimodular, and a vertex
-(basic feasible solution) of an $m \times n$ transportation polytope has at most
-$m + n - 1$ non-zero entries. For our $4 \times 4$ problem that is **7 of the 16
-routes**. An optimal plan is always sparse: most pairs of bins never trade. The
-demo below shows the count live.
+**Sparsity.** Two separate facts, often run together. The constraint matrix is
+totally unimodular, which gives *integral* vertices when the marginals are
+integral. Separately, the constraint matrix has rank $m + n - 1$, so a vertex
+(basic feasible solution) has at most $m + n - 1$ non-zero entries — its support
+is a forest. For our $4 \times 4$ problem that is **7 of the 16 routes**.
+
+Note what this does and does not say. There always *exists* an optimal plan that
+is this sparse, and that is what a simplex-type method returns. It is not true
+that every optimal plan is sparse: if $C \equiv 0$ then every coupling is
+optimal, including the dense independent one. The demo shows the count live for
+the plan it displays.
 
 **Duality, as prices.** The dual of the program above is
 
@@ -111,10 +117,10 @@ Four price lists, all built from the bin index distance $d = |i-j|$:
 
 | $C_{ij}$ | Name | Optimal total is | Plan |
 |---|---|---|---|
-| $\lvert i - j\rvert$ | distance on a line | $W_1$, the **Earth Mover's Distance** | monotone |
-| $(i-j)^2$ | squared distance | $W_2^2$ (its square root is $W_2$) | monotone |
-| $\mathbf{1}[i \ne j]$ | all-or-nothing | the **total variation distance** | typically not monotone |
-| $\sqrt{\lvert i-j \rvert}$ | concave in distance | no standard name | mass prefers to stay put |
+| $\lvert i - j\rvert$ | distance on a line | $W_1$, the **Earth Mover's Distance** | monotone (ties possible) |
+| $(i-j)^2$ | squared distance | $W_2^2$ (its square root is $W_2$) | monotone, uniquely |
+| $\mathbf{1}[i \ne j]$ | all-or-nothing | the **total variation distance** | order need not be kept |
+| $\sqrt{\lvert i-j \rvert}$ | concave in distance | no standard name | common mass stays; residue may cross |
 
 Three of these deserve a proof sketch, because each is a small surprise.
 
@@ -143,23 +149,39 @@ $$
 
 the total gap between the two cumulative distributions. This is the discrete
 image of the inverse-CDF transport that
-[The Map, Proved](./08-map-proved.qmd) builds in the continuum: the same map, on
-a finite ground set.
+[The Map, Proved](./08-map-proved.qmd) builds in the continuum — the finite
+analogue of the same quantile *coupling*. Not of the same map: the discrete
+monotone coupling generally has to split a source bin across two targets, which
+§4 turns into a theorem.
 
-**Convex costs never cross; concave costs do.** For any cost $c(|i-j|)$ with $c$
-*convex*, the monotone coupling is optimal — mass keeps its order, and in the
-ribbon picture no ribbon crosses another. For $c$ *concave*, the structure flips:
-moving one unit a long way is cheaper than moving two units half as far, so the
-optimal plan leaves common mass untouched and ships the residue in long jumps.
-The plans genuinely differ; the demo flags which case you are in.
+**Convex costs need not cross; concave costs may have to.** State this carefully,
+because the folklore version is false. Convexity of $c$ *alone* is not enough:
+$c(r) = (r-1)^2$ is convex, and with $p = q = (\tfrac12,\tfrac12)$ on two
+adjacent bins the order-preserving plan costs $1$ while swapping costs $0$. The
+condition that works is convexity of the **displacement** cost $z \mapsto c(|z|)$
+— for which it suffices that $c$ be nondecreasing and convex with $c(0) = 0$, as
+all four price lists above are. Then an order-preserving optimum always exists;
+if $c$ is *strictly* convex, crossings are strictly suboptimal and the monotone
+coupling is the unique optimum on distinct ordered locations. For $c(r) = r$,
+crossing plans can tie.
+
+For concave $c$ the picture changes: an increasing concave $c$ with $c(0)=0$
+makes $c(|i-j|)$ itself a metric, so some optimum leaves all common mass on the
+diagonal — but *that* much follows from the triangle inequality, not from
+concavity. What concavity adds is that after the common mass is cancelled, one
+long jump can beat two short ones, so a crossing plan can be strictly cheaper.
+There is no universal rule for where the residue goes; it depends on $p$ and $q$.
+The demo reports which case you are in, by cost rather than by inspection.
 
 ::: {.callout-warning}
 
 ## When is the answer a distance?
 
-Not always. If $C$ is itself a metric on the ground set ($C_{ii}=0$, symmetric,
-triangle inequality), then $\operatorname{OT}_C$ is a metric on the simplex of
-histograms — this is the $W_1$/EMD case, and it is what earns EMD the word
+Not always. If $C$ is itself a metric on the ground set ($C_{ij}=0$ **exactly when**
+$i=j$, symmetric, triangle inequality), then $\operatorname{OT}_C$ is a metric on
+the simplex of histograms. Definiteness matters: drop it and $C \equiv 0$ passes
+the other two conditions while making $\operatorname{OT}_C$ identically zero — a
+pseudometric, not a metric — this is the $W_1$/EMD case, and it is what earns EMD the word
 "distance." Drop any of those conditions and you may keep a useful number while
 losing the guarantees: $(i-j)^2$ is *not* a metric on bins, and correspondingly
 $W_2^2$ does not satisfy the triangle inequality — only its square root $W_2$
@@ -192,8 +214,9 @@ comment; a map cannot exist.
 
 This is the discrete shadow of the atomic obstruction in
 [Generative Models as Transport](./10-transport-rigorous.qmd): a deterministic
-map cannot split an atom. Generation *into* an atomic target is always fine;
-deterministic encoding *out of* an atomic source is what fails. Kantorovich's
+map cannot split an atom. Generation from an atomless prior into an atomic target is fine; the obstruction
+is having to split an indivisible source atom, which is what the example above
+does. Kantorovich's
 plans are the repair, and they are why the modern theory is stated in terms of
 couplings rather than maps.
 
@@ -225,11 +248,24 @@ else. It is precisely the statement $T_\# p = q$ — *this map is a valid
 transport* — written in densities. It is the continuous form of "the row sums and
 column sums come out right."
 
-It says nothing whatever about cost. Just as infinitely many couplings satisfy
-the marginal constraints, infinitely many maps satisfy the Jacobian equation, and
-the Jacobian cannot prefer one to another. You still need to name a price.
+It says nothing whatever about cost. Just as many couplings satisfy the marginal
+constraints, the Jacobian equation is typically satisfied by many maps — always
+by many *measurable* transports, and in $d \ge 2$ usually by many smooth ones,
+since composing with any $p$-preserving diffeomorphism gives another. (In $d=1$
+it is more rigid: a diffeomorphism must be monotone, so for positive continuous
+densities there is one increasing solution and one decreasing one.) Wherever
+several exist, the Jacobian equation expresses no preference among them. You
+still need to name a price.
 
 :::
+
+One caution before the table. The general continuous object is a **coupling**
+$\gamma$, exactly as in the discrete case, and its constraints are that its two
+marginals are $p$ and $q$. The Jacobian equation is the constraint only for the
+**Monge special case**, where $\gamma = (\mathrm{id}, T)_\#\,p\,dx$ is
+concentrated on the graph of a map — and even then the pointwise density form
+requires $T$ to be a smooth enough diffeomorphism. Read the middle column below
+as "the Kantorovich constraint, with the Monge form in parentheses."
 
 So the dictionary is:
 
@@ -237,8 +273,8 @@ So the dictionary is:
 |---|---|---|
 | bins $i, j$ | points $x, y \in \mathbb{R}^d$ | a path of densities $p_t$ |
 | $p_i$, $q_j$ | densities $p$, $q$ | endpoints $p_0 = p$, $p_1 = q$ |
-| plan $\gamma_{ij} \ge 0$ | coupling measure $\gamma(dx,dy)$ | velocity field $v_t(x)$ |
-| row/column sums | $T_\# p = q$, i.e. the **Jacobian equation** | **continuity equation** $\partial_t p_t + \nabla\!\cdot(p_t v_t) = 0$ |
+| plan $\gamma_{ij} \ge 0$ | coupling measure $\gamma(dx,dy)$ | density path $p_t$ with velocity $v_t$ |
+| row/column sums | $(\pi_1)_\#\gamma = p\,dx$, $(\pi_2)_\#\gamma = q\,dy$ | **continuity equation** $\partial_t p_t + \nabla\!\cdot(p_t v_t) = 0$, with $p_0 = p$, $p_1 = q$ |
 | cost matrix $C_{ij}$ | cost function $c(x,y)$ | kinetic energy density $\lVert v_t(x)\rVert^2$ |
 | $\sum_{ij}\gamma_{ij}C_{ij}$ | $\iint c(x,y)\, d\gamma$ | $\int_0^1\!\!\int \lVert v_t\rVert^2 p_t \,dx\,dt$ |
 | min-cost flow | Monge–Kantorovich problem | Benamou–Brenier problem |
@@ -251,22 +287,44 @@ $$
 W_2^2(p,q) \;=\; \min_{(p_t, v_t)} \int_0^1\!\!\int_{\mathbb{R}^d}
 \lVert v_t(x)\rVert^2 \, p_t(x)\,dx\,dt
 \quad\text{subject to}\quad
-\partial_t p_t + \nabla\!\cdot(p_t v_t) = 0,
+\begin{cases}
+\partial_t p_t + \nabla\!\cdot(p_t v_t) = 0,\\[2pt]
+p_0 = p, \quad p_1 = q,
+\end{cases}
 $$
 
-the unknown is not a matrix and not a map but a **time-dependent vector field**;
-the map is recovered as the flow of that field. The continuity equation is the
-*infinitesimal* Jacobian equation — along a trajectory $\dot\Phi_t = v_t(\Phi_t)$,
-the Jacobian obeys $\frac{d}{dt}\log\det\nabla\Phi_t = (\nabla\!\cdot v_t)\circ
-\Phi_t$, which is the same bookkeeping in derivative form. This is exactly the
-object that flow matching regresses onto and that the
-[probability-flow ODE](./09-probability-flow-ode.qmd) integrates. *Learning a
-velocity field is learning a transporter*, and the kinetic energy is its cost.
+for $p, q \in \mathcal{P}_2(\mathbb{R}^d)$, with the continuity equation read
+distributionally. The endpoint conditions are not decoration: without them the
+minimum is $0$, achieved by standing still. The unknown is a **density path
+together with its velocity field** — not a matrix, not a map — and the map is
+recovered as the flow of that field when the field is regular enough to have one.
+
+The continuity equation is the *infinitesimal* Jacobian equation. For a
+spatially Lipschitz $v_t$ with a well-defined flow $\dot\Phi_t = v_t(\Phi_t)$,
+
+$$
+\frac{d}{dt}\log\det\nabla\Phi_t = (\nabla\!\cdot v_t)\circ\Phi_t,
+\qquad\text{equivalently}\qquad
+p_t\big(\Phi_t(x)\big)\,\det\nabla\Phi_t(x) = p_0(x),
+$$
+
+the second form being the Jacobian equation of §5 with a clock attached. This is
+the kind of object that flow matching regresses onto and that the
+[probability-flow ODE](./09-probability-flow-ode.qmd) integrates — though note
+that neither *solves* this minimum-action problem: they produce a velocity field
+consistent with a prescribed density path, which as
+[tutorial 10](./10-transport-rigorous.qmd) insists is a weaker thing than
+selecting the Benamou–Brenier geodesic. *Learning a velocity field is learning a
+transporter*; making it the **cheapest** transporter is a further demand.
 
 **Quadratic cost has a canonical answer.** For $c(x,y) = \tfrac12\lVert
-x-y\rVert^2$, Brenier's theorem (1991) says the optimal map is the gradient of a
-convex function, $T = \nabla\varphi$. Substituting into the Jacobian equation
-gives the **Monge–Ampère equation**
+x-y\rVert^2$ with $p\,dx, q\,dy \in \mathcal{P}_2(\mathbb{R}^d)$ and the
+*source* absolutely continuous, Brenier's theorem (1991) says the optimal map is
+the gradient of a convex function, $T = \nabla\varphi$, uniquely $p$-almost
+everywhere. Under further regularity making $\varphi$ twice differentiable and
+$\nabla\varphi$ suitably invertible — Brenier alone does not supply this, and in
+general the equation is read in a weak (Aleksandrov) sense — substituting into
+the Jacobian equation gives the **Monge–Ampère equation**
 
 $$
 p(x) \;=\; q\big(\nabla\varphi(x)\big)\, \det\big(\nabla^2\varphi(x)\big),
@@ -285,10 +343,11 @@ $$
 
 and the Jacobian term sits squarely in the *objective* — which invites the
 reading that flows are doing optimal transport. They are not. That term is
-enforcing normalization, i.e. the constraint; it does not price displacement. Two
-maps $T$ and $T \circ S$, where $S$ is any map preserving $p$, push $p$ to the
-same $q$ and are worth exactly the same likelihood, while having wildly different
-transport costs. Maximum likelihood identifies the *density*; it does not select
+change-of-variables volume bookkeeping, the price of keeping the model density
+normalized; it does not price displacement. Two encoders $T$ and $T \circ S$,
+where $S$ is a $p$-preserving diffeomorphism, induce the same model density and
+so are worth exactly the same likelihood, while having wildly different transport
+costs. Maximum likelihood identifies the *density*; it does not select
 a map. To get the optimal map you have to add a transport cost on purpose — which
 is what OT-regularised flows and minibatch-OT couplings in flow matching do, and
 why they straighten trajectories that likelihood training leaves tangled.
@@ -301,7 +360,7 @@ and three routes matter.
 - **Network simplex / Hungarian.** Exact, and the right answer for moderate $n$.
   Roughly $O(n^3 \log n)$ for the transportation problem; the Hungarian algorithm
   is the $O(n^3)$ special case when both histograms are uniform with equal atoms,
-  so the plan is a permutation.
+  where an optimum *can be chosen* to be a permutation (ties admit mixtures too).
 - **Entropic regularisation (Sinkhorn).** Add $\varepsilon \sum_{ij}\gamma_{ij}
   (\log \gamma_{ij} - 1)$ to the objective. The problem becomes strictly convex,
   and its solution has the form $\gamma = \operatorname{diag}(u)\, K
@@ -312,10 +371,14 @@ and three routes matter.
   already met: as $\varepsilon \to 0$ it recovers the sharp optimal plan, and as
   $\varepsilon \to \infty$ it relaxes to the independent coupling $p q^{\top}$ —
   the "shipping blind" baseline reported in the demo.
-- **Sliced and low-rank approximations.** Project to one dimension, where the
-  answer is the sorted-order formula of §3, and average over projections. Cheap,
-  and exact in the only dimension where transport is exactly solvable — which is
-  the same reason this course starts in 1-D.
+- **Sliced approximations.** Project to one dimension, where §3's sorted-order
+  formula applies, and average the resulting 1-D costs over many projections.
+  Cheap and differentiable — but note that sliced Wasserstein is a *different*
+  metric, not full Wasserstein recovered in the limit of enough projections.
+  (Low-rank OT is a separate family of methods, factorising the plan rather than
+  the space.) One dimension is special here not because it is the only solvable
+  case — finite OT is exactly solvable in any dimension by LP — but because it is
+  the one with a closed-form order-statistic answer.
 
 ## 7. Where this shows up
 
@@ -330,13 +393,24 @@ and three routes matter.
   cheapest way to transport one bag of words onto another. This is the
   "fixed vocabulary on both sides" setting exactly — and it shows what the cost
   matrix buys you: semantics enters *only* through $C$.
-- **Generative modelling.** Wasserstein GANs optimise the dual form of $W_1$ with
-  a Lipschitz-constrained critic. FID scores samples with a closed-form $W_2$
-  between Gaussians fitted to Inception features. Minibatch-OT couplings in flow
-  matching pick which noise sample is paired with which data sample, straightening
-  the paths a model has to learn. And the course's central claim — generative
-  modelling *is* transport — is the statement that all of these are choosing a
-  coupling between a simple distribution and a complicated one.
+- **Generative modelling** — but at three genuinely different levels, and it is
+  worth not blurring them.
+  - *Comparing endpoint laws.* Wasserstein GANs approximate a
+    Kantorovich–Rubinstein dual objective with a Lipschitz-constrained neural
+    critic (Arjovsky, Chintala and Bottou, 2017). FID scores samples with the
+    closed-form **$W_2^2$** — the squared Fréchet distance — between Gaussians
+    fitted to Inception features (Heusel et al., 2017). Neither of these chooses
+    the generator's noise-to-data coupling; they measure how far apart two
+    endpoint distributions are.
+  - *Choosing a coupling.* Minibatch-OT flow matching genuinely does select which
+    noise sample is paired with which data sample, and reports simpler, straighter
+    learned flows as a result (Pooladian et al., 2023; Tong et al., 2024). It does
+    not thereby certify the population OT map.
+  - *The course's thesis.* "Generative modelling is transport" is a statement
+    about the third level, and [tutorial 10](./10-transport-rigorous.qmd) is
+    careful about how much it buys: a transport representation is available for
+    almost anything, so exhibiting one explains less than it appears to. Using OT
+    to *score* a model and using OT to *build* one are different activities.
 
 ::: {.callout-tip}
 
@@ -369,10 +443,11 @@ spends the rest of its time learning.
 4. Prove that a vertex of the $m \times n$ transportation polytope has at most
    $m + n - 1$ non-zero entries. *(Hint: a cycle among the used routes lets you
    push mass around it in either direction at no change to the marginals.)*
-5. Exhibit two histograms and a cost $C$ with $C_{ii} = 0$ and symmetry but
-   *violating* the triangle inequality, such that $\operatorname{OT}_C$ violates
-   the triangle inequality on histograms. Then explain why $W_2^2$ is not a
-   metric but $W_2$ is.
+5. A triangle-inequality violation needs *three* histograms. On three bins with
+   $C_{ij} = (i-j)^2$, take $\mu = \delta_A$, $\nu = \delta_B$, $\rho = \delta_C$
+   and show $\operatorname{OT}_C(\mu,\rho) = 4 > 1 + 1 =
+   \operatorname{OT}_C(\mu,\nu) + \operatorname{OT}_C(\nu,\rho)$. Then explain
+   why $W_2 = \sqrt{\operatorname{OT}_C}$ *is* a metric.
 6. *(Concave costs.)* With $C_{ij} = \sqrt{|i-j|}$, find $p, q$ for which the
    optimal plan is **not** monotone, and describe in words what the optimal plan
    prefers to do instead. Why does convexity of $c$ rule this out?

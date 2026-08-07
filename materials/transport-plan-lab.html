@@ -247,7 +247,24 @@
       plan.push([]);
       for (let j = 0; j < n; j++) plan[i].push(cap[eid[i][j] ^ 1]);
     }
-    return { cost: total, plan };
+    // Never hand back a partial flow that a caller would label "optimal".
+    // Certify the result: all mass routed, both marginals met, and the
+    // accumulated cost equal to the plan's own cost.
+    const tol = 1e-7;
+    let ok = Math.abs(flow - target) <= tol;
+    let check = 0;
+    for (let i = 0; i < n && ok; i++) {
+      let r = 0;
+      for (let j = 0; j < n; j++) { r += plan[i][j]; check += plan[i][j] * C[i][j]; }
+      if (Math.abs(r - p[i]) > tol) ok = false;
+    }
+    for (let j = 0; j < n && ok; j++) {
+      let c = 0;
+      for (let i = 0; i < n; i++) c += plan[i][j];
+      if (Math.abs(c - q[j]) > tol) ok = false;
+    }
+    if (ok && Math.abs(check - total) > tol * Math.max(1, Math.abs(total))) ok = false;
+    return { cost: total, plan, ok };
   }
 
   const planCost = (g, C) => {
@@ -448,7 +465,14 @@
       b.setAttribute("aria-pressed", String(COSTS[i].key === costKey)));
 
     const C = costMatrix(cur);
-    const { cost } = solveOT(p, q, C);
+    const solved = solveOT(p, q, C);
+    if (!solved.ok) {
+      document.getElementById("r-plan").innerHTML =
+        "<b>Solver error:</b> the min-cost flow did not certify " +
+        "(mass routed, both marginals met, cost consistent). Nothing below is trustworthy.";
+      return;
+    }
+    const { cost } = solved;
     // The optimum can be non-unique (|i-j| ties routinely), and the solver may
     // return a crossing plan when an equally cheap non-crossing one exists.
     // Prefer the monotone optimum for display, so the picture never contradicts
