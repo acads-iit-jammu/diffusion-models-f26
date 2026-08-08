@@ -292,7 +292,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Probability 101 — A Refresher</span></a>
+ <span class="menu-text">Probability &amp; Random Variables</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -453,7 +453,7 @@ Optional, and where it sits
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Nothing in the lectures or the other tutorials depends on this pair. The working versions of everything here are in <a href="../tutorials/01-probability-101.html">Probability 101</a> and <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>, and you can follow the whole course from those. Read this track when you want to know <em>why</em> the working versions are allowed — or when a formula has surprised you and you want the footing that explains it.</p>
+<p>Nothing in the lectures or the other tutorials depends on this pair. The working versions of everything here are in <a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a> and <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>, and you can follow the whole course from those. Read this track when you want to know <em>why</em> the working versions are allowed — or when a formula has surprised you and you want the footing that explains it.</p>
 </div>
 </div>
 <div class="callout callout-style-simple callout-note callout-titled">
@@ -882,7 +882,7 @@ p_X(x)\,dx\)</span>, when such a function exists.</p>
 <p>Two consequences, both load-bearing later:</p>
 <ul>
 <li><p><strong>The blob is forgettable.</strong> Any two random variables with the same pushforward are indistinguishable by probability statements about their values. This is why probability courses can work with distributions and never mention <span class="math inline">\(\Omega\)</span> — and why <em>we</em> may choose <span class="math inline">\(\Omega\)</span> freely, to be whatever is convenient.</p>
-<p>This is the theorem behind a move <a href="../tutorials/01-probability-101.html">Probability 101</a> makes informally. There, the sample space for tomorrow’s temperature is described as the set of possible states of the world, and <span class="math inline">\(T \sim \mathcal{N}(\mu,\sigma^2)\)</span> as a statement about the distribution <span class="math inline">\(T\)</span> <em>induces</em> on the line — after which the “canonical shortcut” throws the possible worlds away and works on <span class="math inline">\((\mathbb{R}, \mathcal{N},
+<p>This is the theorem behind a move <a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a> makes informally. There, the sample space for tomorrow’s temperature is described as the set of possible states of the world, and <span class="math inline">\(T \sim \mathcal{N}(\mu,\sigma^2)\)</span> as a statement about the distribution <span class="math inline">\(T\)</span> <em>induces</em> on the line — after which the “canonical shortcut” throws the possible worlds away and works on <span class="math inline">\((\mathbb{R}, \mathcal{N},
 \mathrm{id})\)</span> instead. What licenses that substitution is exactly the sentence above: the two constructions have the same pushforward, so no statement about the value of <span class="math inline">\(T\)</span> can separate them. Note also what it does <em>not</em> license — two variables sharing an outcome. A coupling is more than a pair of pushforwards, which is the whole content of <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional</a>.</p></li>
 <li><p><strong>The canonical choice is <span class="math inline">\(\Omega = [0,1]\)</span>.</strong> Take <span class="math inline">\(P\)</span> = length on <span class="math inline">\([0,1]\)</span> and <span class="math inline">\(X = Q\)</span>, the quantile function (inverse CDF) of any target distribution: then <span class="math inline">\(Q_\# (\text{uniform})\)</span> <em>is</em> that distribution. Every 1-D distribution is the pushforward of uniform mass through its quantile map — one blob serves all.</p></li>
 </ul>

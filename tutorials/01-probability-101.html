@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Probability 101 — A Refresher – ID-5-02 (TO)</title>
+<title>Probability &amp; Random Variables – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Probability 101 — A Refresher</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -292,7 +292,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Probability 101 — A Refresher</span></a>
+ <span class="menu-text">Probability &amp; Random Variables</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -414,9 +414,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Probability 101 — A Refresher</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Probability 101 — A Refresher</h1>
+<h1 class="title">Probability &amp; Random Variables</h1>
 </div>
 
 
@@ -433,7 +433,7 @@ window.Quarto = {
 </header>
 
 
-<p><em>A standalone tutorial (used in <a href="../weeks/w02.html">W02</a>): a self-contained refresher on the probability prerequisites of the course: sample spaces, random variables, joint and marginal distributions, conditioning, and expectation. Readers comfortable with these notions may proceed directly to <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>.</em></p>
+<p><em>A standalone tutorial (used in <a href="../weeks/w02.html">W02</a>): the probability the course actually uses, built from the ground up — sample spaces, events, random variables, joint and marginal distributions, conditioning, and expectation. Readers already comfortable with these notions may proceed directly to <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>.</em></p>
 <div class="callout callout-style-simple callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -448,7 +448,7 @@ The level this works at
 <p>If you want to know what that presentation is glossing over — why “arbitrary subsets” is not quite allowed, what happens to laws that are neither discrete nor continuous, and why the noisy density in a diffusion model has a score when the data density may not — the <strong>Advanced</strong> tutorials <a href="../tutorials/10-measuring-things.html">Measuring Things</a> and <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional</a> rebuild the same objects on a <span class="math inline">\(\sigma\)</span>-algebra. They are optional, and nothing here depends on them.</p>
 </div>
 </div>
-<p>Probability theory is built on two distinct maps: the probability measure, which assigns numbers to events, and the random variable, which assigns numbers to outcomes. Distinguishing the two carefully at the outset prevents most of the common confusions, and this refresher is organized accordingly.</p>
+<p>Probability theory is built on two distinct maps: the probability measure, which assigns numbers to events, and the random variable, which assigns numbers to outcomes. Distinguishing the two carefully at the outset prevents most of the common confusions, and this tutorial is organized accordingly.</p>
 <section id="the-sample-space-events-and-the-probability-measure" class="level2">
 <h2 class="anchored" data-anchor-id="the-sample-space-events-and-the-probability-measure">The sample space, events, and the probability measure</h2>
 <p>A random experiment is modeled by three objects.</p>
@@ -682,7 +682,7 @@ p(y \mid x) = \frac{p(x, y)}{p(x)} .
 </colgroup>
 <thead>
 <tr class="header">
-<th>Probability 101 object</th>
+<th>Object</th>
 <th>Where it appears in this course</th>
 </tr>
 </thead>
