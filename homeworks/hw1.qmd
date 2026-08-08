@@ -1,0 +1,210 @@
+# HW 1 — Random Variables, Joints, Conditionals, Bayes {.unnumbered}
+
+*Practice homework · 5 problems · **50 points total** · no calculators needed beyond
+arithmetic.*
+
+**Scope.** Everything here is covered by
+[Probability & Random Variables](../tutorials/01-probability-101.qmd) and the
+[W02 primer deck](../materials/w02-deck-00-probability-joints.html). Distributions,
+likelihood and maximum likelihood are **not** examined here — they are HW 2.
+
+**Who this is for.** No background beyond first-year calculus and algebra is
+assumed, and no branch-specific knowledge of any kind. Problem 4 needs only
+single-variable integration.
+
+**How to present your work.** Full marks require the reasoning, not just the
+number. Where a probability is requested, leave it as an exact fraction *and*
+give a decimal to three places. State clearly which variable you are conditioning
+on every time you condition.
+
+::: {.callout-tip}
+## Difficulty, so you can plan
+
+Problems 1 and 2 are straightforward; 3 and 4 are moderate; 5 is the most
+demanding and is best attempted last. Every problem is self-contained.
+:::
+
+---
+
+## Problem 1 — The two maps (10 points) {.unnumbered}
+
+*Straightforward.*
+
+Roll one fair six-sided die once. Let
+
+$$
+X(\omega) = \omega, \qquad
+Y(\omega) = \begin{cases} 1 & \omega \text{ is prime},\\ 0 & \text{otherwise.}\end{cases}
+$$
+
+(a) **(2)** Write down the sample space $\Omega$. How many distinct events does
+this experiment have? Justify the count in one line.
+
+(b) **(2)** List the two preimages $\{\omega : Y(\omega) = 1\}$ and
+$\{\omega : Y(\omega) = 0\}$.
+
+(c) **(3)** A classmate writes "$Y$ maps the event $\{2,3,5\}$ to $1$." Explain in
+two or three sentences why this is the wrong description of what $Y$ does, and
+write down the correct chain of steps that takes a random variable to a
+probability.
+
+(d) **(3)** Compute $\mathbb{P}(Y = 1)$ and $\mathbb{P}(X \le 3,\ Y = 1)$. For the
+second, name the event explicitly before computing its probability.
+
+---
+
+## Problem 2 — A table of counts (10 points) {.unnumbered}
+
+*Straightforward.*
+
+A plant inspects **200** finished components. Each is recorded by which machine
+made it ($X \in \{A, B, C\}$) and its quality grade ($Y \in \{1, 2, 3\}$):
+
+|   | $Y=1$ | $Y=2$ | $Y=3$ |
+|:--|:-----:|:-----:|:-----:|
+| $X=A$ | 40 | 20 | 10 |
+| $X=B$ | 15 | 35 | 20 |
+| $X=C$ | 10 | 15 | 35 |
+
+(a) **(2)** Compute the row totals, the column totals and the net, and from them
+the two marginal distributions $\mathbb{P}(X = \cdot)$ and
+$\mathbb{P}(Y = \cdot)$. Say in one line what you divided by, and why.
+
+(b) **(3)** Compute the conditional distributions $\mathbb{P}(Y = \cdot \mid X = A)$
+and $\mathbb{P}(Y = \cdot \mid X = C)$. Verify each sums to $1$. What does the
+comparison between the two tell you about $X$ and $Y$?
+
+(c) **(2)** Compute $\mathbb{P}(X = B \mid Y = 2)$. State which total you divided
+by and why it is that one and not the net.
+
+(d) **(3)** If $X$ and $Y$ were independent, what count would you expect in the
+cell $(A, 1)$? Compare with the observed count and state your conclusion. Would
+matching in this one cell have been enough to conclude independence?
+
+---
+
+## Problem 3 — A screening test (10 points) {.unnumbered}
+
+*Moderate.*
+
+A condition affects $1\%$ of a population. A screening test is applied to a
+randomly chosen person. The test is positive for $95\%$ of those who have the
+condition, and — wrongly — for $10\%$ of those who do not.
+
+Let $D$ be the event "has the condition" and $+$ the event "tests positive".
+
+(a) **(2)** Write the three given numbers in conditional-probability notation.
+Which of them is a conditional, and on what?
+
+(b) **(3)** Compute $\mathbb{P}(+)$, stating the rule you are using and why the
+two cases you sum over are exhaustive and mutually exclusive.
+
+(c) **(3)** Compute $\mathbb{P}(D \mid +)$.
+
+(d) **(2)** The test is "$95\%$ accurate" on the diseased, yet your answer to (c)
+is far below $95\%$. Explain why in one or two sentences. Then state which single
+number you would change, and in which direction, to raise
+$\mathbb{P}(D \mid +)$ the most.
+
+::: {.callout-note}
+## A useful check
+
+Redo (b) and (c) by imagining **10,000 people** and filling in a $2 \times 2$
+table of counts, as in Problem 2. You should get the same answer, and the
+arithmetic is easier. Doing it both ways is worth doing even though only one is
+required.
+:::
+
+---
+
+## Problem 4 — A joint density (10 points) {.unnumbered}
+
+*Moderate.*
+
+Let $(X, Y)$ have joint density
+
+$$
+f(x,y) = c\,(x + y), \qquad 0 \le x \le 1,\ \ 0 \le y \le 2,
+$$
+
+and $f = 0$ elsewhere.
+
+(a) **(2)** Find the constant $c$.
+
+(b) **(3)** Find both marginal densities $f_X(x)$ and $f_Y(y)$, stating their
+ranges. Verify that each integrates to $1$. Which variable did you integrate out
+in each case?
+
+(c) **(3)** Find the conditional density $f(y \mid x)$ for a fixed
+$x \in [0,1]$, and verify that it integrates to $1$ over $y$. Explain in one
+sentence what you divided by, and why that is the continuous analogue of
+"divide the row by its row total".
+
+(d) **(2)** Are $X$ and $Y$ independent? Justify by an explicit comparison, not
+by inspection alone.
+
+---
+
+## Problem 5 — A hidden cause (10 points) {.unnumbered}
+
+*The most demanding problem. Attempt it last.*
+
+Items come from one of two machines. Machine $1$ is used for a fraction $0.6$ of
+production and machine $2$ for $0.4$. The number of surface defects $X$ on an
+item depends on which machine made it:
+
+| | $X = 0$ | $X = 1$ | $X = 2$ |
+|:--|:--:|:--:|:--:|
+| $\mathbb{P}(X = \cdot \mid Z = 1)$ | 0.7 | 0.2 | 0.1 |
+| $\mathbb{P}(X = \cdot \mid Z = 2)$ | 0.2 | 0.3 | 0.5 |
+
+You observe only $X$. The machine label $Z \in \{1, 2\}$ is **not** observed.
+
+(a) **(2)** Using the factorisation $p(z, x) = p(z)\,p(x \mid z)$, write out the
+full $2 \times 3$ table of joint probabilities. Check that it sums to $1$.
+
+(b) **(2)** Compute the marginal $\mathbb{P}(X = x)$ for each $x$. Which variable
+did you sum out? Why is it reasonable to call it a *nuisance* variable here, and
+what has been irretrievably lost by summing it out?
+
+(c) **(3)** Compute the posterior $\mathbb{P}(Z = 1 \mid X = x)$ for each of
+$x = 0, 1, 2$. Write down Bayes' rule in the form you are using it, and identify
+each factor as the prior, the likelihood, or the evidence.
+
+(d) **(2)** Compute the posterior mean $\mathbb{E}[Z \mid X = x]$ for each $x$.
+Notice that it is not always one of the two possible values of $Z$ — explain what
+such a value means and why it is not a contradiction.
+
+(e) **(1)** Verify numerically that
+
+$$
+\mathbb{E}\big[\,\mathbb{E}[Z \mid X]\,\big] \;=\; \mathbb{E}[Z].
+$$
+
+State in words what this identity says about averaging.
+
+::: {.callout-note}
+## Why this problem is here
+
+Parts (c) and (d) are, in miniature, exactly what a diffusion model's denoiser
+computes: a posterior over a hidden quantity given a noisy observation, and then
+its mean. You will meet the continuous version as
+$\mathbb{E}[x_0 \mid x_\sigma]$ in
+[The World's Smallest Diffusion Model](../tutorials/05-two-point-diffusion.qmd),
+where the same two lines of algebra produce a $\tanh$.
+:::
+
+---
+
+### Marks
+
+| Problem | Topic | Level | Points |
+|:--|:--|:--|:--:|
+| 1 | Sample space, events, random variables | straightforward | 10 |
+| 2 | Joint counts, marginals, conditionals, independence | straightforward | 10 |
+| 3 | Law of total probability, Bayes' rule | moderate | 10 |
+| 4 | Joint density, marginalisation, conditional density | moderate | 10 |
+| 5 | Factorisation, latent variable, posterior, tower property | demanding | 10 |
+| | | **Total** | **50** |
+
+: {tbl-colwidths="[10,45,25,20]"}
