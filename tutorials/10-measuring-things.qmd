@@ -683,6 +683,19 @@ Two consequences, both load-bearing later:
   are indistinguishable by probability statements about their values. This is why
   probability courses can work with distributions and never mention $\Omega$ —
   and why *we* may choose $\Omega$ freely, to be whatever is convenient.
+
+  This is the theorem behind a move
+  [Probability 101](./01-probability-101.qmd) makes informally. There, the sample
+  space for tomorrow's temperature is described as the set of possible states of
+  the world, and $T \sim \mathcal{N}(\mu,\sigma^2)$ as a statement about the
+  distribution $T$ *induces* on the line — after which the "canonical shortcut"
+  throws the possible worlds away and works on $(\mathbb{R}, \mathcal{N},
+  \mathrm{id})$ instead. What licenses that substitution is exactly the sentence
+  above: the two constructions have the same pushforward, so no statement about
+  the value of $T$ can separate them. Note also what it does *not* license — two
+  variables sharing an outcome. A coupling is more than a pair of pushforwards,
+  which is the whole content of
+  [Joint, Marginal, Conditional](./11-joint-conditional-bayes.qmd).
 - **The canonical choice is $\Omega = [0,1]$.** Take $P$ = length on $[0,1]$ and
   $X = Q$, the quantile function (inverse CDF) of any target distribution: then
   $Q_\# (\text{uniform})$ *is* that distribution. Every 1-D distribution is the
