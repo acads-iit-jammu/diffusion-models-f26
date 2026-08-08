@@ -263,8 +263,9 @@ $$
 $$
 
 which converts a conditional in one direction into the conditional in the other.
-The tanh denoiser of W01 is an application of this identity, with $x$ the clean
-data point and $y$ the noisy observation.
+The tanh denoiser of [W01](../weeks/w01.qmd) is an application of this identity,
+with $x$ the clean data point and $y$ the noisy observation; it is derived in full
+in [The World's Smallest Diffusion Model](./05-two-point-diffusion.qmd).
 
 $X$ and $Y$ are **independent** if $p(x, y) = p(x)\, p(y)$ for all $x, y$ —
 equivalently, if $p(y \mid x) = p(y)$, so that conditioning on $X$ conveys no
@@ -305,13 +306,15 @@ Two properties carry most of the weight in this course.
   \mathbb{E}\big[(X - \mathbb{E}X)^2\big] =
   \mathbb{E}[X^2] - (\mathbb{E}X)^2$ measures spread about the mean, and for
   independent random variables variances add. The identity
-  $\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2$ of W01 is an instance.
+  $\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2$ of
+  [W01](../weeks/w01.qmd) is an instance.
 
 Finally, the **conditional expectation** $\mathbb{E}[X \mid Y = y]$ is the mean of
 the conditional distribution of $X$ given $Y = y$, regarded as a function of $y$. It
 is the minimum-mean-squared-error prediction of $X$ from the observation $Y = y$
 (proved in [Distributions and Maximum Likelihood](./02-distributions-mle.qmd)), and the denoiser
-$\mathbb{E}[x_0 \mid x_\sigma]$ of W01 is precisely a conditional expectation.
+$\mathbb{E}[x_0 \mid x_\sigma]$ of [W01](../weeks/w01.qmd) is precisely a
+conditional expectation.
 
 ## The four objects, in one table
 
@@ -337,7 +340,7 @@ the real line.
 | pmf / pdf | every curve in the Distribution Playground |
 | Joint $p(x, z)$ | mixture model: latent variable and observation |
 | Marginalization $\sum_z p(x, z)$ | the mixture density; later, the ELBO (M3) |
-| Conditioning and Bayes' rule | posteriors; W01's tanh denoiser |
+| Conditioning and Bayes' rule | posteriors; the [tanh denoiser](./05-two-point-diffusion.qmd) of W01 |
 | Independence | i.i.d. data; likelihoods factorize |
 | $\mathbb{E}$, linearity, variance | losses, noise accumulation, $1 + \sigma^2$ |
 | $\mathbb{E}[X \mid Y]$ | the denoiser — the central object of the course |
@@ -363,5 +366,7 @@ the real line.
 5. In the mixture model $z \sim \text{Bernoulli}(\pi)$,
    $x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)$: identify the joint
    $p(x, z)$, both marginals, and both conditionals. State which of these objects
-   W01's denoiser computes, and which the ancestral sampler of *Generative AI, in Its Simplest Form* uses.
+   the [W01 denoiser](./05-two-point-diffusion.qmd) computes, and which the
+   ancestral sampler of
+   [Generative AI, in Its Simplest Form](./04-genai-simplest-form.qmd) uses.
 
