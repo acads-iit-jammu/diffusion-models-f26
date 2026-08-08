@@ -600,7 +600,7 @@ p(y \mid x) = \frac{p(x, y)}{p(x)} .
 <p><span class="math display">\[
 \boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
 \]</span></p>
-<p>which converts a conditional in one direction into the conditional in the other. The tanh denoiser of W01 is an application of this identity, with <span class="math inline">\(x\)</span> the clean data point and <span class="math inline">\(y\)</span> the noisy observation.</p>
+<p>which converts a conditional in one direction into the conditional in the other. The tanh denoiser of <a href="../weeks/w01.html">W01</a> is an application of this identity, with <span class="math inline">\(x\)</span> the clean data point and <span class="math inline">\(y\)</span> the noisy observation; it is derived in full in <a href="../tutorials/05-two-point-diffusion.html">The World’s Smallest Diffusion Model</a>.</p>
 <p><span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>independent</strong> if <span class="math inline">\(p(x, y) = p(x)\, p(y)\)</span> for all <span class="math inline">\(x, y\)</span> — equivalently, if <span class="math inline">\(p(y \mid x) = p(y)\)</span>, so that conditioning on <span class="math inline">\(X\)</span> conveys no information about <span class="math inline">\(Y\)</span>. In the table, <span class="math inline">\(0.20 \ne 0.45 \times 0.25\)</span>, so the two variables are dependent. The i.i.d. assumption underlying the likelihoods of <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> are an independence statement applied to repeated observations.</p>
 </section>
 <section id="expectation" class="level2">
@@ -623,9 +623,9 @@ p(y \mid x) = \frac{p(x, y)}{p(x)} .
 <li><strong>Linearity.</strong> <span class="math inline">\(\mathbb{E}[aX + bY] = a\,\mathbb{E}[X] + b\,\mathbb{E}[Y]\)</span> holds for all random variables on a common sample space, with no independence assumption. (Independence is required for the separate statement <span class="math inline">\(\mathbb{E}[XY] = \mathbb{E}[X]\,\mathbb{E}[Y]\)</span>.)</li>
 <li><strong>Variance.</strong> <span class="math inline">\(\operatorname{Var}(X) =
 \mathbb{E}\big[(X - \mathbb{E}X)^2\big] =
-\mathbb{E}[X^2] - (\mathbb{E}X)^2\)</span> measures spread about the mean, and for independent random variables variances add. The identity <span class="math inline">\(\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2\)</span> of W01 is an instance.</li>
+\mathbb{E}[X^2] - (\mathbb{E}X)^2\)</span> measures spread about the mean, and for independent random variables variances add. The identity <span class="math inline">\(\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2\)</span> of <a href="../weeks/w01.html">W01</a> is an instance.</li>
 </ul>
-<p>Finally, the <strong>conditional expectation</strong> <span class="math inline">\(\mathbb{E}[X \mid Y = y]\)</span> is the mean of the conditional distribution of <span class="math inline">\(X\)</span> given <span class="math inline">\(Y = y\)</span>, regarded as a function of <span class="math inline">\(y\)</span>. It is the minimum-mean-squared-error prediction of <span class="math inline">\(X\)</span> from the observation <span class="math inline">\(Y = y\)</span> (proved in <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>), and the denoiser <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma]\)</span> of W01 is precisely a conditional expectation.</p>
+<p>Finally, the <strong>conditional expectation</strong> <span class="math inline">\(\mathbb{E}[X \mid Y = y]\)</span> is the mean of the conditional distribution of <span class="math inline">\(X\)</span> given <span class="math inline">\(Y = y\)</span>, regarded as a function of <span class="math inline">\(y\)</span>. It is the minimum-mean-squared-error prediction of <span class="math inline">\(X\)</span> from the observation <span class="math inline">\(Y = y\)</span> (proved in <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>), and the denoiser <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma]\)</span> of <a href="../weeks/w01.html">W01</a> is precisely a conditional expectation.</p>
 </section>
 <section id="the-four-objects-in-one-table" class="level2">
 <h2 class="anchored" data-anchor-id="the-four-objects-in-one-table">The four objects, in one table</h2>
@@ -713,7 +713,7 @@ p(y \mid x) = \frac{p(x, y)}{p(x)} .
 </tr>
 <tr class="odd">
 <td>Conditioning and Bayes’ rule</td>
-<td>posteriors; W01’s tanh denoiser</td>
+<td>posteriors; the <a href="../tutorials/05-two-point-diffusion.html">tanh denoiser</a> of W01</td>
 </tr>
 <tr class="even">
 <td>Independence</td>
@@ -737,7 +737,7 @@ p(y \mid x) = \frac{p(x, y)}{p(x)} .
 <li>For the sky-and-rain table, compute <span class="math inline">\(\mathbb{P}(\text{cloudy} \mid \text{rain})\)</span> by Bayes’ rule from <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy})\)</span> and the marginals, and confirm the result by direct computation from the table.</li>
 <li>Exhibit (a) a pdf exceeding 3 at some point; (b) a random variable whose expectation is not an attainable value; (c) two dependent random variables for which <span class="math inline">\(\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]\)</span> nevertheless holds, illustrating that linearity requires no independence.</li>
 <li>Let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span> and <span class="math inline">\(X = U^2\)</span>. Compute <span class="math inline">\(\mathbb{E}[X]\)</span> twice: directly via <span class="math inline">\(\mathbb{E}[g(U)]\)</span>, and by first deriving the CDF and pdf of <span class="math inline">\(X\)</span>. Compare the effort required.</li>
-<li>In the mixture model <span class="math inline">\(z \sim \text{Bernoulli}(\pi)\)</span>, <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)\)</span>: identify the joint <span class="math inline">\(p(x, z)\)</span>, both marginals, and both conditionals. State which of these objects W01’s denoiser computes, and which the ancestral sampler of <em>Generative AI, in Its Simplest Form</em> uses.</li>
+<li>In the mixture model <span class="math inline">\(z \sim \text{Bernoulli}(\pi)\)</span>, <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)\)</span>: identify the joint <span class="math inline">\(p(x, z)\)</span>, both marginals, and both conditionals. State which of these objects the <a href="../tutorials/05-two-point-diffusion.html">W01 denoiser</a> computes, and which the ancestral sampler of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> uses.</li>
 </ol>
 
 

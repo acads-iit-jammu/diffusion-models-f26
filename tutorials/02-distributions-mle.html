@@ -488,7 +488,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>A sentence of habitat for each: the <strong>Uniform</strong> encodes total ignorance on an interval; the <strong>Normal</strong> is what sums of many small independent effects look like (W01’s warm-up demo <em>is</em> this statement); the <strong>Gamma</strong> models positive, right-skewed quantities such as waiting times; the <strong>Beta</strong> lives on <span class="math inline">\((0,1)\)</span> and models proportions and probabilities; a <strong>mixture</strong> models data with subpopulations — clusters — and is the recurring character of this course.</p>
+<p>A sentence of habitat for each: the <strong>Uniform</strong> encodes total ignorance on an interval; the <strong>Normal</strong> is what sums of many small independent effects look like (<a href="../weeks/w01.html">W01</a>’s warm-up demo <em>is</em> this statement); the <strong>Gamma</strong> models positive, right-skewed quantities such as waiting times; the <strong>Beta</strong> lives on <span class="math inline">\((0,1)\)</span> and models proportions and probabilities; a <strong>mixture</strong> models data with subpopulations — clusters — and is the recurring character of this course.</p>
 </section>
 <section id="how-sampling-actually-works" class="level2">
 <h2 class="anchored" data-anchor-id="how-sampling-actually-works">How sampling actually works</h2>
@@ -597,7 +597,7 @@ L(\theta) = \prod_{i=1}^n \pi_i^{\,y_i} (1 - \pi_i)^{1 - y_i},
 -\ell(\theta) = \sum_{i=1}^n \log\!\big(1 + e^{-y_i s_i}\big)
 \]</span></p>
 <p>— the same objective, rewritten.</p>
-<p><strong>The connection to this course.</strong> W01’s latent posterior <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is precisely this model with logit <span class="math inline">\(s(x) = 2x/\sigma^2\)</span>: the optimal classifier of the hidden component is a Bernoulli model whose log-odds are linear in the observation. Classification, denoising, and latent inference are all the same likelihood computation wearing different clothes.</p>
+<p><strong>The connection to this course.</strong> The latent posterior of <a href="../weeks/w01.html">W01</a> <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is precisely this model with logit <span class="math inline">\(s(x) = 2x/\sigma^2\)</span>: the optimal classifier of the hidden component is a Bernoulli model whose log-odds are linear in the observation. Classification, denoising, and latent inference are all the same likelihood computation wearing different clothes.</p>
 </section>
 <section id="fitting-the-other-families-honestly" class="level2">
 <h2 class="anchored" data-anchor-id="fitting-the-other-families-honestly">Fitting the other families — honestly</h2>
