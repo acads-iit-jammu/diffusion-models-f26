@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Probability 101 — A Refresher – ID-5-02 (TO)</title>
+<title>Moving Distributions: The Transport Story – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/04-distributions-mle.html" rel="next">
-<link href="../tutorials/02-joint-conditional-bayes.html" rel="prev">
+<link href="../tutorials/04-genai-simplest-form.html" rel="next">
+<link href="../tutorials/02-distributions-mle.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/03-probability-101.html">Probability 101 — A Refresher</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Moving Distributions: The Transport Story</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -282,34 +282,22 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Tutorials · Foundations</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/01-measuring-things.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Measuring Things — From Length to Probability</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/02-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/03-probability-101.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability 101 — A Refresher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-distributions-mle.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
@@ -317,53 +305,76 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
  <span class="menu-text">Tutorials · Diffusion Models</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/05-transport-story.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Moving Distributions: The Transport Story</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/06-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/07-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/08-map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/09-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/10-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/11-discrete-transport.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/09-discrete-transport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials · Advanced</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
   </div>
 </li>
       </ul>
@@ -384,23 +395,22 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-sample-space-events-and-the-probability-measure" id="toc-the-sample-space-events-and-the-probability-measure" class="nav-link active" data-scroll-target="#the-sample-space-events-and-the-probability-measure">The sample space, events, and the probability measure</a></li>
-  <li><a href="#random-variables" id="toc-random-variables" class="nav-link" data-scroll-target="#random-variables">Random variables</a></li>
-  <li><a href="#joint-distributions" id="toc-joint-distributions" class="nav-link" data-scroll-target="#joint-distributions">Joint distributions</a></li>
-  <li><a href="#marginal-distributions" id="toc-marginal-distributions" class="nav-link" data-scroll-target="#marginal-distributions">Marginal distributions</a></li>
-  <li><a href="#conditional-distributions-and-bayes-rule" id="toc-conditional-distributions-and-bayes-rule" class="nav-link" data-scroll-target="#conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</a></li>
-  <li><a href="#expectation" id="toc-expectation" class="nav-link" data-scroll-target="#expectation">Expectation</a></li>
-  <li><a href="#correspondence-with-this-course" id="toc-correspondence-with-this-course" class="nav-link" data-scroll-target="#correspondence-with-this-course">Correspondence with this course</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  <li><a href="#the-problem-without-any-symbols" id="toc-the-problem-without-any-symbols" class="nav-link active" data-scroll-target="#the-problem-without-any-symbols">The problem, without any symbols</a></li>
+  <li><a href="#in-one-dimension-the-problem-is-completely-solved" id="toc-in-one-dimension-the-problem-is-completely-solved" class="nav-link" data-scroll-target="#in-one-dimension-the-problem-is-completely-solved">In one dimension, the problem is completely solved</a></li>
+  <li><a href="#and-in-two-dimensions-the-trick-dies" id="toc-and-in-two-dimensions-the-trick-dies" class="nav-link" data-scroll-target="#and-in-two-dimensions-the-trick-dies">And in two dimensions, the trick dies</a></li>
+  <li><a href="#every-model-family-is-a-different-way-of-choosing" id="toc-every-model-family-is-a-different-way-of-choosing" class="nav-link" data-scroll-target="#every-model-family-is-a-different-way-of-choosing">Every model family is a different way of choosing</a></li>
+  <li><a href="#the-punchline-five-roads-one-destination-in-1-d-only" id="toc-the-punchline-five-roads-one-destination-in-1-d-only" class="nav-link" data-scroll-target="#the-punchline-five-roads-one-destination-in-1-d-only">The punchline: five roads, one destination — in 1-D only</a></li>
+  <li><a href="#a-warning-label-what-not-to-carry-upstairs" id="toc-a-warning-label-what-not-to-carry-upstairs" class="nav-link" data-scroll-target="#a-warning-label-what-not-to-carry-upstairs">A warning label: what <em>not</em> to carry upstairs</a></li>
+  <li><a href="#where-to-go-from-here" id="toc-where-to-go-from-here" class="nav-link" data-scroll-target="#where-to-go-from-here">Where to go from here</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/03-probability-101.html">Probability 101 — A Refresher</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Moving Distributions: The Transport Story</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Probability 101 — A Refresher</h1>
+<h1 class="title">Moving Distributions: The Transport Story</h1>
 </div>
 
 
@@ -417,219 +427,73 @@ window.Quarto = {
 </header>
 
 
-<p><em>A standalone tutorial (used in <a href="../weeks/w02.html">W02</a>): a self-contained refresher on the probability prerequisites of the course: sample spaces, random variables, joint and marginal distributions, conditioning, and expectation. Readers comfortable with these notions may proceed directly to <a href="../tutorials/04-distributions-mle.html">Distributions and Maximum Likelihood</a>.</em></p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-An optional pre-measure refresher
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>This tutorial deliberately works at the elementary level: it treats arbitrary subsets as events and splits the world into “discrete” and “continuous”. That is the standard undergraduate presentation and is entirely serviceable for the computations in lecture — but it is <em>less</em> precise than <a href="../tutorials/01-measuring-things.html">Measuring Things</a> and <a href="../tutorials/02-joint-conditional-bayes.html">Joint, Marginal, Conditional</a>, which build the same objects on a <span class="math inline">\(\sigma\)</span>-algebra and cover mixed and singular laws too. If you have read those, treat this one as revision and keep their definitions.</p>
-</div>
-</div>
-<p>Probability theory is built on two distinct maps: the probability measure, which assigns numbers to events, and the random variable, which assigns numbers to outcomes. Distinguishing the two carefully at the outset prevents most of the common confusions, and this refresher is organized accordingly.</p>
-<section id="the-sample-space-events-and-the-probability-measure" class="level2">
-<h2 class="anchored" data-anchor-id="the-sample-space-events-and-the-probability-measure">The sample space, events, and the probability measure</h2>
-<p>A random experiment is modeled by three objects.</p>
-<ul>
-<li><p>The <strong>sample space</strong> <span class="math inline">\(\Omega\)</span> is the set of all possible outcomes of the experiment, with one element <span class="math inline">\(\omega \in \Omega\)</span> per complete outcome. For a single die, <span class="math inline">\(\Omega = \{1, \dots, 6\}\)</span>. For two coin tosses, <span class="math inline">\(\Omega = \{HH, HT, TH, TT\}\)</span>; note that an outcome specifies the result of the entire experiment, i.e.&nbsp;both tosses. For a point drawn from the interval <span class="math inline">\([0,1]\)</span>, <span class="math inline">\(\Omega = [0,1]\)</span>, an uncountable set.</p></li>
-<li><p>An <strong>event</strong> is a subset <span class="math inline">\(A \subseteq \Omega\)</span>; events are the objects to which probabilities are assigned. “The die shows an even number” is the event <span class="math inline">\(\{2, 4, 6\}\)</span>; “at least one head” is the event <span class="math inline">\(\{HH, HT, TH\}\)</span>. An event is a collection of outcomes, not an outcome.</p></li>
-<li><p>The <strong>probability measure</strong> is the first of the two maps:</p>
-<p><span class="math display">\[
-P : \text{events} \longrightarrow [0, 1],
-\]</span></p>
-<p>required to satisfy Kolmogorov’s axioms: (i) <span class="math inline">\(P(A) \ge 0\)</span> for every event <span class="math inline">\(A\)</span>;</p>
-<ol start="2" type="i">
-<li><span class="math inline">\(P(\Omega) = 1\)</span>; (iii) for mutually exclusive events <span class="math inline">\(A_1, A_2, \dots\)</span>, <span class="math inline">\(P\big(\bigcup_i A_i\big) = \sum_i P(A_i)\)</span> (countable additivity).</li>
-</ol></li>
-</ul>
-<p>All further rules are consequences of the axioms; two used constantly are <span class="math inline">\(P(A^c) = 1 - P(A)\)</span> and <span class="math inline">\(P(A \cup B) = P(A) + P(B) - P(A \cap B)\)</span>.</p>
-<p>A remark on the continuous case. For <span class="math inline">\(\Omega = [0,1]\)</span> with the uniform measure, every singleton event <span class="math inline">\(\{\omega\}\)</span> has probability zero, although some outcome certainly occurs. Probability zero therefore does not mean impossibility; it means a vanishing fraction of the possibilities. This is also the reason <span class="math inline">\(P\)</span> is defined on events rather than on individual outcomes: in the continuous case, individual outcomes are too small to carry probability.</p>
+<p><em>An informal tutorial, for readers with no particular background. No proofs, few formulas — just the one idea that organizes all of generative modeling, told from the beginning. Its rigorous twin, with the history and the theorems, is <a href="../tutorials/08-transport-rigorous.html">Generative Models as Transport: History and Validation</a>.</em></p>
+<section id="the-problem-without-any-symbols" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem-without-any-symbols">The problem, without any symbols</h2>
+<p>You have a pile of examples — photographs, sentences, measurements. Behind them stands a <em>distribution</em>: the invisible shape that says which examples are common, which are rare, which are impossible. Generative modeling is one wish:</p>
+<blockquote class="blockquote">
+<p><strong>Make more examples with the same shape.</strong></p>
+</blockquote>
+<p>Here is the reframing that unlocks everything. A computer already owns one perfect source of randomness — dull, structureless randomness, like a uniform lottery number or television static. So the wish becomes a <em>moving</em> job:</p>
+<blockquote class="blockquote">
+<p>Take the boring randomness we have, and <strong>transport</strong> it onto the interesting shape we want. Move the pile of sand into the sculpture.</p>
+</blockquote>
+<p>Every generative model you have heard of — VAEs, GANs, normalizing flows, diffusion models — is a machine for doing exactly this. They differ only in <em>how they decide which grain of sand goes where</em>. That difference is the whole story.</p>
 </section>
-<section id="random-variables" class="level2">
-<h2 class="anchored" data-anchor-id="random-variables">Random variables</h2>
-<p>The second map is the random variable. A <strong>random variable</strong> is a function</p>
-<p><span class="math display">\[
-X : \Omega \longrightarrow \mathbb{R}
-\]</span></p>
-<p>that assigns a numerical value to each outcome. For the two-coin experiment with <span class="math inline">\(X\)</span> the number of heads: <span class="math inline">\(X(HH) = 2\)</span>, <span class="math inline">\(X(HT) = X(TH) = 1\)</span>, <span class="math inline">\(X(TT) = 0\)</span>. Despite the name, <span class="math inline">\(X\)</span> is a fixed, deterministic function; the randomness resides entirely in which outcome <span class="math inline">\(\omega\)</span> the experiment produces.</p>
-<p>The two maps combine as follows. A statement such as <span class="math inline">\(\mathbb{P}(X = 1)\)</span> is evaluated by first identifying the event determined by the condition and then applying <span class="math inline">\(P\)</span> to it:</p>
-<p><span class="math display">\[
-\mathbb{P}(X = 1)
-\;=\; P\big(\{\omega \in \Omega : X(\omega) = 1\}\big)
-\;=\; P(\{HT, TH\}) = \tfrac{2}{4}.
-\]</span></p>
-<p>Carrying this out for every value (or set of values) of <span class="math inline">\(X\)</span> yields the <strong>distribution</strong> of <span class="math inline">\(X\)</span>, a probability assignment on the real line. Once the distribution is available, the underlying sample space is usually suppressed and one works with the distribution directly; this is standard practice, and the remainder of the course follows it. The present section records what that convention leaves implicit.</p>
-<p>A <strong>discrete</strong> random variable is described by its probability mass function (pmf) <span class="math inline">\(p(x) = \mathbb{P}(X = x)\)</span>, with <span class="math inline">\(\sum_x p(x) = 1\)</span>. A <strong>continuous</strong> random variable is described by its probability density function (pdf) <span class="math inline">\(f(x) \ge 0\)</span>, with <span class="math inline">\(\int_{-\infty}^{\infty} f(x)\, dx = 1\)</span>; probabilities are obtained as areas under the density,</p>
-<p><span class="math display">\[
-\mathbb{P}(a \le X \le b) = \int_a^b f(x)\, dx .
-\]</span></p>
-<p>Three properties of densities deserve emphasis.</p>
-<ul>
-<li>A density value is not a probability and may exceed 1; the Uniform distribution on <span class="math inline">\([0, \tfrac12]\)</span> has <span class="math inline">\(f \equiv 2\)</span>. Only areas under the density are probabilities.</li>
-<li><span class="math inline">\(\mathbb{P}(X = x) = 0\)</span> for every individual <span class="math inline">\(x\)</span>, by the singleton remark above. The informal reading of a density is <span class="math inline">\(f(x)\,dx \approx\)</span> the probability of an outcome within <span class="math inline">\(dx\)</span> of <span class="math inline">\(x\)</span>; densities compare the relative plausibility of neighborhoods.</li>
-<li>The cumulative distribution function (CDF) <span class="math inline">\(F(x) = \mathbb{P}(X \le x)\)</span> applies to discrete and continuous variables alike, and its derivative, where it exists, is the pdf. The CDF appears in <a href="../tutorials/06-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> as the sampling map <span class="math inline">\(F^{-1}\)</span>.</li>
-</ul>
-</section>
-<section id="joint-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="joint-distributions">Joint distributions</h2>
-<p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables defined on the same sample space — two numerical features of the same outcome. Their <strong>joint distribution</strong> specifies <span class="math inline">\(p(x, y) = \mathbb{P}(X = x \text{ and } Y = y)\)</span> in the discrete case, or a joint density <span class="math inline">\(f(x, y)\)</span> whose volumes are probabilities in the continuous case. The joint distribution is a complete description of the pair: every probabilistic statement about <span class="math inline">\((X, Y)\)</span> can be computed from it.</p>
-<p>The following discrete joint distribution serves as the running example (the state of a morning sky and the occurrence of rain):</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 34%">
-<col style="width: 22%">
-<col style="width: 22%">
-<col style="width: 22%">
-</colgroup>
-<thead>
-<tr class="header">
-<th><span class="math inline">\(p(x,y)\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> rain</th>
-<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> no rain</th>
-<th style="text-align: center;">row sum</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(X{=}\)</span> cloudy</td>
-<td style="text-align: center;">0.20</td>
-<td style="text-align: center;">0.25</td>
-<td style="text-align: center;"><strong>0.45</strong></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(X{=}\)</span> clear</td>
-<td style="text-align: center;">0.05</td>
-<td style="text-align: center;">0.50</td>
-<td style="text-align: center;"><strong>0.55</strong></td>
-</tr>
-<tr class="odd">
-<td>column sum</td>
-<td style="text-align: center;"><strong>0.25</strong></td>
-<td style="text-align: center;"><strong>0.75</strong></td>
-<td style="text-align: center;">1</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="marginal-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="marginal-distributions">Marginal distributions</h2>
-<p>The <strong>marginal</strong> distribution of <span class="math inline">\(X\)</span> describes <span class="math inline">\(X\)</span> alone, with <span class="math inline">\(Y\)</span> disregarded. It is obtained by summing (or, for densities, integrating) the joint distribution over the other variable:</p>
-<p><span class="math display">\[
-p(x) = \sum_y p(x, y),
-\qquad\text{or}\qquad
-f(x) = \int f(x, y)\, dy .
-\]</span></p>
-<p>In the table these are the row and column sums — the margins of the table, which is the origin of the term: <span class="math inline">\(\mathbb{P}(\text{cloudy}) = 0.45\)</span> and <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>. The operation is justified directly by the additivity axiom: the event “cloudy” is the disjoint union of “cloudy and rain” and “cloudy and no rain”. Marginalization recurs throughout the course; in the mixture model of <a href="../tutorials/06-genai-simplest-form.html">Generative AI, in Its Simplest Form</a>, the observed density <span class="math inline">\(p(x) = \sum_z p(z)\, p(x \mid z)\)</span> is precisely the joint distribution of <span class="math inline">\((x, z)\)</span> with the latent variable summed out.</p>
-</section>
-<section id="conditional-distributions-and-bayes-rule" class="level2">
-<h2 class="anchored" data-anchor-id="conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</h2>
-<p>The <strong>conditional</strong> distribution of <span class="math inline">\(Y\)</span> given <span class="math inline">\(X = x\)</span> is defined, whenever <span class="math inline">\(p(x) &gt; 0\)</span>, by</p>
-<p><span class="math display">\[
-p(y \mid x) = \frac{p(x, y)}{p(x)} .
-\]</span></p>
-<p>The definition restricts attention to the outcomes consistent with <span class="math inline">\(X = x\)</span> and renormalizes their probabilities to total 1. In the running example, <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy}) = 0.20 / 0.45 \approx 0.44\)</span>, compared with the unconditional <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>.</p>
-<p>Applying the definition in both directions and eliminating the joint yields <strong>Bayes’ rule</strong>,</p>
-<p><span class="math display">\[
-\boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
-\]</span></p>
-<p>which converts a conditional in one direction into the conditional in the other. The tanh denoiser of W01 is an application of this identity, with <span class="math inline">\(x\)</span> the clean data point and <span class="math inline">\(y\)</span> the noisy observation.</p>
-<p><span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>independent</strong> if <span class="math inline">\(p(x, y) = p(x)\, p(y)\)</span> for all <span class="math inline">\(x, y\)</span> — equivalently, if <span class="math inline">\(p(y \mid x) = p(y)\)</span>, so that conditioning on <span class="math inline">\(X\)</span> conveys no information about <span class="math inline">\(Y\)</span>. In the table, <span class="math inline">\(0.20 \ne 0.45 \times 0.25\)</span>, so the two variables are dependent. The i.i.d. assumption underlying the likelihoods of <a href="../tutorials/04-distributions-mle.html">Distributions and Maximum Likelihood</a> are an independence statement applied to repeated observations.</p>
-</section>
-<section id="expectation" class="level2">
-<h2 class="anchored" data-anchor-id="expectation">Expectation</h2>
-<p>The <strong>expectation</strong> of a random variable is the probability-weighted average of its values,</p>
-<p><span class="math display">\[
-\mathbb{E}[X] = \sum_x x\, p(x)
-\qquad\text{or}\qquad
-\mathbb{E}[X] = \int x\, f(x)\, dx ,
-\]</span></p>
-<p>the center of mass of the distribution. The expectation need not be an attainable value; a fair die has <span class="math inline">\(\mathbb{E}[X] = 3.5\)</span>. More generally, for a function <span class="math inline">\(g\)</span>,</p>
-<p><span class="math display">\[
-\mathbb{E}[g(X)] = \sum_x g(x)\, p(x)
-\qquad\text{or}\qquad
-\int g(x)\, f(x)\, dx ,
-\]</span></p>
-<p>so that the distribution of <span class="math inline">\(g(X)\)</span> itself need never be computed (a fact sometimes called the law of the unconscious statistician).</p>
-<p>Two properties carry most of the weight in this course.</p>
-<ul>
-<li><strong>Linearity.</strong> <span class="math inline">\(\mathbb{E}[aX + bY] = a\,\mathbb{E}[X] + b\,\mathbb{E}[Y]\)</span> holds for all random variables on a common sample space, with no independence assumption. (Independence is required for the separate statement <span class="math inline">\(\mathbb{E}[XY] = \mathbb{E}[X]\,\mathbb{E}[Y]\)</span>.)</li>
-<li><strong>Variance.</strong> <span class="math inline">\(\operatorname{Var}(X) =
-\mathbb{E}\big[(X - \mathbb{E}X)^2\big] =
-\mathbb{E}[X^2] - (\mathbb{E}X)^2\)</span> measures spread about the mean, and for independent random variables variances add. The identity <span class="math inline">\(\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2\)</span> of W01 is an instance.</li>
-</ul>
-<p>Finally, the <strong>conditional expectation</strong> <span class="math inline">\(\mathbb{E}[X \mid Y = y]\)</span> is the mean of the conditional distribution of <span class="math inline">\(X\)</span> given <span class="math inline">\(Y = y\)</span>, regarded as a function of <span class="math inline">\(y\)</span>. It is the minimum-mean-squared-error prediction of <span class="math inline">\(X\)</span> from the observation <span class="math inline">\(Y = y\)</span> (proved in <a href="../tutorials/04-distributions-mle.html">Distributions and Maximum Likelihood</a>), and the denoiser <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma]\)</span> of W01 is precisely a conditional expectation.</p>
-</section>
-<section id="correspondence-with-this-course" class="level2">
-<h2 class="anchored" data-anchor-id="correspondence-with-this-course">Correspondence with this course</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 40%">
-<col style="width: 60%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Probability 101 object</th>
-<th>Where it appears in this course</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Sample space <span class="math inline">\(\Omega\)</span>, outcome <span class="math inline">\(\omega\)</span></td>
-<td>the randomness underlying every “sample”</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(P\)</span>: events <span class="math inline">\(\to [0,1]\)</span></td>
-<td>the data distribution <span class="math inline">\(p_{\text{data}}\)</span></td>
-</tr>
-<tr class="odd">
-<td>Random variable <span class="math inline">\(X: \Omega \to \mathbb{R}\)</span></td>
-<td>data <span class="math inline">\(x\)</span>, noise <span class="math inline">\(z\)</span>, latent <span class="math inline">\(z\)</span></td>
-</tr>
-<tr class="even">
-<td>pmf / pdf</td>
-<td>every curve in the Distribution Playground</td>
-</tr>
-<tr class="odd">
-<td>Joint <span class="math inline">\(p(x, z)\)</span></td>
-<td>mixture model: latent variable and observation</td>
-</tr>
-<tr class="even">
-<td>Marginalization <span class="math inline">\(\sum_z p(x, z)\)</span></td>
-<td>the mixture density; later, the ELBO (M3)</td>
-</tr>
-<tr class="odd">
-<td>Conditioning and Bayes’ rule</td>
-<td>posteriors; W01’s tanh denoiser</td>
-</tr>
-<tr class="even">
-<td>Independence</td>
-<td>i.i.d. data; likelihoods factorize</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\mathbb{E}\)</span>, linearity, variance</td>
-<td>losses, noise accumulation, <span class="math inline">\(1 + \sigma^2\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\mathbb{E}[X \mid Y]\)</span></td>
-<td>the denoiser — the central object of the course</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="exercises" class="level2">
-<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<section id="in-one-dimension-the-problem-is-completely-solved" class="level2">
+<h2 class="anchored" data-anchor-id="in-one-dimension-the-problem-is-completely-solved">In one dimension, the problem is completely solved</h2>
+<p>Suppose your data is just numbers — heights, incomes, temperatures. One dimension. Then there is a classical trick, and it settles everything.</p>
+<p><strong>The rank trick.</strong> To transform lottery numbers into incomes:</p>
 <ol type="1">
-<li>For two fair coin tosses with <span class="math inline">\(X\)</span> the number of heads: write out <span class="math inline">\(\Omega\)</span>, the values <span class="math inline">\(X(\omega)\)</span> for all four outcomes, and the pmf of <span class="math inline">\(X\)</span>; verify that the pmf sums to 1 using the additivity axiom.</li>
-<li>For the sky-and-rain table, compute <span class="math inline">\(\mathbb{P}(\text{cloudy} \mid \text{rain})\)</span> by Bayes’ rule from <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy})\)</span> and the marginals, and confirm the result by direct computation from the table.</li>
-<li>Exhibit (a) a pdf exceeding 3 at some point; (b) a random variable whose expectation is not an attainable value; (c) two dependent random variables for which <span class="math inline">\(\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]\)</span> nevertheless holds, illustrating that linearity requires no independence.</li>
-<li>Let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span> and <span class="math inline">\(X = U^2\)</span>. Compute <span class="math inline">\(\mathbb{E}[X]\)</span> twice: directly via <span class="math inline">\(\mathbb{E}[g(U)]\)</span>, and by first deriving the CDF and pdf of <span class="math inline">\(X\)</span>. Compare the effort required.</li>
-<li>In the mixture model <span class="math inline">\(z \sim \text{Bernoulli}(\pi)\)</span>, <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)\)</span>: identify the joint <span class="math inline">\(p(x, z)\)</span>, both marginals, and both conditionals. State which of these objects W01’s denoiser computes, and which the ancestral sampler of <em>Generative AI, in Its Simplest Form</em> uses.</li>
+<li>Draw a uniform lottery number between 0 and 1 — say <span class="math inline">\(0.83\)</span>.</li>
+<li>Read it as a <em>rank</em>: “the 83rd percentile.”</li>
+<li>Output the income that sits at the 83rd percentile of the income distribution.</li>
 </ol>
+<p>That’s the entire generator. Ask “what fraction of the data lies below this value?” — that question is the <strong>CDF</strong>, and it converts values into ranks. Answer it backwards — rank into value — and that is the <strong>inverse CDF</strong>. The generator is: <em>uniform randomness in, read as a rank, matched to the value with the same rank.</em></p>
+<p>Three things make this trick special, not just convenient:</p>
+<ul>
+<li><strong>It always works.</strong> Any distribution of numbers, however lumpy, has percentiles.</li>
+<li><strong>It is fair, and it never crosses.</strong> The 20th percentile of the lottery goes to the 20th percentile of incomes, the 90th to the 90th. Lower stays lower, higher stays higher — two grains of sand never swap places in flight.</li>
+<li><strong>It is the only such rule — <em>if</em> you insist on never crossing.</strong> Drop that insistence and even one dimension has many transports (flip every rank, <span class="math inline">\(u \leftrightarrow 1-u\)</span>, and the output distribution is identical). What is special about one dimension is not that transport is unique — it is that the line comes with a natural tie-breaking rule everyone accepts: <em>lower stays lower</em>. The rule crowns a unique king.</li>
+<li>One small honesty note for the reverse direction: turning <em>data back into ranks</em> needs care when many data points tie (repeated values); ties must be broken with a coin flip. Generation — ranks into data — never has this problem.</li>
+</ul>
+<p>You can watch this trick operating in the course demo <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>, and it is the exact mechanism behind the two-point generator of W01. In one dimension, generative modeling is <em>finished</em> — a lookup in a percentile table.</p>
+</section>
+<section id="and-in-two-dimensions-the-trick-dies" class="level2">
+<h2 class="anchored" data-anchor-id="and-in-two-dimensions-the-trick-dies">And in two dimensions, the trick dies</h2>
+<p>Now let the data be pairs — a height <em>and</em> a weight; an image with many pixels. Try the rank trick: “what fraction of the data lies <em>below</em> this point?”</p>
+<p>Below? Point A is up and to the left of point B. Which one is “lower”? In a plane there is <strong>no natural order</strong>. No order, no ranks; no ranks, no percentiles; no percentiles, no inverse CDF. The one canonical tool we had does not survive the second dimension.</p>
+<p>Worse — the problem is not that transport becomes impossible. It becomes <em>embarrassingly possible</em>. Picture moving a round cloud of sand onto another round cloud: you can slide it straight over; or slide it over and rotate it by any angle; or swirl the middle while fixing the edge. <strong>Infinitely many transports do the job, and no one of them is the boss.</strong> In one dimension the never-cross rule crowned a unique king; in two dimensions there is no throne.</p>
+<p>This is the honest statement of the difficulty: in higher dimensions, transport is not <em>undefined</em> — it is <strong>underdetermined</strong>. And the thing that is missing is precisely the tie-breaker: the line’s “lower stays lower” rule has no natural analogue in the plane. Something must be <em>added</em> to pick one map out of the infinite crowd.</p>
+</section>
+<section id="every-model-family-is-a-different-way-of-choosing" class="level2">
+<h2 class="anchored" data-anchor-id="every-model-family-is-a-different-way-of-choosing">Every model family is a different way of choosing</h2>
+<p>Here is the reveal: the famous generative model families are exactly the famous ways of adding that missing choice.</p>
+<p><strong>Sort by coordinates anyway — normalizing flows.</strong> Alphabetical order: sort by the first coordinate; break ties with the second; and so on. This resurrects ranks, one coordinate at a time — transform the first coordinate by its percentiles, then the second <em>given</em> the first, and so on. It works at every scale, and it is exactly what autoregressive normalizing flows do. The cost: the answer depends on which coordinate you called “first,” as alphabetical order depends on the alphabet.</p>
+<p><strong>Move at the cheapest total cost — optimal transport.</strong> Charge for distance: among all valid transports, take the one minimizing the total moving bill. A deep theorem says that (in the natural settings) this again produces a <em>unique</em> map. The cost: computing it at scale is hard, and — a genuine surprise below — it is <em>not</em> what the popular generators actually compute.</p>
+<p><strong>Melt, then re-freeze — diffusion models.</strong> Refuse the direct matching entirely. Instead, <em>melt</em> the data — add noise a little at a time until every shape becomes the same formless Gaussian blob — and learn to run the melting backwards. Freezing is guided by a purely local question: “from here, which direction looks denser?” That local question is learnable by a neural network even in a million dimensions. Two choices select the route: the melting <em>schedule</em>, and — a subtlety — a <em>no-swirling</em> rule: many wind patterns produce the same evolution of the sand’s density (add any swirl that circulates without piling anything up), and diffusion picks the swirl-free wind. This is the entire subject of this course, met from a new side.</p>
+<p><strong>Fool the inspector — GANs.</strong> Train a forger against a detective: any transport whose output the detective cannot distinguish from data is accepted. Note what is missing: <em>any</em> transport. Here is how loose that is, even in one dimension: take the fair rank-matcher, but first <em>fold</em> the lottery ticket — send every rank <span class="math inline">\(u\)</span> to <span class="math inline">\(1-u\)</span>, or crease it in the middle like a tent. The folded generator produces exactly the same distribution, so no inspector, however perfect, can object — yet it is not the rank map. GANs add no selection principle at all, which is part of why they are powerful and part of why they are temperamental.</p>
+<p><strong>Compress and decompress — VAEs.</strong> Learn an encoder that squeezes data into tidy randomness and a decoder that reinflates it. Here is a lovely secret: in one dimension, the <em>perfect</em> encoder is precisely the rank trick — the CDF! — and the perfect decoder is the inverse CDF. But two honest footnotes. First, nothing in the VAE’s training <em>forces</em> that choice: many equally good codes exist (swap all ranks <span class="math inline">\(u \leftrightarrow 1-u\)</span>, for a start), and the VAE has no reason to prefer the tidy one. Second, a textbook VAE is not even <em>allowed</em> to be perfectly tidy — its rules require the code to stay a little blurry (a perfectly sharp code costs it an infinite penalty). The “encoder = CDF” story is the idealized, noise-free, never-crossing limit of a VAE — a beautiful limit, and one the actual training objective does not select. The VAE illustrates underdeterminacy from the inside.</p>
+</section>
+<section id="the-punchline-five-roads-one-destination-in-1-d-only" class="level2">
+<h2 class="anchored" data-anchor-id="the-punchline-five-roads-one-destination-in-1-d-only">The punchline: five roads, one destination — in 1-D only</h2>
+<p>Run all five families on one-dimensional data, each trained to perfection <em>and each given the natural tie-breaking rule</em> (never cross), and they collapse into the same map: the rank trick. But the fine print matters, and it splits three ways. For the smooth-flow families — diffusion’s deterministic sampler, normalizing flows, flow matching — the collapse is a <strong>theorem</strong>: a one-dimensional flow physically cannot cross itself, so the tie-breaker comes built in (this course proves the diffusion case in <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a>). For GANs and VAEs the collapse is merely <strong>available</strong>: their training rules accept the rank map but do not prefer it — the folded forger and the blurry code are equally welcome. In one dimension the five philosophies <em>can</em> be one philosophy; only some of them insist on it.</p>
+<p>In two dimensions and up, they genuinely part ways — and that is not a defect but the point: each family is one answer to a question that no longer has a single answer. If you understand (a) the 1-D trick, (b) why it dies upstairs, and (c) what each family adds to revive it, you understand the map of the whole field.</p>
+</section>
+<section id="a-warning-label-what-not-to-carry-upstairs" class="level2">
+<h2 class="anchored" data-anchor-id="a-warning-label-what-not-to-carry-upstairs">A warning label: what <em>not</em> to carry upstairs</h2>
+<p>The 1-D picture is a superb ladder and a treacherous railing. Keep the ladder, do not lean on it:</p>
+<ul>
+<li><strong>“Lower stays lower” means nothing upstairs.</strong> There is no single order to preserve — and “monotone” does not become meaningless, it becomes <em>many different things</em> (several inequivalent notions replace it, and different fixes pick different ones).</li>
+<li><strong>“The transport” is not a phrase you may use</strong> without saying which selection rule you chose.</li>
+<li><strong>The diffusion route is not the cheapest route.</strong> In 1-D the melter and the cheapest mover coincide; in higher dimensions they provably differ — professionals conjectured otherwise in print and were corrected by a counterexample.</li>
+<li><strong>Even the melting does not determine the route by itself.</strong> Upstairs, many winds produce the same density evolution (swirls circulate without piling); the no-swirl rule is an extra choice, invisible in 1-D where there is no room to swirl.</li>
+<li><strong>Percentile bookkeeping is a 1-D luxury.</strong> The beautiful fact that a diffusing particle “rides its quantile” (proved in this course) has no higher-dimensional analogue.</li>
+</ul>
+</section>
+<section id="where-to-go-from-here" class="level2">
+<h2 class="anchored" data-anchor-id="where-to-go-from-here">Where to go from here</h2>
+<p>The rigorous twin of this tutorial — <a href="../tutorials/08-transport-rigorous.html">Generative Models as Transport: History and Validation</a> — replays this story with theorems, dates, and citations: who proved the rank trick unique, who invented each fix and when, what exactly is true about the “VAE encoder = CDF” slogan, and where the counterexamples live. And the rest of the course is the deep dive into one of the five roads — the melt-and-refreeze road — chosen because its local, learnable steering question scales to the dimensions where images and language live.</p>
 
 
 </section>
@@ -1062,13 +926,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/02-joint-conditional-bayes.html" class="pagination-link" aria-label="Joint, Marginal, Conditional — and Bayes">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Joint, Marginal, Conditional — and Bayes</span>
+      <a href="../tutorials/02-distributions-mle.html" class="pagination-link" aria-label="Distributions and Maximum Likelihood">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Distributions and Maximum Likelihood</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/04-distributions-mle.html" class="pagination-link" aria-label="Distributions and Maximum Likelihood">
-        <span class="nav-page-text">Distributions and Maximum Likelihood</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/04-genai-simplest-form.html" class="pagination-link" aria-label="Generative AI, in Its Simplest Form">
+        <span class="nav-page-text">Generative AI, in Its Simplest Form</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

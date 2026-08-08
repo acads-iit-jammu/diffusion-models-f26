@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/02-joint-conditional-bayes.html" rel="next">
-<link href="../weeks/w17.html" rel="prev">
+<link href="../tutorials/11-joint-conditional-bayes.html" rel="next">
+<link href="../tutorials/09-discrete-transport.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Measuring Things — From Length to Probability</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/10-measuring-things.html">Tutorials · Advanced</a></li><li class="breadcrumb-item"><a href="../tutorials/10-measuring-things.html">Measuring Things — From Length to Probability</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -282,34 +282,22 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Tutorials · Foundations</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/01-measuring-things.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Measuring Things — From Length to Probability</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/02-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/03-probability-101.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability 101 — A Refresher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-distributions-mle.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
@@ -326,44 +314,67 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/05-transport-story.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Moving Distributions: The Transport Story</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/06-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/07-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/08-map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/09-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/10-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/11-discrete-transport.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/09-discrete-transport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials · Advanced</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
   </div>
 </li>
       </ul>
@@ -412,7 +423,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-measuring-things.html">Measuring Things — From Length to Probability</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/10-measuring-things.html">Tutorials · Advanced</a></li><li class="breadcrumb-item"><a href="../tutorials/10-measuring-things.html">Measuring Things — From Length to Probability</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Measuring Things — From Length to Probability</h1>
 </div>
@@ -431,7 +442,20 @@ window.Quarto = {
 </header>
 
 
-<p><em>A standalone tutorial, and the first of two on the measure-theoretic view of probability. It assumes no exposure to measure theory. The story: how we measure length, area, and volume; why the Riemann integral is the wrong tool for probability; how Lebesgue’s rearrangement fixes it; and how Kolmogorov used the resulting theory of measure to give probability a rigorous foundation. The sequel, <a href="../tutorials/02-joint-conditional-bayes.html">Joint, Marginal, Conditional — and Bayes</a>, builds the multivariate picture on this footing.</em></p>
+<p><em>An <strong>Advanced</strong> tutorial, and the first of two on the measure-theoretic view of probability. It assumes no exposure to measure theory and is self-contained. The story: how we measure length, area, and volume; why the Riemann integral is the wrong tool for probability; how Lebesgue’s rearrangement fixes it; and how Kolmogorov used the resulting theory of measure to give probability a rigorous foundation. The sequel, <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional — and Bayes</a>, builds the multivariate picture on this footing.</em></p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Optional, and where it sits
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nothing in the lectures or the other tutorials depends on this pair. The working versions of everything here are in <a href="../tutorials/01-probability-101.html">Probability 101</a> and <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>, and you can follow the whole course from those. Read this track when you want to know <em>why</em> the working versions are allowed — or when a formula has surprised you and you want the footing that explains it.</p>
+</div>
+</div>
 <div class="callout callout-style-simple callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -442,7 +466,7 @@ Why this tutorial exists
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Every object in this course — density, likelihood, score, KL divergence, pushforward, transport map — is a measure-theoretic object. One can use them by rote, but the moment a formula surprises you (why is <span class="math inline">\(P(X = x) = 0\)</span> for every <span class="math inline">\(x\)</span> yet the density is positive? what does <span class="math inline">\(\mathbb{E}[x_0 \mid x_t]\)</span> actually average over?), the only reliable footing is the measure-theoretic one. This tutorial builds that footing visually, with almost no machinery.</p>
+<p>Every object in this course — density, likelihood, score, KL divergence, pushforward, transport map — is a measure-theoretic object. One can use them by rote, and for the lectures that is enough. But the moment a formula surprises you (why is <span class="math inline">\(P(X = x) = 0\)</span> for every <span class="math inline">\(x\)</span> yet the density is positive? what does <span class="math inline">\(\mathbb{E}[x_0 \mid x_t]\)</span> actually average over? why does adding noise make the score <em>exist</em>?), the only reliable footing is the measure-theoretic one. This tutorial builds that footing visually, with almost no machinery.</p>
 </div>
 </div>
 <section id="how-do-we-measure-things" class="level2">
@@ -1022,7 +1046,7 @@ Key takeaway
 </tr>
 </tbody>
 </table>
-<p>The sequel, <a href="../tutorials/02-joint-conditional-bayes.html">Joint, Marginal, Conditional — and Bayes</a>, puts <em>two</em> numbers on the blob and develops joints as mountains, marginals as shadows, conditionals as renormalized slices, and Bayes’ rule as the freedom to slice in either direction — the grammar in which every diffusion-model statement (<span class="math inline">\(p(x_t \mid x_0)\)</span>, <span class="math inline">\(\mathbb{E}[x_0 \mid x_t]\)</span>, the posterior over mixture components) is written. A later installment will build likelihood, score, and KL divergence on the same footing.</p>
+<p>The sequel, <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional — and Bayes</a>, puts <em>two</em> numbers on the blob and develops joints as mountains, marginals as shadows, conditionals as renormalized slices, and Bayes’ rule as the freedom to slice in either direction — the grammar in which every diffusion-model statement (<span class="math inline">\(p(x_t \mid x_0)\)</span>, <span class="math inline">\(\mathbb{E}[x_0 \mid x_t]\)</span>, the posterior over mixture components) is written. A later installment will build likelihood, score, and KL divergence on the same footing.</p>
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
@@ -1481,12 +1505,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../weeks/w17.html" class="pagination-link" aria-label="W17: Flows, Applications &amp; Wrap-up">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">W17: Flows, Applications &amp; Wrap-up</span>
+      <a href="../tutorials/09-discrete-transport.html" class="pagination-link" aria-label="Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/02-joint-conditional-bayes.html" class="pagination-link" aria-label="Joint, Marginal, Conditional — and Bayes">
+      <a href="../tutorials/11-joint-conditional-bayes.html" class="pagination-link" aria-label="Joint, Marginal, Conditional — and Bayes">
         <span class="nav-page-text">Joint, Marginal, Conditional — and Bayes</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>The World’s Smallest Diffusion Model – ID-5-02 (TO)</title>
+<title>Joint, Marginal, Conditional — and Bayes – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -64,8 +30,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/08-map-proved.html" rel="next">
-<link href="../tutorials/06-genai-simplest-form.html" rel="prev">
+<link href="../resources.html" rel="next">
+<link href="../tutorials/10-measuring-things.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -144,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/05-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/07-two-point-diffusion.html">The World’s Smallest Diffusion Model</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/10-measuring-things.html">Tutorials · Advanced</a></li><li class="breadcrumb-item"><a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional — and Bayes</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -325,25 +291,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/01-measuring-things.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Measuring Things — From Length to Probability</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/02-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/03-probability-101.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability 101 — A Refresher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-distributions-mle.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
@@ -351,53 +305,76 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
  <span class="menu-text">Tutorials · Diffusion Models</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/05-transport-story.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Moving Distributions: The Transport Story</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/06-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/07-two-point-diffusion.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/08-map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/09-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/10-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/11-discrete-transport.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/09-discrete-transport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials · Advanced</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
   </div>
 </li>
       </ul>
@@ -418,12 +395,15 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-dataset" id="toc-the-dataset" class="nav-link active" data-scroll-target="#the-dataset">The dataset</a></li>
-  <li><a href="#forward-process-noise-melts-the-data" id="toc-forward-process-noise-melts-the-data" class="nav-link" data-scroll-target="#forward-process-noise-melts-the-data">Forward process: noise melts the data</a></li>
-  <li><a href="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" id="toc-denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="nav-link" data-scroll-target="#denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</a></li>
-  <li><a href="#the-score-function-a-preview-of-module-4" id="toc-the-score-function-a-preview-of-module-4" class="nav-link" data-scroll-target="#the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</a></li>
-  <li><a href="#reverse-process-run-the-diffusion-backwards" id="toc-reverse-process-run-the-diffusion-backwards" class="nav-link" data-scroll-target="#reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</a></li>
-  <li><a href="#why-the-course-exists-what-breaks-for-images" id="toc-why-the-course-exists-what-breaks-for-images" class="nav-link" data-scroll-target="#why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</a></li>
+  <li><a href="#two-colorings-one-blob" id="toc-two-colorings-one-blob" class="nav-link active" data-scroll-target="#two-colorings-one-blob">1. Two colorings, one blob</a></li>
+  <li><a href="#marginals-are-shadows-and-shadows-forget" id="toc-marginals-are-shadows-and-shadows-forget" class="nav-link" data-scroll-target="#marginals-are-shadows-and-shadows-forget">2. Marginals are shadows — and shadows forget</a></li>
+  <li><a href="#conditionals-are-slices-renormalized" id="toc-conditionals-are-slices-renormalized" class="nav-link" data-scroll-target="#conditionals-are-slices-renormalized">3. Conditionals are slices, renormalized</a></li>
+  <li><a href="#bayes-rule-is-the-freedom-to-slice-both-ways" id="toc-bayes-rule-is-the-freedom-to-slice-both-ways" class="nav-link" data-scroll-target="#bayes-rule-is-the-freedom-to-slice-both-ways">4. Bayes’ rule is the freedom to slice both ways</a></li>
+  <li><a href="#mixed-joints-the-two-shelf-picture" id="toc-mixed-joints-the-two-shelf-picture" class="nav-link" data-scroll-target="#mixed-joints-the-two-shelf-picture">5. Mixed joints: the two-shelf picture</a>
+  <ul class="collapse">
+  <li><a href="#the-worked-example-this-course-runs-on" id="toc-the-worked-example-this-course-runs-on" class="nav-link" data-scroll-target="#the-worked-example-this-course-runs-on">The worked example this course runs on</a></li>
+  </ul></li>
+  <li><a href="#what-is-deferred-deliberately" id="toc-what-is-deferred-deliberately" class="nav-link" data-scroll-target="#what-is-deferred-deliberately">6. What is deferred, deliberately</a></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
@@ -431,9 +411,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/05-transport-story.html">Tutorials · Diffusion Models</a></li><li class="breadcrumb-item"><a href="../tutorials/07-two-point-diffusion.html">The World’s Smallest Diffusion Model</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/10-measuring-things.html">Tutorials · Advanced</a></li><li class="breadcrumb-item"><a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional — and Bayes</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">The World’s Smallest Diffusion Model</h1>
+<h1 class="title">Joint, Marginal, Conditional — and Bayes</h1>
 </div>
 
 
@@ -450,159 +430,190 @@ window.Quarto = {
 </header>
 
 
-<p><em>Standalone tutorial accompanying <a href="../weeks/w01.html">W01</a>. Interactive version: <a href="../materials/two-point-diffusion-demo.html">live demo</a> — every figure in this note, animated.</em></p>
-<p>Diffusion models generate images from pure noise. Before we spend forty lectures on the mathematics, this note builds a <strong>complete diffusion model with a dataset of two points</strong> — small enough that every quantity the course will later approximate with a neural network can be computed <em>exactly</em>, with nothing beyond Bayes’ rule.</p>
-<section id="the-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="the-dataset">The dataset</h2>
-<p>Our data distribution puts equal mass on two points:</p>
+<p><em>An <strong>Advanced</strong> tutorial, the second of two on the measure-theoretic view of probability, continuing <a href="../tutorials/10-measuring-things.html">Measuring Things</a>. Like its predecessor it is optional: the working versions of joints, marginals and conditioning are in <a href="../tutorials/01-probability-101.html">Probability 101</a>. One new move — paint <strong>two</strong> numbers on the blob instead of one — generates the entire multivariate vocabulary: joints as mountains, marginals as shadows, conditionals as renormalized slices, Bayes’ rule as the license to slice in either direction. No new measure theory is needed.</em></p>
+<section id="two-colorings-one-blob" class="level2">
+<h2 class="anchored" data-anchor-id="two-colorings-one-blob">1. Two colorings, one blob</h2>
+<p>Recall the picture: a blob <span class="math inline">\(\Omega\)</span> of unit mass, a probability measure <span class="math inline">\(P\)</span> weighing its regions, and a random variable as numbers painted on the blob. Now paint the blob <strong>twice</strong>: two measurable functions</p>
 <p><span class="math display">\[
-p_{\text{data}}(x_0) \;=\; \tfrac{1}{2}\,\delta(x_0 + 1) \;+\; \tfrac{1}{2}\,\delta(x_0 - 1),
-\qquad x_0 \in \{-1, +1\}.
+X : \Omega \to \mathbb{R}, \qquad Y : \Omega \to \mathbb{R},
 \]</span></p>
-<p>Generative modeling asks: given samples from <span class="math inline">\(p_{\text{data}}\)</span>, produce <em>more</em> samples. For this dataset the answer is a coin flip — which is exactly why it is the right dataset: the machinery becomes transparent.</p>
+<p>on the <em>same</em> blob. This co-residence is the whole point. “<span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are jointly distributed” is not an extra assumption bolted on later; it is the statement that one outcome <span class="math inline">\(\omega\)</span> determines both numbers at once — height <em>and</em> weight of the same person, today’s price <em>and</em> tomorrow’s price of the same stock, clean image <em>and</em> noisy image from the same generation run.</p>
+<p>The pair is a single map into the plane,</p>
+<p><span class="math display">\[
+(X, Y) : \Omega \to \mathbb{R}^2,
+\qquad
+\mu_{X,Y} \;=\; (X,Y)_\# P,
+\]</span></p>
+<p>and the pushforward <span class="math inline">\(\mu_{X,Y}\)</span> — the blob’s mass transported to the plane — is the <strong>joint distribution</strong>. When it has a density <span class="math inline">\(p(x,y)\)</span>, picture the joint as a <strong>mountain</strong> of mass over the plane: total volume <span class="math inline">\(1\)</span>, height = mass per unit area.</p>
 </section>
-<section id="forward-process-noise-melts-the-data" class="level2">
-<h2 class="anchored" data-anchor-id="forward-process-noise-melts-the-data">Forward process: noise melts the data</h2>
-<p>Corrupt a clean sample with Gaussian noise of size <span class="math inline">\(\sigma\)</span>:</p>
+<section id="marginals-are-shadows-and-shadows-forget" class="level2">
+<h2 class="anchored" data-anchor-id="marginals-are-shadows-and-shadows-forget">2. Marginals are shadows — and shadows forget</h2>
+<p>The <strong>marginal</strong> of <span class="math inline">\(X\)</span> is nothing new: it is the pushforward of <span class="math inline">\(P\)</span> under <span class="math inline">\(X\)</span> alone, obtained from the joint by integrating out the other coordinate,</p>
 <p><span class="math display">\[
-x_\sigma \;=\; x_0 + \sigma z, \qquad z \sim \mathcal{N}(0, 1) \text{ independent of } x_0.
+p(x) = \int p(x, y)\, dy ,
+\qquad
+p(y) = \int p(x, y)\, dx .
 \]</span></p>
-<p>Since <span class="math inline">\(x_0 = \pm 1\)</span> with probability <span class="math inline">\(\tfrac12\)</span> each, the density of the corrupted sample is a two-component Gaussian mixture:</p>
+<p>Geometrically: collapse the mountain onto one axis — the marginal is the mountain’s <strong>shadow</strong>. And a shadow forgets. It records how much mass sits over each <span class="math inline">\(x\)</span>, but nothing about how that mass is distributed in <span class="math inline">\(y\)</span>.</p>
+<p>This forgetting is a one-way street with a name you will meet again:</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key takeaway: many mountains, same shadows
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The map from joints to marginal pairs is <strong>many-to-one</strong>. Fix both shadows to be standard normal; then <em>every</em> correlation <span class="math inline">\(\rho \in (-1, 1)\)</span> gives a different mountain casting those same two shadows (Act I of the demo below — drag <span class="math inline">\(\rho\)</span> and watch the mountain twist while the shadows stand still). Those are only the <em>jointly Gaussian</em> couplings of two standard normals; that pair admits many non-Gaussian couplings too.</p>
+<p>Twisting one ellipse is the mild version of the point. Here is the version you cannot argue with. Write <span class="math inline">\(N_{(u,v)}(x,y) = \mathcal{N}(x; u, s^2)\,
+\mathcal{N}(y; v, s^2)\)</span> for a round Gaussian lump of width <span class="math inline">\(s\)</span> centred at <span class="math inline">\((u,v)\)</span>, fix <span class="math inline">\(a &gt; s &gt; 0\)</span>, and put lumps at the four corners <span class="math inline">\((\pm a, \pm a)\)</span>. Build three joints by placing mass on them differently:</p>
 <p><span class="math display">\[
-p_\sigma(x) \;=\; \tfrac{1}{2}\,\mathcal{N}(x;\, -1,\, \sigma^2)
-\;+\; \tfrac{1}{2}\,\mathcal{N}(x;\, +1,\, \sigma^2).
+\begin{aligned}
+p_{\nearrow}(x,y) &amp;= \tfrac12 N_{(-a,-a)} + \tfrac12 N_{(+a,+a)}, \\
+p_{\searrow}(x,y) &amp;= \tfrac12 N_{(-a,+a)} + \tfrac12 N_{(+a,-a)}, \\
+p_{\boxplus}(x,y) &amp;= \tfrac14 \big( N_{(-a,-a)} + N_{(+a,+a)} + N_{(-a,+a)} + N_{(+a,-a)} \big).
+\end{aligned}
 \]</span></p>
-<p>Two facts, both visible in the demo:</p>
+<p>Integrating <span class="math inline">\(N_{(u,v)}\)</span> over <span class="math inline">\(y\)</span> leaves exactly <span class="math inline">\(\mathcal{N}(x; u, s^2)\)</span>, so each joint’s <span class="math inline">\(x\)</span>-marginal is the weighted sum of its lumps’ <span class="math inline">\(x\)</span>-factors. In every one of the three, the total weight sitting at <span class="math inline">\(u = -a\)</span> is <span class="math inline">\(\tfrac12\)</span> and at <span class="math inline">\(u = +a\)</span> is <span class="math inline">\(\tfrac12\)</span> — and likewise in <span class="math inline">\(y\)</span>. So all three have the <strong>identical</strong> pair of shadows, exactly and not approximately: the same two-bump curve</p>
+<p><span class="math display">\[
+p(x) \;=\; \tfrac12\, \mathcal{N}(x; -a, s^2) + \tfrac12\, \mathcal{N}(x; +a, s^2)
+\]</span></p>
+<p>on each axis. Yet one is two lumps on the rising diagonal, one is two lumps on the falling diagonal, and one is four lumps in a square. Their correlations are <span class="math inline">\(+\tfrac{a^2}{a^2 + s^2}\)</span>, <span class="math inline">\(-\tfrac{a^2}{a^2 + s^2}\)</span> and <span class="math inline">\(0\)</span> — strongly positive, strongly negative, and exactly zero (using <span class="math inline">\(\operatorname{Var}(X) = a^2 + s^2\)</span>). The third is genuinely independent — it is the product of its marginals. The first two are dependent, with correlation magnitude approaching <span class="math inline">\(1\)</span> as <span class="math inline">\(a/s\)</span> grows.</p>
+<p>Click through the three in Act I of the demo and watch the shadow curves on the edges: they do not so much as flicker. Nothing computed from the marginals alone — not their means, not their variances, not their complete one-dimensional shapes — distinguishes joints this different. And note where the correlation sits in this: it is <em>not</em> computable from the marginals either. It is joint information, one number’s worth, which the shadows have thrown away along with everything else. A joint with prescribed marginals is called a <strong>coupling</strong> of them, and the set of couplings is enormous. Many generative constructions induce a coupling of noise and data — a particular mountain over the (noise, data) plane — and some, such as minibatch-OT flow matching, select one on purpose. The transport tutorials (<a href="../tutorials/03-transport-story.html">the intuitive story</a> and <a href="../tutorials/08-transport-rigorous.html">the rigorous account</a>) study what <em>additional</em> structure picks out a map, a coupling, a kernel or a path; tutorial 10 is insistent that merely exhibiting a coupling explains less than it appears to. The mathematics of that choice starts here, with the fact that shadows do not determine the mountain.</p>
+</div>
+</div>
+<p>One special coupling deserves its name now: <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>independent</strong> when the joint is the product of the marginals, <span class="math inline">\(p(x,y) = p(x)\,p(y)\)</span> — the mountain built by extruding one shadow along the other, with no interaction. Independence is thus <em>one point</em> in the vast space of couplings, not the typical case; elementary courses over-expose it because it is the easiest mountain to compute with.</p>
+<p><strong>Interactive demo</strong> — <a href="../materials/joint-slicer.html" target="_blank">The Joint Slicer</a></p>
+<iframe src="../materials/joint-slicer.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: a correlated Gaussian joint with fixed marginals and draggable slices; a mixed two-shelf joint with posterior readout">
+</iframe>
+</section>
+<section id="conditionals-are-slices-renormalized" class="level2">
+<h2 class="anchored" data-anchor-id="conditionals-are-slices-renormalized">3. Conditionals are slices, renormalized</h2>
+<p>Fix a value <span class="math inline">\(x_0\)</span> and ask: <em>given</em> that <span class="math inline">\(X = x_0\)</span>, how is <span class="math inline">\(Y\)</span> distributed? On the mountain, the answer is geometric: cut a vertical <strong>slice</strong> through the mountain at <span class="math inline">\(x = x_0\)</span>. The slice’s profile <span class="math inline">\(y \mapsto p(x_0, y)\)</span> has the right <em>shape</em> but the wrong <em>total</em> — it is a sliver of mass, not a probability distribution. So renormalize: divide by the slice’s own area, which is exactly the marginal <span class="math inline">\(p(x_0)\)</span>. The result is the <strong>conditional density</strong></p>
+<p><span class="math display">\[
+p(y \mid x_0) \;=\; \frac{p(x_0, y)}{p(x_0)} .
+\]</span></p>
+<p><em>Slice, then renormalize.</em> That is the entire definition, and Act I of the demo lets you drag the slice line and watch both steps: the raw sliver (dashed) and its re-inflated version (solid).</p>
+<p>In blob language, for an event <span class="math inline">\(B\)</span> with <span class="math inline">\(P(B) &gt; 0\)</span>, conditioning genuinely does restrict the blob to <span class="math inline">\(B\)</span> and rescale: <span class="math inline">\(P(A \mid B) = P(A \cap B)/P(B)\)</span>, ordinary division.</p>
+<p>For <span class="math inline">\(X = x_0\)</span> with a continuous <span class="math inline">\(X\)</span> that story is not available, and it is worth being exact about why. The fibre <span class="math inline">\(\{X = x_0\}\)</span> has mass <strong>zero</strong>; there is nothing to rescale, and <span class="math inline">\(0/0\)</span> is not a definition. So the displayed formula is not restriction-and-rescaling in disguise — it is a <em>new</em> object, and it comes with hypotheses. Assume the joint has a density that is continuous near <span class="math inline">\(x_0\)</span> and that <span class="math inline">\(p(x_0) &gt; 0\)</span>. Then the quotient defines a natural continuous version of the conditional density, and it is recovered as the limit of thickened slices <span class="math inline">\(\{x_0 \le X \le x_0 + \varepsilon\}\)</span> as <span class="math inline">\(\varepsilon \to 0\)</span>.</p>
+<p>Two caveats to file away. The function <span class="math inline">\(y \mapsto p(x_0, y)\)</span> is a <strong>density cross-section</strong>, not a sliver of mass: its integral is the marginal <em>density</em> <span class="math inline">\(p(x_0)\)</span>, not the probability of a zero-width strip. And in general — without the continuity assumption — a conditional law is a <em>disintegration</em>, pinned down only for <span class="math inline">\(P_X\)</span>-almost every <span class="math inline">\(x_0\)</span>, so different versions may disagree at any particular value.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+A lean caution: conditioning on probability-zero events (Borel–Kolmogorov)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Because that limit is taken along shrinking <em>bands</em>, the answer can depend on the <strong>shape of the bands</strong>. The same probability-zero set can be presented in two ways — say, as the vertical line <span class="math inline">\(\{X = 0\}\)</span> or as a diagonal-parameterized family that happens to collapse onto that same line — and the two shrinking procedures can yield <em>different</em> conditional distributions. This is the Borel–Kolmogorov paradox. The first half of the rule is simple: <strong>a conditional distribution is defined relative to a chosen slicing variable</strong> (formally: a chosen <span class="math inline">\(\sigma\)</span>-algebra), never relative to the bare event. Always know <em>which variable</em> you are conditioning on.</p>
+<p>But naming the variable is not quite enough either, and it would be dishonest to stop there. Conditioning on <span class="math inline">\(\sigma(X)\)</span> determines the conditional law only for <span class="math inline">\(P_X\)</span>-<em>almost every</em> value; at any single null value <span class="math inline">\(x_0\)</span> a regular conditional kernel may be redefined at will. So what actually keeps this course safe is not that the slicing variable is explicit — though it always is — but that Gaussian smoothing gives every <span class="math inline">\(p(x_t \mid x_0)\)</span> and <span class="math inline">\(p_t\)</span> a positive, smooth density. That supplies a canonical continuous version, and identities between conditionals should otherwise be read as holding almost everywhere.</p>
+</div>
+</div>
+</section>
+<section id="bayes-rule-is-the-freedom-to-slice-both-ways" class="level2">
+<h2 class="anchored" data-anchor-id="bayes-rule-is-the-freedom-to-slice-both-ways">4. Bayes’ rule is the freedom to slice both ways</h2>
+<p>The mountain does not care which axis you slice along. Vertical slices give <span class="math inline">\(p(y \mid x)\)</span>; horizontal slices give <span class="math inline">\(p(x \mid y)\)</span>; and both factorizations rebuild the same mountain:</p>
+<p><span class="math display">\[
+p(x, y) \;=\; p(y \mid x)\, p(x) \;=\; p(x \mid y)\, p(y).
+\]</span></p>
+<p>Read the second equality as a statement about one object — <em>ribbons of conditional mass, weighted by the shadow, tile the mountain, in either direction</em> — and division gives</p>
+<p><span class="math display">\[
+p(x \mid y) \;=\; \frac{p(y \mid x)\, p(x)}{p(y)} ,
+\qquad
+p(y) = \int p(y \mid x)\, p(x)\, dx .
+\]</span></p>
+<p>That is Bayes’ rule. On the measure-theoretic picture it is not a new axiom, not a philosophy, not even a theorem of any depth: it is the observation that a mountain admits two slicings. All of its power in applications comes from an asymmetry of <em>availability</em>, not of mathematics — models are naturally specified in one direction (a cause <span class="math inline">\(x\)</span> producing an observation <span class="math inline">\(y\)</span> via <span class="math inline">\(p(y \mid x)\)</span>), while inference needs the other (<span class="math inline">\(p(x \mid y)\)</span>). Bayes’ rule is the pivot between them.</p>
+</section>
+<section id="mixed-joints-the-two-shelf-picture" class="level2">
+<h2 class="anchored" data-anchor-id="mixed-joints-the-two-shelf-picture">5. Mixed joints: the two-shelf picture</h2>
+<p>Diffusion models constantly condition between a <em>discrete</em> variable and a <em>continuous</em> one, and there the mountain picture needs one adjustment. Let <span class="math inline">\(z \in
+\{-1, +1\}\)</span> be a latent label with <span class="math inline">\(P(z = -1) = \pi\)</span>, and let <span class="math inline">\(x \mid z \sim
+\mathcal{N}(z, \sigma^2)\)</span>. The joint of <span class="math inline">\((z, x)\)</span> is not a mountain over the plane: it is <strong>two shelves</strong> of 1-D density, one per value of <span class="math inline">\(z\)</span>, holding masses <span class="math inline">\(\pi\)</span> and <span class="math inline">\(1 - \pi\)</span>:</p>
+<p><span class="math display">\[
+p(z, x) \;=\;
+\begin{cases}
+\pi \cdot \mathcal{N}(x; -1, \sigma^2) &amp; z = -1,\\[2pt]
+(1-\pi) \cdot \mathcal{N}(x; +1, \sigma^2) &amp; z = +1.
+\end{cases}
+\]</span></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/two-shelves.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>A mixed joint: one discrete and one continuous variable. The joint is two weighted shelves of density; a vertical slice crosses both shelves, and renormalizing the two heights gives the posterior over z.</figcaption>
+</figure>
+</div>
+<p>Everything from §§2–4 transfers verbatim, with one integral replaced by a sum:</p>
 <ul>
-<li><strong>Small <span class="math inline">\(\sigma\)</span>:</strong> two sharp bumps at <span class="math inline">\(\pm 1\)</span> — the data is intact.</li>
-<li><strong>Large <span class="math inline">\(\sigma\)</span>:</strong> the bumps merge. Indeed <span class="math inline">\(\mathbb{E}[x_\sigma] = 0\)</span> and <span class="math inline">\(\operatorname{Var}(x_\sigma) = \mathbb{E}[x_0^2] + \sigma^2 = 1 + \sigma^2\)</span>, and for <span class="math inline">\(\sigma \gtrsim 3\)</span> the mixture is indistinguishable in practice from <span class="math inline">\(\mathcal{N}(0,\, 1 + \sigma^2)\)</span> — at <span class="math inline">\(\sigma = 3\)</span> its excess kurtosis is only <span class="math inline">\(-0.02\)</span>. (It is never <em>exactly</em> Gaussian at finite <span class="math inline">\(\sigma\)</span>; the precise statement is <span class="math inline">\(x_\sigma / \sqrt{1+\sigma^2} \Rightarrow \mathcal{N}(0,1)\)</span> as <span class="math inline">\(\sigma \to \infty\)</span>.)</li>
+<li><strong>Marginal of <span class="math inline">\(x\)</span></strong> (shadow of both shelves): the mixture <span class="math inline">\(p(x) = \pi\, \mathcal{N}(x; -1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; +1,
+\sigma^2)\)</span>.</li>
+<li><strong>Conditional of <span class="math inline">\(x\)</span> given <span class="math inline">\(z\)</span></strong> (one shelf, renormalized): just <span class="math inline">\(\mathcal{N}(x; z, \sigma^2)\)</span> — the model as specified.</li>
+<li><strong>Conditional of <span class="math inline">\(z\)</span> given <span class="math inline">\(x\)</span></strong> — slice vertically at <span class="math inline">\(x\)</span>. The slice meets <em>two points</em> of mass, the heights of the two shelves; renormalizing the pair gives the <strong>posterior</strong></li>
 </ul>
-<p>This is the first design principle of diffusion models: <strong>destroying structure is easy, fully understood, and ends somewhere known</strong> (a Gaussian), no matter what the data was.</p>
+<p><span class="math display">\[
+P(z = +1 \mid x)
+= \frac{(1-\pi)\, \mathcal{N}(x; +1, \sigma^2)}
+       {\pi\, \mathcal{N}(x; -1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; +1, \sigma^2)} .
+\]</span></p>
+<p>This is Bayes’ rule again, but now the slice-and-renormalize is a two-bar histogram — Act II of the demo, where the slice line drags across both shelves and the posterior bars re-balance live.</p>
+<section id="the-worked-example-this-course-runs-on" class="level3">
+<h3 class="anchored" data-anchor-id="the-worked-example-this-course-runs-on">The worked example this course runs on</h3>
+<p>Set <span class="math inline">\(\pi = \tfrac12\)</span>. Cancel the common factor and simplify the ratio of Gaussians:</p>
+<p><span class="math display">\[
+P(z = +1 \mid x)
+= \frac{\exp\!\big(\!-\tfrac{(x-1)^2}{2\sigma^2}\big)}
+       {\exp\!\big(\!-\tfrac{(x+1)^2}{2\sigma^2}\big) + \exp\!\big(\!-\tfrac{(x-1)^2}{2\sigma^2}\big)}
+= \frac{1}{1 + e^{-2x/\sigma^2}}
+= \operatorname{sigmoid}\!\left(\frac{2x}{\sigma^2}\right),
+\]</span></p>
+<p>and therefore the <strong>posterior mean</strong> of the label is</p>
+<p><span class="math display">\[
+\mathbb{E}[z \mid x]
+= (+1)\,P(z{=}{+1} \mid x) + (-1)\,P(z{=}{-1} \mid x)
+= \tanh\!\left(\frac{x}{\sigma^2}\right).
+\]</span></p>
+<p>This sigmoid/tanh pair is the exact object that appears in <a href="../tutorials/05-two-point-diffusion.html">Two-Point Diffusion</a> as the optimal denoiser <span class="math inline">\(\mathbb{E}[x_0 \mid x]\)</span> — under the dictionary <span class="math inline">\(z \leftrightarrow x_0\)</span> and <span class="math inline">\(x \leftrightarrow x_\sigma\)</span>, since <span class="math inline">\(x = z + \sigma\varepsilon\)</span> here is that tutorial’s VE corruption <span class="math inline">\(x_\sigma = x_0 + \sigma\varepsilon\)</span>. (Mind the letter: <span class="math inline">\(z\)</span> is the <em>clean label</em> here and the <em>noise</em> there.) Concretely: what a denoiser computes <em>is</em> a posterior mean — a slice through a joint of (clean, noisy), renormalized, then averaged. Seen from this tutorial, the W01 formula is one drag of the slice line in Act II.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key takeaway
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Four pictures, one object. The <strong>joint</strong> is the complete description (mountain, or shelves). <strong>Marginals</strong> are its shadows — lossy, with many joints per shadow-pair. <strong>Conditionals</strong> are its slices, renormalized to unit mass — well-defined once you say which variable slices. <strong>Bayes’ rule</strong> is the identity between the two ways of slicing. Every probabilistic statement in this course — <span class="math inline">\(p(x_t \mid x_0)\)</span>, the posterior over components, <span class="math inline">\(\mathbb{E}[x_0 \mid x_t]\)</span> — is one of these four moves on some joint.</p>
+</div>
+</div>
 </section>
-<section id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form" class="level2">
-<h2 class="anchored" data-anchor-id="denoising-bayes-rule-gives-the-optimal-denoiser-in-closed-form">Denoising: Bayes’ rule gives the optimal denoiser in closed form</h2>
-<p>Now invert: we observe a noisy <span class="math inline">\(x_\sigma = x\)</span> and want the clean <span class="math inline">\(x_0\)</span>. The best guess under squared error is the <strong>posterior mean</strong> <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma = x]\)</span> (we will prove this optimality claim in Module 1; for now, take it).</p>
-<p>The posterior over the two candidates follows from Bayes’ rule:</p>
-<p><span class="math display">\[
-\mathbb{P}(x_0 = +1 \mid x)
-= \frac{\tfrac12\,\mathcal{N}(x; +1, \sigma^2)}
-       {\tfrac12\,\mathcal{N}(x; +1, \sigma^2) + \tfrac12\,\mathcal{N}(x; -1, \sigma^2)}
-= \frac{1}{1 + \exp\!\big(-\tfrac{2x}{\sigma^2}\big)}
-= \operatorname{sigmoid}\!\Big(\frac{2x}{\sigma^2}\Big),
-\]</span></p>
-<p>where the middle step divides through by <span class="math inline">\(\mathcal{N}(x; +1, \sigma^2)\)</span> and uses <span class="math inline">\(\exp\!\big(-\tfrac{(x+1)^2}{2\sigma^2}\big) \big/ \exp\!\big(-\tfrac{(x-1)^2}{2\sigma^2}\big)
-= \exp\!\big(-\tfrac{2x}{\sigma^2}\big)\)</span>. Therefore</p>
-<p><span class="math display">\[
-\boxed{\;\mathbb{E}[x_0 \mid x_\sigma = x]
-= (+1)\,\mathbb{P}(+1 \mid x) + (-1)\,\mathbb{P}(-1 \mid x)
-= \tanh\!\Big(\frac{x}{\sigma^2}\Big).\;}
-\]</span></p>
-<p>The optimal denoiser is a <strong>tanh</strong> — an activation function you already know, produced by nothing but probability. Sanity-check its two regimes:</p>
-<ul>
-<li><span class="math inline">\(\sigma \to 0\)</span>: <span class="math inline">\(\tanh(x/\sigma^2)\)</span> becomes a hard step — snap to the nearer data point.</li>
-<li><span class="math inline">\(\sigma \to \infty\)</span>: <span class="math inline">\(\tanh(x/\sigma^2) \approx x/\sigma^2 \to 0\)</span> — the observation is all noise, so the best guess is the prior mean <span class="math inline">\(0\)</span>.</li>
-</ul>
 </section>
-<section id="the-score-function-a-preview-of-module-4" class="level2">
-<h2 class="anchored" data-anchor-id="the-score-function-a-preview-of-module-4">The score function (a preview of Module 4)</h2>
-<p>Differentiate <span class="math inline">\(\log p_\sigma\)</span> directly. With <span class="math inline">\(\varphi_\pm(x) = \mathcal{N}(x; \pm 1, \sigma^2)\)</span> and <span class="math inline">\(\varphi_\pm'(x) = -\tfrac{x \mp 1}{\sigma^2}\varphi_\pm(x)\)</span>,</p>
-<p><span class="math display">\[
-\nabla_x \log p_\sigma(x)
-= \frac{\tfrac12\varphi_-'(x) + \tfrac12\varphi_+'(x)}{p_\sigma(x)}
-= -\frac{x - \mathbb{E}[x_0 \mid x]}{\sigma^2}
-= \frac{\tanh\!\big(\tfrac{x}{\sigma^2}\big) - x}{\sigma^2}.
-\]</span></p>
-<p>Rearranged, this is <strong>Tweedie’s formula</strong>, one of the two or three most important identities of the course:</p>
-<p><span class="math display">\[
-\mathbb{E}[x_0 \mid x_\sigma = x] \;=\; x + \sigma^2\, \nabla_x \log p_\sigma(x).
-\]</span></p>
-<p><em>Denoising and knowing the score are the same thing</em> — for additive Gaussian noise of known size <span class="math inline">\(\sigma\)</span>, which is exactly the diffusion setting. The score <span class="math inline">\(\nabla_x \log p_\sigma\)</span> points from <span class="math inline">\(x\)</span> toward where the (noised) data is denser; the denoiser just moves by <span class="math inline">\(\sigma^2\)</span> times the score. One caveat: the score is a <em>local</em> quantity — at <span class="math inline">\(x = 0\)</span> it vanishes by symmetry even though, in the two-bump regime, <span class="math inline">\(x = 0\)</span> is a density <em>minimum</em>. It is an unstable equilibrium: the reverse dynamics leave a particle sitting exactly there alone, and push a particle on either side away toward the nearer mode.</p>
-</section>
-<section id="reverse-process-run-the-diffusion-backwards" class="level2">
-<h2 class="anchored" data-anchor-id="reverse-process-run-the-diffusion-backwards">Reverse process: run the diffusion backwards</h2>
-<p>Generation now works by <em>annealing</em>: start from pure noise at a large <span class="math inline">\(\sigma_{\max}\)</span>, and lower <span class="math inline">\(\sigma\)</span> along a grid <span class="math inline">\(\sigma_{\max} = \sigma_0 &gt; \sigma_1 &gt; \cdots &gt; \sigma_K \approx 0\)</span>, nudging the sample along the score at every step. (We write <span class="math inline">\(y_k\)</span> for the reverse iterate at noise level <span class="math inline">\(\sigma_k\)</span>, keeping <span class="math inline">\(x_0\)</span> reserved for the clean data point; <span class="math inline">\(y_0\)</span> is pure noise and <span class="math inline">\(y_K\)</span> is the generated sample.)</p>
-<p><span class="math display">\[
-y_{k+1} \;=\; y_k \;+\; \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\,
-\nabla_y \log p_{\sigma_k}(y_k)
-\;=\; y_k + \frac{\sigma_k^2 - \sigma_{k+1}^2}{2}\cdot
-\frac{\tanh\!\big(y_k/\sigma_k^2\big) - y_k}{\sigma_k^2}.
-\]</span></p>
-<p>This deterministic rule is the explicit Euler discretization of the <strong>probability-flow ODE</strong> in the variance clock <span class="math inline">\(\tau = \sigma^2\)</span>. (Strictly, to speak of dynamics <em>across</em> noise levels we couple them: <span class="math inline">\(x_\tau = x_0 + w_\tau\)</span> with <span class="math inline">\(w\)</span> a Brownian motion — Module 5 makes this precise; nothing below needs it yet.) The stochastic variant both <strong>doubles the score drift and injects fresh independent noise</strong> at each step,</p>
-<p><span class="math display">\[
-y_{k+1} = y_k + \big(\sigma_k^2 - \sigma_{k+1}^2\big)\,\nabla_y \log p_{\sigma_k}(y_k)
-+ \sqrt{\sigma_k^2 - \sigma_{k+1}^2}\; z_k, \qquad z_k \sim \mathcal{N}(0,1)
-\text{ i.i.d.},
-\]</span></p>
-<p>giving the Euler–Maruyama discretization of the <strong>reverse-time SDE</strong>. Where these updates <em>come from</em> is the business of Modules 5–6 (Fokker–Planck, reverse-time dynamics); today we only need to <em>watch them work</em>: a cloud of particles started from <span class="math inline">\(\mathcal{N}(0,\, 1+\sigma_{\max}^2)\)</span> splits, condenses, and lands within <span class="math inline">\(\approx \sigma_{\min}\)</span> of <span class="math inline">\(\{-1, +1\}\)</span>, in equal proportions up to sampling error.</p>
-<p>To be honest about the word “exact”: the <em>formulas</em> are exact, but the sampler carries four small approximations — we initialize from the moment-matched Gaussian rather than the true mixture <span class="math inline">\(p_{\sigma_{\max}}\)</span> (indistinguishable at <span class="math inline">\(\sigma_{\max} = 3\)</span>, but not equal); we stop at <span class="math inline">\(\sigma_{\min} = 10^{-2} &gt; 0\)</span>, so samples end a hair’s width from the atoms; the Euler steps discretize the flow; and any finite run has sampling noise. Each vanishes in the appropriate limit — and every one of them has a counterpart in real diffusion models.</p>
-<p>The full sampler, with no neural network anywhere:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(y, s2):                 <span class="co"># ∇ log p_σ(y), exact for the two-point data</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (np.tanh(y <span class="op">/</span> s2) <span class="op">-</span> y) <span class="op">/</span> s2</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>smax, smin, K, N <span class="op">=</span> <span class="fl">3.0</span>, <span class="fl">1e-2</span>, <span class="dv">500</span>, <span class="dv">100_000</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sig <span class="op">=</span> smax <span class="op">*</span> (smin <span class="op">/</span> smax) <span class="op">**</span> (np.arange(K <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> K)    <span class="co"># geometric σ grid</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> smax<span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> np.random.randn(N)           <span class="co"># start from pure noise</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):                                       <span class="co"># probability-flow ODE</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> sig[k]<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> sig[k <span class="op">+</span> <span class="dv">1</span>]<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    y <span class="op">+=</span> <span class="fl">0.5</span> <span class="op">*</span> d <span class="op">*</span> score(y, sig[k]<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>err <span class="op">=</span> np.<span class="bu">abs</span>(np.<span class="bu">abs</span>(y) <span class="op">-</span> <span class="dv">1</span>).<span class="bu">max</span>()      <span class="co"># worst distance to the nearest data point</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(err, (y <span class="op">&gt;</span> <span class="dv">0</span>).mean())   <span class="co"># ≈ 0 and ≈ 0.5, up to σ_min + discretization + sampling</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="why-the-course-exists-what-breaks-for-images" class="level2">
-<h2 class="anchored" data-anchor-id="why-the-course-exists-what-breaks-for-images">Why the course exists: what breaks for images</h2>
-<p>Everything above was exact because the posterior mean had a formula. For images there is no usable one. (Exercise 4 gives a closed form for any <em>finite</em> training set — but a sampler built on it can only ever reproduce the training points; what we actually want is the posterior mean under the unknown <em>population</em> distribution.) Nor can it be tabulated: a <span class="math inline">\(64 \times 64\)</span> RGB image lives in a space of <span class="math inline">\(256^{12288}\)</span> configurations, and the data occupies a vanishingly thin filament of it (Module 1: the curse of dimensionality). The entire role of the neural network in a diffusion model is to <strong>approximate the map <span class="math inline">\((x, \sigma) \mapsto \mathbb{E}[x_0 \mid x]\)</span></strong> — to be the tanh we can no longer derive. Every other ingredient of this note survives unchanged, and each becomes a module of the course:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>In this note</th>
-<th>In the course</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>The “produce more samples” problem; why direct density estimation fails</td>
-<td>M1 — Foundations of generative modeling</td>
-</tr>
-<tr class="even">
-<td>Gaussian mixture, conditioning, <span class="math inline">\(\operatorname{Var} = 1+\sigma^2\)</span></td>
-<td>M2 — Gaussians and noise accumulation</td>
-</tr>
-<tr class="odd">
-<td>The discrete <span class="math inline">\(\sigma\)</span> grid; denoising as the training target</td>
-<td>M3 — DDPM framework</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\nabla_x \log p_\sigma\)</span>, Tweedie’s formula</td>
-<td>M4 — Score matching and denoising</td>
-</tr>
-<tr class="odd">
-<td>The <span class="math inline">\(\sigma\)</span>-continuum, densities evolving with <span class="math inline">\(\sigma\)</span></td>
-<td>M5 — SDEs and Fokker–Planck</td>
-</tr>
-<tr class="even">
-<td>The reverse update and the probability-flow ODE</td>
-<td>M6 — Reverse-time dynamics</td>
-</tr>
-</tbody>
-</table>
+<section id="what-is-deferred-deliberately" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-deferred-deliberately">6. What is deferred, deliberately</h2>
+<p>Three objects belong to this storyline but deserve their own installment: <strong>likelihood</strong> (the conditional read as a function of the parameter, not the data), the <strong>score</strong> (the gradient of a log-density, i.e.&nbsp;of a log-slice), and <strong>KL divergence</strong> (a measure-theoretic comparison of two mountains). Where each is actually picked up: likelihood in <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>, and the score in <a href="../tutorials/05-two-point-diffusion.html">Two-Point Diffusion</a> and <a href="../tutorials/07-probability-flow-ode.html">the probability-flow ODE</a>. KL has no measure-theoretic treatment in the present sequence — it is used in lecture in its working form, and a proper installment is still owed.</p>
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
 <ol type="1">
-<li>Fill in the algebra for <span class="math inline">\(\mathbb{P}(x_0 = +1 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> and <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh(x/\sigma^2)\)</span>.</li>
-<li>Show <span class="math inline">\(\operatorname{Var}(x_\sigma) = 1 + \sigma^2\)</span>, and more generally <span class="math inline">\(\operatorname{Var}(x_\sigma) = \operatorname{Var}(x_0) + \sigma^2\)</span> for any data distribution with finite variance (independence of <span class="math inline">\(z\)</span> and <span class="math inline">\(x_0\)</span> is all you need — zero mean is not required).</li>
-<li><strong>Unequal weights.</strong> Let <span class="math inline">\(\mathbb{P}(x_0 = +1) = \pi\)</span> with <span class="math inline">\(0 &lt; \pi &lt; 1\)</span>. <em>(Convention warning: this is the opposite of tutorials <a href="../tutorials/01-measuring-things.html">01</a> and <a href="../tutorials/02-joint-conditional-bayes.html">02</a>, which set <span class="math inline">\(\pi = \mathbb{P}(-1)\)</span>. The formulas differ by <span class="math inline">\(\pi \to 1 - \pi\)</span>; check which one you are reading.)</em> Show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \tanh\!\big(\tfrac{x}{\sigma^2} + \tfrac12 \log\tfrac{\pi}{1-\pi}\big)\)</span> — the denoiser acquires a <em>bias</em>. Check that as <span class="math inline">\(\sigma \to \infty\)</span> this tends to <span class="math inline">\(2\pi - 1\)</span>, the prior mean, and work out what happens in the degenerate cases <span class="math inline">\(\pi \in \{0, 1\}\)</span> by taking limits.</li>
-<li><strong>More points.</strong> For data uniform on <span class="math inline">\(\{a_1, \dots, a_m\}\)</span>, show <span class="math inline">\(\mathbb{E}[x_0 \mid x] = \sum_i a_i\, w_i(x)\)</span> with <span class="math inline">\(w_i(x) \propto \exp\!\big(\tfrac{a_i x}{\sigma^2} - \tfrac{a_i^2}{2\sigma^2}\big)
-\propto \exp\!\big(-\tfrac{(x - a_i)^2}{2\sigma^2}\big)\)</span> — a <em>softmax</em> with Gaussian-kernel weights. (So the optimal denoiser for a finite dataset under Gaussian corruption is attention-like: an RBF-weighted average of the training points. For non-uniform weights <span class="math inline">\(\pi_i\)</span>, each logit gains <span class="math inline">\(\log \pi_i\)</span>.)</li>
-<li>Run the sampler above with the SDE update instead of the ODE. Compare the RMS distance of the final samples to the nearest data point for both, as a function of <span class="math inline">\(K\)</span> and of <span class="math inline">\(\sigma_{\min}\)</span>. (You should find that increasing <span class="math inline">\(K\)</span> removes discretization error but both samplers retain a terminal width <span class="math inline">\(\approx \sigma_{\min}\)</span> — lowering <span class="math inline">\(\sigma_{\min}\)</span>, not raising <span class="math inline">\(K\)</span>, is what sharpens the atoms.)</li>
+<li>Two fair coin tosses; <span class="math inline">\(X\)</span> = first toss, <span class="math inline">\(Y\)</span> = number of heads. Write the four nonzero entries of the joint as a <span class="math inline">\(2 \times 3\)</span> table, compute both marginals (shadow along each axis), and both conditional families. Verify Bayes’ rule on <span class="math inline">\(P(X = H \mid Y = 1)\)</span>.</li>
+<li>The standard bivariate normal with correlation <span class="math inline">\(|\rho| &lt; 1\)</span> has density <span class="math display">\[
+p(x,y) = \frac{1}{2\pi\sqrt{1-\rho^2}}
+  \exp\!\Big(\!-\tfrac{x^2 - 2\rho x y + y^2}{2(1-\rho^2)}\Big).
+\]</span> Verify by completing the square in <span class="math inline">\(y\)</span> that the vertical slice at <span class="math inline">\(x_0\)</span>, renormalized, is <span class="math inline">\(\mathcal{N}(\rho x_0,\, 1 - \rho^2)\)</span>. Confirm both readings against the demo: the slice’s centre moves with <span class="math inline">\(x_0\)</span> (unless <span class="math inline">\(\rho = 0\)</span>), while its width is the same for every <span class="math inline">\(x_0\)</span>.</li>
+<li>Construct two <em>different</em> joints on <span class="math inline">\(\{0,1\}^2\)</span> with both marginals uniform. (You have found two couplings of the same shadows. How many are there?)</li>
+<li>Show that if <span class="math inline">\(p(x,y) = p(x)\,p(y)\)</span> then every vertical slice, renormalized, is the same distribution <span class="math inline">\(p(y)\)</span> — independence means <em>the slices don’t move</em>. Check this in Act I at <span class="math inline">\(\rho = 0\)</span>. Note carefully why that check is legitimate here: the family is <em>jointly Gaussian</em>, and for jointly Gaussian pairs zero correlation does imply independence. In general it does not — the four-lump joint above is uncorrelated and dependent.</li>
+<li>Derive the sigmoid posterior above, keeping general <span class="math inline">\(\pi \in (0,1)\)</span>; show the effect of <span class="math inline">\(\pi \neq \tfrac12\)</span> is an additive shift <span class="math inline">\(\tfrac{\sigma^2}{2}\log
+\tfrac{1-\pi}{\pi}\)</span> in <span class="math inline">\(x\)</span>. Watch the bars in Act II shift as you drag <span class="math inline">\(\pi\)</span>.</li>
+<li>For general <span class="math inline">\(\pi\)</span> the posterior mean is the <em>shifted</em> tanh of Exercise 5, <span class="math display">\[
+\mathbb{E}[z \mid x] = \tanh\!\Big(\tfrac{x}{\sigma^2}
+  + \tfrac12 \log \tfrac{1-\pi}{\pi}\Big),
+\]</span> which reduces to <span class="math inline">\(\tanh(x/\sigma^2)\)</span> only at <span class="math inline">\(\pi = \tfrac12\)</span>. Integrating <em>that</em> against the mixture marginal gives <span class="math inline">\(\mathbb{E}[\,\mathbb{E}[z \mid x]\,]\)</span> — and you should be able to name the answer, <span class="math inline">\(1 - 2\pi\)</span>, <em>without computing any integral</em>. (This is the tower property; it will become the workhorse identity of the course. Check what goes wrong if you integrate the unshifted <span class="math inline">\(\tanh(x/\sigma^2)\)</span> against an unequal mixture.)</li>
+<li><em>(Borel–Kolmogorov, lean.)</em> On the unit square with uniform mass, the event “<span class="math inline">\(Y = X\)</span>” has probability zero. Two different variables vanish exactly on it: <span class="math display">\[
+U = Y - X, \qquad V = \frac{Y - X}{1 + X}.
+\]</span> Both band families <span class="math inline">\(\{|U| \le \varepsilon\}\)</span> and <span class="math inline">\(\{|V| \le \varepsilon\} = \{|Y - X| \le \varepsilon(1+X)\}\)</span> shrink to the same diagonal. Parameterising that diagonal by <span class="math inline">\(x \in [0,1]\)</span>, show the first induces the uniform limiting density <span class="math inline">\(1\)</span> and the second induces <span class="math inline">\(\tfrac{2(1+x)}{3}\)</span>. Same limiting set, different answers — so it is the <em>variable</em>, not the event, that the conditional depends on.</li>
 </ol>
 
 
@@ -1036,13 +1047,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/06-genai-simplest-form.html" class="pagination-link" aria-label="Generative AI, in Its Simplest Form">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Generative AI, in Its Simplest Form</span>
+      <a href="../tutorials/10-measuring-things.html" class="pagination-link" aria-label="Measuring Things — From Length to Probability">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Measuring Things — From Length to Probability</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/08-map-proved.html" class="pagination-link" aria-label="The Deterministic Map, Proved">
-        <span class="nav-page-text">The Deterministic Map, Proved</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../resources.html" class="pagination-link" aria-label="Resources">
+        <span class="nav-page-text">Resources</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
