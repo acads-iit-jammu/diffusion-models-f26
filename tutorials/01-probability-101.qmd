@@ -1,9 +1,10 @@
-# Probability 101 — A Refresher {.unnumbered}
+# Probability & Random Variables {.unnumbered}
 
-*A standalone tutorial (used in [W02](../weeks/w02.qmd)): a self-contained refresher on the probability prerequisites of the
-course: sample spaces, random variables, joint and marginal distributions,
-conditioning, and expectation. Readers comfortable with these notions may proceed
-directly to [Distributions and Maximum Likelihood](./02-distributions-mle.qmd).*
+*A standalone tutorial (used in [W02](../weeks/w02.qmd)): the probability the
+course actually uses, built from the ground up — sample spaces, events, random
+variables, joint and marginal distributions, conditioning, and expectation.
+Readers already comfortable with these notions may proceed directly to
+[Distributions and Maximum Likelihood](./02-distributions-mle.qmd).*
 
 ::: {.callout-note}
 ## The level this works at
@@ -26,7 +27,7 @@ them.
 Probability theory is built on two distinct maps: the probability measure, which
 assigns numbers to events, and the random variable, which assigns numbers to
 outcomes. Distinguishing the two carefully at the outset prevents most of the common
-confusions, and this refresher is organized accordingly.
+confusions, and this tutorial is organized accordingly.
 
 ## The sample space, events, and the probability measure
 
@@ -328,7 +329,7 @@ the real line.
 
 ## Correspondence with this course
 
-| Probability 101 object | Where it appears in this course |
+| Object | Where it appears in this course |
 |---|---|
 | Sample space $\Omega$, outcome $\omega$ | the randomness underlying every "sample" |
 | $P$: events $\to [0,1]$ | the data distribution $p_{\text{data}}$ |

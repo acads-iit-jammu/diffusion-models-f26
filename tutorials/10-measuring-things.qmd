@@ -14,7 +14,7 @@ builds the multivariate picture on this footing.*
 
 Nothing in the lectures or the other tutorials depends on this pair. The working
 versions of everything here are in
-[Probability 101](./01-probability-101.qmd) and
+[Probability & Random Variables](./01-probability-101.qmd) and
 [Distributions and Maximum Likelihood](./02-distributions-mle.qmd), and you can
 follow the whole course from those. Read this track when you want to know *why*
 the working versions are allowed — or when a formula has surprised you and you
@@ -685,7 +685,7 @@ Two consequences, both load-bearing later:
   and why *we* may choose $\Omega$ freely, to be whatever is convenient.
 
   This is the theorem behind a move
-  [Probability 101](./01-probability-101.qmd) makes informally. There, the sample
+  [Probability & Random Variables](./01-probability-101.qmd) makes informally. There, the sample
   space for tomorrow's temperature is described as the set of possible states of
   the world, and $T \sim \mathcal{N}(\mu,\sigma^2)$ as a statement about the
   distribution $T$ *induces* on the line — after which the "canonical shortcut"
