@@ -397,10 +397,15 @@ window.Quarto = {
   <ul>
   <li><a href="#the-sample-space-events-and-the-probability-measure" id="toc-the-sample-space-events-and-the-probability-measure" class="nav-link active" data-scroll-target="#the-sample-space-events-and-the-probability-measure">The sample space, events, and the probability measure</a></li>
   <li><a href="#random-variables" id="toc-random-variables" class="nav-link" data-scroll-target="#random-variables">Random variables</a></li>
+  <li><a href="#what-omega-actually-is-when-the-variable-is-continuous" id="toc-what-omega-actually-is-when-the-variable-is-continuous" class="nav-link" data-scroll-target="#what-omega-actually-is-when-the-variable-is-continuous">What <span class="math inline">\(\Omega\)</span> actually is when the variable is continuous</a>
+  <ul class="collapse">
+  <li><a href="#the-canonical-shortcut" id="toc-the-canonical-shortcut" class="nav-link" data-scroll-target="#the-canonical-shortcut">The canonical shortcut</a></li>
+  </ul></li>
   <li><a href="#joint-distributions" id="toc-joint-distributions" class="nav-link" data-scroll-target="#joint-distributions">Joint distributions</a></li>
   <li><a href="#marginal-distributions" id="toc-marginal-distributions" class="nav-link" data-scroll-target="#marginal-distributions">Marginal distributions</a></li>
   <li><a href="#conditional-distributions-and-bayes-rule" id="toc-conditional-distributions-and-bayes-rule" class="nav-link" data-scroll-target="#conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</a></li>
   <li><a href="#expectation" id="toc-expectation" class="nav-link" data-scroll-target="#expectation">Expectation</a></li>
+  <li><a href="#the-four-objects-in-one-table" id="toc-the-four-objects-in-one-table" class="nav-link" data-scroll-target="#the-four-objects-in-one-table">The four objects, in one table</a></li>
   <li><a href="#correspondence-with-this-course" id="toc-correspondence-with-this-course" class="nav-link" data-scroll-target="#correspondence-with-this-course">Correspondence with this course</a></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
@@ -449,7 +454,8 @@ The level this works at
 <p>A random experiment is modeled by three objects.</p>
 <ul>
 <li><p>The <strong>sample space</strong> <span class="math inline">\(\Omega\)</span> is the set of all possible outcomes of the experiment, with one element <span class="math inline">\(\omega \in \Omega\)</span> per complete outcome. For a single die, <span class="math inline">\(\Omega = \{1, \dots, 6\}\)</span>. For two coin tosses, <span class="math inline">\(\Omega = \{HH, HT, TH, TT\}\)</span>; note that an outcome specifies the result of the entire experiment, i.e.&nbsp;both tosses. For a point drawn from the interval <span class="math inline">\([0,1]\)</span>, <span class="math inline">\(\Omega = [0,1]\)</span>, an uncountable set.</p></li>
-<li><p>An <strong>event</strong> is a subset <span class="math inline">\(A \subseteq \Omega\)</span>; events are the objects to which probabilities are assigned. “The die shows an even number” is the event <span class="math inline">\(\{2, 4, 6\}\)</span>; “at least one head” is the event <span class="math inline">\(\{HH, HT, TH\}\)</span>. An event is a collection of outcomes, not an outcome.</p></li>
+<li><p>An <strong>event</strong> is a subset <span class="math inline">\(A \subseteq \Omega\)</span>; events are the objects to which probabilities are assigned. “The die shows an even number” is the event <span class="math inline">\(\{2, 4, 6\}\)</span>; “at least one head” is the event <span class="math inline">\(\{HH, HT, TH\}\)</span>. An event is a collection of outcomes, not an outcome.</p>
+<p>Worth pausing on the asymmetry here, because it is the source of a lot of early confusion. <strong>Exactly one outcome occurs, but many events occur at once.</strong> Roll a <span class="math inline">\(4\)</span> and the single outcome is <span class="math inline">\(\omega = 4\)</span> — yet “even”, “at most <span class="math inline">\(5\)</span>”, “not a <span class="math inline">\(6\)</span>” and <span class="math inline">\(\Omega\)</span> itself have all occurred simultaneously, because <span class="math inline">\(4\)</span> belongs to all of them. Outcomes are exclusive; events are not.</p></li>
 <li><p>The <strong>probability measure</strong> is the first of the two maps:</p>
 <p><span class="math display">\[
 P : \text{events} \longrightarrow [0, 1],
@@ -469,6 +475,30 @@ P : \text{events} \longrightarrow [0, 1],
 X : \Omega \longrightarrow \mathbb{R}
 \]</span></p>
 <p>that assigns a numerical value to each outcome. For the two-coin experiment with <span class="math inline">\(X\)</span> the number of heads: <span class="math inline">\(X(HH) = 2\)</span>, <span class="math inline">\(X(HT) = X(TH) = 1\)</span>, <span class="math inline">\(X(TT) = 0\)</span>. Despite the name, <span class="math inline">\(X\)</span> is a fixed, deterministic function; the randomness resides entirely in which outcome <span class="math inline">\(\omega\)</span> the experiment produces.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+A random variable is not a function of events
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The single most common misreading is that a random variable takes <em>events</em> to numbers. It does not. Its input is a single outcome <span class="math inline">\(\omega\)</span>, never a set.</p>
+<p>Take a die and the indicator of oddness,</p>
+<p><span class="math display">\[
+Y(\omega) = \begin{cases} 1 &amp; \omega \in \{1,3,5\},\\ 0 &amp; \omega \in \{2,4,6\}. \end{cases}
+\]</span></p>
+<p>It is tempting to read this as “<span class="math inline">\(Y\)</span> sends the event <em>even</em> to <span class="math inline">\(0\)</span>.” It does not. <span class="math inline">\(Y\)</span> sends the outcome <span class="math inline">\(2\)</span> to <span class="math inline">\(0\)</span>, and the outcome <span class="math inline">\(4\)</span> to <span class="math inline">\(0\)</span>, and the outcome <span class="math inline">\(6\)</span> to <span class="math inline">\(0\)</span> — three separate outcomes that happen to receive the same number. Nothing is ever evaluated at the set <span class="math inline">\(\{2,4,6\}\)</span>.</p>
+<p>The direction that <em>is</em> available runs the other way: a random variable manufactures events by taking preimages. From <span class="math inline">\(Y\)</span> we recover</p>
+<p><span class="math display">\[
+\{\omega : Y(\omega) = 0\} = \{2,4,6\}, \qquad
+\{\omega : Y(\omega) = 1\} = \{1,3,5\},
+\]</span></p>
+<p>so the chain is <em>random variable</em> <span class="math inline">\(\to\)</span> <em>numerical condition</em> <span class="math inline">\(\to\)</span> <em>event</em> <span class="math inline">\(\to\)</span> <em>probability</em>. Getting this arrow the right way round is most of what the two-map picture buys you.</p>
+</div>
+</div>
 <p>The two maps combine as follows. A statement such as <span class="math inline">\(\mathbb{P}(X = 1)\)</span> is evaluated by first identifying the event determined by the condition and then applying <span class="math inline">\(P\)</span> to it:</p>
 <p><span class="math display">\[
 \mathbb{P}(X = 1)
@@ -486,6 +516,27 @@ X : \Omega \longrightarrow \mathbb{R}
 <li><span class="math inline">\(\mathbb{P}(X = x) = 0\)</span> for every individual <span class="math inline">\(x\)</span>, by the singleton remark above. The informal reading of a density is <span class="math inline">\(f(x)\,dx \approx\)</span> the probability of an outcome within <span class="math inline">\(dx\)</span> of <span class="math inline">\(x\)</span>; densities compare the relative plausibility of neighborhoods.</li>
 <li>The cumulative distribution function (CDF) <span class="math inline">\(F(x) = \mathbb{P}(X \le x)\)</span> applies to discrete and continuous variables alike, and its derivative, where it exists, is the pdf. The CDF appears in <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> as the sampling map <span class="math inline">\(F^{-1}\)</span>.</li>
 </ul>
+</section>
+<section id="what-omega-actually-is-when-the-variable-is-continuous" class="level2">
+<h2 class="anchored" data-anchor-id="what-omega-actually-is-when-the-variable-is-continuous">What <span class="math inline">\(\Omega\)</span> actually is when the variable is continuous</h2>
+<p>Write <span class="math inline">\(T \sim \mathcal{N}(\mu, \sigma^2)\)</span> for tomorrow’s temperature and it is natural to assume the sample space is <span class="math inline">\(\mathbb{R}\)</span>. It is not — or at least, it need not be, and thinking it must be obscures what the notation says.</p>
+<p>The experiment is <em>tomorrow</em>. Its outcomes are the ways tomorrow could turn out: every physically possible state of the world, an enormous set with no numbers in it anywhere. Call it <span class="math inline">\(\Omega\)</span>. The temperature is a <strong>reading taken from</strong> such a state,</p>
+<p><span class="math display">\[
+T : \Omega \longrightarrow \mathbb{R},
+\]</span></p>
+<p>which extracts one number from each possible world and discards everything else about it — the wind, the cloud cover, who won the match. Humidity would be a second reading <span class="math inline">\(H : \Omega \to \mathbb{R}\)</span> of the very same worlds, which is precisely why <span class="math inline">\(T\)</span> and <span class="math inline">\(H\)</span> can be correlated: they are two numbers pulled from one outcome.</p>
+<p>So <span class="math inline">\(T \sim \mathcal{N}(\mu, \sigma^2)\)</span> is not a claim about <span class="math inline">\(\Omega\)</span> at all. It is a claim about the <strong>distribution induced by <span class="math inline">\(T\)</span></strong> on the real line: the probability that lands on each region of <span class="math inline">\(\mathbb{R}\)</span> once <span class="math inline">\(P\)</span> is pushed through <span class="math inline">\(T\)</span>. The underlying <span class="math inline">\(\Omega\)</span> stays exactly where it was, unmentioned.</p>
+<section id="the-canonical-shortcut" class="level3">
+<h3 class="anchored" data-anchor-id="the-canonical-shortcut">The canonical shortcut</h3>
+<p>Nobody ever constructs the set of possible worlds. What statistics does instead is take the induced distribution and <em>make it the model</em>:</p>
+<p><span class="math display">\[
+\Omega = \mathbb{R}, \qquad
+P = \mathcal{N}(\mu, \sigma^2), \qquad
+X(\omega) = \omega .
+\]</span></p>
+<p>Sample space the real line, probability the Gaussian itself, random variable the identity function — the outcome <em>is</em> the number. This is the <strong>canonical probability space</strong>, and it is what is silently in play whenever a textbook says “let <span class="math inline">\(X \sim \mathcal{N}(0,1)\)</span>” and never mentions an experiment.</p>
+<p>The shortcut is legitimate because every probability statement about the value of <span class="math inline">\(T\)</span> depends only on the induced distribution, and the canonical space reproduces that distribution exactly. It costs you nothing as long as you want statements about one variable’s value. It costs you something the moment you want two variables to live on the same outcome — then you need a sample space rich enough to carry both, which is the subject of the next section.</p>
+</section>
 </section>
 <section id="joint-distributions" class="level2">
 <h2 class="anchored" data-anchor-id="joint-distributions">Joint distributions</h2>
@@ -575,6 +626,52 @@ p(y \mid x) = \frac{p(x, y)}{p(x)} .
 \mathbb{E}[X^2] - (\mathbb{E}X)^2\)</span> measures spread about the mean, and for independent random variables variances add. The identity <span class="math inline">\(\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2\)</span> of W01 is an instance.</li>
 </ul>
 <p>Finally, the <strong>conditional expectation</strong> <span class="math inline">\(\mathbb{E}[X \mid Y = y]\)</span> is the mean of the conditional distribution of <span class="math inline">\(X\)</span> given <span class="math inline">\(Y = y\)</span>, regarded as a function of <span class="math inline">\(y\)</span>. It is the minimum-mean-squared-error prediction of <span class="math inline">\(X\)</span> from the observation <span class="math inline">\(Y = y\)</span> (proved in <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>), and the denoiser <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma]\)</span> of W01 is precisely a conditional expectation.</p>
+</section>
+<section id="the-four-objects-in-one-table" class="level2">
+<h2 class="anchored" data-anchor-id="the-four-objects-in-one-table">The four objects, in one table</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Object</th>
+<th>Form</th>
+<th>What it does</th>
+<th>Common misreading</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sample space <span class="math inline">\(\Omega\)</span></td>
+<td>a set</td>
+<td>lists every way the experiment could turn out</td>
+<td>that it must be numbers</td>
+</tr>
+<tr class="even">
+<td>Event <span class="math inline">\(A\)</span></td>
+<td><span class="math inline">\(A \subseteq \Omega\)</span></td>
+<td>a yes/no question about the outcome</td>
+<td>that only one can occur</td>
+</tr>
+<tr class="odd">
+<td>Probability <span class="math inline">\(P\)</span></td>
+<td><span class="math inline">\(P(A) \in [0,1]\)</span></td>
+<td>assigns probability <strong>to events</strong></td>
+<td>that it applies to outcomes</td>
+</tr>
+<tr class="even">
+<td>Random variable <span class="math inline">\(X\)</span></td>
+<td><span class="math inline">\(X : \Omega \to \mathbb{R}\)</span></td>
+<td>assigns a number <strong>to outcomes</strong></td>
+<td>that it applies to events</td>
+</tr>
+</tbody>
+</table>
+<p>The two maps point at different arguments, and that is the whole distinction: <em>probabilities attach to events, numbers attach to outcomes</em>. A distribution is what you get by combining them — push <span class="math inline">\(P\)</span> through <span class="math inline">\(X\)</span> and read off the result on the real line.</p>
 </section>
 <section id="correspondence-with-this-course" class="level2">
 <h2 class="anchored" data-anchor-id="correspondence-with-this-course">Correspondence with this course</h2>
