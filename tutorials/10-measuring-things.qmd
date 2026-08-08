@@ -1,12 +1,25 @@
 # Measuring Things — From Length to Probability {.unnumbered}
 
-*A standalone tutorial, and the first of two on the measure-theoretic view of
-probability. It assumes no exposure to measure theory. The story: how we measure
-length, area, and volume; why the Riemann integral is the wrong tool for probability;
-how Lebesgue's rearrangement fixes it; and how Kolmogorov used the resulting theory
-of measure to give probability a rigorous foundation. The sequel,
-[Joint, Marginal, Conditional — and Bayes](./02-joint-conditional-bayes.qmd),
+*An **Advanced** tutorial, and the first of two on the measure-theoretic view of
+probability. It assumes no exposure to measure theory and is self-contained. The
+story: how we measure length, area, and volume; why the Riemann integral is the
+wrong tool for probability; how Lebesgue's rearrangement fixes it; and how
+Kolmogorov used the resulting theory of measure to give probability a rigorous
+foundation. The sequel,
+[Joint, Marginal, Conditional — and Bayes](./11-joint-conditional-bayes.qmd),
 builds the multivariate picture on this footing.*
+
+::: {.callout-note}
+## Optional, and where it sits
+
+Nothing in the lectures or the other tutorials depends on this pair. The working
+versions of everything here are in
+[Probability 101](./01-probability-101.qmd) and
+[Distributions and Maximum Likelihood](./02-distributions-mle.qmd), and you can
+follow the whole course from those. Read this track when you want to know *why*
+the working versions are allowed — or when a formula has surprised you and you
+want the footing that explains it.
+:::
 
 ::: {.callout-note}
 
@@ -14,10 +27,11 @@ builds the multivariate picture on this footing.*
 
 Every object in this course — density, likelihood, score, KL divergence,
 pushforward, transport map — is a measure-theoretic object. One can use them by
-rote, but the moment a formula surprises you (why is $P(X = x) = 0$ for every $x$
-yet the density is positive? what does $\mathbb{E}[x_0 \mid x_t]$ actually average
-over?), the only reliable footing is the measure-theoretic one. This tutorial
-builds that footing visually, with almost no machinery.
+rote, and for the lectures that is enough. But the moment a formula surprises you
+(why is $P(X = x) = 0$ for every $x$ yet the density is positive? what does
+$\mathbb{E}[x_0 \mid x_t]$ actually average over? why does adding noise make the
+score *exist*?), the only reliable footing is the measure-theoretic one. This
+tutorial builds that footing visually, with almost no machinery.
 
 :::
 
@@ -772,7 +786,7 @@ more flexible hypotheses, which is why it is the one everyone reaches for.
 | Almost everywhere | Almost surely | Except on mass-0 dust |
 | Density (Radon–Nikodym derivative) | pdf $p_X$ | Mass per unit length |
 
-The sequel, [Joint, Marginal, Conditional — and Bayes](./02-joint-conditional-bayes.qmd),
+The sequel, [Joint, Marginal, Conditional — and Bayes](./11-joint-conditional-bayes.qmd),
 puts *two* numbers on the blob and develops joints as mountains, marginals as
 shadows, conditionals as renormalized slices, and Bayes' rule as the freedom to
 slice in either direction — the grammar in which every diffusion-model statement

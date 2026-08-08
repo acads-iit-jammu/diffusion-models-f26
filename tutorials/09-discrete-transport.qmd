@@ -1,8 +1,8 @@
 # Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass {.unnumbered}
 
 *A standalone tutorial. The transport tutorials so far have been about the
-continuum — [the intuitive story](./05-transport-story.qmd) and
-[the rigorous account](./10-transport-rigorous.qmd). This one puts transport on a
+continuum — [the intuitive story](./03-transport-story.qmd) and
+[the rigorous account](./08-transport-rigorous.qmd). This one puts transport on a
 finite ground set, where it becomes a linear program you can solve exactly, and
 where the one modelling decision that drives everything — **what does it cost to
 move mass?** — is out in the open. Earth Mover's Distance, Word Mover's Distance,
@@ -39,7 +39,7 @@ $$
 Those two conditions say the non-negative table $\gamma$ has row sums $p$ and
 column sums $q$ — that is, **$\gamma$ is a joint distribution whose two marginals
 are $p$ and $q$**. A transport plan *is* a coupling, in the exact sense of
-[Joint, Marginal, Conditional](./02-joint-conditional-bayes.qmd): the mountain
+[Joint, Marginal, Conditional](./11-joint-conditional-bayes.qmd): the mountain
 whose two shadows are $p$ and $q$.
 
 So everything from that tutorial applies verbatim, including the part that
@@ -149,7 +149,7 @@ $$
 
 the total gap between the two cumulative distributions. This is the discrete
 image of the inverse-CDF transport that
-[The Map, Proved](./08-map-proved.qmd) builds in the continuum — the finite
+[The Map, Proved](./06-map-proved.qmd) builds in the continuum — the finite
 analogue of the same quantile *coupling*. Not of the same map: the discrete
 monotone coupling generally has to split a source bin across two targets, which
 §4 turns into a theorem.
@@ -213,7 +213,7 @@ at most $\tfrac13$, so $A$'s mass *must* be split. A plan handles this without
 comment; a map cannot exist.
 
 This is the discrete shadow of the atomic obstruction in
-[Generative Models as Transport](./10-transport-rigorous.qmd): a deterministic
+[Generative Models as Transport](./08-transport-rigorous.qmd): a deterministic
 map cannot split an atom. Generation from an atomless prior into an atomic target is fine; the obstruction
 is having to split an indivisible source atom, which is what the example above
 does. Kantorovich's
@@ -310,10 +310,10 @@ $$
 
 the second form being the Jacobian equation of §5 with a clock attached. This is
 the kind of object that flow matching regresses onto and that the
-[probability-flow ODE](./09-probability-flow-ode.qmd) integrates — though note
+[probability-flow ODE](./07-probability-flow-ode.qmd) integrates — though note
 that neither *solves* this minimum-action problem: they produce a velocity field
 consistent with a prescribed density path, which as
-[tutorial 10](./10-transport-rigorous.qmd) insists is a weaker thing than
+[tutorial 10](./08-transport-rigorous.qmd) insists is a weaker thing than
 selecting the Benamou–Brenier geodesic. *Learning a velocity field is learning a
 transporter*; making it the **cheapest** transporter is a further demand.
 
@@ -407,7 +407,7 @@ and three routes matter.
     learned flows as a result (Pooladian et al., 2023; Tong et al., 2024). It does
     not thereby certify the population OT map.
   - *The course's thesis.* "Generative modelling is transport" is a statement
-    about the third level, and [tutorial 10](./10-transport-rigorous.qmd) is
+    about the third level, and [tutorial 10](./08-transport-rigorous.qmd) is
     careful about how much it buys: a transport representation is available for
     almost anything, so exhibiting one explains less than it appears to. Using OT
     to *score* a model and using OT to *build* one are different activities.
@@ -420,7 +420,7 @@ Transport has two ingredients and they do different jobs. The **constraints** sa
 which plans are legal: row and column sums on a finite ground set, the Jacobian
 equation for a map between densities, the continuity equation for a flow. They
 never single out an answer, because couplings are plentiful — the lesson of
-[many mountains, same shadows](./02-joint-conditional-bayes.qmd). The **cost**
+[many mountains, same shadows](./11-joint-conditional-bayes.qmd). The **cost**
 is what selects, and it is a modelling choice, not a mathematical given. Choose
 $\mathbf{1}[i \ne j]$ and you have total variation; choose $|i-j|$ and you have
 Earth Mover; choose embedding distance and you have Word Mover; choose

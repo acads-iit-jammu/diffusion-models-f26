@@ -62,19 +62,21 @@ book:
         - weeks/w17.qmd
     - part: "Tutorials · Foundations"
       chapters:
-        - tutorials/01-measuring-things.qmd
-        - tutorials/02-joint-conditional-bayes.qmd
-        - tutorials/03-probability-101.qmd
-        - tutorials/04-distributions-mle.qmd
+        - tutorials/01-probability-101.qmd
+        - tutorials/02-distributions-mle.qmd
     - part: "Tutorials · Diffusion Models"
       chapters:
-        - tutorials/05-transport-story.qmd
-        - tutorials/06-genai-simplest-form.qmd
-        - tutorials/07-two-point-diffusion.qmd
-        - tutorials/08-map-proved.qmd
-        - tutorials/09-probability-flow-ode.qmd
-        - tutorials/10-transport-rigorous.qmd
-        - tutorials/11-discrete-transport.qmd
+        - tutorials/03-transport-story.qmd
+        - tutorials/04-genai-simplest-form.qmd
+        - tutorials/05-two-point-diffusion.qmd
+        - tutorials/06-map-proved.qmd
+        - tutorials/07-probability-flow-ode.qmd
+        - tutorials/08-transport-rigorous.qmd
+        - tutorials/09-discrete-transport.qmd
+    - part: "Tutorials · Advanced"
+      chapters:
+        - tutorials/10-measuring-things.qmd
+        - tutorials/11-joint-conditional-bayes.qmd
     - resources.qmd
 
 format:

@@ -34,7 +34,7 @@ Every sampler in the playground reduces to uniform random numbers:
 
 - **Inverse CDF.** If $F$ is a CDF and $U \sim \text{Uniform}(0,1)$, then
   $X = F^{-1}(U)$ has CDF $F$ (proved in the companion note
-  [*Generative AI, in Its Simplest Form*](./06-genai-simplest-form.qmd)). This handles
+  [*Generative AI, in Its Simplest Form*](./04-genai-simplest-form.qmd)). This handles
   Uniform ($x = a + (b-a)u$) and anything with a computable $F^{-1}$.
 - **Box–Muller** for the Normal: with $U_1, U_2$ independent uniforms,
   $\sqrt{-2\log U_1}\,\cos(2\pi U_2)$ is exactly $\mathcal{N}(0,1)$. This is the

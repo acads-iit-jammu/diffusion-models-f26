@@ -28,17 +28,21 @@
 
 **Tutorials for this week** (standalone documents, under the Tutorials section):
 
-- [Measuring Things — From Length to Probability](../tutorials/01-measuring-things.qmd) — the measure-theoretic footing: measure, the Lebesgue integral, Kolmogorov's axioms, random variables as painted numbers, pushforward, expectation.
-- [Joint, Marginal, Conditional — and Bayes](../tutorials/02-joint-conditional-bayes.qmd) — joints as mountains, marginals as shadows, conditionals as renormalized slices, and the sigmoid/tanh posterior the W01 denoiser uses.
-- [Probability 101 — A Refresher](../tutorials/03-probability-101.qmd)
-- [Distributions and Maximum Likelihood](../tutorials/04-distributions-mle.qmd) — the five families, the pdf-vs-likelihood distinction, the Gaussian MLE, and the BCE aside.
-- [Generative AI, in Its Simplest Form](../tutorials/06-genai-simplest-form.qmd) — conditional generation and sampling as a map.
-- [The Deterministic Map, Proved](../tutorials/08-map-proved.qmd) — full proofs, including the score flow as the quantile transport.
+- [Probability 101 — A Refresher](../tutorials/01-probability-101.qmd)
+- [Distributions and Maximum Likelihood](../tutorials/02-distributions-mle.qmd) — the five families, the pdf-vs-likelihood distinction, the Gaussian MLE, and the BCE aside.
+- [Generative AI, in Its Simplest Form](../tutorials/04-genai-simplest-form.qmd) — conditional generation and sampling as a map.
+- [The Deterministic Map, Proved](../tutorials/06-map-proved.qmd) — full proofs, including the score flow as the quantile transport.
+
+*Optional, under Tutorials · Advanced* — the measure-theoretic footing behind the
+above. Not required for anything in lecture:
+
+- [Measuring Things — From Length to Probability](../tutorials/10-measuring-things.qmd) — measure, the Lebesgue integral, Kolmogorov's axioms, random variables as measurable functions, pushforward, expectation.
+- [Joint, Marginal, Conditional — and Bayes](../tutorials/11-joint-conditional-bayes.qmd) — joints as mountains, marginals as shadows, conditionals as renormalized slices, and the sigmoid/tanh posterior the W01 denoiser uses.
 
 **Interactive demos**
 
-- [The Measure Playground](../materials/measure-playground.html) — σ-algebras as pixelation, and expectation as the area under the quantile curve.
-- [The Joint Slicer](../materials/joint-slicer.html) — a correlated Gaussian with fixed marginals, plus the two-shelf mixed joint with a live posterior.
+- [The Measure Playground](../materials/measure-playground.html) — a σ-algebra as what a report tells you, and expectation as the area under the quantile curve.
+- [The Joint Slicer](../materials/joint-slicer.html) — four joints with identical marginals, plus the two-shelf mixed joint with a live posterior.
 - [The Distribution Playground](../materials/distributions-playground.html) — see, sample, fit, sample from the fit (and the single-Gaussian-on-mixture trap).
 - [The Likelihood Lens](../materials/likelihood-lens.html) — pdf and likelihood as two slices of one surface; draggable data with a live MLE.
 - [Sampling as a Map](../materials/sampling-as-a-map.html) — ancestral sampling, then the same generator as one deterministic map; slide σ → 0 for the two-point staircase.
