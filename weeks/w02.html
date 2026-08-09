@@ -69,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -368,6 +397,14 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#pre-read" id="toc-pre-read" class="nav-link active" data-scroll-target="#pre-read">Pre-read</a></li>
   <li><a href="#in-class" id="toc-in-class" class="nav-link" data-scroll-target="#in-class">In Class</a></li>
+  <li><a href="#notes-bayes-rule-and-why-inference-is-the-inverse-problem" id="toc-notes-bayes-rule-and-why-inference-is-the-inverse-problem" class="nav-link" data-scroll-target="#notes-bayes-rule-and-why-inference-is-the-inverse-problem">Notes — Bayes’ rule, and why inference is the inverse problem</a>
+  <ul class="collapse">
+  <li><a href="#generation-runs-forward-inference-runs-backward" id="toc-generation-runs-forward-inference-runs-backward" class="nav-link" data-scroll-target="#generation-runs-forward-inference-runs-backward">Generation runs forward; inference runs backward</a></li>
+  <li><a href="#a-toy-example-did-the-student-understand-or" id="toc-a-toy-example-did-the-student-understand-or" class="nav-link" data-scroll-target="#a-toy-example-did-the-student-understand-or">A toy example: did the student understand “or”?</a></li>
+  <li><a href="#the-sampling-distribution-is-the-likelihood" id="toc-the-sampling-distribution-is-the-likelihood" class="nav-link" data-scroll-target="#the-sampling-distribution-is-the-likelihood">The sampling distribution <em>is</em> the likelihood</a></li>
+  <li><a href="#bayesian-knowledge-tracing" id="toc-bayesian-knowledge-tracing" class="nav-link" data-scroll-target="#bayesian-knowledge-tracing">Bayesian Knowledge Tracing</a></li>
+  <li><a href="#why-this-is-the-shape-of-the-whole-course" id="toc-why-this-is-the-shape-of-the-whole-course" class="nav-link" data-scroll-target="#why-this-is-the-shape-of-the-whole-course">Why this is the shape of the whole course</a></li>
+  </ul></li>
   <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After Class</a></li>
   </ul>
 </nav>
@@ -436,7 +473,264 @@ ul.task-list li input[type="checkbox"] {
 <li><a href="../materials/likelihood-lens.html">The Likelihood Lens</a> — pdf and likelihood as two slices of one surface; draggable data with a live MLE.</li>
 <li><a href="../materials/sampling-as-a-map.html">Sampling as a Map</a> — ancestral sampling, then the same generator as one deterministic map; slide σ → 0 for the two-point staircase.</li>
 </ul>
-<p><em>Lecture notes/board scans will be posted here.</em></p>
+</section>
+<section id="notes-bayes-rule-and-why-inference-is-the-inverse-problem" class="level2">
+<h2 class="anchored" data-anchor-id="notes-bayes-rule-and-why-inference-is-the-inverse-problem">Notes — Bayes’ rule, and why inference is the inverse problem</h2>
+<section id="generation-runs-forward-inference-runs-backward" class="level3">
+<h3 class="anchored" data-anchor-id="generation-runs-forward-inference-runs-backward">Generation runs forward; inference runs backward</h3>
+<p>Almost every model in this course is written in the <strong>forward</strong> direction. You posit some unobserved state, and you write down a mechanism that turns it into data:</p>
+<p><span class="math display">\[
+\underbrace{z}_{\text{latent, what we care about}}
+\;\longrightarrow\;
+\underbrace{x}_{\text{observed, what we get}} ,
+\qquad \text{specified by } p(x \mid z).
+\]</span></p>
+<p>Writing <span class="math inline">\(p(x \mid z)\)</span> is usually the easy half. It is a <em>mechanism</em> — a simulator, a physical story, a noise model — and you can often just state it.</p>
+<p>But that is rarely what you want. You do not observe <span class="math inline">\(z\)</span>; you observe <span class="math inline">\(x\)</span>, and you want to reason back to the cause. That is the <strong>inverse problem</strong>:</p>
+<p><span class="math display">\[
+\underbrace{x}_{\text{observed}} \;\longrightarrow\; \underbrace{z}_{\text{inferred}},
+\qquad \text{wanted: } p(z \mid x).
+\]</span></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Forward</th>
+<th>Inverse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Direction</td>
+<td>cause <span class="math inline">\(\to\)</span> effect</td>
+<td>effect <span class="math inline">\(\to\)</span> cause</td>
+</tr>
+<tr class="even">
+<td>Object</td>
+<td><span class="math inline">\(p(x \mid z)\)</span></td>
+<td><span class="math inline">\(p(z \mid x)\)</span></td>
+</tr>
+<tr class="odd">
+<td>Typical status</td>
+<td>given, by modelling</td>
+<td>wanted, must be computed</td>
+</tr>
+<tr class="even">
+<td>Names</td>
+<td>generative model, sampling distribution, simulator</td>
+<td>inference, inversion, the posterior</td>
+</tr>
+</tbody>
+</table>
+<p>You cannot simply invert the arrow, because the forward map is generally <strong>many-to-one</strong>: different latent states can produce the very same observation. Knowing <span class="math inline">\(x\)</span> therefore does not determine <span class="math inline">\(z\)</span> — it only makes some values of <span class="math inline">\(z\)</span> more plausible than others. Something extra is needed to break the tie, and that something is what you believed about <span class="math inline">\(z\)</span> before looking. Bayes’ rule is exactly the bookkeeping that combines the two:</p>
+<p><span class="math display">\[
+\underbrace{p(z \mid x)}_{\text{posterior}}
+\;=\;
+\frac{\overbrace{p(x \mid z)}^{\text{likelihood}}\;\overbrace{p(z)}^{\text{prior}}}
+     {\underbrace{p(x)}_{\text{evidence}}},
+\qquad
+p(x) = \sum_z p(x \mid z)\,p(z).
+\]</span></p>
+<p>This is the single most useful thing in the course’s toolkit: <strong>it is the bridge from the direction you can write down to the direction you want.</strong></p>
+</section>
+<section id="a-toy-example-did-the-student-understand-or" class="level3">
+<h3 class="anchored" data-anchor-id="a-toy-example-did-the-student-understand-or">A toy example: did the student understand “or”?</h3>
+<p>A student is set ten short questions on the logical connective <strong>or</strong>. We would like to know whether they have actually grasped it — but “understanding” is not something we can measure. We can only mark the answers.</p>
+<ul>
+<li><strong>Latent</strong> <span class="math inline">\(z \in \{0, 1\}\)</span>: the student understands the concept, or does not. This is the <em>inferential goal</em>.</li>
+<li><strong>Observable</strong> <span class="math inline">\(x \in \{0, 1, \dots, 10\}\)</span>: the number of questions correct. This is all we ever see.</li>
+</ul>
+<p>Now the forward model — the <strong>sampling distribution</strong> that says how marks are produced given the latent state. A student who understands still slips occasionally; one who does not can still get items right by guessing or by luck in which items came up. Take each item as independent with</p>
+<p><span class="math display">\[
+x \mid z = 1 \;\sim\; \text{Binomial}(10,\ 0.9),
+\qquad
+x \mid z = 0 \;\sim\; \text{Binomial}(10,\ 0.4).
+\]</span></p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The marks scale does not matter
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nothing above depends on marks running <span class="math inline">\(0\)</span> to <span class="math inline">\(10\)</span>. The same structure works for a single right/wrong item (<span class="math inline">\(x \in \{0,1\}\)</span>, a Bernoulli), or a percentage score <span class="math inline">\(0\)</span>–<span class="math inline">\(100\)</span>, or a graded rubric. All that changes is the count distribution you put on the observable. What stays fixed is the shape of the problem: a latent you want, an observable you get, and a sampling distribution connecting them.</p>
+</div>
+</div>
+<p>Suppose the student scores <span class="math inline">\(x = 7\)</span>. Take a neutral prior <span class="math inline">\(p(z=1) = 0.5\)</span>. Then</p>
+<p><span class="math display">\[
+\frac{p(z=1 \mid x=7)}{p(z=0 \mid x=7)}
+= \underbrace{\frac{\binom{10}{7} 0.9^{7} 0.1^{3}}{\binom{10}{7} 0.4^{7} 0.6^{3}}}_{\text{likelihood ratio}}
+\times \underbrace{\frac{0.5}{0.5}}_{\text{prior odds}}
+= \Big(\tfrac{0.9}{0.4}\Big)^{7}\Big(\tfrac{0.1}{0.6}\Big)^{3}
+= 1.352 ,
+\]</span></p>
+<p>so <span class="math inline">\(p(z = 1 \mid x = 7) = 1.352 / 2.352 = \mathbf{0.575}\)</span>.</p>
+<p>Two things are worth noticing. The binomial coefficient <span class="math inline">\(\binom{10}{7}\)</span> appears in both the numerator and the denominator and <strong>cancels</strong> — it describes how many ways the marks could have been arranged, which is the same under either hypothesis, so it carries no evidence. And <span class="math inline">\(7/10\)</span>, which sounds like a decent score, is barely informative here: it moves us from <span class="math inline">\(50\%\)</span> to <span class="math inline">\(58\%\)</span>.</p>
+<p>Across the range of possible scores:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Score <span class="math inline">\(x\)</span></th>
+<th>3</th>
+<th>5</th>
+<th>7</th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(p(z = 1 \mid x)\)</span></td>
+<td>0.000</td>
+<td>0.007</td>
+<td>0.575</td>
+<td>0.996</td>
+<td>1.000</td>
+</tr>
+</tbody>
+</table>
+<p>The posterior is not a smooth reflection of the mark — it is nearly flat at the extremes and swings sharply in the middle, where the two hypotheses actually disagree.</p>
+<p>And the prior genuinely matters. At the same score <span class="math inline">\(x = 7\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Prior <span class="math inline">\(p(z=1)\)</span></th>
+<th>0.2</th>
+<th>0.5</th>
+<th>0.8</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Posterior <span class="math inline">\(p(z=1 \mid x=7)\)</span></td>
+<td>0.253</td>
+<td>0.575</td>
+<td>0.844</td>
+</tr>
+</tbody>
+</table>
+<p>Same evidence, three different conclusions. This is not a defect. It is the honest statement that seven out of ten is weak evidence, and weak evidence does not overturn what you already knew.</p>
+</section>
+<section id="the-sampling-distribution-is-the-likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="the-sampling-distribution-is-the-likelihood">The sampling distribution <em>is</em> the likelihood</h3>
+<p>The expression <span class="math inline">\(p(x \mid z)\)</span> has been doing two jobs above, and it is worth separating them, because this is the distinction <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> makes in the parametric setting.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Hold fixed</th>
+<th>Vary</th>
+<th>You get</th>
+<th>Sums to 1?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>the latent <span class="math inline">\(z\)</span></td>
+<td>the data <span class="math inline">\(x\)</span></td>
+<td>the <strong>sampling distribution</strong> — how marks come out</td>
+<td>yes, over <span class="math inline">\(x\)</span></td>
+</tr>
+<tr class="even">
+<td>the observed data <span class="math inline">\(x\)</span></td>
+<td>the latent <span class="math inline">\(z\)</span></td>
+<td>the <strong>likelihood</strong> — how well each <span class="math inline">\(z\)</span> explains what we saw</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>It is one formula read in two directions. Forward, it generates. Backward, it scores. Bayes’ rule is what converts the backward reading into an actual probability distribution over <span class="math inline">\(z\)</span>, by weighting with the prior and renormalising.</p>
+</section>
+<section id="bayesian-knowledge-tracing" class="level3">
+<h3 class="anchored" data-anchor-id="bayesian-knowledge-tracing">Bayesian Knowledge Tracing</h3>
+<p>The toy example freezes the student in time. Real learners <em>learn</em>, so the latent state changes as they work — and the natural extension is exactly the model used in intelligent tutoring systems: <strong>Bayesian Knowledge Tracing</strong> (Corbett and Anderson, 1995, <em>User Modeling and User-Adapted Interaction</em>).</p>
+<p>BKT keeps the same two-layer structure and lets the latent evolve:</p>
+<ul>
+<li>a hidden binary skill state <span class="math inline">\(z_t \in \{\text{not known}, \text{known}\}\)</span>;</li>
+<li>an observed response <span class="math inline">\(x_t \in \{\text{incorrect}, \text{correct}\}\)</span> at each opportunity <span class="math inline">\(t\)</span>.</li>
+</ul>
+<p>Four parameters specify it, and each is a conditional probability:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(P(L_0)\)</span></td>
+<td>probability the skill is known before any practice — the <strong>prior</strong></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(P(T)\)</span></td>
+<td>probability of learning it at an opportunity, if not yet known — the <strong>transition</strong></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(P(G)\)</span></td>
+<td>probability of answering correctly <em>without</em> knowing it — the <strong>guess</strong></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(P(S)\)</span></td>
+<td>probability of answering incorrectly <em>while</em> knowing it — the <strong>slip</strong></td>
+</tr>
+</tbody>
+</table>
+<p>So the emission model is <span class="math inline">\(P(\text{correct} \mid \text{known}) = 1 - P(S)\)</span> and <span class="math inline">\(P(\text{correct} \mid \text{not known}) = P(G)\)</span>. Standard BKT assumes no forgetting.</p>
+<p>Tracing a student is then a two-step recursion, repeated per question — and the first step is precisely Bayes’ rule:</p>
+<ol type="1">
+<li><strong>Update on the evidence.</strong> With <span class="math inline">\(L\)</span> the current probability the skill is known, a correct answer gives <span class="math display">\[
+L^{+} \;=\; \frac{L\,(1 - P(S))}{L\,(1 - P(S)) + (1-L)\,P(G)} ,
+\]</span> and an incorrect answer gives <span class="math inline">\(L^{-} = L\,P(S) \,/\, [\,L\,P(S) + (1-L)(1 - P(G))\,]\)</span>.</li>
+<li><strong>Predict forward through learning.</strong> <span class="math inline">\(L \leftarrow L^{\pm} + (1 - L^{\pm})\,P(T)\)</span>.</li>
+</ol>
+<p>For instance with <span class="math inline">\(L = 0.4\)</span>, <span class="math inline">\(P(S) = 0.10\)</span>, <span class="math inline">\(P(G) = 0.25\)</span>, <span class="math inline">\(P(T) = 0.20\)</span>, a correct answer raises the belief to <span class="math inline">\(0.36 / 0.51 = 0.706\)</span>, and the learning step then carries it to <span class="math inline">\(0.706 + 0.294 \times 0.20 = 0.765\)</span> before the next question. An incorrect answer instead drops it to <span class="math inline">\(0.04/0.49 = 0.082\)</span>.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The shape to remember
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A latent state you care about, an observable you actually get, a forward model connecting them, and Bayes running the inference backwards — repeated over a sequence. That is BKT, and it is also a hidden Markov model, a Kalman filter, and, as the next few weeks will show, a diffusion model.</p>
+</div>
+</div>
+</section>
+<section id="why-this-is-the-shape-of-the-whole-course" class="level3">
+<h3 class="anchored" data-anchor-id="why-this-is-the-shape-of-the-whole-course">Why this is the shape of the whole course</h3>
+<p>Diffusion models are an inverse problem, and it is worth being blunt about the terminology, because it inverts what you might expect.</p>
+<ul>
+<li>The <strong>forward process</strong> of a diffusion model is the <em>corruption</em>: <span class="math inline">\(x_0 \to x_\sigma = x_0 + \sigma z\)</span>. We write it down ourselves, in closed form, and it is trivial to sample. This is the easy direction.</li>
+<li><strong>Generating an image</strong> means going the other way — recovering a plausible clean <span class="math inline">\(x_0\)</span> from a noisy <span class="math inline">\(x_\sigma\)</span>. The clean signal is the latent; the noisy observation is the data.</li>
+</ul>
+<p>So in a diffusion model, <em>generation is the inference problem</em>. That is why the central object of the course is a posterior, and why the optimal denoiser is a posterior <strong>mean</strong>:</p>
+<p><span class="math display">\[
+\mathbb{E}[x_0 \mid x_\sigma]
+= \tanh\!\Big(\frac{x_\sigma}{\sigma^2}\Big)
+\quad\text{for the two-point dataset of }
+\]</span> <a href="../weeks/w01.html">W01</a> — which, as <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional</a> shows, is nothing but Bayes’ rule applied to two Gaussian shelves and then averaged. Swap “understands the concept” for “was a <span class="math inline">\(+1\)</span>”, and “ten marks” for “one noisy measurement”, and it is the same calculation you did above.</p>
+<p><em>Board scans from the lecture will be added here.</em></p>
+</section>
 </section>
 <section id="after-class" class="level2">
 <h2 class="anchored" data-anchor-id="after-class">After Class</h2>
