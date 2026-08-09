@@ -19,6 +19,7 @@ project:
     - materials/transport-plan-lab.html
     - materials/gaussian-lab.html
     - materials/img/**
+    - materials/site_libs/**
     - homeworks/*.pdf
 
 book:
@@ -56,12 +57,18 @@ book:
         - tutorials/15-comparing-distributions.qmd
     - part: "Decks"
       chapters:
-        - decks/01-mechanics.qmd
-        - decks/02-motivation.qmd
-        - decks/03-two-point.qmd
-        - decks/04-probability-joints.qmd
-        - decks/05-distributions-mle.qmd
-        - decks/06-genai-simplest-form.qmd
+        - href: materials/w01-deck-01-mechanics.html
+          text: "01 · Course Mechanics"
+        - href: materials/w01-deck-02-motivation.html
+          text: "02 · Why Diffusion Models?"
+        - href: materials/w01-deck-03-toy-example.html
+          text: "03 · The World's Smallest Diffusion Model"
+        - href: materials/w02-deck-00-probability-joints.html
+          text: "04 · Probability, Joints, Conditionals and Bayes"
+        - href: materials/w02-deck-01-distributions-mle.html
+          text: "05 · Distributions and Maximum Likelihood"
+        - href: materials/w02-deck-02-genai-maps.html
+          text: "06 · Generative AI, in Its Simplest Form"
     - part: "Tutorials"
       chapters:
         - tutorials/13-inequalities.qmd
@@ -74,7 +81,8 @@ book:
         - tutorials/10-measuring-things.qmd
         - tutorials/11-joint-conditional-bayes.qmd
         - tutorials/14-why-gaussian.qmd
-        - decks/map-proved.qmd
+        - href: materials/w02-deck-03-map-limit.html
+          text: "Deck · The Map, Proved"
     - part: "Draft"
       chapters:
         - tutorials/07-probability-flow-ode.qmd

@@ -1,0 +1,104 @@
+---
+title: "Why Diffusion Models?"
+subtitle: "W01 · Part 2 — the success story, and what diffusion actually is"
+author: "Uma Satyaranjan · Soma S Dhavala"
+date: "ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"
+date-format: "[ID-5-02 (TO) · Monsoon 2026 · IIT Jammu]"
+---
+
+## The success story
+
+:::: {.cols}
+::: {.col}
+Diffusion models made **photorealistic image generation from text** a consumer
+product:
+
+- **DALL·E 2** (OpenAI, 2022) — the famous *"an astronaut riding a horse"*
+- **Stable Diffusion** (2022) — open-source, latent diffusion; ran on a gaming GPU
+- **Imagen** (Google), **Midjourney** — an award-winning art scene almost overnight
+
+[Type a sentence → get an image that never existed.]{.big}
+:::
+::: {.col}
+![](../materials/img/astronaut-sdxl.jpg){width="100%" style="border-radius:8px"}
+
+[“An astronaut riding a horse” — Stable Diffusion XL (Wikimedia Commons)]{style="font-size:.7em;color:#667"}
+:::
+::::
+
+## Far beyond images
+
+- **Video** — Sora (OpenAI), Veo (Google): text → coherent video clips
+- **Audio & speech** — music and voice synthesis
+- **Science** — protein *design* (RFdiffusion); **AlphaFold 3**'s structure
+  module is a diffusion model; weather forecasting (GenCast)
+- **…and now language** — diffusion LLMs denoise whole passages *in parallel*
+  instead of one token at a time: Mercury, Gemini Diffusion, LLaDA (2025)
+
+::: {.note}
+One idea, moving discipline to discipline — usually the signature of good
+mathematics.
+:::
+
+## The field agrees
+
+- **ICLR 2021 Outstanding Paper** — *Score-Based Generative Modeling through
+  SDEs* (Song et al.): the framework we build to in Modules 5–6
+- **ICML 2024 Best Paper** — *Discrete Diffusion Modeling…* (Lou, Meng, Ermon):
+  diffusion for text
+- Top-venue best-paper awards keep landing on diffusion papers — this is the
+  field's frontier
+
+::: {.note}
+**This course:** the mathematics behind that success, in a deliberately simpler
+setting — low dimensions, Gaussians, formulas you can derive by hand. By the end,
+you read those papers.
+:::
+
+## So what is diffusion?
+
+[Forget AI for ten minutes. Put a drop of ink in still water. Watch.]{.big}
+
+- It spreads. Always. Nobody stirs, nothing pushes.
+- **Pure randomness moves matter from crowded to empty** — structure dissolves
+  into uniformity.
+- That spreading is diffusion. Its mathematics is 200 years old.
+
+## Two centuries before AI/ML
+
+| Year | Who | What diffused |
+|---|---|---|
+| 1822 | Fourier | **Heat** — the heat equation |
+| 1827 | Brown | **Pollen grains** jiggling in water |
+| 1855 | Fick | **Chemicals** — concentration gradients |
+| 1900 | Bachelier | **Stock prices** — five years *before* Einstein |
+| 1905 | Einstein | Brownian motion ⇒ **atoms are real** (Perrin's Nobel) |
+| 1931 | Kolmogorov | The **probability theory** of diffusion processes |
+| 1962 | Rogers | **Ideas** — "diffusion of innovations" |
+| 1973 | Black–Scholes–Merton | **Option prices** — finance runs on diffusions |
+
+Same equations every time. You will recognize all of them in this course.
+
+## Then it made it big in AI
+
+| Year | Step |
+|---|---|
+| 2015 | Sohl-Dickstein et al. — borrow *non-equilibrium thermodynamics* for generative modeling |
+| 2019 | Song & Ermon — generate by following the **score** |
+| 2020 | Ho et al. — **DDPM**: diffusion matches GANs on images |
+| 2021 | Song et al. — one **SDE** unifies everything |
+| 2022 | DALL·E 2, Imagen, Stable Diffusion — the public moment |
+| 2024– | Video, proteins, weather, **language** |
+
+::: {.note}
+The one twist AI added to 200 years of physics: **run the diffusion backwards.**
+:::
+
+## {.accent}
+
+::: {.quote}
+We will learn to undo what physics does for free — mathematics that turns noise
+back into data.
+
+<small>And we start with the smallest example that contains the whole idea: two data points. → Part 3</small>
+:::

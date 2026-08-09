@@ -171,10 +171,4 @@ pre {
 .wk-card .wk-row li { margin: 0 0 .12rem; line-height: 1.4; }
 .wk-card .wk-row li::marker { color: #9fb3c8; }
 
-/* Deck wrapper pages */
-.deck-meta { display:block; font-size:.9rem; color:#5b6672; margin:-.4rem 0 1.1rem; }
-.deck-open { display:inline-block; background:#003f87; color:#fff !important; text-decoration:none !important;
-  padding:.6rem 1.15rem; border-radius:6px; font-weight:600; font-size:.95rem; margin:.4rem 0 0; }
-.deck-open:hover { background:#0056b8; }
-.deck-frame { width:100%; aspect-ratio:16/10; border:1px solid #cfe0f5; border-radius:8px;
-  margin:1.25rem 0 .4rem; background:#0b1e3a; }
+.deck-open.deck-secondary:hover { background: #dbe9fb; }

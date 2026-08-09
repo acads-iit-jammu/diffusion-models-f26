@@ -1,0 +1,140 @@
+---
+title: "The Map, Proved"
+subtitle: "W02 · Part 3 — uniform noise to the two-point mixture, and the sign function in the limit"
+author: "Uma Satyaranjan · Soma S Dhavala"
+date: "ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"
+date-format: "[ID-5-02 (TO) · Monsoon 2026 · IIT Jammu]"
+---
+
+## What we are proving today
+
+Last time we *claimed*: a generative model is a deterministic map applied to
+simple randomness. Today we **prove** it, end to end, for one family:
+
+$$p_\sigma(x) = \tfrac12 \mathcal{N}(x; -1, \sigma^2) + \tfrac12 \mathcal{N}(x; +1, \sigma^2)$$
+
+- **Step 1:** a deterministic map $T_\sigma$ with $T_\sigma(U) \sim p_\sigma$ exists and is smooth
+- **Step 2:** as $\sigma \to 0$, $T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)$ — the two-point generator of W01
+- Everything is elementary: monotone functions and a squeeze argument
+
+## Theorem 1 — the probability integral transform
+
+::: {.note}
+**Theorem.** Let $F$ be a continuous, strictly increasing CDF mapping
+$\mathbb{R}$ onto $(0,1)$, and $U \sim \mathrm{Uniform}(0,1)$. Then $X = F^{-1}(U)$
+has CDF $F$.
+:::
+
+**Proof.** Since $F$ is increasing, $F^{-1}(u) \le x \iff u \le F(x)$. Therefore
+
+$$\mathbb{P}\big(F^{-1}(U) \le x\big) = \mathbb{P}\big(U \le F(x)\big) = F(x). \qquad \blacksquare$$
+
+One line. The entire "sampling = a map" claim rests on this line.
+
+## Step 1: the map exists and is smooth
+
+The mixture CDF is
+$F_\sigma(x) = \tfrac12 \Phi\!\left(\frac{x+1}{\sigma}\right) + \tfrac12 \Phi\!\left(\frac{x-1}{\sigma}\right)$.
+
+- $F_\sigma' = p_\sigma > 0$ everywhere $\implies$ strictly increasing; limits $0$
+  and $1$ at $\mp\infty$ $\implies$ a bijection $\mathbb{R} \to (0,1)$
+- So **$T_\sigma := F_\sigma^{-1}$ exists**, and by the inverse function theorem it
+  is smooth, with
+- $T_\sigma'(u) = 1 / p_\sigma(T_\sigma(u))$ — steepest exactly where the density is smallest
+
+::: {.note}
+Read that derivative: the **plateau** of $F$ (the empty region between the bumps)
+is the **cliff** of $T$. The staircase in the demo is this formula at work.
+:::
+
+## A symmetry we get for free
+
+From $\Phi(-t) = 1 - \Phi(t)$, swapping the two components:
+
+$$F_\sigma(-x) = 1 - F_\sigma(x) \quad\Longrightarrow\quad
+T_\sigma(1-u) = -T_\sigma(u), \quad T_\sigma(\tfrac12) = 0$$
+
+- The map is odd about the center — so it suffices to prove the limit for $u < \tfrac12$
+- $T_\sigma(\tfrac12) = 0$ for *every* $\sigma$: the tie point never moves
+
+## Step 2: the limit — statement
+
+::: {.note}
+**Theorem.** For every fixed $u \in (0,1)$ with $u \ne \tfrac12$,
+$T_\sigma(u) \to \operatorname{sign}(u - \tfrac12)$ as $\sigma \to 0$.
+:::
+
+By symmetry, take $u < \tfrac12$ and show $T_\sigma(u) \to -1$. The tool: **squeeze
+$T_\sigma(u)$ between $-1-\varepsilon$ and $-1+\varepsilon$** by evaluating
+$F_\sigma$ at those two points and using monotonicity.
+
+## The squeeze, in two evaluations
+
+Fix $\varepsilon \in (0,1)$. As $\sigma \to 0$:
+
+| Evaluate | Value | Limit | Conclusion ($u<\tfrac12$, monotonicity) |
+|---|---|---|---|
+| $F_\sigma(-1+\varepsilon)$ | $\tfrac12\Phi(\varepsilon/\sigma) + \tfrac12\Phi((\varepsilon-2)/\sigma)$ | $\to \tfrac12\cdot 1 + \tfrac12\cdot 0 = \tfrac12$ | eventually $> u \implies T_\sigma(u) < -1+\varepsilon$ |
+| $F_\sigma(-1-\varepsilon)$ | $\tfrac12\Phi(-\varepsilon/\sigma) + \tfrac12\Phi((-2-\varepsilon)/\sigma)$ | $\to \tfrac12\cdot 0 + \tfrac12\cdot 0 = 0$ | eventually $< u \implies T_\sigma(u) > -1-\varepsilon$ |
+
+Hence $|T_\sigma(u) + 1| < \varepsilon$ for all small $\sigma$:
+
+$$T_\sigma(u) \to -1. \qquad \blacksquare$$
+
+At $u = \tfrac12$ exactly: $T_\sigma(\tfrac12) = 0$ always — a single point,
+probability zero for $U$.
+
+## Watch the theorem happen
+
+```{=html}
+<iframe src="sampling-as-a-map.html" style="width:100%;height:70%;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="Sampling as a map demo"></iframe>
+```
+
+## How the stairs form: the quantitative picture
+
+- For $u < \tfrac12$, the far component contributes at most $\tfrac12\Phi(-1/\sigma)$ — *exponentially* small
+- Dropping it: $T_\sigma(u) \approx -1 + \sigma\,\Phi^{-1}(2u)$ — each stair is a
+  **Gaussian quantile, compressed by $\sigma$**
+- Slope at the center:
+  $T_\sigma'(\tfrac12) = 1/p_\sigma(0) = \sigma\sqrt{2\pi}\; e^{1/(2\sigma^2)} \to \infty$ — the jump forming
+- Convergence is uniform away from $u = \tfrac12$, but never uniform across it — a
+  boundary layer, exactly like $\tanh(x/\sigma^2)$ in W01
+
+## What the theorem buys us
+
+- $T_\sigma(U) \to \operatorname{sign}(U - \tfrac12)$ **almost surely** $\implies$
+  also in distribution: the two-point dataset is the $\sigma \to 0$ *limit of smooth generators*
+- The same step function appeared twice now: $\tanh(x/\sigma^2) \to \operatorname{sign}(x)$
+  (the denoiser) and $T_\sigma(u) \to \operatorname{sign}(u-\tfrac12)$ (the generator)
+- Deep generative models live at small-but-positive $\sigma$ *on purpose*: smooth
+  maps are learnable; steps are not
+
+::: {.note}
+This is the one-dimensional shadow of a general principle: discrete or
+manifold-supported data is reached as a limit of smooth transports — which is why
+diffusion models anneal $\sigma$ instead of jumping to 0.
+:::
+
+## And the score flow? Same map — a theorem
+
+- **No crossing:** a 1-D ODE flow with unique solutions preserves order $\implies$
+  the probability-flow map $\Psi$ is continuous and strictly increasing
+- **Rigidity:** a strictly increasing map pushing $p_{\sigma_{\max}}$ to
+  $p_{\sigma_{\min}}$ is unique: $F_{\sigma_{\min}}^{-1} \circ F_{\sigma_{\max}}$
+- **Therefore:** W01's tanh-driven flow *is* the quantile transport — and by
+  today's theorem, $\Psi(x_T) \to \operatorname{sign}(x_T)$ as $\sigma_{\min} \to 0$
+
+::: {.note}
+Numerically: 20,000-step exact-score Euler vs $F^{-1}\!\circ F$ on a grid —
+agreement $\approx 10^{-5}$ everywhere except the separatrix $x_T = 0$ (W01's
+unstable equilibrium). Caveat: this identification is special to 1-D; in higher
+dimensions the flow is a transport, but not *the* monotone one.
+:::
+
+## {.accent}
+
+::: {.quote}
+A claim became a theorem: the generator is a map, and the two-point world is its limit.
+
+<small>Exercises: the ε-argument for u &gt; ½; unequal weights (the stair moves to u = π); three components.</small>
+:::

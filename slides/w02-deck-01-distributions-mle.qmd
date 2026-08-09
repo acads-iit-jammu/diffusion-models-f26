@@ -1,0 +1,124 @@
+---
+title: "Distributions and Maximum Likelihood"
+subtitle: "W02 · Part 1 — see it, sample it, fit it, sample from the fit"
+author: "Uma Satyaranjan · Soma S Dhavala"
+date: "ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"
+date-format: "[ID-5-02 (TO) · Monsoon 2026 · IIT Jammu]"
+---
+
+## Where we are
+
+- W01: a generative model **produces samples** — and we saw a complete one on two data points
+- The loop of this module: **distribution → samples → fitted distribution → new samples**
+- Today we make the word **fit** precise: maximum likelihood
+
+::: {.note}
+Tomorrow: KL divergence (how wrong is a fit?). Then: empirical risk minimization.
+:::
+
+## The cast of distributions
+
+| Family | Support | Knobs | Natural habitat |
+|---|---|---|---|
+| $\mathrm{Uniform}(a,b)$ | $[a,b]$ | endpoints | total ignorance on an interval |
+| $\mathcal{N}(\mu,\sigma^2)$ | $\mathbb{R}$ | center, width | noise, sums of small effects |
+| $\mathrm{Gamma}(k,\theta)$ | $(0,\infty)$ | shape, scale | waiting times, positive skew |
+| $\mathrm{Beta}(\alpha,\beta)$ | $(0,1)$ | two shapes | proportions, probabilities |
+| Mixture | $\mathbb{R}$ | weights + components | multimodal data — clusters |
+
+Five shapes cover most of what this course needs — and the mixture is the star of
+the semester.
+
+## Playground: see it, sample it, fit it
+
+```{=html}
+<iframe src="distributions-playground.html" style="width:100%;height:70%;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="Distribution playground"></iframe>
+```
+
+## What the histogram is telling you
+
+- Density-normalized histogram → as $n$ grows it **hugs the pdf**: samples carry
+  the distribution
+- $n = 30$ is ragged, $n = 3000$ is faithful — *estimation error shrinks like
+  $1/\sqrt{n}$* (Module 1 will say this properly)
+- Fitting = choosing the family member that makes the observed samples **most probable**
+
+## PDF vs likelihood — the confusion, dissolved
+
+```{=html}
+<iframe src="likelihood-lens.html" style="width:100%;height:70%;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="Likelihood lens"></iframe>
+```
+
+## One function, two readings
+
+$$f(x; \theta)$$
+
+| Fix | Vary | You get | Area under curve |
+|---|---|---|---|
+| parameters $\theta$ | data $x$ | **pdf** — a distribution over data | $=1$, always |
+| observed data $x$ | parameters $\theta$ | **likelihood** — a score for fitting | meaningless |
+
+::: {.note}
+The likelihood is **not** a probability distribution over $\theta$. Only its
+argmax — and its shape near the argmax — carries information.
+:::
+
+## Likelihood of a dataset
+
+Independent observations multiply; logs turn products into sums:
+
+$$L(\theta) = \prod_{i} f(x_i; \theta)
+\qquad\Longrightarrow\qquad
+\ell(\theta) = \sum_{i} \log f(x_i; \theta)$$
+
+- The log changes nothing about *where* the maximum is (log is monotone)
+- …and everything about how pleasant the algebra is
+- Numerically: products of 3000 small numbers underflow; sums of logs do not
+
+## To the board: the Gaussian MLE
+
+Maximize
+
+$$\ell(\mu,\sigma^2) = -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_i (x_i-\mu)^2$$
+
+- $\partial\ell/\partial\mu = 0 \implies \hat\mu = \bar x$ (the sample mean — for every $\sigma$)
+- $\partial\ell/\partial\sigma^2 = 0 \implies \hat\sigma^2 = \frac{1}{n}\sum_i (x_i - \bar x)^2$
+
+::: {.note}
+Derivation on the board now — it is tonight's Exercise if you want to redo it
+alone. Note the divisor $n$, not $n-1$: the MLE is (slightly) biased.
+:::
+
+## Honesty about the other families
+
+| Family | How we fit it | Why |
+|---|---|---|
+| Normal | maximum likelihood | closed form — you just derived it |
+| Uniform | maximum likelihood | closed form: $\hat a = \min$, $\hat b = \max$ (cute proof — exercise) |
+| Gamma | **method of moments** | MLE has *no closed form*: match $\bar x$ and $s^2$ instead |
+| Beta | **method of moments** | same story |
+| Mixture | …? | stay tuned — this one needs real machinery (EM, later) |
+
+Method of moments: set the family's mean and variance equal to the sample's.
+Simple, honest, and a good estimator to know by itself.
+
+## The trap: right method, wrong family
+
+- In the playground: mixture data, 3000 samples, press **Fit**
+- The single best Normal — by *maximum likelihood, done perfectly* — puts its peak
+  **where the data is emptiest**
+- Fitting well within the wrong family is still wrong
+
+::: {.note}
+Needed: a way to **measure** the gap between the data distribution and the model.
+That measure is KL divergence — tomorrow.
+:::
+
+## {.accent}
+
+::: {.quote}
+The pdf and the likelihood are the same curve — you just walk along it in
+different directions.
+
+<small>Tonight: derive $\hat\sigma^2$, prove Uniform's MLE is (min, max), and play the mixture trap yourself.</small>
+:::

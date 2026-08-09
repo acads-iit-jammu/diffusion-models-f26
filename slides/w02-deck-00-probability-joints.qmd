@@ -1,0 +1,243 @@
+---
+title: "Probability, Joints, Conditionals and Bayes"
+subtitle: "W02 · Primer — everything from one 4 × 4 table of counts"
+author: "Uma Satyaranjan · Soma S Dhavala"
+date: "ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"
+date-format: "[ID-5-02 (TO) · Monsoon 2026 · IIT Jammu]"
+---
+
+## Two maps, and only two
+
+Everything in probability is built from a pair of functions that point at
+*different arguments*.
+
+| Map | Takes | Gives | Example |
+|---|---|---|---|
+| Probability $\mathbb{P}$ | an **event** — a set of outcomes | a number in $[0,1]$ | $\mathbb{P}(\text{die is even}) = 1/2$ |
+| Random variable $X$ | an **outcome** — a single $\omega$ | a real number | $X(\omega) = $ the face shown |
+
+::: {.note}
+**Probabilities attach to events. Numbers attach to outcomes.** Almost every
+early confusion is these two being swapped.
+:::
+
+## One outcome happens; many events happen
+
+- The experiment produces exactly **one** outcome — roll a 4, and $\omega = 4$
+- But **many events** occur at once: "even", "at most 5", "not a 6", and $\Omega$
+  itself all contain 4
+- Outcomes are mutually exclusive. Events are not — they overlap freely
+
+::: {.note}
+A random variable is **not** a function of events. The odd-indicator $Y$ does not
+send the *set* $\{2,4,6\}$ to 0 — it sends the outcome 2 to 0, and 4 to 0, and 6
+to 0. Three outcomes that happen to share a number.
+:::
+
+The arrow that *does* exist runs backwards, and it is how every probability gets
+computed:
+
+::: {style="text-align:center"}
+[random variable → numerical condition → event → probability]{.big}
+:::
+
+## The experiment: two four-faced dice
+
+A coin has two faces. Give it four, roll **two** of them, and record the pair.
+
+- Outcome: $\omega = (\text{first face}, \text{second face})$ — there are
+  $4 \times 4 = \mathbf{16}$ of them
+- $X$ = the first die, $Y$ = the second die — two numbers read off *the same* outcome
+- That co-residence is the whole idea of a **joint** distribution: one roll, two readings
+
+::: {.note}
+Toss the pair **100 times** and tally how often each of the 16 combinations came
+up. That tally is the next slide, and everything today comes out of it.
+:::
+
+## 100 tosses, tallied
+
+```{=html}
+<table class="grid"><thead><tr><th class="lbl"></th><th>Y = 1</th><th>Y = 2</th><th>Y = 3</th><th>Y = 4</th><th class="lbl">row total</th></tr></thead><tbody><tr><td class="lbl"><b>X = 1</b></td><td class="">12</td><td class="">8</td><td class="">4</td><td class="">1</td><td class="tot">25</td></tr><tr><td class="lbl"><b>X = 2</b></td><td class="">6</td><td class="">14</td><td class="">7</td><td class="">3</td><td class="tot">30</td></tr><tr><td class="lbl"><b>X = 3</b></td><td class="">3</td><td class="">7</td><td class="">12</td><td class="">5</td><td class="tot">27</td></tr><tr><td class="lbl"><b>X = 4</b></td><td class="">1</td><td class="">3</td><td class="">6</td><td class="">8</td><td class="tot">18</td></tr><tr><td class="lbl"><b>col total</b></td><td class="tot">22</td><td class="tot">32</td><td class="tot">29</td><td class="tot">17</td><td class="net">100</td></tr></tbody></table>
+```
+
+- The 16 inner cells are the **joint** counts: how many tosses gave that exact pair
+- The margins are **totals**: each row summed across, each column summed down
+- Bottom-right is the **net** — 100 tosses, and both margins must add up to it
+
+## Marginals: divide the totals by the net
+
+```{=html}
+<table class="grid"><thead><tr><th class="lbl"></th><th>Y = 1</th><th>Y = 2</th><th>Y = 3</th><th>Y = 4</th><th class="lbl">row total</th></tr></thead><tbody><tr><td class="lbl"><b>X = 1</b></td><td class="">12</td><td class="">8</td><td class="">4</td><td class="">1</td><td class="tot">25</td></tr><tr><td class="lbl"><b>X = 2</b></td><td class="">6</td><td class="">14</td><td class="">7</td><td class="">3</td><td class="tot">30</td></tr><tr><td class="lbl"><b>X = 3</b></td><td class="">3</td><td class="">7</td><td class="">12</td><td class="">5</td><td class="tot">27</td></tr><tr><td class="lbl"><b>X = 4</b></td><td class="">1</td><td class="">3</td><td class="">6</td><td class="">8</td><td class="tot">18</td></tr><tr><td class="lbl"><b>col total</b></td><td class="tot">22</td><td class="tot">32</td><td class="tot">29</td><td class="tot">17</td><td class="net">100</td></tr></tbody></table>
+```
+
+Ignore $Y$ entirely and ask only how the first die behaved — read the **row totals**:
+
+$$\mathbb{P}(X = 1,2,3,4) = \tfrac{25}{100}, \tfrac{30}{100}, \tfrac{27}{100}, \tfrac{18}{100} = 0.25,\; 0.30,\; 0.27,\; 0.18$$
+
+Ignore $X$ and read the **column totals**: $\mathbb{P}(Y = \cdot) = 0.22,\; 0.32,\; 0.29,\; 0.17$
+
+::: {.note}
+**Marginal = total ÷ net.** The name is literal: the answer is written in the
+margin of the table.
+:::
+
+## Conditionals: divide a row by its own total
+
+```{=html}
+<table class="grid"><thead><tr><th class="lbl"></th><th>Y = 1</th><th>Y = 2</th><th>Y = 3</th><th>Y = 4</th><th class="lbl">row total</th></tr></thead><tbody><tr><td class="lbl"><b>X = 1</b></td><td class="hi">12</td><td class="hi">8</td><td class="hi">4</td><td class="hi">1</td><td class="hi">25</td></tr><tr><td class="lbl"><b>X = 2</b></td><td class="">6</td><td class="">14</td><td class="">7</td><td class="">3</td><td class="tot">30</td></tr><tr><td class="lbl"><b>X = 3</b></td><td class="">3</td><td class="">7</td><td class="">12</td><td class="">5</td><td class="tot">27</td></tr><tr><td class="lbl"><b>X = 4</b></td><td class="">1</td><td class="">3</td><td class="">6</td><td class="">8</td><td class="tot">18</td></tr><tr><td class="lbl"><b>col total</b></td><td class="tot">22</td><td class="tot">32</td><td class="tot">29</td><td class="tot">17</td><td class="net">100</td></tr></tbody></table>
+```
+
+Now suppose you are *told* the first die showed 1. Only the highlighted row is
+still in play — the other 75 tosses never happened. Keep that row and rescale it
+so it sums to one:
+
+$$\mathbb{P}(Y = \cdot \mid X = 1) = \tfrac{12}{25}, \tfrac{8}{25}, \tfrac{4}{25}, \tfrac{1}{25} = 0.48,\; 0.32,\; 0.16,\; 0.04$$
+
+::: {.note}
+Divide by the **row total (25)**, not by the net (100). Dividing by the net would
+give the *joint* $\mathbb{P}(X = 1, Y = \cdot)$ — a sliver of mass that sums to
+0.25, not a distribution.
+:::
+
+## Every row is a distribution
+
+Do it for all four rows. Each is a legitimate probability distribution over $Y$ —
+four numbers, non-negative, summing to 1:
+
+| Given | Y = 1 | Y = 2 | Y = 3 | Y = 4 | Σ |
+|---|---|---|---|---|---|
+| X = 1 (÷25) | 0.48 | 0.32 | 0.16 | 0.04 | 1 |
+| X = 2 (÷30) | 0.20 | 0.47 | 0.23 | 0.10 | 1 |
+| X = 3 (÷27) | 0.11 | 0.26 | 0.44 | 0.19 | 1 |
+| X = 4 (÷18) | 0.06 | 0.17 | 0.33 | 0.44 | 1 |
+
+- The rows are **different** — knowing $X$ changes what you expect of $Y$. That *is* dependence
+- If they were all identical, $X$ would tell you nothing and the two dice would be **independent**
+
+::: {.note}
+Independence check: if $X$ and $Y$ were independent, cell (1,1) would be
+$25 \times 22 / 100 = \mathbf{5.5}$. It is $\mathbf{12}$. These dice are loaded together.
+:::
+
+## …and every column is a distribution too
+
+```{=html}
+<table class="grid"><thead><tr><th class="lbl"></th><th>Y = 1</th><th>Y = 2</th><th>Y = 3</th><th>Y = 4</th><th class="lbl">row total</th></tr></thead><tbody><tr><td class="lbl"><b>X = 1</b></td><td class="">12</td><td class="hi2">8</td><td class="">4</td><td class="">1</td><td class="tot">25</td></tr><tr><td class="lbl"><b>X = 2</b></td><td class="">6</td><td class="hi2">14</td><td class="">7</td><td class="">3</td><td class="tot">30</td></tr><tr><td class="lbl"><b>X = 3</b></td><td class="">3</td><td class="hi2">7</td><td class="">12</td><td class="">5</td><td class="tot">27</td></tr><tr><td class="lbl"><b>X = 4</b></td><td class="">1</td><td class="hi2">3</td><td class="">6</td><td class="">8</td><td class="tot">18</td></tr><tr><td class="lbl"><b>col total</b></td><td class="tot">22</td><td class="hi2">32</td><td class="tot">29</td><td class="tot">17</td><td class="net">100</td></tr></tbody></table>
+```
+
+Nothing privileges rows. Told that the second die showed 2, keep that **column**
+and divide by **its** total (32):
+
+$$\mathbb{P}(X = \cdot \mid Y = 2) = \tfrac{8}{32}, \tfrac{14}{32}, \tfrac{7}{32}, \tfrac{3}{32} = 0.25,\; 0.44,\; 0.22,\; 0.09$$
+
+::: {.note}
+One table, two families of conditionals. Rows give $\mathbb{P}(Y \mid X)$, columns
+give $\mathbb{P}(X \mid Y)$. The table does not care which way you slice it — and
+that symmetry is Bayes' rule.
+:::
+
+## Bayes' rule is the two slicings, reconciled
+
+A single cell can be reached from either direction, so it has two factorizations:
+
+$$\mathbb{P}(x,y) = \mathbb{P}(y \mid x)\,\mathbb{P}(x) = \mathbb{P}(x \mid y)\,\mathbb{P}(y)$$
+
+Divide, and you can convert either conditional into the other:
+
+$$\mathbb{P}(x \mid y) = \frac{\mathbb{P}(y \mid x)\,\mathbb{P}(x)}{\mathbb{P}(y)}$$
+
+| Piece | From the table | Value |
+|---|---|---|
+| $\mathbb{P}(Y=2 \mid X=1)$ | row 1, cell 2 ÷ 25 | 0.32 |
+| $\mathbb{P}(X=1)$ | row total ÷ net = 25/100 | 0.25 |
+| $\mathbb{P}(Y=2)$ | col total ÷ net = 32/100 | 0.32 |
+| **$\mathbb{P}(X=1 \mid Y=2)$** | 0.32 × 0.25 / 0.32 | **0.25** |
+| check: directly | col 2, cell 1 ÷ 32 = 8/32 | **0.25** ✓ |
+
+::: {.note}
+No new axiom — just bookkeeping on one table. Bayes matters because in practice
+you can *build* $\mathbb{P}(y \mid x)$ (a cause producing an observation) but you
+*want* $\mathbb{P}(x \mid y)$.
+:::
+
+## From counts to densities
+
+Now let the dice have more and more faces — 4, then 400, then a continuum. The
+table becomes a fine grid over the plane, and:
+
+| Discrete table | Continuous joint |
+|---|---|
+| cell count ÷ net | $p(x,y)\,dx\,dy$ — a **joint density** |
+| a single row | a vertical **slice** of the surface at $x$ |
+| that row's total | the marginal value $p(x)$ — the slice's area |
+| row ÷ row total | $p(y \mid x) = p(x,y)/p(x)$ — the slice, **renormalised** |
+| column totals | $p(y) = \int p(x,y)\,dx$ |
+
+::: {.note}
+Nothing conceptual changes. **Sums become integrals**, and "divide the row by its
+total" becomes "divide the slice by its area". Slice, then renormalise.
+:::
+
+## Marginalising = integrating out the nuisance
+
+Summing a row is exactly integrating out the variable you do not care about:
+
+$$p(x) = \int p(x,y)\,dy \qquad\qquad p(y) = \int p(x,y)\,dx$$
+
+- With many variables, integrate out **every** one you are not asking about — the
+  **nuisance** variables
+- $p(x_1) = \int\!\!\int\cdots\!\int p(x_1, x_2, \dots, x_n)\, dx_2 \cdots dx_n$
+- Latent variables are the nuisance case that matters here:
+  $p(x) = \sum_z p(x,z)$ is exactly a **mixture**
+
+::: {.note}
+Marginalising **loses information** and cannot be undone: many different joints
+share the same margins. Two dice with these row and column totals could have been
+independent — they were not.
+:::
+
+## Factorisation: build a joint out of conditionals
+
+Read $\mathbb{P}(x,y) = \mathbb{P}(y \mid x)\mathbb{P}(x)$ the other way — not as
+an identity to check, but as a **recipe to generate**: draw $x$ from its marginal,
+then draw $y$ from the row it selects.
+
+Pick any ordering of the variables and the same move chains:
+
+$$p(x_1, \dots, x_n) = p(x_1)\, p(x_2 \mid x_1)\, p(x_3 \mid x_1, x_2) \cdots p(x_n \mid x_1, \dots, x_{n-1})$$
+
+- Each factor conditions on a **set** — everything already drawn, not just the previous one
+- The ordering is **yours to choose**: any permutation gives a valid and different factorisation
+- Every factor is still just "a row, renormalised" — of a higher-dimensional table
+
+::: {.note}
+This is the chain rule of probability, and it is how every sequential generative
+model is defined: language models factorise left to right, diffusion models
+factorise along the noise level.
+:::
+
+## Where this lands in the course
+
+| Today's object | Where it reappears |
+|---|---|
+| Joint $p(x,z)$ | the mixture model — latent label and observation |
+| Marginalising out $z$ | the mixture density; later, the evidence and the ELBO |
+| Conditional as a renormalised slice | $p(x_t \mid x_0)$: the forward noising step |
+| Bayes, the two slicings | $p(x_0 \mid x_t)$: the posterior a **denoiser** estimates |
+| Posterior *mean* of a slice | $\mathbb{E}[x_0 \mid x_t] = \tanh(x/\sigma^2)$ — W01's denoiser, exactly |
+| Chain rule with an ordering | $p(x_{0:T}) = p(x_T)\prod p(x_{t-1} \mid x_t)$ — the reverse process |
+
+::: {.note}
+The whole of diffusion is these four moves on one very large joint: the joint of a
+clean signal and its noisy versions.
+:::
+
+## {.accent}
+
+::: {.quote}
+One table. Totals give marginals, rows give conditionals, and reading a cell two
+ways gives Bayes.
+
+<small>Tutorials: Probability &amp; Random Variables · Joint, Marginal, Conditional — and Bayes · demo: The Joint Slicer</small>
+:::

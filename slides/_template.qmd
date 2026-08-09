@@ -1,0 +1,118 @@
+---
+title: "Deck Title Goes Here"
+subtitle: "W0N · Part N — the one-line description"
+author: "Uma Satyaranjan · Soma S Dhavala"
+date: "ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"
+date-format: "[ID-5-02 (TO) · Monsoon 2026 · IIT Jammu]"
+---
+
+<!--
+  TEMPLATE — not built. Files starting with "_" are skipped by Quarto and by
+  build-decks.sh. To make a real deck:
+
+      cp _template.qmd w03-deck-01-my-topic.qmd
+      quarto preview w03-deck-01-my-topic.qmd     # live reload while writing
+      quarto render  w03-deck-01-my-topic.qmd     # -> ../materials/<same name>.html
+
+  Format (theme, offline embedding, MathML) comes from _quarto.yml. Do not add
+  a `format:` block here — it would override the shared settings.
+
+  Everything below shows a construct the house theme supports. Delete what you
+  do not need.
+-->
+
+## A plain slide
+
+Each `##` heading starts a new slide. Body text is ordinary markdown.
+
+- Bullets work as expected
+- **Bold**, *italic*, `code`
+- Keep to ~5 bullets; the font is sized for a room, not a monitor
+
+## Math is real LaTeX
+
+Inline like $\mathbb{E}[x_0 \mid x_\sigma]$, and display like
+
+$$p_\sigma(x) = \tfrac12 \mathcal{N}(x; -1, \sigma^2) + \tfrac12 \mathcal{N}(x; +1, \sigma^2)$$
+
+Rendered to MathML at build time, so it needs no network in the classroom.
+
+## Callout box
+
+::: {.note}
+`::: {.note}` gives the pale-blue box with the dark left rule. Use it for the
+one thing you want them to leave with.
+:::
+
+## Emphasis line
+
+Wrap a sentence in `[...]{.big}` to get the large blue emphasis text:
+
+[The whole pipeline: noise the data → learn to denoise → run it backwards.]{.big}
+
+To centre it, put it inside a centred div:
+
+::: {style="text-align:center"}
+[Centred and large.]{.big}
+:::
+
+## Tables
+
+| Family | Support | Knobs |
+|---|---|---|
+| $\mathcal{N}(\mu,\sigma^2)$ | $\mathbb{R}$ | center, width |
+| $\mathrm{Beta}(\alpha,\beta)$ | $(0,1)$ | two shapes |
+
+Header row is blue, even rows are tinted — automatic.
+
+## Two columns
+
+:::: {.cols}
+::: {.col}
+Left column. Good for text beside a figure.
+:::
+::: {.col}
+Right column.
+:::
+::::
+
+## An image
+
+Paths are relative to this `slides/` folder, and the image is embedded into the
+output file:
+
+```markdown
+![](../materials/img/astronaut-sdxl.jpg){width="100%"}
+```
+
+## An embedded demo
+
+The deck is built into `../materials/`, so an iframe path is relative to *that*
+folder — no `../`:
+
+````markdown
+```{=html}
+<iframe src="two-point-diffusion-demo.html" style="width:100%;height:60%;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="Demo"></iframe>
+```
+````
+
+## Reveal extras
+
+::: {.fragment}
+This line appears on the next keypress — wrap anything in `::: {.fragment}`.
+:::
+
+::: {.notes}
+Speaker notes. Press **S** during the talk for the presenter view with these,
+a timer, and the next slide.
+:::
+
+Press **O** for the slide overview, **F** for fullscreen, **E** for print/PDF view.
+
+## {.accent}
+
+::: {.quote}
+The closing slide: pale blue, centred, one sentence worth remembering.
+
+<small>A smaller follow-up line — what to read, or what comes next.</small>
+:::

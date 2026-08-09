@@ -1,0 +1,119 @@
+/*-- scss:defaults --*/
+// IIT Jammu house palette, matched to iitjammu.scss
+$blue:        #003f87;
+$blue-dark:   #002d63;
+$blue-mid:    #0056b8;
+$blue-sky:    #4da3ff;
+$blue-pale:   #eaf3ff;
+$ink:         #22262a;
+
+// Local stacks only — no webfont requests, so decks stay fully offline
+$font-family-sans-serif: Roboto, "Helvetica Neue", system-ui, sans-serif !default;
+$font-family-monospace: "Roboto Mono", "SF Mono", Menlo, monospace !default;
+$presentation-heading-font: "Roboto Slab", Georgia, serif !default;
+
+$body-bg: #ffffff;
+$body-color: $ink;
+$link-color: $blue-mid;
+$presentation-heading-color: $blue-dark;
+$presentation-font-size-root: 30px;
+$presentation-h2-font-size: 1.55em;
+$code-block-font-size: 0.7em;
+
+/*-- scss:rules --*/
+.reveal h2 {
+  border-bottom: 3px solid $blue-pale;
+  padding-bottom: .22em;
+  margin-bottom: .55em;
+  text-align: left;
+}
+.reveal .slides section { text-align: left; }
+
+// Title slide: deep blue gradient with white text, as in the original decks.
+// Quarto emits <section id="title-slide">, an id — a .title-slide class selector
+// never matches, so this must be an id selector to win on specificity.
+.reveal #title-slide,
+.reveal section#title-slide.quarto-title-block {
+  background: linear-gradient(160deg, $blue-dark 0%, $blue 70%, $blue-mid 100%);
+  color: #fff;
+  text-align: left;
+  padding: 0 6%;
+
+  h1, h1.title, .title {
+    color: #fff;
+    font-size: 1.9em;
+    line-height: 1.15;
+    border-bottom: none;
+    margin-bottom: .25em;
+  }
+  .subtitle, p.subtitle {
+    color: #cfe3ff; font-weight: 400; font-size: .82em; line-height: 1.35;
+    margin-bottom: 2.2em;
+  }
+  .quarto-title-authors, .author, .quarto-title-author,
+  .quarto-title-author-name {
+    color: #cfe3ff; font-size: .68em; display: block; text-align: left;
+    border: none; padding: 0;
+  }
+  .quarto-title-authors { justify-content: flex-start; }
+  .date, .quarto-title-date {
+    color: #8fb4e8; font-size: .58em; letter-spacing: .1em; text-transform: uppercase;
+  }
+  a { color: #cfe3ff; }
+}
+// reveal paints a backdrop behind the section; colour it too so the gradient
+// is not framed by the default white
+.reveal .backgrounds .slide-background:first-child .slide-background-content {
+  background: linear-gradient(160deg, $blue-dark 0%, $blue 70%, $blue-mid 100%);
+}
+
+// Section-break slide, pale blue
+.reveal section.accent { background: linear-gradient(160deg, #f6faff, $blue-pale); }
+
+.reveal .kicker {
+  font-size: .58em; letter-spacing: .14em; text-transform: uppercase; color: $blue-sky;
+}
+
+.reveal table {
+  border-collapse: collapse; width: 100%; font-size: .74em; margin: .4em 0;
+  th { background: $blue; color: #fff; text-align: left; }
+  th, td { border: 1px solid #cfdcec; padding: .35em .7em; }
+  tbody tr:nth-child(even) td { background: #f4f8fd; }
+}
+
+.reveal .note {
+  background: $blue-pale; border-left: 5px solid $blue;
+  padding: .5em 1em; border-radius: 0 8px 8px 0; font-size: .82em; margin: .5em 0;
+}
+
+.reveal .quote {
+  font-family: $presentation-heading-font; font-size: 1.5em; color: $blue-dark;
+  text-align: center; line-height: 1.4;
+  small { display: block; font-family: $font-family-sans-serif; font-size: .5em; color: #667; margin-top: 1.2em; }
+}
+
+.reveal .big { font-size: 1.2em; font-weight: 500; color: $blue-dark; }
+
+// Centred monospace grid, for the joint-count tables
+.reveal table.grid {
+  td, th { text-align: center; font-family: $font-family-monospace; }
+  td.lbl, th.lbl { text-align: left; font-family: $font-family-sans-serif; }
+  tbody tr:nth-child(even) td { background: transparent; }
+}
+.reveal td.hi  { background: #fff3cd !important; font-weight: 700; color: #7a5b00; }
+.reveal td.hi2 { background: #e6f4ea !important; font-weight: 700; color: #1e5631; }
+.reveal td.tot { background: #{$blue-pale} !important; font-weight: 700; color: $blue-dark; }
+.reveal td.net { background: #dbe9fb !important; font-weight: 700; color: $blue-dark; }
+
+.reveal .cols { display: flex; gap: 4%; }
+.reveal .cols > div { flex: 1; }
+
+// MathML needs a font carrying the mathematical alphanumerics block —
+// \mathcal{N} is U+1D4A9, absent from ordinary text fonts. Ship a stack so
+// script/blackboard letters resolve wherever the deck is shown.
+.reveal math,
+.reveal math * {
+  font-family: "STIX Two Math", "Latin Modern Math", "Cambria Math",
+               "TeX Gyre Termes Math", "DejaVu Math TeX Gyre", STIXGeneral, serif;
+}
+.reveal math[display="block"] { font-size: 1.08em; margin: .35em 0; }

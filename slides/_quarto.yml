@@ -1,0 +1,32 @@
+# Slide decks. Separate Quarto project: a book chapter cannot render as
+# revealjs, so decks are built here into ../materials/ and linked from the
+# book sidebar as plain hrefs.
+#
+# type: website (not default) so all decks SHARE one ../materials/site_libs/.
+# With embed-resources each deck was 3.5 MB (24 MB total); with type: default
+# each got its own _files/ copy (40 MB). Shared libs: ~6 MB for all seven,
+# still fully offline.
+#
+# Build:  ./build-decks.sh
+project:
+  type: website
+  output-dir: ../materials
+
+website:
+  title: "ID-5-02 decks"
+
+format:
+  revealjs:
+    theme: [default, iitjammu-reveal.scss]
+    # MathML is rendered at build time: no MathJax/KaTeX CDN fetch at runtime,
+    # so equations survive a classroom with no network.
+    html-math-method: mathml
+    slide-number: c/t
+    history: false
+    transition: none
+    width: 1280
+    height: 800
+    margin: 0.06
+    center: false
+    menu:
+      numbers: true
