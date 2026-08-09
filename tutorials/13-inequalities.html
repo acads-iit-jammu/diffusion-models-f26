@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>W04: Gaussian Calculus &amp; Markov Chains – ID-5-02 (TO)</title>
+<title>Inequalities Worth Knowing – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../weeks/w05.html" rel="next">
-<link href="../weeks/w03.html" rel="prev">
+<link href="../tutorials/03-transport-story.html" rel="next">
+<link href="../decks/06-genai-simplest-form.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -69,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -81,7 +110,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weeks/w01.html">Weekly Notes</a></li><li class="breadcrumb-item"><a href="../weeks/w04.html">W04: Gaussian Calculus &amp; Markov Chains</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/13-inequalities.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/13-inequalities.html">Inequalities Worth Knowing</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -134,119 +163,65 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../curriculum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Curriculum</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../assignments.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assignments</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Weekly Notes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lecture Notes</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w01.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W01: Generative Modeling I</span></a>
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">00 · Introduction and Motivation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w02.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W02: Generative Modeling II</span></a>
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w03.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W03: High Dimensions &amp; Gaussians</span></a>
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w04.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">W04: Gaussian Calculus &amp; Markov Chains</span></a>
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w05.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W05: Noise Accumulation</span></a>
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w06.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W06: DDPM I</span></a>
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w07.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W07: DDPM II</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w08.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W08: Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w09.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W09: Mid-Semester Examinations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W10: Denoising Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w11.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W11: Brownian Motion &amp; SDEs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w12.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W12: Fokker–Planck</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w13.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W13: Continuous Forward Equation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w14.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W14: Reverse-time Drift</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w15.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W15: Information Flow &amp; Probability Flow ODE</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w16.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W16: Holiday Week</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w17.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W17: Flows, Applications &amp; Wrap-up</span></a>
+  <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
   </div>
 </li>
       </ul>
@@ -254,7 +229,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Tutorials · Foundations</span></a>
+ <span class="menu-text">Decks</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -262,27 +237,68 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Probability &amp; Random Variables</span></a>
+  <a href="../decks/01-mechanics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Course Mechanics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Distributions and Maximum Likelihood</span></a>
+  <a href="../decks/02-motivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Why Diffusion Models?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/03-two-point.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/04-probability-joints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/05-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/06-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Tutorials · Diffusion Models</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Inequalities Worth Knowing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Perspectives</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
@@ -291,26 +307,8 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -325,17 +323,6 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
   </div>
 </li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
- <span class="menu-text">Tutorials · Advanced</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
@@ -346,6 +333,35 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deck · The Map, Proved</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Draft</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
       </ul>
@@ -366,18 +382,22 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#pre-read" id="toc-pre-read" class="nav-link active" data-scroll-target="#pre-read">Pre-read</a></li>
-  <li><a href="#in-class" id="toc-in-class" class="nav-link" data-scroll-target="#in-class">In Class</a></li>
-  <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After Class</a></li>
+  <li><a href="#markov-the-one-everything-else-comes-from" id="toc-markov-the-one-everything-else-comes-from" class="nav-link active" data-scroll-target="#markov-the-one-everything-else-comes-from">1. Markov: the one everything else comes from</a></li>
+  <li><a href="#chebyshev-mean-and-variance-force-concentration" id="toc-chebyshev-mean-and-variance-force-concentration" class="nav-link" data-scroll-target="#chebyshev-mean-and-variance-force-concentration">2. Chebyshev: mean and variance force concentration</a></li>
+  <li><a href="#jensen-which-way-convexity-bends-an-average" id="toc-jensen-which-way-convexity-bends-an-average" class="nav-link" data-scroll-target="#jensen-which-way-convexity-bends-an-average">3. Jensen: which way convexity bends an average</a></li>
+  <li><a href="#cauchyschwarz-and-correlation-being-bounded" id="toc-cauchyschwarz-and-correlation-being-bounded" class="nav-link" data-scroll-target="#cauchyschwarz-and-correlation-being-bounded">4. Cauchy–Schwarz, and correlation being bounded</a></li>
+  <li><a href="#the-union-bound" id="toc-the-union-bound" class="nav-link" data-scroll-target="#the-union-bound">5. The union bound</a></li>
+  <li><a href="#putting-markov-to-work-the-weak-law" id="toc-putting-markov-to-work-the-weak-law" class="nav-link" data-scroll-target="#putting-markov-to-work-the-weak-law">6. Putting Markov to work: the weak law</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weeks/w01.html">Weekly Notes</a></li><li class="breadcrumb-item"><a href="../weeks/w04.html">W04: Gaussian Calculus &amp; Markov Chains</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/13-inequalities.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/13-inequalities.html">Inequalities Worth Knowing</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">W04: Gaussian Calculus &amp; Markov Chains</h1>
+<h1 class="title">Inequalities Worth Knowing</h1>
 </div>
 
 
@@ -394,30 +414,129 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p><strong>Dates:</strong> Mon Aug 17, Tue Aug 18, Wed Aug 19, 2026</p>
-<p><strong>Slot/Venue:</strong> Mon 9:00–9:50 · Tue 10:00–10:50 · Wed 11:00–11:50 · 11AC4004</p>
-<p><strong>Syllabus module:</strong> M2 — Conditioning and marginalization; linear transformations; discrete-time Markov chains</p>
-<div class="callout callout-style-simple callout-important">
-<div class="callout-body d-flex">
+<p><em>A standalone tutorial, and a short one. Five inequalities that between them justify most of the “and therefore it concentrates” steps in this course. Each is stated, proved in a few lines, and given the job it actually does. The last two sections are the payoff: how a bound that knows only the mean and variance already forces data to cluster, and where that bound is far too pessimistic — a gap the <a href="../tutorials/14-why-gaussian.html">Advanced</a> tutorial then turns into an argument for the Gaussian.</em></p>
+<section id="markov-the-one-everything-else-comes-from" class="level2">
+<h2 class="anchored" data-anchor-id="markov-the-one-everything-else-comes-from">1. Markov: the one everything else comes from</h2>
+<p>For a <strong>non-negative</strong> random variable <span class="math inline">\(X \ge 0\)</span> and any <span class="math inline">\(a &gt; 0\)</span>,</p>
+<p><span class="math display">\[
+\boxed{\;\mathbb{P}(X \ge a) \;\le\; \frac{\mathbb{E}[X]}{a}.\;}
+\]</span></p>
+<p><em>Proof.</em> Since <span class="math inline">\(X \ge 0\)</span>, we have <span class="math inline">\(X \ge a\,\mathbf{1}\{X \ge a\}\)</span> pointwise — check the two cases: if <span class="math inline">\(X \ge a\)</span> the right side is <span class="math inline">\(a \le X\)</span>; otherwise it is <span class="math inline">\(0 \le X\)</span>. Take expectations and use monotonicity: <span class="math inline">\(\mathbb{E}[X] \ge a\,\mathbb{P}(X \ge a)\)</span>. <span class="math inline">\(\square\)</span></p>
+<p>That is the entire proof, and it is worth noticing how little it uses: only non-negativity and the mean. In exchange, the bound is usually weak. Its value is that it needs almost nothing, and that everything below is a corollary of it applied to a cleverly chosen non-negative quantity.</p>
+</section>
+<section id="chebyshev-mean-and-variance-force-concentration" class="level2">
+<h2 class="anchored" data-anchor-id="chebyshev-mean-and-variance-force-concentration">2. Chebyshev: mean and variance force concentration</h2>
+<p>Apply Markov to <span class="math inline">\((X - \mu)^2\)</span>, which is non-negative, with threshold <span class="math inline">\(k^2\sigma^2\)</span>:</p>
+<p><span class="math display">\[
+\mathbb{P}\big(|X - \mu| \ge k\sigma\big)
+= \mathbb{P}\big((X-\mu)^2 \ge k^2\sigma^2\big)
+\le \frac{\mathbb{E}[(X-\mu)^2]}{k^2\sigma^2}
+= \frac{\sigma^2}{k^2\sigma^2},
+\]</span></p>
+<p>so for any random variable with finite variance and any <span class="math inline">\(k &gt; 0\)</span>,</p>
+<p><span class="math display">\[
+\boxed{\;\mathbb{P}\big(|X - \mu| \ge k\sigma\big) \;\le\; \frac{1}{k^{2}}.\;}
+\]</span></p>
+<p><strong>Read what this says.</strong> It assumes <em>nothing</em> about the shape of the distribution — not symmetry, not unimodality, not a density. Knowing only the mean and the variance, at most <span class="math inline">\(1/4\)</span> of the mass can sit two standard deviations or more from the mean, at most <span class="math inline">\(1/9\)</span> beyond three. Variance is not merely a summary of spread; it is a <em>budget</em> that limits how much mass can be far out.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(k\)</span></th>
+<th>Chebyshev bound <span class="math inline">\(1/k^2\)</span></th>
+<th>Actual, if Gaussian</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1.000</td>
+<td>0.317</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>0.250</td>
+<td>0.0455</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>0.111</td>
+<td>0.0027</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>0.0625</td>
+<td>0.0000633</td>
+</tr>
+</tbody>
+</table>
+<p>The right column is the point of the <a href="../tutorials/14-why-gaussian.html">Advanced tutorial</a>. Chebyshev is tight — there are distributions attaining it — but for the Gaussian it is wildly pessimistic, off by a factor of nearly <span class="math inline">\(1000\)</span> at <span class="math inline">\(k=4\)</span>. Something much stronger is true for the shapes we actually meet, and asking <em>why</em> leads straight to the normal distribution.</p>
+</section>
+<section id="jensen-which-way-convexity-bends-an-average" class="level2">
+<h2 class="anchored" data-anchor-id="jensen-which-way-convexity-bends-an-average">3. Jensen: which way convexity bends an average</h2>
+<p>For a <strong>convex</strong> <span class="math inline">\(\varphi\)</span> and integrable <span class="math inline">\(X\)</span>,</p>
+<p><span class="math display">\[
+\boxed{\;\varphi\big(\mathbb{E}[X]\big) \;\le\; \mathbb{E}\big[\varphi(X)\big].\;}
+\]</span></p>
+<p>For concave <span class="math inline">\(\varphi\)</span> the inequality reverses.</p>
+<p><em>Proof.</em> Convexity means the graph lies above each of its tangent lines. Take the tangent at <span class="math inline">\(m = \mathbb{E}[X]\)</span>: there is a slope <span class="math inline">\(c\)</span> with <span class="math inline">\(\varphi(x) \ge \varphi(m) + c(x - m)\)</span> for all <span class="math inline">\(x\)</span>. Take expectations; the linear term has expectation zero. <span class="math inline">\(\square\)</span></p>
+<p>Three uses you will meet:</p>
+<ul>
+<li><span class="math inline">\(\mathbb{E}[X^2] \ge (\mathbb{E}X)^2\)</span>, i.e.&nbsp;<strong>variance is non-negative</strong> — Jensen with <span class="math inline">\(\varphi(x)=x^2\)</span>.</li>
+<li><span class="math inline">\(\log \mathbb{E}[X] \ge \mathbb{E}[\log X]\)</span> — <span class="math inline">\(\log\)</span> is concave. This single line is what makes the <strong>ELBO</strong> a lower bound on the log-evidence.</li>
+<li><span class="math inline">\(\mathrm{KL}(p \,\|\, q) \ge 0\)</span>, with equality only when <span class="math inline">\(p = q\)</span> — Jensen applied to <span class="math inline">\(-\log\)</span>. Every “this divergence is non-negative, so minimising it makes sense” argument is this.</li>
+</ul>
+</section>
+<section id="cauchyschwarz-and-correlation-being-bounded" class="level2">
+<h2 class="anchored" data-anchor-id="cauchyschwarz-and-correlation-being-bounded">4. Cauchy–Schwarz, and correlation being bounded</h2>
+<p><span class="math display">\[
+\boxed{\;\big|\mathbb{E}[XY]\big| \;\le\; \sqrt{\mathbb{E}[X^2]\,\mathbb{E}[Y^2]}.\;}
+\]</span></p>
+<p><em>Proof.</em> For every <span class="math inline">\(t\)</span>, <span class="math inline">\(0 \le \mathbb{E}[(X - tY)^2] = \mathbb{E}[X^2] - 2t\,\mathbb{E}[XY] + t^2\mathbb{E}[Y^2]\)</span>. A quadratic in <span class="math inline">\(t\)</span> that is never negative has non-positive discriminant: <span class="math inline">\(4(\mathbb{E}[XY])^2 - 4\mathbb{E}[X^2]\mathbb{E}[Y^2] \le 0\)</span>. <span class="math inline">\(\square\)</span></p>
+<p>Applied to centred variables this says exactly that the correlation coefficient lies in <span class="math inline">\([-1,1]\)</span>, with <span class="math inline">\(|\rho| = 1\)</span> precisely when <span class="math inline">\(Y\)</span> is an affine function of <span class="math inline">\(X\)</span>. That is the fact underlying the constraint <span class="math inline">\(|\rho| &lt; 1\)</span> everywhere in <a href="../tutorials/12-multivariate-gaussian.html">the multivariate Gaussian reference</a> — at <span class="math inline">\(|\rho| = 1\)</span> the covariance matrix is singular and the ellipse collapses to a line.</p>
+</section>
+<section id="the-union-bound" class="level2">
+<h2 class="anchored" data-anchor-id="the-union-bound">5. The union bound</h2>
+<p>For any events <span class="math inline">\(A_1, A_2, \dots\)</span> — <strong>no independence required</strong> —</p>
+<p><span class="math display">\[
+\boxed{\;\mathbb{P}\Big(\bigcup_i A_i\Big) \;\le\; \sum_i \mathbb{P}(A_i).\;}
+\]</span></p>
+<p><em>Proof.</em> Countable subadditivity, which follows from countable additivity by disjointifying: replace <span class="math inline">\(A_i\)</span> by <span class="math inline">\(A_i \setminus \bigcup_{j&lt;i}A_j\)</span>, which is contained in <span class="math inline">\(A_i\)</span> and hence no more probable. <span class="math inline">\(\square\)</span></p>
+<p>Crude, and indispensable. It is how you go from “each of <span class="math inline">\(d\)</span> coordinates is unlikely to be extreme” to “no coordinate is extreme”, at a cost of a factor <span class="math inline">\(d\)</span>. In high dimension that factor is the whole difficulty: with <span class="math inline">\(d = 784\)</span>, an event of probability <span class="math inline">\(10^{-3}\)</span> per coordinate gives no useful bound at all across coordinates, which is one honest way to see why high-dimensional density estimation is hard.</p>
+</section>
+<section id="putting-markov-to-work-the-weak-law" class="level2">
+<h2 class="anchored" data-anchor-id="putting-markov-to-work-the-weak-law">6. Putting Markov to work: the weak law</h2>
+<p>The inequalities are not decoration. Here is a complete theorem in three lines.</p>
+<p>Let <span class="math inline">\(X_1,\dots,X_n\)</span> be i.i.d.&nbsp;with mean <span class="math inline">\(\mu\)</span> and finite variance <span class="math inline">\(\sigma^2\)</span>, and let <span class="math inline">\(\bar X_n\)</span> be their average. Then <span class="math inline">\(\mathbb{E}[\bar X_n] = \mu\)</span> and, because variances of independent variables add, <span class="math inline">\(\operatorname{Var}(\bar X_n) = \sigma^2/n\)</span>. Chebyshev gives, for any <span class="math inline">\(\varepsilon &gt; 0\)</span>,</p>
+<p><span class="math display">\[
+\mathbb{P}\big(|\bar X_n - \mu| \ge \varepsilon\big) \;\le\; \frac{\sigma^2}{n\varepsilon^2}
+\;\xrightarrow[n\to\infty]{}\; 0 .
+\]</span></p>
+<p>That is the <strong>weak law of large numbers</strong>, proved entirely from Markov. Note what it does and does not give: it says the average concentrates, but it says nothing about the <em>shape</em> of the fluctuation around <span class="math inline">\(\mu\)</span>. Rescaling by <span class="math inline">\(\sqrt{n}\)</span> instead of <span class="math inline">\(n\)</span> and asking what shape survives is the central limit theorem — and the answer being Gaussian, always, is the subject of the next tutorial.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-body-container">
-<p>Class Test-1 window opens Wed Aug 19 (through Aug 25).</p>
+<div class="callout-title-container flex-fill">
+Key takeaway
 </div>
 </div>
+<div class="callout-body-container callout-body">
+<p>Markov is the whole toolkit: it needs only non-negativity, and Chebyshev, the weak law and most concentration results are Markov applied to a well-chosen non-negative quantity. What you buy with more assumptions is <em>sharpness</em> — Chebyshev’s <span class="math inline">\(1/k^2\)</span> decay becomes the Gaussian’s <span class="math inline">\(e^{-k^2/2}\)</span> once you know more than two moments, and closing that gap is exactly the question the Advanced track takes up.</p>
 </div>
-<section id="pre-read" class="level2">
-<h2 class="anchored" data-anchor-id="pre-read">Pre-read</h2>
-<p><em>To be posted (typically by the weekend before) — section references into the primary text.</em></p>
+</div>
 </section>
-<section id="in-class" class="level2">
-<h2 class="anchored" data-anchor-id="in-class">In Class</h2>
-<p><em>Lecture notes/board scans will be posted here.</em></p>
-</section>
-<section id="after-class" class="level2">
-<h2 class="anchored" data-anchor-id="after-class">After Class</h2>
-<p><em>Exercises and pointers will be posted here.</em></p>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Show Markov is tight: find a non-negative <span class="math inline">\(X\)</span> and an <span class="math inline">\(a\)</span> for which <span class="math inline">\(\mathbb{P}(X \ge a) = \mathbb{E}[X]/a\)</span> exactly. (Two atoms suffice.)</li>
+<li>Show Chebyshev is tight at <span class="math inline">\(k = 2\)</span>: construct a distribution with mean <span class="math inline">\(0\)</span>, variance <span class="math inline">\(1\)</span>, and exactly <span class="math inline">\(1/4\)</span> of its mass at distance <span class="math inline">\(\ge 2\)</span>.</li>
+<li>Why does Markov require <span class="math inline">\(X \ge 0\)</span>? Give a random variable with <span class="math inline">\(\mathbb{E}[X] = 0\)</span> for which the conclusion fails without it.</li>
+<li>Use Jensen to show <span class="math inline">\(\mathbb{E}[1/X] \ge 1/\mathbb{E}[X]\)</span> for a positive random variable, and give an example where the inequality is strict.</li>
+<li>Use Cauchy–Schwarz to prove <span class="math inline">\(|\rho| \le 1\)</span>, and characterise exactly when <span class="math inline">\(|\rho| = 1\)</span>.</li>
+<li>A vector has <span class="math inline">\(d\)</span> coordinates, each of which exceeds <span class="math inline">\(3\sigma\)</span> with probability at most <span class="math inline">\(0.0027\)</span>. Bound the probability that <em>some</em> coordinate does, for <span class="math inline">\(d = 10\)</span> and <span class="math inline">\(d = 784\)</span>. At what <span class="math inline">\(d\)</span> does the union bound stop saying anything?</li>
+<li>Compare the Chebyshev bound at <span class="math inline">\(k=3\)</span> with the true Gaussian tail. By what factor is Chebyshev too pessimistic? Now do the same at <span class="math inline">\(k=5\)</span> and comment on how the gap grows.</li>
+</ol>
 
 
 </section>
@@ -850,13 +969,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../weeks/w03.html" class="pagination-link" aria-label="W03: High Dimensions &amp; Gaussians">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">W03: High Dimensions &amp; Gaussians</span>
+      <a href="../decks/06-genai-simplest-form.html" class="pagination-link" aria-label="06 · Generative AI, in Its Simplest Form">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">06 · Generative AI, in Its Simplest Form</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../weeks/w05.html" class="pagination-link" aria-label="W05: Noise Accumulation">
-        <span class="nav-page-text">W05: Noise Accumulation</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/03-transport-story.html" class="pagination-link" aria-label="Moving Distributions: The Transport Story">
+        <span class="nav-page-text">Moving Distributions: The Transport Story</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

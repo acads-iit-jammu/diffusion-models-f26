@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>00 · Introduction and Motivation – ID-5-02 (TO)</title>
+<title>Why the Gaussian? Four Arguments for One Density – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/05-two-point-diffusion.html" rel="next">
-<link href="../assignments.html" rel="prev">
+<link href="../decks/map-proved.html" rel="next">
+<link href="../tutorials/11-joint-conditional-bayes.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Perspectives</a></li><li class="breadcrumb-item"><a href="../tutorials/14-why-gaussian.html">Why the Gaussian? Four Arguments for One Density</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -175,16 +175,16 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Lecture Notes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">00 · Introduction and Motivation</span></a>
   </div>
 </li>
@@ -292,13 +292,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
  <span class="menu-text">Perspectives</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
@@ -337,7 +337,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
   </div>
 </li>
@@ -382,18 +382,11 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#what-this-course-is-about" id="toc-what-this-course-is-about" class="nav-link active" data-scroll-target="#what-this-course-is-about">What this course is about</a>
-  <ul class="collapse">
-  <li><a href="#the-route-in-one-paragraph" id="toc-the-route-in-one-paragraph" class="nav-link" data-scroll-target="#the-route-in-one-paragraph">The route, in one paragraph</a></li>
-  <li><a href="#how-the-material-is-organised" id="toc-how-the-material-is-organised" class="nav-link" data-scroll-target="#how-the-material-is-organised">How the material is organised</a></li>
-  <li><a href="#where-to-start" id="toc-where-to-start" class="nav-link" data-scroll-target="#where-to-start">Where to start</a></li>
-  </ul></li>
-  <li><a href="#the-simplest-generative-model-there-is" id="toc-the-simplest-generative-model-there-is" class="nav-link" data-scroll-target="#the-simplest-generative-model-there-is">The simplest generative model there is</a></li>
-  <li><a href="#view-1-conditional-generation-a-hierarchical-model" id="toc-view-1-conditional-generation-a-hierarchical-model" class="nav-link" data-scroll-target="#view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</a></li>
-  <li><a href="#view-2-the-coin-disappears-into-a-map" id="toc-view-2-the-coin-disappears-into-a-map" class="nav-link" data-scroll-target="#view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</a></li>
-  <li><a href="#the-two-point-limit" id="toc-the-two-point-limit" class="nav-link" data-scroll-target="#the-two-point-limit">The two-point limit</a></li>
-  <li><a href="#maps-are-not-unique" id="toc-maps-are-not-unique" class="nav-link" data-scroll-target="#maps-are-not-unique">Maps are not unique</a></li>
-  <li><a href="#the-claim-that-organizes-everything" id="toc-the-claim-that-organizes-everything" class="nav-link" data-scroll-target="#the-claim-that-organizes-everything">The claim that organizes everything</a></li>
+  <li><a href="#the-gap-chebyshev-leaves-open" id="toc-the-gap-chebyshev-leaves-open" class="nav-link active" data-scroll-target="#the-gap-chebyshev-leaves-open">1. The gap Chebyshev leaves open</a></li>
+  <li><a href="#symmetry-plus-independence-and-the-density-falls-out" id="toc-symmetry-plus-independence-and-the-density-falls-out" class="nav-link" data-scroll-target="#symmetry-plus-independence-and-the-density-falls-out">2. Symmetry plus independence, and the density falls out</a></li>
+  <li><a href="#maximum-entropy-the-least-committed-choice" id="toc-maximum-entropy-the-least-committed-choice" class="nav-link" data-scroll-target="#maximum-entropy-the-least-committed-choice">3. Maximum entropy: the least committed choice</a></li>
+  <li><a href="#the-central-limit-theorem-additivity" id="toc-the-central-limit-theorem-additivity" class="nav-link" data-scroll-target="#the-central-limit-theorem-additivity">4. The central limit theorem: additivity</a></li>
+  <li><a href="#four-demands-one-density" id="toc-four-demands-one-density" class="nav-link" data-scroll-target="#four-demands-one-density">5. Four demands, one density</a></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
@@ -401,9 +394,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/03-transport-story.html">Perspectives</a></li><li class="breadcrumb-item"><a href="../tutorials/14-why-gaussian.html">Why the Gaussian? Four Arguments for One Density</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">00 · Introduction and Motivation</h1>
+<h1 class="title">Why the Gaussian? Four Arguments for One Density</h1>
 </div>
 
 
@@ -420,147 +413,206 @@ window.Quarto = {
 </header>
 
 
-<p><em>The first note of the course. It says what the subject is, what the rest of the material is for, and then earns the claim that organises everything with the smallest possible example. Interactive version: <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>.</em></p>
-<section id="what-this-course-is-about" class="level2">
-<h2 class="anchored" data-anchor-id="what-this-course-is-about">What this course is about</h2>
-<p>A <strong>generative model</strong> is a thing that produces samples. Show it a pile of handwritten digits and it should produce new handwritten digits — not ones from the pile, and not noise, but plausible new members of the same population.</p>
-<p>The difficulty is that nobody hands you the population. You get a finite pile of examples, and from that pile you must build something that can generate more. Put formally: given samples <span class="math inline">\(x_1,\dots,x_n\)</span> drawn from an unknown <span class="math inline">\(p_{\text{data}}\)</span>, construct a procedure that draws fresh samples from something close to <span class="math inline">\(p_{\text{data}}\)</span>.</p>
-<p>Two observations shape everything that follows.</p>
-<p><strong>Sampling is not the same as knowing the density.</strong> You do not need a formula for <span class="math inline">\(p_{\text{data}}(x)\)</span> in order to draw from it, and — as the course will show — for images you could not write one down anyway. What you need is a <em>procedure</em>.</p>
-<p><strong>Every such procedure turns simple randomness into structured output.</strong> Somewhere in the machine there is a coin flip, a uniform draw, or a burst of Gaussian noise, and everything downstream of it is arithmetic. That is the picture this note builds, and the rest of the course is about how to <em>learn</em> the arithmetic when the target is complicated.</p>
-<section id="the-route-in-one-paragraph" class="level3">
-<h3 class="anchored" data-anchor-id="the-route-in-one-paragraph">The route, in one paragraph</h3>
-<p>We start with probability itself — random variables, joints, conditionals, Bayes — because generation runs forward from a latent cause to an observation while inference runs backward, and Bayes is the bridge. Then distributions and maximum likelihood in one dimension, where fitting has closed forms. Then the multivariate Gaussian, the one family closed under everything linear, which is why every tractable calculation in this subject goes through it. Then the wall: in high dimension, estimating a density directly stops working, even with structure. That failure is what forces the modern approach — stop describing distributions and start <strong>comparing</strong> them, which is why distances and divergences become central. Diffusion models are then one particular, very effective answer.</p>
-</section>
-<section id="how-the-material-is-organised" class="level3">
-<h3 class="anchored" data-anchor-id="how-the-material-is-organised">How the material is organised</h3>
-<p><strong>Lecture Notes</strong> are the numbered spine, in reading order, and follow the lectures. <strong>Tutorials</strong> sit alongside and go deeper on one thing. <strong>Perspectives</strong> are optional reinterpretations — a transport reading of the whole subject, and the measure-theoretic foundations — and nothing in the lectures depends on them. The <a href="../curriculum.html">Curriculum</a> page lists the sequence and maps it to weeks.</p>
-</section>
-<section id="where-to-start" class="level3">
-<h3 class="anchored" data-anchor-id="where-to-start">Where to start</h3>
-<p>Read this note, then <a href="../tutorials/05-two-point-diffusion.html">01 · The World’s Smallest Diffusion Model</a>, which builds a complete working diffusion model on a dataset of two points, with every step in closed form. Nothing in it is approximated and nothing is learned — which makes it the clearest possible statement of <em>what we are trying to do in high dimensions</em>, and of exactly which step stops being computable once the data is images rather than two numbers.</p>
-</section>
-</section>
-<section id="the-simplest-generative-model-there-is" class="level2">
-<h2 class="anchored" data-anchor-id="the-simplest-generative-model-there-is">The simplest generative model there is</h2>
-<p>The rest of this note presents one tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative sampler, diffusion included, is the second picture, once all of its random inputs are exposed, with a learned ingredient in place of the formula.</p>
-</section>
-<section id="view-1-conditional-generation-a-hierarchical-model" class="level2">
-<h2 class="anchored" data-anchor-id="view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</h2>
-<p>The simplest latent-variable model:</p>
+<p><em>An <strong>Advanced</strong> tutorial. Optional: nothing in the lectures depends on it. The question it answers is the one that nags after you have used the normal distribution for a while — where does that formula actually come from? Writing <span class="math inline">\(e^{-x^2/2}\)</span> and calling it natural is not an explanation. Four independent arguments arrive at it, each starting from a different demand, and the fact that they converge is the real reason the Gaussian is not just convenient but inevitable.</em></p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Prerequisites and where this sits
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Builds on <a href="../tutorials/13-inequalities.html">Inequalities Worth Knowing</a> — particularly Chebyshev, which is where §1 starts — and on <a href="../tutorials/12-multivariate-gaussian.html">The Multivariate Gaussian</a> for the <span class="math inline">\(d\)</span>-dimensional statements in §2. The working versions of everything here are in the Foundations track; read this when you want to know why the working versions look the way they do.</p>
+</div>
+</div>
+<section id="the-gap-chebyshev-leaves-open" class="level2">
+<h2 class="anchored" data-anchor-id="the-gap-chebyshev-leaves-open">1. The gap Chebyshev leaves open</h2>
+<p>Start where the Foundations tutorial stopped. Chebyshev says that for <em>any</em> law with mean <span class="math inline">\(\mu\)</span> and variance <span class="math inline">\(\sigma^2\)</span>,</p>
 <p><span class="math display">\[
-\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
-x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
+\mathbb{P}\big(|X - \mu| \ge k\sigma\big) \le \frac{1}{k^{2}} .
 \]</span></p>
-<p><strong>Ancestral sampling</strong> generates by following the arrows: draw the latent coin <span class="math inline">\(z\)</span>, then draw <span class="math inline">\(x\)</span> from the selected component. The observed marginal is obtained by summing out the latent:</p>
-<p><span class="math display">\[
-p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
-\;=\; \pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)
-\]</span></p>
-<p>— exactly the two-component mixture from the playground. A mixture is not just a formula; it is a <em>generative story</em>: population <span class="math inline">\(\to\)</span> subpopulation <span class="math inline">\(\to\)</span> individual.</p>
-<p><strong>Inference is the same hierarchy, run backwards.</strong> Given an observed <span class="math inline">\(x\)</span>, Bayes’ rule gives the posterior over the hidden coin:</p>
-<p><span class="math display">\[
-\mathbb{P}(z = 1 \mid x)
-= \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
-       {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
-\]</span></p>
-<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this equals <span class="math inline">\(\operatorname{sigmoid}(-2x/\sigma^2)\)</span>; its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is exactly the posterior W01 computed for the <span class="math inline">\(+1\)</span> component, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
-</section>
-<section id="view-2-the-coin-disappears-into-a-map" class="level2">
-<h2 class="anchored" data-anchor-id="view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</h2>
-<p><strong>Theorem (inverse-CDF / probability integral transform).</strong> Let <span class="math inline">\(F\)</span> be a CDF with generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
-<p><em>Proof.</em> <span class="math inline">\(\mathbb{P}(F^{-1}(U) \le x) = \mathbb{P}(U \le F(x)) = F(x)\)</span>, since <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span> by monotonicity. <span class="math inline">\(\square\)</span></p>
-<p>For our mixture, <span class="math inline">\(F(x) = \pi\,\Phi\!\big(\tfrac{x-\mu_1}{\sigma}\big) +
-(1-\pi)\,\Phi\!\big(\tfrac{x-\mu_2}{\sigma}\big)\)</span> is continuous and strictly increasing, so <span class="math inline">\(F^{-1}\)</span> is an honest function, and</p>
-<p><span class="math display">\[
-u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
-\]</span></p>
-<p>generates the mixture <strong>with no coin anywhere</strong> — the explicit coin has been marginalized out. One caution about where it went: under this map, the event <span class="math inline">\(u &lt; \pi\)</span> selects the lowest <span class="math inline">\(\pi\)</span>-fraction of the <em>mixture</em> distribution, which is <strong>not</strong> the same as the ancestral label <span class="math inline">\(z = 1\)</span> when the components overlap — both Gaussians have full support, so each contributes on both sides of any quantile. (In the well-separated limit <span class="math inline">\(\sigma \to 0\)</span> the two events do coincide, and the <em>packed</em> map below is the construction in which <span class="math inline">\(u &lt; \pi\)</span> genuinely encodes the coin.) Randomness in, structure out, everything in between deterministic.</p>
-</section>
-<section id="the-two-point-limit" class="level2">
-<h2 class="anchored" data-anchor-id="the-two-point-limit">The two-point limit</h2>
-<p>Send <span class="math inline">\(\sigma \to 0\)</span> with <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>. The CDF collapses to a staircase: a jump of height <span class="math inline">\(\pi\)</span> at <span class="math inline">\(-1\)</span>, a flat <strong>plateau</strong> at height <span class="math inline">\(\pi\)</span> across the empty middle, a jump to <span class="math inline">\(1\)</span> at <span class="math inline">\(+1\)</span>. The map becomes</p>
-<p><span class="math display">\[
-x = \begin{cases} -1, &amp; u &lt; \pi \\ +1, &amp; u &gt; \pi \end{cases}
-\qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
-\]</span></p>
-<p>W01’s dataset, generated by thresholding a uniform (almost surely: the single point <span class="math inline">\(u = \pi\)</span> has probability zero). The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a> proves this limit. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
-</section>
-<section id="maps-are-not-unique" class="level2">
-<h2 class="anchored" data-anchor-id="maps-are-not-unique">Maps are not unique</h2>
-<p><span class="math inline">\(F^{-1}\)</span> is the <em>monotone</em> map pushing <span class="math inline">\(\text{Uniform}(0,1)\)</span> to <span class="math inline">\(p\)</span>, but not the only map. The “packed” two-stage construction</p>
-<p><span class="math display">\[
-x = \begin{cases}
-\mu_1 + \sigma\, \Phi^{-1}\!\big(u/\pi\big), &amp; u &lt; \pi,\\[2pt]
-\mu_2 + \sigma\, \Phi^{-1}\!\big(\tfrac{u-\pi}{1-\pi}\big), &amp; u \ge \pi,
-\end{cases}
-\]</span></p>
-<p>also pushes uniform to the mixture (each branch rescales its segment of <span class="math inline">\([0,1]\)</span> back to a full uniform — Exercise 3), and it is <em>literally</em> ancestral sampling written as one formula. Different map, same distribution: what is canonical is the <em>distribution</em>, not the transport. (In higher dimensions, choosing among the many maps is its own subject — optimal transport — which we will brush against later.)</p>
-</section>
-<section id="the-claim-that-organizes-everything" class="level2">
-<h2 class="anchored" data-anchor-id="the-claim-that-organizes-everything">The claim that organizes everything</h2>
-<blockquote class="blockquote">
-<p><strong>Once all of its random draws are exposed, a generative sampler is a deterministic map from base randomness to a sample.</strong></p>
-</blockquote>
+<p>It is a genuine theorem and it is tight — some distribution attains it for each <span class="math inline">\(k\)</span>. But look at what it costs to be that general:</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 18%">
-<col style="width: 24%">
-<col style="width: 32%">
-<col style="width: 26%">
-</colgroup>
 <thead>
 <tr class="header">
-<th>Model</th>
-<th>Random input(s)</th>
-<th>Sampling mechanism</th>
-<th>Typical fitting</th>
+<th><span class="math inline">\(k\)</span></th>
+<th>Chebyshev <span class="math inline">\(1/k^2\)</span></th>
+<th>Gaussian <span class="math inline">\(\mathbb{P}(|Z|\ge k)\)</span></th>
+<th>ratio</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>This note</td>
-<td><span class="math inline">\(u \sim \text{U}(0,1)\)</span></td>
-<td>quantile <span class="math inline">\(F^{-1}(u)\)</span> (numerical in the demo)</td>
-<td>the CDF is known</td>
+<td>1</td>
+<td>1.000</td>
+<td>0.3173</td>
+<td>3.2</td>
 </tr>
 <tr class="even">
-<td>GAN</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td><span class="math inline">\(G_\theta(z)\)</span>, a network</td>
-<td>adversarial objective</td>
+<td>2</td>
+<td>0.250</td>
+<td>0.04550</td>
+<td>5.5</td>
 </tr>
 <tr class="odd">
-<td>VAE</td>
-<td><span class="math inline">\(z\)</span>, plus decoder noise <span class="math inline">\(\varepsilon\)</span></td>
-<td>sample <span class="math inline">\(p_\theta(x \mid z)\)</span>, i.e.&nbsp;<span class="math inline">\(T_\theta(z, \varepsilon)\)</span></td>
-<td>ELBO / variational learning</td>
+<td>3</td>
+<td>0.1111</td>
+<td>0.002700</td>
+<td>41</td>
 </tr>
 <tr class="even">
-<td>Normalizing flow</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td>invertible <span class="math inline">\(f_\theta(z)\)</span></td>
-<td>exact likelihood (change of variables)</td>
-</tr>
-<tr class="odd">
-<td><strong>Diffusion</strong></td>
-<td><span class="math inline">\(x_T \sim \mathcal{N}\)</span>; step noise if stochastic</td>
-<td><strong>probability-flow ODE</strong> (deterministic) or reverse SDE</td>
-<td><strong>score/denoising objectives, ELBO</strong></td>
+<td>4</td>
+<td>0.0625</td>
+<td>0.0000633</td>
+<td>987</td>
 </tr>
 </tbody>
 </table>
-<p>The outer skeleton is shared — simple randomness, a sampling mechanism, data — while the learned object, the structural constraints, and the sampler differ. For diffusion in particular, determinism is a <em>sampler choice</em>: the probability-flow ODE is a deterministic map from <span class="math inline">\(x_T\)</span>; the reverse SDE consumes fresh noise at every step and is a deterministic function only of <span class="math inline">\((x_T, \text{all step noises})\)</span>.</p>
-<p>In one dimension with a known CDF, the map is a formula. For images, the population law is unknown and no tractable multivariate inverse-CDF construction exists — so deep generative models learn a <em>transport, density, score, or other ingredient</em> of a sampler rather than writing the map down. And you have already run one: W01’s probability-flow ODE numerically transported a moment-matched Gaussian to within <span class="math inline">\(\approx \sigma_{\min}\)</span> of the two-point data (W01 lists the approximations involved); with the exact terminal law, score, and integration, it is an exact deterministic transport — an inverse-CDF-like map built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
+<p>Chebyshev’s tail decays <strong>polynomially</strong>, like <span class="math inline">\(k^{-2}\)</span>. The Gaussian’s decays like <span class="math inline">\(e^{-k^2/2}\)</span> — not merely faster, but in a different regime altogether. By <span class="math inline">\(k=4\)</span> the bound is a thousand times too pessimistic.</p>
+<p>So the honest question is not “why is the Gaussian’s tail small” but: <strong>what extra assumption, beyond a finite variance, buys you <span class="math inline">\(e^{-k^2/2}\)</span> instead of <span class="math inline">\(k^{-2}\)</span>?</strong> Chebyshev is what you can say knowing two moments and nothing else. Each of the arguments below adds one structural demand — symmetry, or additivity, or ignorance — and each time the answer that comes back is <span class="math inline">\(e^{-x^2/2}\)</span>.</p>
+</section>
+<section id="symmetry-plus-independence-and-the-density-falls-out" class="level2">
+<h2 class="anchored" data-anchor-id="symmetry-plus-independence-and-the-density-falls-out">2. Symmetry plus independence, and the density falls out</h2>
+<p>This is the argument that lets you <em>see</em> the density rather than be handed it. It is due to Herschel (1850) and Maxwell (1860), who each wanted the distribution of errors in two dimensions.</p>
+<p>Impose exactly two demands on a density <span class="math inline">\(f\)</span> on <span class="math inline">\(\mathbb{R}^2\)</span>:</p>
+<ol type="1">
+<li><strong>The coordinates are independent</strong> — <span class="math inline">\(f(x,y) = g(x)\,g(y)\)</span> for some one-dimensional <span class="math inline">\(g\)</span>, the same in each coordinate.</li>
+<li><strong>The density is rotationally symmetric</strong> — <span class="math inline">\(f(x,y)\)</span> depends on <span class="math inline">\((x,y)\)</span> only through the radius <span class="math inline">\(\sqrt{x^2+y^2}\)</span>. Errors have no preferred direction.</li>
+</ol>
+<p>Both are natural for a measurement error: the horizontal and vertical components of a miss should not influence each other, and no direction on the target should be special. Now watch what they force together.</p>
+<p>Write the second demand as <span class="math inline">\(f(x,y) = h(x^2+y^2)\)</span>. Combining with the first,</p>
+<p><span class="math display">\[
+g(x)\,g(y) = h(x^2 + y^2).
+\]</span></p>
+<p>Set <span class="math inline">\(y = 0\)</span>: <span class="math inline">\(g(x)g(0) = h(x^2)\)</span>, so <span class="math inline">\(h(u) = g(\sqrt{u})\,g(0)\)</span>. Substituting back,</p>
+<p><span class="math display">\[
+g(x)\,g(y) \;=\; g\big(\sqrt{x^2+y^2}\big)\,g(0).
+\]</span></p>
+<p>Define <span class="math inline">\(\varphi(u) = g(\sqrt{u})/g(0)\)</span> for <span class="math inline">\(u \ge 0\)</span>. The relation becomes</p>
+<p><span class="math display">\[
+\varphi(u)\,\varphi(v) \;=\; \varphi(u+v),
+\]</span></p>
+<p>which is <strong>Cauchy’s exponential functional equation</strong>. Its only measurable solutions are <span class="math inline">\(\varphi(u) = e^{cu}\)</span>. Therefore</p>
+<p><span class="math display">\[
+g(t) \;=\; g(0)\,e^{c t^{2}},
+\]</span></p>
+<p>and for <span class="math inline">\(g\)</span> to be integrable we need <span class="math inline">\(c &lt; 0\)</span>. Write <span class="math inline">\(c = -1/(2\sigma^2)\)</span> and normalise:</p>
+<p><span class="math display">\[
+\boxed{\;g(t) = \frac{1}{\sqrt{2\pi}\,\sigma}\,e^{-t^{2}/2\sigma^{2}}.\;}
+\]</span></p>
+<p>The Gaussian, with no probabilistic input at all — only “independent coordinates” and “no preferred direction”, plus the requirement that the answer be a density.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What that argument really shows
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The exponent is quadratic because the <em>only</em> rotation-invariant quantity built from independent coordinates is the sum of squares, and the only way to turn a sum into a product is to exponentiate. That is the whole mechanism: <span class="math inline">\(e^{-\frac12\sum x_i^2} = \prod e^{-x_i^2/2}\)</span>. Read it in reverse and it is exactly §2 of <a href="../tutorials/12-multivariate-gaussian.html">the multivariate reference</a>: <span class="math inline">\(\mathcal{N}(0,I)\)</span> factorises into independent coordinates <em>because</em> its exponent is a sum of squares.</p>
+<p>It also explains the shape of the level sets. Rotational symmetry gives circles; apply a linear map and circles become <strong>ellipses</strong>, which is why every multivariate Gaussian contour is an ellipsoid and no other shape ever appears.</p>
+<p>The Gaussian is the <em>only</em> density with independent coordinates and rotational symmetry. Try <span class="math inline">\(e^{-|t|}\)</span>: the product <span class="math inline">\(e^{-|x|}e^{-|y|} = e^{-(|x|+|y|)}\)</span> has diamond-shaped level sets, not circles. It fails, and so does everything else.</p>
+</div>
+</div>
+</section>
+<section id="maximum-entropy-the-least-committed-choice" class="level2">
+<h2 class="anchored" data-anchor-id="maximum-entropy-the-least-committed-choice">3. Maximum entropy: the least committed choice</h2>
+<p>A second demand, of a completely different kind. Suppose all you are willing to assert about a quantity is its mean and its variance. Among all densities with those two moments, which should you pick?</p>
+<p>The principled answer is: the one that assumes the least — that is, the one of <strong>maximum entropy</strong>, <span class="math inline">\(h(p) = -\int p \log p\)</span>. Committing to anything with lower entropy means smuggling in structure you have no evidence for.</p>
+<p><strong>The answer is the Gaussian.</strong> Let <span class="math inline">\(q = \mathcal{N}(\mu,\sigma^2)\)</span> and let <span class="math inline">\(p\)</span> be any density with the same mean and variance. Then</p>
+<p><span class="math display">\[
+0 \;\le\; \mathrm{KL}(p \,\|\, q) \;=\; \int p \log \frac{p}{q}
+\;=\; -h(p) - \int p \log q ,
+\]</span></p>
+<p>using <span class="math inline">\(\mathrm{KL} \ge 0\)</span>, which is Jensen from <a href="../tutorials/13-inequalities.html">the inequalities tutorial</a>. Now the second term: because <span class="math inline">\(\log q\)</span> is a <em>quadratic</em> in <span class="math inline">\(x\)</span>, the integral <span class="math inline">\(\int p \log q\)</span> depends on <span class="math inline">\(p\)</span> only through its mean and variance — which are the same as <span class="math inline">\(q\)</span>’s by assumption. So <span class="math inline">\(\int p\log q = \int q \log q = -h(q)\)</span>, and the display rearranges to</p>
+<p><span class="math display">\[
+h(p) \;\le\; h(q),
+\]</span></p>
+<p>with equality exactly when <span class="math inline">\(p = q\)</span>. <span class="math inline">\(\square\)</span></p>
+<p>The step that makes it work is worth naming: <strong><span class="math inline">\(\log\)</span> of a Gaussian is a quadratic, and a quadratic only sees two moments.</strong> Fix a different pair of constraints and you get a different maximum-entropy family — fix the mean alone on <span class="math inline">\([0,\infty)\)</span> and you get the exponential; fix nothing but a bounded range and you get the uniform. The Gaussian is the maximum-entropy answer to precisely the question “I know the mean and the variance”.</p>
+<p>Numerically, at variance <span class="math inline">\(1\)</span>: Gaussian <span class="math inline">\(h = 1.4189\)</span> nats, Laplace <span class="math inline">\(1.3466\)</span>, uniform <span class="math inline">\(1.2425\)</span> — the Gaussian wins, as it must.</p>
+</section>
+<section id="the-central-limit-theorem-additivity" class="level2">
+<h2 class="anchored" data-anchor-id="the-central-limit-theorem-additivity">4. The central limit theorem: additivity</h2>
+<p>The third demand is additivity. Let <span class="math inline">\(X_1, X_2, \dots\)</span> be i.i.d.&nbsp;with mean <span class="math inline">\(\mu\)</span> and finite variance <span class="math inline">\(\sigma^2\)</span> — <strong>no other assumption about their distribution</strong>. Then</p>
+<p><span class="math display">\[
+\frac{1}{\sigma\sqrt{n}}\sum_{i=1}^{n}(X_i - \mu)
+\;\xrightarrow[n\to\infty]{d}\;
+\mathcal{N}(0,1).
+\]</span></p>
+<p>The weak law of §6 of the inequalities tutorial said the average concentrates on <span class="math inline">\(\mu\)</span>. The CLT says what the <em>residual fluctuation</em> looks like once you magnify it by the right amount: divide by <span class="math inline">\(n\)</span> and everything collapses to a point; divide by <span class="math inline">\(\sqrt{n}\)</span> and a fixed shape survives — and that shape is the Gaussian, whatever you started from.</p>
+<p>Act III of <a href="../materials/gaussian-lab.html" target="_blank">the Gaussian Lab</a> makes the convergence visible, and also makes visible that the <em>rate</em> depends heavily on the source: a symmetric one like the uniform is close by <span class="math inline">\(n=3\)</span>, while a lopsided exponential or a two-valued coin flip takes far longer. The limit is identical; only the approach differs.</p>
+<p><strong>Why this is an argument for the Gaussian and not merely a fact about sums.</strong> Measurement error is typically the accumulation of many small independent perturbations. So is thermal noise, and so is the pixel noise in a sensor. If a quantity is a sum of many small independent contributions and you know nothing about the individual terms, the CLT says you already know the shape of the total. That is why Gaussian noise models are so often right without anyone having checked.</p>
+<p><strong>And it explains stability.</strong> The Gaussian is a <em>fixed point</em> of adding: sum two independent Gaussians and you get a Gaussian, with variances adding. It is the only distribution with finite variance that is stable in this sense, which is why it is the limit — anything else would be changed by the very operation the limit is built from.</p>
+</section>
+<section id="four-demands-one-density" class="level2">
+<h2 class="anchored" data-anchor-id="four-demands-one-density">5. Four demands, one density</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Demand</th>
+<th>Argument</th>
+<th>What forces the exponent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Only two moments known</td>
+<td>Chebyshev (§1)</td>
+<td><em>nothing</em> — this is the weak baseline the others improve on</td>
+</tr>
+<tr class="even">
+<td>Independent coordinates, no preferred direction</td>
+<td>Herschel–Maxwell (§2)</td>
+<td>sum of squares is the only rotation-invariant form</td>
+</tr>
+<tr class="odd">
+<td>Assume as little as possible given mean and variance</td>
+<td>maximum entropy (§3)</td>
+<td><span class="math inline">\(\log\)</span>-Gaussian is quadratic, so it only sees two moments</td>
+</tr>
+<tr class="even">
+<td>Sum of many small independent effects</td>
+<td>central limit theorem (§4)</td>
+<td>stability under addition</td>
+</tr>
+</tbody>
+</table>
+<p>Four different starting points — a symmetry, an epistemic principle, a limit theorem — and one density at the end of each. That convergence is what earns the Gaussian its place. It is not that it is convenient, though it is; it is that several quite different demands each single it out uniquely.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why this course adds Gaussian noise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every argument above is also a reason the forward process of a diffusion model uses <span class="math inline">\(\mathcal{N}(0,\sigma^2 I)\)</span> rather than anything else. It is isotropic, so no direction of image space is privileged (§2). It is the least committed choice given a noise scale (§3). It is stable under composition, so many small steps equal one big step with variances added (§4) — which is what makes <span class="math inline">\(p(x_t \mid x_0)\)</span> available in closed form at every <span class="math inline">\(t\)</span> instead of only step-by-step. And it is closed under the linear maps the model applies, per <a href="../tutorials/12-multivariate-gaussian.html">the multivariate reference</a>.</p>
+<p>Choose any other noise and all four properties fail at once.</p>
+</div>
+</div>
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
 <ol type="1">
-<li>Complete the inverse-CDF proof for a general (possibly non-strictly-increasing) <span class="math inline">\(F\)</span> using the generalized inverse.</li>
-<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above, and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x)\)</span> equals W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span> posterior (mind which component carries the <span class="math inline">\(+\)</span> sign); compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
-<li>Verify the packed map: show that conditional on <span class="math inline">\(u &lt; \pi\)</span>, the rescaled variable <span class="math inline">\(u/\pi\)</span> is <span class="math inline">\(\text{Uniform}(0,1)\)</span>, and conclude that the branch produces <span class="math inline">\(\mathcal{N}(\mu_1, \sigma^2)\)</span> with the correct probability.</li>
-<li>Construct the inverse-CDF map for a <strong>three</strong>-component mixture and describe its staircase limit as <span class="math inline">\(\sigma \to 0\)</span>. How many plateaus, at what heights?</li>
-<li>The map <span class="math inline">\(x = F^{-1}(u)\)</span> is monotone increasing. Exhibit a <em>decreasing</em> map with the same pushforward, and a map that is neither monotone nor continuous. (Hint: <span class="math inline">\(1 - u\)</span> is also uniform.)</li>
+<li>Complete the Herschel–Maxwell derivation carefully. Where exactly is measurability (or continuity) of <span class="math inline">\(\varphi\)</span> used, and what goes wrong without it? <em>(Cauchy’s equation has pathological non-measurable solutions.)</em></li>
+<li>Show that <span class="math inline">\(e^{-|x|}e^{-|y|}\)</span> is not rotationally symmetric by finding two points at the same radius with different densities. Sketch its level sets.</li>
+<li>Carry the Herschel–Maxwell argument into <span class="math inline">\(d\)</span> dimensions and show it yields <span class="math inline">\(\mathcal{N}(0,\sigma^2 I_d)\)</span>. Which of the two demands does a <em>non-isotropic</em> Gaussian <span class="math inline">\(\mathcal{N}(0,\Sigma)\)</span> violate?</li>
+<li>Verify the maximum-entropy proof’s key step: show explicitly that <span class="math inline">\(\int p \log q\)</span> depends on <span class="math inline">\(p\)</span> only through <span class="math inline">\(\int x\,p\)</span> and <span class="math inline">\(\int x^2 p\)</span> when <span class="math inline">\(q\)</span> is Gaussian.</li>
+<li>Find the maximum-entropy density on <span class="math inline">\([0,\infty)\)</span> subject to a fixed mean. <em>(Answer: exponential. The same Lagrangian argument, with a different constraint.)</em></li>
+<li>Compute the Chebyshev bound and the true Gaussian tail at <span class="math inline">\(k = 6\)</span>. How large is the discrepancy, and which of §§2–4 explains why the true tail is so much thinner?</li>
+<li><em>(Stability.)</em> Show directly, using the MGF from <a href="../tutorials/12-multivariate-gaussian.html">the multivariate reference</a>, that a sum of two independent Gaussians is Gaussian with variances adding. Then explain why this makes the Gaussian a natural candidate for the CLT limit.</li>
 </ol>
 
 
@@ -994,13 +1046,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../assignments.html" class="pagination-link" aria-label="Assignments">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Assignments</span>
+      <a href="../tutorials/11-joint-conditional-bayes.html" class="pagination-link" aria-label="Joint, Marginal, Conditional — and Bayes">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Joint, Marginal, Conditional — and Bayes</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/05-two-point-diffusion.html" class="pagination-link" aria-label="01 · The World's Smallest Diffusion Model">
-        <span class="nav-page-text">01 · The World’s Smallest Diffusion Model</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../decks/map-proved.html" class="pagination-link" aria-label="Deck · The Map, Proved">
+        <span class="nav-page-text">Deck · The Map, Proved</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

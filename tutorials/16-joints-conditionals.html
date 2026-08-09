@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>W02: Generative Modeling II – ID-5-02 (TO)</title>
+<title>03 · Joint, Conditional, Marginal — and Bayes – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../weeks/w03.html" rel="next">
-<link href="../weeks/w01.html" rel="prev">
+<link href="../tutorials/02-distributions-mle.html" rel="next">
+<link href="../tutorials/01-probability-101.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weeks/w01.html">Weekly Notes</a></li><li class="breadcrumb-item"><a href="../weeks/w02.html">W02: Generative Modeling II</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/16-joints-conditionals.html">03 · Joint, Conditional, Marginal — and Bayes</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -163,6 +163,12 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../curriculum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Curriculum</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../assignments.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assignments</span></a>
   </div>
@@ -170,7 +176,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Weekly Notes</span></a>
+ <span class="menu-text">Lecture Notes</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -178,104 +184,44 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w01.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W01: Generative Modeling I</span></a>
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">00 · Introduction and Motivation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w02.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">W02: Generative Modeling II</span></a>
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w03.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W03: High Dimensions &amp; Gaussians</span></a>
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w04.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W04: Gaussian Calculus &amp; Markov Chains</span></a>
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w05.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W05: Noise Accumulation</span></a>
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w06.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W06: DDPM I</span></a>
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w07.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W07: DDPM II</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w08.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W08: Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w09.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W09: Mid-Semester Examinations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W10: Denoising Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w11.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W11: Brownian Motion &amp; SDEs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w12.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W12: Fokker–Planck</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w13.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W13: Continuous Forward Equation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w14.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W14: Reverse-time Drift</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w15.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W15: Information Flow &amp; Probability Flow ODE</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w16.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W16: Holiday Week</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w17.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W17: Flows, Applications &amp; Wrap-up</span></a>
+  <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
   </div>
 </li>
       </ul>
@@ -283,7 +229,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Tutorials · Foundations</span></a>
+ <span class="menu-text">Decks</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -291,14 +237,38 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Probability &amp; Random Variables</span></a>
+  <a href="../decks/01-mechanics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Course Mechanics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Distributions and Maximum Likelihood</span></a>
+  <a href="../decks/02-motivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Why Diffusion Models?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/03-two-point.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/04-probability-joints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/05-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/06-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
       </ul>
@@ -306,12 +276,29 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Tutorials · Diffusion Models</span></a>
+ <span class="menu-text">Tutorials</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inequalities Worth Knowing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Perspectives</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
@@ -320,26 +307,8 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -354,17 +323,6 @@ window.Quarto = {
  <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
   </div>
 </li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
- <span class="menu-text">Tutorials · Advanced</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
@@ -375,6 +333,35 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deck · The Map, Proved</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Draft</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
       </ul>
@@ -395,26 +382,21 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#pre-read" id="toc-pre-read" class="nav-link active" data-scroll-target="#pre-read">Pre-read</a></li>
-  <li><a href="#in-class" id="toc-in-class" class="nav-link" data-scroll-target="#in-class">In Class</a></li>
-  <li><a href="#notes-bayes-rule-and-why-inference-is-the-inverse-problem" id="toc-notes-bayes-rule-and-why-inference-is-the-inverse-problem" class="nav-link" data-scroll-target="#notes-bayes-rule-and-why-inference-is-the-inverse-problem">Notes — Bayes’ rule, and why inference is the inverse problem</a>
-  <ul class="collapse">
-  <li><a href="#generation-runs-forward-inference-runs-backward" id="toc-generation-runs-forward-inference-runs-backward" class="nav-link" data-scroll-target="#generation-runs-forward-inference-runs-backward">Generation runs forward; inference runs backward</a></li>
-  <li><a href="#a-toy-example-did-the-student-understand-or" id="toc-a-toy-example-did-the-student-understand-or" class="nav-link" data-scroll-target="#a-toy-example-did-the-student-understand-or">A toy example: did the student understand “or”?</a></li>
-  <li><a href="#the-sampling-distribution-is-the-likelihood" id="toc-the-sampling-distribution-is-the-likelihood" class="nav-link" data-scroll-target="#the-sampling-distribution-is-the-likelihood">The sampling distribution <em>is</em> the likelihood</a></li>
-  <li><a href="#bayesian-knowledge-tracing" id="toc-bayesian-knowledge-tracing" class="nav-link" data-scroll-target="#bayesian-knowledge-tracing">Bayesian Knowledge Tracing</a></li>
-  <li><a href="#why-this-is-the-shape-of-the-whole-course" id="toc-why-this-is-the-shape-of-the-whole-course" class="nav-link" data-scroll-target="#why-this-is-the-shape-of-the-whole-course">Why this is the shape of the whole course</a></li>
-  </ul></li>
-  <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After Class</a></li>
+  <li><a href="#two-numbers-on-one-outcome" id="toc-two-numbers-on-one-outcome" class="nav-link active" data-scroll-target="#two-numbers-on-one-outcome">Two numbers on one outcome</a></li>
+  <li><a href="#joint-distributions" id="toc-joint-distributions" class="nav-link" data-scroll-target="#joint-distributions">Joint distributions</a></li>
+  <li><a href="#marginal-distributions" id="toc-marginal-distributions" class="nav-link" data-scroll-target="#marginal-distributions">Marginal distributions</a></li>
+  <li><a href="#conditional-distributions-and-bayes-rule" id="toc-conditional-distributions-and-bayes-rule" class="nav-link" data-scroll-target="#conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</a></li>
+  <li><a href="#bayes-rule-and-why-inference-is-the-inverse-problem" id="toc-bayes-rule-and-why-inference-is-the-inverse-problem" class="nav-link" data-scroll-target="#bayes-rule-and-why-inference-is-the-inverse-problem">Bayes’ rule, and why inference is the inverse problem</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weeks/w01.html">Weekly Notes</a></li><li class="breadcrumb-item"><a href="../weeks/w02.html">W02: Generative Modeling II</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/16-joints-conditionals.html">03 · Joint, Conditional, Marginal — and Bayes</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">W02: Generative Modeling II</h1>
+<h1 class="title">03 · Joint, Conditional, Marginal — and Bayes</h1>
 </div>
 
 
@@ -431,53 +413,94 @@ window.Quarto = {
 </header>
 
 
-<p><strong>Dates:</strong> Mon Aug 3, Tue Aug 4, Wed Aug 5, 2026</p>
-<p><strong>Slot/Venue:</strong> Mon 9:00–9:50 · Tue 10:00–10:50 · Wed 11:00–11:50 · 11AC4004</p>
-<p><strong>Syllabus module:</strong> M1 — Maximum-likelihood estimation; KL divergence; empirical risk minimization</p>
-<section id="pre-read" class="level2">
-<h2 class="anchored" data-anchor-id="pre-read">Pre-read</h2>
-<p><em>To be posted (typically by the weekend before) — section references into the primary text.</em></p>
+<p><em>The second concept in the spine, and the point at which probability starts being useful. One new move — put <strong>two</strong> numbers on the same outcome instead of one — produces the whole multivariate vocabulary: joints, marginals, conditionals, and Bayes’ rule. Everything here is elementary; the measure-theoretic version is <a href="../tutorials/11-joint-conditional-bayes.html">in Perspectives</a> and is not needed.</em></p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Where this sits
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Follows <a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a>, which introduced a single random variable on a sample space. Here two random variables share an outcome, and that co-residence is the entire subject. The W02 primer deck <a href="../materials/w02-deck-00-probability-joints.html" target="_blank">Probability, Joints, Conditionals and Bayes</a> develops the same material from a 4 × 4 table of dice counts.</p>
+</div>
+</div>
+<section id="two-numbers-on-one-outcome" class="level2">
+<h2 class="anchored" data-anchor-id="two-numbers-on-one-outcome">Two numbers on one outcome</h2>
+<p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables defined on the <strong>same</strong> sample space — two numerical features read off the same outcome <span class="math inline">\(\omega\)</span>. Height and weight of one person; today’s price and tomorrow’s price of one stock; the clean image and its noisy version from one generation run.</p>
+<p>That sharing is the whole idea. “<span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are jointly distributed” is not an extra assumption bolted on; it is the statement that a single <span class="math inline">\(\omega\)</span> determines both numbers at once, which is exactly why they can be correlated.</p>
 </section>
-<section id="in-class" class="level2">
-<h2 class="anchored" data-anchor-id="in-class">In Class</h2>
-<p><strong>Slides</strong> (← → arrows or click the edges to navigate):</p>
-<p><em>Primer — Probability, Joints, Conditionals and Bayes</em> (<a href="../materials/w02-deck-00-probability-joints.html" target="_blank">open fullscreen</a>) — the probability background the rest of the week assumes, developed from a single 4 × 4 table of dice counts:</p>
-<iframe src="../materials/w02-deck-00-probability-joints.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 primer deck: probability, joints, conditionals and Bayes">
-</iframe>
-<p><em>Part 1 — Distributions and Maximum Likelihood</em> (<a href="../materials/w02-deck-01-distributions-mle.html" target="_blank">open fullscreen</a>):</p>
-<iframe src="../materials/w02-deck-01-distributions-mle.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 1: distributions and MLE">
-</iframe>
-<p><em>Part 2 — Generative AI, in Its Simplest Form</em> (<a href="../materials/w02-deck-02-genai-maps.html" target="_blank">open fullscreen</a>):</p>
-<iframe src="../materials/w02-deck-02-genai-maps.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 2: generative AI in its simplest form">
-</iframe>
-<p><em>Part 3 — The Map, Proved</em> (<a href="../materials/w02-deck-03-map-limit.html" target="_blank">open fullscreen</a>):</p>
-<iframe src="../materials/w02-deck-03-map-limit.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 3: the map, proved">
-</iframe>
-<p><strong>Tutorials for this week</strong> (standalone documents, under the Tutorials section):</p>
-<ul>
-<li><a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a> — sample spaces, events, random variables as maps out of outcomes, joints, conditioning, and expectation.</li>
-<li><a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> — the five families, the pdf-vs-likelihood distinction, the Gaussian MLE, and the BCE aside.</li>
-<li><a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> — conditional generation and sampling as a map.</li>
-<li><a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a> — full proofs, including the score flow as the quantile transport.</li>
-</ul>
-<p><em>Optional, under Tutorials · Advanced</em> — the measure-theoretic footing behind the above. Not required for anything in lecture:</p>
-<ul>
-<li><a href="../tutorials/10-measuring-things.html">Measuring Things — From Length to Probability</a> — measure, the Lebesgue integral, Kolmogorov’s axioms, random variables as measurable functions, pushforward, expectation.</li>
-<li><a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional — and Bayes</a> — joints as mountains, marginals as shadows, conditionals as renormalized slices, and the sigmoid/tanh posterior the W01 denoiser uses.</li>
-</ul>
-<p><strong>Interactive demos</strong></p>
-<ul>
-<li><a href="../materials/measure-playground.html">The Measure Playground</a> — a σ-algebra as what a report tells you, and expectation as the area under the quantile curve.</li>
-<li><a href="../materials/joint-slicer.html">The Joint Slicer</a> — four joints with identical marginals, plus the two-shelf mixed joint with a live posterior.</li>
-<li><a href="../materials/distributions-playground.html">The Distribution Playground</a> — see, sample, fit, sample from the fit (and the single-Gaussian-on-mixture trap).</li>
-<li><a href="../materials/likelihood-lens.html">The Likelihood Lens</a> — pdf and likelihood as two slices of one surface; draggable data with a live MLE.</li>
-<li><a href="../materials/sampling-as-a-map.html">Sampling as a Map</a> — ancestral sampling, then the same generator as one deterministic map; slide σ → 0 for the two-point staircase.</li>
-</ul>
+<section id="joint-distributions" class="level2">
+<h2 class="anchored" data-anchor-id="joint-distributions">Joint distributions</h2>
+<p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables defined on the same sample space — two numerical features of the same outcome. Their <strong>joint distribution</strong> specifies <span class="math inline">\(p(x, y) = \mathbb{P}(X = x \text{ and } Y = y)\)</span> in the discrete case, or a joint density <span class="math inline">\(f(x, y)\)</span> whose volumes are probabilities in the continuous case. The joint distribution is a complete description of the pair: every probabilistic statement about <span class="math inline">\((X, Y)\)</span> can be computed from it.</p>
+<p>The following discrete joint distribution serves as the running example (the state of a morning sky and the occurrence of rain):</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 34%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(p(x,y)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> rain</th>
+<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> no rain</th>
+<th style="text-align: center;">row sum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(X{=}\)</span> cloudy</td>
+<td style="text-align: center;">0.20</td>
+<td style="text-align: center;">0.25</td>
+<td style="text-align: center;"><strong>0.45</strong></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(X{=}\)</span> clear</td>
+<td style="text-align: center;">0.05</td>
+<td style="text-align: center;">0.50</td>
+<td style="text-align: center;"><strong>0.55</strong></td>
+</tr>
+<tr class="odd">
+<td>column sum</td>
+<td style="text-align: center;"><strong>0.25</strong></td>
+<td style="text-align: center;"><strong>0.75</strong></td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="notes-bayes-rule-and-why-inference-is-the-inverse-problem" class="level2">
-<h2 class="anchored" data-anchor-id="notes-bayes-rule-and-why-inference-is-the-inverse-problem">Notes — Bayes’ rule, and why inference is the inverse problem</h2>
-<section id="generation-runs-forward-inference-runs-backward" class="level3">
-<h3 class="anchored" data-anchor-id="generation-runs-forward-inference-runs-backward">Generation runs forward; inference runs backward</h3>
+<section id="marginal-distributions" class="level2">
+<h2 class="anchored" data-anchor-id="marginal-distributions">Marginal distributions</h2>
+<p>The <strong>marginal</strong> distribution of <span class="math inline">\(X\)</span> describes <span class="math inline">\(X\)</span> alone, with <span class="math inline">\(Y\)</span> disregarded. It is obtained by summing (or, for densities, integrating) the joint distribution over the other variable:</p>
+<p><span class="math display">\[
+p(x) = \sum_y p(x, y),
+\qquad\text{or}\qquad
+f(x) = \int f(x, y)\, dy .
+\]</span></p>
+<p>In the table these are the row and column sums — the margins of the table, which is the origin of the term: <span class="math inline">\(\mathbb{P}(\text{cloudy}) = 0.45\)</span> and <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>. The operation is justified directly by the additivity axiom: the event “cloudy” is the disjoint union of “cloudy and rain” and “cloudy and no rain”. Marginalization recurs throughout the course; in the mixture model of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a>, the observed density <span class="math inline">\(p(x) = \sum_z p(z)\, p(x \mid z)\)</span> is precisely the joint distribution of <span class="math inline">\((x, z)\)</span> with the latent variable summed out.</p>
+</section>
+<section id="conditional-distributions-and-bayes-rule" class="level2">
+<h2 class="anchored" data-anchor-id="conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</h2>
+<p>The <strong>conditional</strong> distribution of <span class="math inline">\(Y\)</span> given <span class="math inline">\(X = x\)</span> is defined, whenever <span class="math inline">\(p(x) &gt; 0\)</span>, by</p>
+<p><span class="math display">\[
+p(y \mid x) = \frac{p(x, y)}{p(x)} .
+\]</span></p>
+<p>The definition restricts attention to the outcomes consistent with <span class="math inline">\(X = x\)</span> and renormalizes their probabilities to total 1. In the running example, <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy}) = 0.20 / 0.45 \approx 0.44\)</span>, compared with the unconditional <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>.</p>
+<p>Applying the definition in both directions and eliminating the joint yields <strong>Bayes’ rule</strong>,</p>
+<p><span class="math display">\[
+\boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
+\]</span></p>
+<p>which converts a conditional in one direction into the conditional in the other. The tanh denoiser of W01 is an application of this identity, with <span class="math inline">\(x\)</span> the clean data point and <span class="math inline">\(y\)</span> the noisy observation; it is derived in full in <a href="../tutorials/05-two-point-diffusion.html">The World’s Smallest Diffusion Model</a>.</p>
+<p><span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>independent</strong> if <span class="math inline">\(p(x, y) = p(x)\, p(y)\)</span> for all <span class="math inline">\(x, y\)</span> — equivalently, if <span class="math inline">\(p(y \mid x) = p(y)\)</span>, so that conditioning on <span class="math inline">\(X\)</span> conveys no information about <span class="math inline">\(Y\)</span>. In the table, <span class="math inline">\(0.20 \ne 0.45 \times 0.25\)</span>, so the two variables are dependent. The i.i.d. assumption underlying the likelihoods of <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> are an independence statement applied to repeated observations.</p>
+</section>
+<section id="bayes-rule-and-why-inference-is-the-inverse-problem" class="level2">
+<h2 class="anchored" data-anchor-id="bayes-rule-and-why-inference-is-the-inverse-problem">Bayes’ rule, and why inference is the inverse problem</h2>
+<section id="generation-runs-forward-inference-runs-backward" class="level4">
+<h4 class="anchored" data-anchor-id="generation-runs-forward-inference-runs-backward">Generation runs forward; inference runs backward</h4>
 <p>Almost every model in this course is written in the <strong>forward</strong> direction. You posit some unobserved state, and you write down a mechanism that turns it into data:</p>
 <p><span class="math display">\[
 \underbrace{z}_{\text{latent, what we care about}}
@@ -538,8 +561,8 @@ p(x) = \sum_z p(x \mid z)\,p(z).
 \]</span></p>
 <p>This is the single most useful thing in the course’s toolkit: <strong>it is the bridge from the direction you can write down to the direction you want.</strong></p>
 </section>
-<section id="a-toy-example-did-the-student-understand-or" class="level3">
-<h3 class="anchored" data-anchor-id="a-toy-example-did-the-student-understand-or">A toy example: did the student understand “or”?</h3>
+<section id="a-toy-example-did-the-student-understand-or" class="level4">
+<h4 class="anchored" data-anchor-id="a-toy-example-did-the-student-understand-or">A toy example: did the student understand “or”?</h4>
 <p>A student is set ten short questions on the logical connective <strong>or</strong>. We would like to know whether they have actually grasped it — but “understanding” is not something we can measure. We can only mark the answers.</p>
 <ul>
 <li><strong>Latent</strong> <span class="math inline">\(z \in \{0, 1\}\)</span>: the student understands the concept, or does not. This is the <em>inferential goal</em>.</li>
@@ -619,8 +642,8 @@ The marks scale does not matter
 </table>
 <p>Same evidence, three different conclusions. This is not a defect. It is the honest statement that seven out of ten is weak evidence, and weak evidence does not overturn what you already knew.</p>
 </section>
-<section id="the-sampling-distribution-is-the-likelihood" class="level3">
-<h3 class="anchored" data-anchor-id="the-sampling-distribution-is-the-likelihood">The sampling distribution <em>is</em> the likelihood</h3>
+<section id="the-sampling-distribution-is-the-likelihood" class="level4">
+<h4 class="anchored" data-anchor-id="the-sampling-distribution-is-the-likelihood">The sampling distribution <em>is</em> the likelihood</h4>
 <p>The expression <span class="math inline">\(p(x \mid z)\)</span> has been doing two jobs above, and it is worth separating them, because this is the distinction <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> makes in the parametric setting.</p>
 <table class="caption-top table">
 <colgroup>
@@ -654,8 +677,8 @@ The marks scale does not matter
 </table>
 <p>It is one formula read in two directions. Forward, it generates. Backward, it scores. Bayes’ rule is what converts the backward reading into an actual probability distribution over <span class="math inline">\(z\)</span>, by weighting with the prior and renormalising.</p>
 </section>
-<section id="bayesian-knowledge-tracing" class="level3">
-<h3 class="anchored" data-anchor-id="bayesian-knowledge-tracing">Bayesian Knowledge Tracing</h3>
+<section id="bayesian-knowledge-tracing" class="level4">
+<h4 class="anchored" data-anchor-id="bayesian-knowledge-tracing">Bayesian Knowledge Tracing</h4>
 <p>The toy example freezes the student in time. Real learners <em>learn</em>, so the latent state changes as they work — and the natural extension is exactly the model used in intelligent tutoring systems: <strong>Bayesian Knowledge Tracing</strong> (Corbett and Anderson, 1995, <em>User Modeling and User-Adapted Interaction</em>).</p>
 <p>BKT keeps the same two-layer structure and lets the latent evolve:</p>
 <ul>
@@ -716,8 +739,8 @@ The shape to remember
 </div>
 </div>
 </section>
-<section id="why-this-is-the-shape-of-the-whole-course" class="level3">
-<h3 class="anchored" data-anchor-id="why-this-is-the-shape-of-the-whole-course">Why this is the shape of the whole course</h3>
+<section id="why-this-is-the-shape-of-the-whole-course" class="level4">
+<h4 class="anchored" data-anchor-id="why-this-is-the-shape-of-the-whole-course">Why this is the shape of the whole course</h4>
 <p>Diffusion models are an inverse problem, and it is worth being blunt about the terminology, because it inverts what you might expect.</p>
 <ul>
 <li>The <strong>forward process</strong> of a diffusion model is the <em>corruption</em>: <span class="math inline">\(x_0 \to x_\sigma = x_0 + \sigma z\)</span>. We write it down ourselves, in closed form, and it is trivial to sample. This is the easy direction.</li>
@@ -728,13 +751,19 @@ The shape to remember
 \mathbb{E}[x_0 \mid x_\sigma]
 = \tanh\!\Big(\frac{x_\sigma}{\sigma^2}\Big)
 \quad\text{for the two-point dataset of }
-\]</span> <a href="../weeks/w01.html">W01</a> — which, as <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional</a> shows, is nothing but Bayes’ rule applied to two Gaussian shelves and then averaged. Swap “understands the concept” for “was a <span class="math inline">\(+1\)</span>”, and “ten marks” for “one noisy measurement”, and it is the same calculation you did above.</p>
-<p><em>Board scans from the lecture will be added here.</em></p>
+\]</span> W01 — which, as <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional</a> shows, is nothing but Bayes’ rule applied to two Gaussian shelves and then averaged. Swap “understands the concept” for “was a <span class="math inline">\(+1\)</span>”, and “ten marks” for “one noisy measurement”, and it is the same calculation you did above.</p>
 </section>
 </section>
-<section id="after-class" class="level2">
-<h2 class="anchored" data-anchor-id="after-class">After Class</h2>
-<p><em>Exercises and pointers will be posted here.</em></p>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Two fair coin tosses. Let <span class="math inline">\(X\)</span> be the result of the first toss and <span class="math inline">\(Y\)</span> the total number of heads. Write the joint as a table, compute both marginals, and compute both families of conditionals. Verify Bayes’ rule on <span class="math inline">\(\mathbb{P}(X = H \mid Y = 1)\)</span>.</li>
+<li>For the sky-and-rain table above, compute <span class="math inline">\(\mathbb{P}(\text{cloudy} \mid \text{rain})\)</span> by Bayes’ rule from <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy})\)</span> and the marginals, then confirm it by reading the table directly.</li>
+<li>Construct two <em>different</em> joint distributions on <span class="math inline">\(\{0,1\}^2\)</span> that have the same pair of marginals. What does this show about whether marginals determine a joint?</li>
+<li>Show that if <span class="math inline">\(p(x,y) = p(x)p(y)\)</span> then every conditional <span class="math inline">\(p(y \mid x)\)</span> equals <span class="math inline">\(p(y)\)</span> — independence means the conditional does not move as you change what you condition on.</li>
+<li>In the mixture model <span class="math inline">\(z \sim \text{Bernoulli}(\pi)\)</span>, <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)\)</span>: identify the joint <span class="math inline">\(p(x,z)\)</span>, both marginals, and both conditionals. State which of these the <a href="../tutorials/05-two-point-diffusion.html">W01 denoiser</a> computes, and which the ancestral sampler of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> uses.</li>
+<li>A generative model produces a noisy observation <span class="math inline">\(x_t\)</span> from a clean signal <span class="math inline">\(x_0\)</span>. Which direction is easy to write down, <span class="math inline">\(p(x_t \mid x_0)\)</span> or <span class="math inline">\(p(x_0 \mid x_t)\)</span>? Which one does generation require? Name the rule that converts one into the other.</li>
+</ol>
 
 
 </section>
@@ -1167,13 +1196,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../weeks/w01.html" class="pagination-link" aria-label="W01: Generative Modeling I">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">W01: Generative Modeling I</span>
+      <a href="../tutorials/01-probability-101.html" class="pagination-link" aria-label="02 · Probability &amp; Random Variables">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">02 · Probability &amp; Random Variables</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../weeks/w03.html" class="pagination-link" aria-label="W03: High Dimensions &amp; Gaussians">
-        <span class="nav-page-text">W03: High Dimensions &amp; Gaussians</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/02-distributions-mle.html" class="pagination-link" aria-label="04 · Distributions and Maximum Likelihood">
+        <span class="nav-page-text">04 · Distributions and Maximum Likelihood</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

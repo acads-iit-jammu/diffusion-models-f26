@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>00 · Introduction and Motivation – ID-5-02 (TO)</title>
+<title>05 · The Multivariate Gaussian — A Working Reference – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/05-two-point-diffusion.html" rel="next">
-<link href="../assignments.html" rel="prev">
+<link href="../tutorials/15-comparing-distributions.html" rel="next">
+<link href="../tutorials/02-distributions-mle.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/12-multivariate-gaussian.html">05 · The Multivariate Gaussian — A Working Reference</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -184,7 +184,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">00 · Introduction and Motivation</span></a>
   </div>
 </li>
@@ -214,7 +214,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
   </div>
 </li>
@@ -382,18 +382,16 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#what-this-course-is-about" id="toc-what-this-course-is-about" class="nav-link active" data-scroll-target="#what-this-course-is-about">What this course is about</a>
+  <li><a href="#the-definition-and-the-one-line-reason-for-its-shape" id="toc-the-definition-and-the-one-line-reason-for-its-shape" class="nav-link active" data-scroll-target="#the-definition-and-the-one-line-reason-for-its-shape">1. The definition, and the one-line reason for its shape</a>
   <ul class="collapse">
-  <li><a href="#the-route-in-one-paragraph" id="toc-the-route-in-one-paragraph" class="nav-link" data-scroll-target="#the-route-in-one-paragraph">The route, in one paragraph</a></li>
-  <li><a href="#how-the-material-is-organised" id="toc-how-the-material-is-organised" class="nav-link" data-scroll-target="#how-the-material-is-organised">How the material is organised</a></li>
-  <li><a href="#where-to-start" id="toc-where-to-start" class="nav-link" data-scroll-target="#where-to-start">Where to start</a></li>
+  <li><a href="#what-it-costs-to-go-multivariate" id="toc-what-it-costs-to-go-multivariate" class="nav-link" data-scroll-target="#what-it-costs-to-go-multivariate">What it costs to go multivariate</a></li>
   </ul></li>
-  <li><a href="#the-simplest-generative-model-there-is" id="toc-the-simplest-generative-model-there-is" class="nav-link" data-scroll-target="#the-simplest-generative-model-there-is">The simplest generative model there is</a></li>
-  <li><a href="#view-1-conditional-generation-a-hierarchical-model" id="toc-view-1-conditional-generation-a-hierarchical-model" class="nav-link" data-scroll-target="#view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</a></li>
-  <li><a href="#view-2-the-coin-disappears-into-a-map" id="toc-view-2-the-coin-disappears-into-a-map" class="nav-link" data-scroll-target="#view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</a></li>
-  <li><a href="#the-two-point-limit" id="toc-the-two-point-limit" class="nav-link" data-scroll-target="#the-two-point-limit">The two-point limit</a></li>
-  <li><a href="#maps-are-not-unique" id="toc-maps-are-not-unique" class="nav-link" data-scroll-target="#maps-are-not-unique">Maps are not unique</a></li>
-  <li><a href="#the-claim-that-organizes-everything" id="toc-the-claim-that-organizes-everything" class="nav-link" data-scroll-target="#the-claim-that-organizes-everything">The claim that organizes everything</a></li>
+  <li><a href="#identity-covariance-the-joint-is-a-product" id="toc-identity-covariance-the-joint-is-a-product" class="nav-link" data-scroll-target="#identity-covariance-the-joint-is-a-product">2. Identity covariance: the joint <em>is</em> a product</a></li>
+  <li><a href="#the-results-in-one-table" id="toc-the-results-in-one-table" class="nav-link" data-scroll-target="#the-results-in-one-table">3. The results, in one table</a></li>
+  <li><a href="#linear-transformations-which-is-the-whole-engine" id="toc-linear-transformations-which-is-the-whole-engine" class="nav-link" data-scroll-target="#linear-transformations-which-is-the-whole-engine">4. Linear transformations, which is the whole engine</a></li>
+  <li><a href="#marginals-and-conditionals" id="toc-marginals-and-conditionals" class="nav-link" data-scroll-target="#marginals-and-conditionals">5. Marginals and conditionals</a></li>
+  <li><a href="#sums-and-why-noise-accumulates-the-way-it-does" id="toc-sums-and-why-noise-accumulates-the-way-it-does" class="nav-link" data-scroll-target="#sums-and-why-noise-accumulates-the-way-it-does">6. Sums, and why noise accumulates the way it does</a></li>
+  <li><a href="#where-each-result-gets-used" id="toc-where-each-result-gets-used" class="nav-link" data-scroll-target="#where-each-result-gets-used">7. Where each result gets used</a></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
@@ -401,9 +399,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/12-multivariate-gaussian.html">05 · The Multivariate Gaussian — A Working Reference</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">00 · Introduction and Motivation</h1>
+<h1 class="title">05 · The Multivariate Gaussian — A Working Reference</h1>
 </div>
 
 
@@ -420,147 +418,259 @@ window.Quarto = {
 </header>
 
 
-<p><em>The first note of the course. It says what the subject is, what the rest of the material is for, and then earns the claim that organises everything with the smallest possible example. Interactive version: <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>.</em></p>
-<section id="what-this-course-is-about" class="level2">
-<h2 class="anchored" data-anchor-id="what-this-course-is-about">What this course is about</h2>
-<p>A <strong>generative model</strong> is a thing that produces samples. Show it a pile of handwritten digits and it should produce new handwritten digits — not ones from the pile, and not noise, but plausible new members of the same population.</p>
-<p>The difficulty is that nobody hands you the population. You get a finite pile of examples, and from that pile you must build something that can generate more. Put formally: given samples <span class="math inline">\(x_1,\dots,x_n\)</span> drawn from an unknown <span class="math inline">\(p_{\text{data}}\)</span>, construct a procedure that draws fresh samples from something close to <span class="math inline">\(p_{\text{data}}\)</span>.</p>
-<p>Two observations shape everything that follows.</p>
-<p><strong>Sampling is not the same as knowing the density.</strong> You do not need a formula for <span class="math inline">\(p_{\text{data}}(x)\)</span> in order to draw from it, and — as the course will show — for images you could not write one down anyway. What you need is a <em>procedure</em>.</p>
-<p><strong>Every such procedure turns simple randomness into structured output.</strong> Somewhere in the machine there is a coin flip, a uniform draw, or a burst of Gaussian noise, and everything downstream of it is arithmetic. That is the picture this note builds, and the rest of the course is about how to <em>learn</em> the arithmetic when the target is complicated.</p>
-<section id="the-route-in-one-paragraph" class="level3">
-<h3 class="anchored" data-anchor-id="the-route-in-one-paragraph">The route, in one paragraph</h3>
-<p>We start with probability itself — random variables, joints, conditionals, Bayes — because generation runs forward from a latent cause to an observation while inference runs backward, and Bayes is the bridge. Then distributions and maximum likelihood in one dimension, where fitting has closed forms. Then the multivariate Gaussian, the one family closed under everything linear, which is why every tractable calculation in this subject goes through it. Then the wall: in high dimension, estimating a density directly stops working, even with structure. That failure is what forces the modern approach — stop describing distributions and start <strong>comparing</strong> them, which is why distances and divergences become central. Diffusion models are then one particular, very effective answer.</p>
-</section>
-<section id="how-the-material-is-organised" class="level3">
-<h3 class="anchored" data-anchor-id="how-the-material-is-organised">How the material is organised</h3>
-<p><strong>Lecture Notes</strong> are the numbered spine, in reading order, and follow the lectures. <strong>Tutorials</strong> sit alongside and go deeper on one thing. <strong>Perspectives</strong> are optional reinterpretations — a transport reading of the whole subject, and the measure-theoretic foundations — and nothing in the lectures depends on them. The <a href="../curriculum.html">Curriculum</a> page lists the sequence and maps it to weeks.</p>
-</section>
-<section id="where-to-start" class="level3">
-<h3 class="anchored" data-anchor-id="where-to-start">Where to start</h3>
-<p>Read this note, then <a href="../tutorials/05-two-point-diffusion.html">01 · The World’s Smallest Diffusion Model</a>, which builds a complete working diffusion model on a dataset of two points, with every step in closed form. Nothing in it is approximated and nothing is learned — which makes it the clearest possible statement of <em>what we are trying to do in high dimensions</em>, and of exactly which step stops being computable once the data is images rather than two numbers.</p>
-</section>
-</section>
-<section id="the-simplest-generative-model-there-is" class="level2">
-<h2 class="anchored" data-anchor-id="the-simplest-generative-model-there-is">The simplest generative model there is</h2>
-<p>The rest of this note presents one tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative sampler, diffusion included, is the second picture, once all of its random inputs are exposed, with a learned ingredient in place of the formula.</p>
-</section>
-<section id="view-1-conditional-generation-a-hierarchical-model" class="level2">
-<h2 class="anchored" data-anchor-id="view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</h2>
-<p>The simplest latent-variable model:</p>
+<p><em>A standalone tutorial accompanying W03, and deliberately built as a reference rather than a narrative: the results you will keep needing, each with enough derivation to see why it is true. The organising fact is that the multivariate normal is closed under everything linear, which is why it is the only distribution this course ever propagates through a computation.</em></p>
+<section id="the-definition-and-the-one-line-reason-for-its-shape" class="level2">
+<h2 class="anchored" data-anchor-id="the-definition-and-the-one-line-reason-for-its-shape">1. The definition, and the one-line reason for its shape</h2>
+<p>A random vector <span class="math inline">\(X \in \mathbb{R}^d\)</span> is <strong>multivariate normal</strong>, written <span class="math inline">\(X \sim \mathcal{N}(\mu, \Sigma)\)</span>, when it has density</p>
 <p><span class="math display">\[
-\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
-x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
+p(x) \;=\; \frac{1}{(2\pi)^{d/2}\,(\det\Sigma)^{1/2}}
+\exp\!\Big(\!-\tfrac12 (x-\mu)^{\!\top}\Sigma^{-1}(x-\mu)\Big),
 \]</span></p>
-<p><strong>Ancestral sampling</strong> generates by following the arrows: draw the latent coin <span class="math inline">\(z\)</span>, then draw <span class="math inline">\(x\)</span> from the selected component. The observed marginal is obtained by summing out the latent:</p>
+<p>with <span class="math inline">\(\mu \in \mathbb{R}^d\)</span> the mean vector and <span class="math inline">\(\Sigma\)</span> a symmetric positive definite <span class="math inline">\(d \times d\)</span> covariance matrix, <span class="math inline">\(\Sigma_{ij} = \operatorname{Cov}(X_i, X_j)\)</span>.</p>
+<p>Everything in the exponent is the scalar</p>
 <p><span class="math display">\[
-p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
-\;=\; \pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)
+\Delta^2(x) \;=\; (x-\mu)^{\!\top}\Sigma^{-1}(x-\mu),
 \]</span></p>
-<p>— exactly the two-component mixture from the playground. A mixture is not just a formula; it is a <em>generative story</em>: population <span class="math inline">\(\to\)</span> subpopulation <span class="math inline">\(\to\)</span> individual.</p>
-<p><strong>Inference is the same hierarchy, run backwards.</strong> Given an observed <span class="math inline">\(x\)</span>, Bayes’ rule gives the posterior over the hidden coin:</p>
+<p>the squared <strong>Mahalanobis distance</strong> — distance from the mean, measured in units of the spread in each direction. So the density depends on <span class="math inline">\(x\)</span> only through <span class="math inline">\(\Delta^2\)</span>, and its level sets <span class="math inline">\(\{\Delta^2 = c\}\)</span> are <strong>ellipsoids</strong> centred at <span class="math inline">\(\mu\)</span>, with axes along the eigenvectors of <span class="math inline">\(\Sigma\)</span> and semi-axis lengths proportional to <span class="math inline">\(\sqrt{\lambda_i}\)</span>.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why the constant out front is what it is
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\((\det\Sigma)^{1/2}\)</span> is the volume factor of the linear map that turns a round unit ball into that ellipsoid — see §4. The <span class="math inline">\((2\pi)^{d/2}\)</span> is <span class="math inline">\(d\)</span> copies of the univariate <span class="math inline">\(\sqrt{2\pi}\)</span>. Neither is arbitrary; both are forced by requiring <span class="math inline">\(\int p = 1\)</span>.</p>
+</div>
+</div>
+<section id="what-it-costs-to-go-multivariate" class="level3">
+<h3 class="anchored" data-anchor-id="what-it-costs-to-go-multivariate">What it costs to go multivariate</h3>
+<p>A single Gaussian is <span class="math inline">\(\mathcal{N}(\mu,\sigma^2)\)</span>: two numbers. The <span class="math inline">\(d\)</span>-dimensional version needs a mean <em>vector</em> and a covariance <em>matrix</em>, so the parameter count jumps from <span class="math inline">\(2\)</span> to</p>
 <p><span class="math display">\[
-\mathbb{P}(z = 1 \mid x)
-= \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
-       {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
+d + \binom{d+1}{2} \;=\; \frac{d(d+3)}{2},
 \]</span></p>
-<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this equals <span class="math inline">\(\operatorname{sigmoid}(-2x/\sigma^2)\)</span>; its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is exactly the posterior W01 computed for the <span class="math inline">\(+1\)</span> component, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
+<p>which for a <span class="math inline">\(784\)</span>-pixel image is <span class="math inline">\(308{,}504\)</span>. Worth seeing where that growth comes from: not from the means, which contribute only <span class="math inline">\(d\)</span>, but from the covariance, which has to record how every coordinate co-varies with every other. This is the whole of the “high-dimensional density estimation is hard” problem in one line, and it is what motivates the structured and low-rank alternatives.</p>
 </section>
-<section id="view-2-the-coin-disappears-into-a-map" class="level2">
-<h2 class="anchored" data-anchor-id="view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</h2>
-<p><strong>Theorem (inverse-CDF / probability integral transform).</strong> Let <span class="math inline">\(F\)</span> be a CDF with generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
-<p><em>Proof.</em> <span class="math inline">\(\mathbb{P}(F^{-1}(U) \le x) = \mathbb{P}(U \le F(x)) = F(x)\)</span>, since <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span> by monotonicity. <span class="math inline">\(\square\)</span></p>
-<p>For our mixture, <span class="math inline">\(F(x) = \pi\,\Phi\!\big(\tfrac{x-\mu_1}{\sigma}\big) +
-(1-\pi)\,\Phi\!\big(\tfrac{x-\mu_2}{\sigma}\big)\)</span> is continuous and strictly increasing, so <span class="math inline">\(F^{-1}\)</span> is an honest function, and</p>
-<p><span class="math display">\[
-u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
-\]</span></p>
-<p>generates the mixture <strong>with no coin anywhere</strong> — the explicit coin has been marginalized out. One caution about where it went: under this map, the event <span class="math inline">\(u &lt; \pi\)</span> selects the lowest <span class="math inline">\(\pi\)</span>-fraction of the <em>mixture</em> distribution, which is <strong>not</strong> the same as the ancestral label <span class="math inline">\(z = 1\)</span> when the components overlap — both Gaussians have full support, so each contributes on both sides of any quantile. (In the well-separated limit <span class="math inline">\(\sigma \to 0\)</span> the two events do coincide, and the <em>packed</em> map below is the construction in which <span class="math inline">\(u &lt; \pi\)</span> genuinely encodes the coin.) Randomness in, structure out, everything in between deterministic.</p>
 </section>
-<section id="the-two-point-limit" class="level2">
-<h2 class="anchored" data-anchor-id="the-two-point-limit">The two-point limit</h2>
-<p>Send <span class="math inline">\(\sigma \to 0\)</span> with <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>. The CDF collapses to a staircase: a jump of height <span class="math inline">\(\pi\)</span> at <span class="math inline">\(-1\)</span>, a flat <strong>plateau</strong> at height <span class="math inline">\(\pi\)</span> across the empty middle, a jump to <span class="math inline">\(1\)</span> at <span class="math inline">\(+1\)</span>. The map becomes</p>
+<section id="identity-covariance-the-joint-is-a-product" class="level2">
+<h2 class="anchored" data-anchor-id="identity-covariance-the-joint-is-a-product">2. Identity covariance: the joint <em>is</em> a product</h2>
+<p>This is the fact worth internalising first. Take <span class="math inline">\(\mu = 0\)</span> and <span class="math inline">\(\Sigma = I\)</span>. Then <span class="math inline">\(\det I = 1\)</span>, <span class="math inline">\(I^{-1} = I\)</span>, and <span class="math inline">\(x^\top x = \sum_i x_i^2\)</span>, so</p>
 <p><span class="math display">\[
-x = \begin{cases} -1, &amp; u &lt; \pi \\ +1, &amp; u &gt; \pi \end{cases}
-\qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
+p(x) = \frac{1}{(2\pi)^{d/2}} e^{-\frac12 \sum_i x_i^2}
+     = \prod_{i=1}^{d} \frac{1}{\sqrt{2\pi}} e^{-x_i^2/2}
+     = \prod_{i=1}^{d} p(x_i).
 \]</span></p>
-<p>W01’s dataset, generated by thresholding a uniform (almost surely: the single point <span class="math inline">\(u = \pi\)</span> has probability zero). The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a> proves this limit. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
+<p>The exponential turns a <strong>sum</strong> in the exponent into a <strong>product</strong> of factors, and each factor is a standard univariate normal. So <span class="math inline">\(\mathcal{N}(0, I)\)</span> in <span class="math inline">\(d\)</span> dimensions is nothing more than <span class="math inline">\(d\)</span> independent standard normals stacked into a vector — there is no extra content in the multivariate object at all.</p>
+<p>More generally, whenever <span class="math inline">\(\Sigma\)</span> is <strong>diagonal</strong>, <span class="math inline">\(\Sigma = \operatorname{diag}(\sigma_1^2,\dots,\sigma_d^2)\)</span>, the same factorisation gives <span class="math inline">\(p(x) = \prod_i \mathcal{N}(x_i; \mu_i, \sigma_i^2)\)</span>: diagonal covariance means independent coordinates.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Diagonal <span class="math inline">\(\Sigma\)</span> means independent — but only because it is Gaussian
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a general joint distribution, zero correlation does <strong>not</strong> imply independence: <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional</a> exhibits four Gaussian lumps that are uncorrelated and strongly dependent. What makes the implication valid here is <em>joint</em> normality. Gaussian marginals are not enough; the pair must be jointly Gaussian.</p>
+</div>
+</div>
+<p>This is also why diffusion models add <span class="math inline">\(\mathcal{N}(0, \sigma^2 I)\)</span> noise and never worry about the dimension: isotropic Gaussian noise is per-pixel independent noise, and the <span class="math inline">\(784\)</span>-dimensional statement is <span class="math inline">\(784\)</span> one-dimensional statements.</p>
 </section>
-<section id="maps-are-not-unique" class="level2">
-<h2 class="anchored" data-anchor-id="maps-are-not-unique">Maps are not unique</h2>
-<p><span class="math inline">\(F^{-1}\)</span> is the <em>monotone</em> map pushing <span class="math inline">\(\text{Uniform}(0,1)\)</span> to <span class="math inline">\(p\)</span>, but not the only map. The “packed” two-stage construction</p>
-<p><span class="math display">\[
-x = \begin{cases}
-\mu_1 + \sigma\, \Phi^{-1}\!\big(u/\pi\big), &amp; u &lt; \pi,\\[2pt]
-\mu_2 + \sigma\, \Phi^{-1}\!\big(\tfrac{u-\pi}{1-\pi}\big), &amp; u \ge \pi,
-\end{cases}
-\]</span></p>
-<p>also pushes uniform to the mixture (each branch rescales its segment of <span class="math inline">\([0,1]\)</span> back to a full uniform — Exercise 3), and it is <em>literally</em> ancestral sampling written as one formula. Different map, same distribution: what is canonical is the <em>distribution</em>, not the transport. (In higher dimensions, choosing among the many maps is its own subject — optimal transport — which we will brush against later.)</p>
-</section>
-<section id="the-claim-that-organizes-everything" class="level2">
-<h2 class="anchored" data-anchor-id="the-claim-that-organizes-everything">The claim that organizes everything</h2>
-<blockquote class="blockquote">
-<p><strong>Once all of its random draws are exposed, a generative sampler is a deterministic map from base randomness to a sample.</strong></p>
-</blockquote>
+<section id="the-results-in-one-table" class="level2">
+<h2 class="anchored" data-anchor-id="the-results-in-one-table">3. The results, in one table</h2>
+<p>Throughout, <span class="math inline">\(X \sim \mathcal{N}(\mu, \Sigma)\)</span> in <span class="math inline">\(\mathbb{R}^d\)</span>.</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 18%">
-<col style="width: 24%">
-<col style="width: 32%">
-<col style="width: 26%">
+<col style="width: 50%">
+<col style="width: 50%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Model</th>
-<th>Random input(s)</th>
-<th>Sampling mechanism</th>
-<th>Typical fitting</th>
+<th>Result</th>
+<th>Statement</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>This note</td>
-<td><span class="math inline">\(u \sim \text{U}(0,1)\)</span></td>
-<td>quantile <span class="math inline">\(F^{-1}(u)\)</span> (numerical in the demo)</td>
-<td>the CDF is known</td>
+<td><strong>Affine map</strong></td>
+<td><span class="math inline">\(AX + b \sim \mathcal{N}(A\mu + b,\; A\Sigma A^{\!\top})\)</span> for any <span class="math inline">\(A \in \mathbb{R}^{m\times d}\)</span>, <span class="math inline">\(b\in\mathbb{R}^m\)</span></td>
 </tr>
 <tr class="even">
-<td>GAN</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td><span class="math inline">\(G_\theta(z)\)</span>, a network</td>
-<td>adversarial objective</td>
+<td><strong>Linear functional</strong></td>
+<td><span class="math inline">\(a^{\!\top} X \sim \mathcal{N}(a^{\!\top}\mu,\; a^{\!\top}\Sigma a)\)</span> — every projection is univariate normal</td>
 </tr>
 <tr class="odd">
-<td>VAE</td>
-<td><span class="math inline">\(z\)</span>, plus decoder noise <span class="math inline">\(\varepsilon\)</span></td>
-<td>sample <span class="math inline">\(p_\theta(x \mid z)\)</span>, i.e.&nbsp;<span class="math inline">\(T_\theta(z, \varepsilon)\)</span></td>
-<td>ELBO / variational learning</td>
+<td><strong>Characterisation</strong></td>
+<td>conversely, if <span class="math inline">\(a^{\!\top}X\)</span> is univariate normal for <em>every</em> <span class="math inline">\(a\)</span>, then <span class="math inline">\(X\)</span> is multivariate normal</td>
 </tr>
 <tr class="even">
-<td>Normalizing flow</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td>invertible <span class="math inline">\(f_\theta(z)\)</span></td>
-<td>exact likelihood (change of variables)</td>
+<td><strong>Marginals</strong></td>
+<td>any subvector <span class="math inline">\(X_S \sim \mathcal{N}(\mu_S, \Sigma_{SS})\)</span> — just delete the other rows and columns</td>
 </tr>
 <tr class="odd">
-<td><strong>Diffusion</strong></td>
-<td><span class="math inline">\(x_T \sim \mathcal{N}\)</span>; step noise if stochastic</td>
-<td><strong>probability-flow ODE</strong> (deterministic) or reverse SDE</td>
-<td><strong>score/denoising objectives, ELBO</strong></td>
+<td><strong>Conditionals</strong></td>
+<td>Gaussian too; formula in §5</td>
+</tr>
+<tr class="even">
+<td><strong>Independent sum</strong></td>
+<td><span class="math inline">\(X \perp Y\)</span>, <span class="math inline">\(Y \sim \mathcal{N}(\nu, T)\)</span> <span class="math inline">\(\Rightarrow\)</span> <span class="math inline">\(X + Y \sim \mathcal{N}(\mu+\nu,\; \Sigma + T)\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Uncorrelated blocks</strong></td>
+<td><span class="math inline">\(\Sigma_{12} = 0\)</span> <span class="math inline">\(\Rightarrow\)</span> <span class="math inline">\(X_1 \perp X_2\)</span> (needs joint normality)</td>
+</tr>
+<tr class="even">
+<td><strong>Whitening</strong></td>
+<td><span class="math inline">\(\Sigma = LL^{\!\top}\)</span> <span class="math inline">\(\Rightarrow\)</span> <span class="math inline">\(L^{-1}(X - \mu) \sim \mathcal{N}(0, I)\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Sampling</strong></td>
+<td><span class="math inline">\(\mu + Lz\)</span> with <span class="math inline">\(z \sim \mathcal{N}(0,I)\)</span> has law <span class="math inline">\(\mathcal{N}(\mu,\Sigma)\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Mahalanobis</strong></td>
+<td><span class="math inline">\((X-\mu)^{\!\top}\Sigma^{-1}(X-\mu) \sim \chi^2_d\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Entropy</strong></td>
+<td><span class="math inline">\(h(X) = \tfrac12 \log\!\big((2\pi e)^d \det\Sigma\big)\)</span> nats</td>
+</tr>
+<tr class="even">
+<td><strong>MGF</strong></td>
+<td><span class="math inline">\(\mathbb{E}[e^{t^{\!\top}X}] = \exp\!\big(t^{\!\top}\mu + \tfrac12 t^{\!\top}\Sigma t\big)\)</span></td>
 </tr>
 </tbody>
 </table>
-<p>The outer skeleton is shared — simple randomness, a sampling mechanism, data — while the learned object, the structural constraints, and the sampler differ. For diffusion in particular, determinism is a <em>sampler choice</em>: the probability-flow ODE is a deterministic map from <span class="math inline">\(x_T\)</span>; the reverse SDE consumes fresh noise at every step and is a deterministic function only of <span class="math inline">\((x_T, \text{all step noises})\)</span>.</p>
-<p>In one dimension with a known CDF, the map is a formula. For images, the population law is unknown and no tractable multivariate inverse-CDF construction exists — so deep generative models learn a <em>transport, density, score, or other ingredient</em> of a sampler rather than writing the map down. And you have already run one: W01’s probability-flow ODE numerically transported a moment-matched Gaussian to within <span class="math inline">\(\approx \sigma_{\min}\)</span> of the two-point data (W01 lists the approximations involved); with the exact terminal law, score, and integration, it is an exact deterministic transport — an inverse-CDF-like map built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
+</section>
+<section id="linear-transformations-which-is-the-whole-engine" class="level2">
+<h2 class="anchored" data-anchor-id="linear-transformations-which-is-the-whole-engine">4. Linear transformations, which is the whole engine</h2>
+<p><strong>The result.</strong> If <span class="math inline">\(X \sim \mathcal{N}(\mu,\Sigma)\)</span> and <span class="math inline">\(Y = AX + b\)</span>, then</p>
+<p><span class="math display">\[
+\boxed{\;Y \sim \mathcal{N}\big(A\mu + b,\; A\Sigma A^{\!\top}\big).\;}
+\]</span></p>
+<p><strong>Why the mean and covariance are those.</strong> No normality needed for this part — it is just linearity of expectation and the definition of covariance:</p>
+<p><span class="math display">\[
+\mathbb{E}[Y] = A\,\mathbb{E}[X] + b = A\mu + b,
+\]</span> <span class="math display">\[
+\operatorname{Cov}(Y) = \mathbb{E}\big[(Y - A\mu - b)(\cdot)^{\!\top}\big]
+= \mathbb{E}\big[A(X-\mu)(X-\mu)^{\!\top}A^{\!\top}\big] = A\Sigma A^{\!\top}.
+\]</span></p>
+<p><strong>Why the result is still Gaussian.</strong> That is the content. The quickest argument uses the MGF: for any <span class="math inline">\(t\)</span>,</p>
+<p><span class="math display">\[
+\mathbb{E}\big[e^{t^{\!\top}Y}\big]
+= e^{t^{\!\top}b}\,\mathbb{E}\big[e^{(A^{\!\top}t)^{\!\top}X}\big]
+= e^{t^{\!\top}b}\exp\!\Big((A^{\!\top}t)^{\!\top}\mu + \tfrac12 (A^{\!\top}t)^{\!\top}\Sigma (A^{\!\top}t)\Big)
+= \exp\!\Big(t^{\!\top}(A\mu + b) + \tfrac12 t^{\!\top}A\Sigma A^{\!\top} t\Big),
+\]</span></p>
+<p>which is exactly the MGF of <span class="math inline">\(\mathcal{N}(A\mu+b, A\Sigma A^{\!\top})\)</span>. Since the MGF determines the distribution, done.</p>
+<p><strong>Sampling and whitening are this result, read in the two directions.</strong> Factor <span class="math inline">\(\Sigma = LL^{\!\top}\)</span> (Cholesky, or <span class="math inline">\(\Sigma^{1/2}\)</span> from the eigendecomposition). Then</p>
+<ul>
+<li><em>forward</em>, <span class="math inline">\(z \sim \mathcal{N}(0,I) \Rightarrow \mu + Lz \sim \mathcal{N}(\mu, LL^{\!\top}) = \mathcal{N}(\mu,\Sigma)\)</span> — this is how you sample any Gaussian from standard noise;</li>
+<li><em>backward</em>, <span class="math inline">\(X \sim \mathcal{N}(\mu,\Sigma) \Rightarrow L^{-1}(X-\mu) \sim \mathcal{N}(0,I)\)</span> — this is <strong>whitening</strong>, and it is why one can always assume <span class="math inline">\(\mathcal{N}(0,I)\)</span> without loss of generality.</li>
+</ul>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The reason this family and no other
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Almost every operation in this course is linear: adding noise, taking a weighted average of a signal and noise, projecting, marginalising. The Gaussian family is <em>closed</em> under all of them, with the parameters transforming by a rule you can compute in closed form. Push almost any other family through a linear map and you leave the family and lose the closed form. That closure is the entire reason diffusion models are analytically tractable.</p>
+</div>
+</div>
+<p><strong>Degenerate case.</strong> If <span class="math inline">\(A\)</span> has rank <span class="math inline">\(&lt; d\)</span> then <span class="math inline">\(A\Sigma A^{\!\top}\)</span> is singular, <span class="math inline">\(\det = 0\)</span>, and the density formula of §1 breaks down — the law is still Gaussian, but it is concentrated on a lower-dimensional subspace and has no density with respect to Lebesgue measure on <span class="math inline">\(\mathbb{R}^m\)</span>. (Compare the manifold discussion in <a href="../tutorials/10-measuring-things.html">Measuring Things</a>: this is the same singularity, arrived at deliberately.) The demo’s <em>singular</em> preset shows the cloud collapsing to a line.</p>
+<p><strong>Interactive demo</strong> — <a href="../materials/gaussian-lab.html" target="_blank">The Gaussian Lab</a></p>
+<iframe src="../materials/gaussian-lab.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: the bivariate normal and its covariance, affine maps of a Gaussian cloud, and the central limit theorem">
+</iframe>
+</section>
+<section id="marginals-and-conditionals" class="level2">
+<h2 class="anchored" data-anchor-id="marginals-and-conditionals">5. Marginals and conditionals</h2>
+<p>Split <span class="math inline">\(X\)</span> into blocks, and <span class="math inline">\(\mu, \Sigma\)</span> to match:</p>
+<p><span class="math display">\[
+X = \begin{pmatrix} X_1 \\ X_2\end{pmatrix},\qquad
+\mu = \begin{pmatrix} \mu_1 \\ \mu_2\end{pmatrix},\qquad
+\Sigma = \begin{pmatrix} \Sigma_{11} &amp; \Sigma_{12} \\ \Sigma_{21} &amp; \Sigma_{22}\end{pmatrix}.
+\]</span></p>
+<p><strong>Marginal.</strong> <span class="math inline">\(X_1 \sim \mathcal{N}(\mu_1, \Sigma_{11})\)</span>. Note how easy this is: you <em>delete</em> the blocks belonging to <span class="math inline">\(X_2\)</span>. No integration is needed, because marginalising is the linear map <span class="math inline">\(X \mapsto \begin{pmatrix} I &amp; 0\end{pmatrix}X\)</span>, and §4 already tells you the answer.</p>
+<p><strong>Conditional.</strong></p>
+<p><span class="math display">\[
+X_1 \mid X_2 = x_2 \;\sim\;
+\mathcal{N}\Big(\underbrace{\mu_1 + \Sigma_{12}\Sigma_{22}^{-1}(x_2 - \mu_2)}_{\text{mean moves linearly in } x_2},\;
+\underbrace{\Sigma_{11} - \Sigma_{12}\Sigma_{22}^{-1}\Sigma_{21}}_{\text{variance does not depend on } x_2}\Big).
+\]</span></p>
+<p>Two features are worth pausing on, because they are unusual and the course leans on both. The conditional <strong>mean is a linear function of what you observed</strong> — so the best predictor of <span class="math inline">\(X_1\)</span> from <span class="math inline">\(X_2\)</span> is linear, which is why linear regression is exactly right under joint normality and only an approximation otherwise. And the conditional <strong>variance does not depend on the observed value</strong> at all: you learn the same amount whatever <span class="math inline">\(x_2\)</span> turns out to be.</p>
+<p>In two dimensions with correlation <span class="math inline">\(\rho\)</span> this reduces to the formula in <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional</a>: <span class="math inline">\(Y \mid X = x \sim \mathcal{N}(\rho x,\, 1-\rho^2)\)</span> for standard marginals.</p>
+</section>
+<section id="sums-and-why-noise-accumulates-the-way-it-does" class="level2">
+<h2 class="anchored" data-anchor-id="sums-and-why-noise-accumulates-the-way-it-does">6. Sums, and why noise accumulates the way it does</h2>
+<p>If <span class="math inline">\(X \sim \mathcal{N}(\mu,\Sigma)\)</span> and <span class="math inline">\(Y \sim \mathcal{N}(\nu,T)\)</span> are <strong>independent</strong>, then <span class="math inline">\(X + Y \sim \mathcal{N}(\mu+\nu,\ \Sigma+T)\)</span>: means add, covariances add. (Independence is essential — without it the covariance of the sum picks up cross terms, <span class="math inline">\(\Sigma + T + \operatorname{Cov}(X,Y) + \operatorname{Cov}(Y,X)\)</span>.)</p>
+<p>This is the whole of the course’s forward process. With <span class="math inline">\(x_0\)</span> fixed and <span class="math inline">\(z \sim \mathcal{N}(0,I)\)</span>,</p>
+<p><span class="math display">\[
+x_\sigma = x_0 + \sigma z \;\sim\; \mathcal{N}(x_0,\ \sigma^2 I),
+\]</span></p>
+<p>and composing two such steps gives <span class="math inline">\(\mathcal{N}(x_0, (\sigma_1^2 + \sigma_2^2)I)\)</span>: <strong>variances add, standard deviations do not</strong>. Noise accumulates like <span class="math inline">\(\sqrt{\sigma_1^2 + \sigma_2^2}\)</span>, which is the <span class="math inline">\(\sqrt{t}\)</span> envelope of W01.</p>
+</section>
+<section id="where-each-result-gets-used" class="level2">
+<h2 class="anchored" data-anchor-id="where-each-result-gets-used">7. Where each result gets used</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Result</th>
+<th>Where it appears</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\Sigma = I\)</span> factorises</td>
+<td>isotropic noise; per-pixel independence in high dimension</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mu + Lz\)</span> sampling</td>
+<td>drawing from any Gaussian given standard noise</td>
+</tr>
+<tr class="odd">
+<td>Affine closure</td>
+<td>every step of the forward process stays Gaussian</td>
+</tr>
+<tr class="even">
+<td>Variances add</td>
+<td>the <span class="math inline">\(\sqrt{t}\)</span> noise envelope; the VE schedule</td>
+</tr>
+<tr class="odd">
+<td>Marginals are Gaussian</td>
+<td><span class="math inline">\(p(x_t \mid x_0)\)</span> in closed form at any <span class="math inline">\(t\)</span></td>
+</tr>
+<tr class="even">
+<td>Conditional mean is linear</td>
+<td>why the two-point posterior is tractable</td>
+</tr>
+<tr class="odd">
+<td>Entropy formula</td>
+<td>measuring how much a noising step destroys</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
 <ol type="1">
-<li>Complete the inverse-CDF proof for a general (possibly non-strictly-increasing) <span class="math inline">\(F\)</span> using the generalized inverse.</li>
-<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above, and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x)\)</span> equals W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span> posterior (mind which component carries the <span class="math inline">\(+\)</span> sign); compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
-<li>Verify the packed map: show that conditional on <span class="math inline">\(u &lt; \pi\)</span>, the rescaled variable <span class="math inline">\(u/\pi\)</span> is <span class="math inline">\(\text{Uniform}(0,1)\)</span>, and conclude that the branch produces <span class="math inline">\(\mathcal{N}(\mu_1, \sigma^2)\)</span> with the correct probability.</li>
-<li>Construct the inverse-CDF map for a <strong>three</strong>-component mixture and describe its staircase limit as <span class="math inline">\(\sigma \to 0\)</span>. How many plateaus, at what heights?</li>
-<li>The map <span class="math inline">\(x = F^{-1}(u)\)</span> is monotone increasing. Exhibit a <em>decreasing</em> map with the same pushforward, and a map that is neither monotone nor continuous. (Hint: <span class="math inline">\(1 - u\)</span> is also uniform.)</li>
+<li>Verify directly from the density that <span class="math inline">\(\mathcal{N}(0, \sigma^2 I_d)\)</span> factorises into <span class="math inline">\(d\)</span> independent <span class="math inline">\(\mathcal{N}(0,\sigma^2)\)</span> coordinates. Where exactly does the argument use that <span class="math inline">\(\Sigma\)</span> is diagonal?</li>
+<li>Let <span class="math inline">\(X \sim \mathcal{N}(0, I_2)\)</span> and <span class="math inline">\(A = \begin{pmatrix} 2 &amp; 1 \\ 0 &amp; 1\end{pmatrix}\)</span>. Compute the law of <span class="math inline">\(AX\)</span>. Sketch its one-<span class="math inline">\(\sigma\)</span> ellipse and check it against Act II of the demo.</li>
+<li>Show that if <span class="math inline">\(X \sim \mathcal{N}(\mu,\Sigma)\)</span> then <span class="math inline">\(a^{\!\top}X\)</span> is univariate normal for every fixed <span class="math inline">\(a\)</span>, using §4 with <span class="math inline">\(A = a^{\!\top}\)</span>. Then explain why the converse (used as a <em>definition</em> of multivariate normality) is a strictly stronger statement than “every coordinate is normal”.</li>
+<li>For the bivariate case with <span class="math inline">\(\mu = 0\)</span>, <span class="math inline">\(\sigma_1 = \sigma_2 = 1\)</span> and correlation <span class="math inline">\(\rho\)</span>, derive the conditional <span class="math inline">\(Y \mid X = x\)</span> from the block formula of §5 and confirm you get <span class="math inline">\(\mathcal{N}(\rho x, 1-\rho^2)\)</span>.</li>
+<li>Two independent noising steps of size <span class="math inline">\(\sigma_1\)</span> then <span class="math inline">\(\sigma_2\)</span> are applied to a fixed <span class="math inline">\(x_0\)</span>. Show the result is the same in law as one step of size <span class="math inline">\(\sqrt{\sigma_1^2+\sigma_2^2}\)</span>. Why does this fail if the two noises are correlated?</li>
+<li><em>(Degeneracy.)</em> Take <span class="math inline">\(A = \begin{pmatrix} 1 &amp; 1 \\ 2 &amp; 2\end{pmatrix}\)</span> and <span class="math inline">\(X \sim \mathcal{N}(0,I_2)\)</span>. Compute <span class="math inline">\(A\Sigma A^{\!\top}\)</span>, show it is singular, and describe where the resulting law actually lives. Why does the density formula of §1 not apply?</li>
+<li><em>(Entropy.)</em> Using <span class="math inline">\(h(X) = \tfrac12\log((2\pi e)^d \det\Sigma)\)</span>, show that an affine map <span class="math inline">\(X \mapsto AX + b\)</span> with <span class="math inline">\(A\)</span> square and invertible changes the entropy by exactly <span class="math inline">\(\log|\det A|\)</span> — and explain why <span class="math inline">\(b\)</span> does not appear.</li>
 </ol>
 
 
@@ -994,13 +1104,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../assignments.html" class="pagination-link" aria-label="Assignments">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Assignments</span>
+      <a href="../tutorials/02-distributions-mle.html" class="pagination-link" aria-label="04 · Distributions and Maximum Likelihood">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">04 · Distributions and Maximum Likelihood</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/05-two-point-diffusion.html" class="pagination-link" aria-label="01 · The World's Smallest Diffusion Model">
-        <span class="nav-page-text">01 · The World’s Smallest Diffusion Model</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/15-comparing-distributions.html" class="pagination-link" aria-label="08 · Comparing Distributions: From CDFs to KL, and the Two Families">
+        <span class="nav-page-text">08 · Comparing Distributions: From CDFs to KL, and the Two Families</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

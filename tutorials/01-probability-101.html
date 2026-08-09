@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Probability &amp; Random Variables – ID-5-02 (TO)</title>
+<title>02 · Probability &amp; Random Variables – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/02-distributions-mle.html" rel="next">
-<link href="../weeks/w17.html" rel="prev">
+<link href="../tutorials/16-joints-conditionals.html" rel="next">
+<link href="../tutorials/05-two-point-diffusion.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">02 · Probability &amp; Random Variables</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -163,142 +163,112 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../curriculum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Curriculum</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../assignments.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assignments</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
- <span class="menu-text">Weekly Notes</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lecture Notes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w01.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W01: Generative Modeling I</span></a>
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">00 · Introduction and Motivation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w02.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W02: Generative Modeling II</span></a>
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w03.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W03: High Dimensions &amp; Gaussians</span></a>
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w04.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W04: Gaussian Calculus &amp; Markov Chains</span></a>
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w05.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W05: Noise Accumulation</span></a>
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w06.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W06: DDPM I</span></a>
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weeks/w07.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W07: DDPM II</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w08.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W08: Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w09.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W09: Mid-Semester Examinations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W10: Denoising Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w11.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W11: Brownian Motion &amp; SDEs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w12.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W12: Fokker–Planck</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w13.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W13: Continuous Forward Equation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w14.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W14: Reverse-time Drift</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w15.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W15: Information Flow &amp; Probability Flow ODE</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w16.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W16: Holiday Week</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weeks/w17.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">W17: Flows, Applications &amp; Wrap-up</span></a>
+  <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Tutorials · Foundations</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Decks</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Probability &amp; Random Variables</span></a>
+  <a href="../decks/01-mechanics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Course Mechanics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Distributions and Maximum Likelihood</span></a>
+  <a href="../decks/02-motivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Why Diffusion Models?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/03-two-point.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/04-probability-joints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/05-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/06-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
   </div>
 </li>
       </ul>
@@ -306,12 +276,29 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Tutorials · Diffusion Models</span></a>
+ <span class="menu-text">Tutorials</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inequalities Worth Knowing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Perspectives</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
@@ -320,26 +307,8 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Generative AI, in Its Simplest Form</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The World’s Smallest Diffusion Model</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Deterministic Map, Proved</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -354,17 +323,6 @@ window.Quarto = {
  <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
   </div>
 </li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
- <span class="menu-text">Tutorials · Advanced</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
@@ -375,6 +333,35 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../decks/map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deck · The Map, Proved</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Draft</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Probability-Flow ODE</span></a>
   </div>
 </li>
       </ul>
@@ -401,9 +388,6 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#the-canonical-shortcut" id="toc-the-canonical-shortcut" class="nav-link" data-scroll-target="#the-canonical-shortcut">The canonical shortcut</a></li>
   </ul></li>
-  <li><a href="#joint-distributions" id="toc-joint-distributions" class="nav-link" data-scroll-target="#joint-distributions">Joint distributions</a></li>
-  <li><a href="#marginal-distributions" id="toc-marginal-distributions" class="nav-link" data-scroll-target="#marginal-distributions">Marginal distributions</a></li>
-  <li><a href="#conditional-distributions-and-bayes-rule" id="toc-conditional-distributions-and-bayes-rule" class="nav-link" data-scroll-target="#conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</a></li>
   <li><a href="#expectation" id="toc-expectation" class="nav-link" data-scroll-target="#expectation">Expectation</a></li>
   <li><a href="#the-four-objects-in-one-table" id="toc-the-four-objects-in-one-table" class="nav-link" data-scroll-target="#the-four-objects-in-one-table">The four objects, in one table</a></li>
   <li><a href="#correspondence-with-this-course" id="toc-correspondence-with-this-course" class="nav-link" data-scroll-target="#correspondence-with-this-course">Correspondence with this course</a></li>
@@ -414,9 +398,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Tutorials · Foundations</a></li><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/01-probability-101.html">02 · Probability &amp; Random Variables</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Probability &amp; Random Variables</h1>
+<h1 class="title">02 · Probability &amp; Random Variables</h1>
 </div>
 
 
@@ -433,7 +417,7 @@ window.Quarto = {
 </header>
 
 
-<p><em>A standalone tutorial (used in <a href="../weeks/w02.html">W02</a>): the probability the course actually uses, built from the ground up — sample spaces, events, random variables, joint and marginal distributions, conditioning, and expectation. Readers already comfortable with these notions may proceed directly to <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>.</em></p>
+<p><em>A standalone tutorial (used in W02): the probability the course actually uses, built from the ground up — sample spaces, events, random variables, and expectation. Joints, conditionals and Bayes’ rule follow in <a href="../tutorials/16-joints-conditionals.html">the next concept</a>. Readers already comfortable with these notions may proceed directly to <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>.</em></p>
 <div class="callout callout-style-simple callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -538,71 +522,6 @@ X(\omega) = \omega .
 <p>The shortcut is legitimate because every probability statement about the value of <span class="math inline">\(T\)</span> depends only on the induced distribution, and the canonical space reproduces that distribution exactly. It costs you nothing as long as you want statements about one variable’s value. It costs you something the moment you want two variables to live on the same outcome — then you need a sample space rich enough to carry both, which is the subject of the next section.</p>
 </section>
 </section>
-<section id="joint-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="joint-distributions">Joint distributions</h2>
-<p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables defined on the same sample space — two numerical features of the same outcome. Their <strong>joint distribution</strong> specifies <span class="math inline">\(p(x, y) = \mathbb{P}(X = x \text{ and } Y = y)\)</span> in the discrete case, or a joint density <span class="math inline">\(f(x, y)\)</span> whose volumes are probabilities in the continuous case. The joint distribution is a complete description of the pair: every probabilistic statement about <span class="math inline">\((X, Y)\)</span> can be computed from it.</p>
-<p>The following discrete joint distribution serves as the running example (the state of a morning sky and the occurrence of rain):</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 34%">
-<col style="width: 22%">
-<col style="width: 22%">
-<col style="width: 22%">
-</colgroup>
-<thead>
-<tr class="header">
-<th><span class="math inline">\(p(x,y)\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> rain</th>
-<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> no rain</th>
-<th style="text-align: center;">row sum</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(X{=}\)</span> cloudy</td>
-<td style="text-align: center;">0.20</td>
-<td style="text-align: center;">0.25</td>
-<td style="text-align: center;"><strong>0.45</strong></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(X{=}\)</span> clear</td>
-<td style="text-align: center;">0.05</td>
-<td style="text-align: center;">0.50</td>
-<td style="text-align: center;"><strong>0.55</strong></td>
-</tr>
-<tr class="odd">
-<td>column sum</td>
-<td style="text-align: center;"><strong>0.25</strong></td>
-<td style="text-align: center;"><strong>0.75</strong></td>
-<td style="text-align: center;">1</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="marginal-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="marginal-distributions">Marginal distributions</h2>
-<p>The <strong>marginal</strong> distribution of <span class="math inline">\(X\)</span> describes <span class="math inline">\(X\)</span> alone, with <span class="math inline">\(Y\)</span> disregarded. It is obtained by summing (or, for densities, integrating) the joint distribution over the other variable:</p>
-<p><span class="math display">\[
-p(x) = \sum_y p(x, y),
-\qquad\text{or}\qquad
-f(x) = \int f(x, y)\, dy .
-\]</span></p>
-<p>In the table these are the row and column sums — the margins of the table, which is the origin of the term: <span class="math inline">\(\mathbb{P}(\text{cloudy}) = 0.45\)</span> and <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>. The operation is justified directly by the additivity axiom: the event “cloudy” is the disjoint union of “cloudy and rain” and “cloudy and no rain”. Marginalization recurs throughout the course; in the mixture model of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a>, the observed density <span class="math inline">\(p(x) = \sum_z p(z)\, p(x \mid z)\)</span> is precisely the joint distribution of <span class="math inline">\((x, z)\)</span> with the latent variable summed out.</p>
-</section>
-<section id="conditional-distributions-and-bayes-rule" class="level2">
-<h2 class="anchored" data-anchor-id="conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</h2>
-<p>The <strong>conditional</strong> distribution of <span class="math inline">\(Y\)</span> given <span class="math inline">\(X = x\)</span> is defined, whenever <span class="math inline">\(p(x) &gt; 0\)</span>, by</p>
-<p><span class="math display">\[
-p(y \mid x) = \frac{p(x, y)}{p(x)} .
-\]</span></p>
-<p>The definition restricts attention to the outcomes consistent with <span class="math inline">\(X = x\)</span> and renormalizes their probabilities to total 1. In the running example, <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy}) = 0.20 / 0.45 \approx 0.44\)</span>, compared with the unconditional <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>.</p>
-<p>Applying the definition in both directions and eliminating the joint yields <strong>Bayes’ rule</strong>,</p>
-<p><span class="math display">\[
-\boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
-\]</span></p>
-<p>which converts a conditional in one direction into the conditional in the other. The tanh denoiser of <a href="../weeks/w01.html">W01</a> is an application of this identity, with <span class="math inline">\(x\)</span> the clean data point and <span class="math inline">\(y\)</span> the noisy observation; it is derived in full in <a href="../tutorials/05-two-point-diffusion.html">The World’s Smallest Diffusion Model</a>.</p>
-<p><span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>independent</strong> if <span class="math inline">\(p(x, y) = p(x)\, p(y)\)</span> for all <span class="math inline">\(x, y\)</span> — equivalently, if <span class="math inline">\(p(y \mid x) = p(y)\)</span>, so that conditioning on <span class="math inline">\(X\)</span> conveys no information about <span class="math inline">\(Y\)</span>. In the table, <span class="math inline">\(0.20 \ne 0.45 \times 0.25\)</span>, so the two variables are dependent. The i.i.d. assumption underlying the likelihoods of <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> are an independence statement applied to repeated observations.</p>
-</section>
 <section id="expectation" class="level2">
 <h2 class="anchored" data-anchor-id="expectation">Expectation</h2>
 <p>The <strong>expectation</strong> of a random variable is the probability-weighted average of its values,</p>
@@ -623,9 +542,9 @@ p(y \mid x) = \frac{p(x, y)}{p(x)} .
 <li><strong>Linearity.</strong> <span class="math inline">\(\mathbb{E}[aX + bY] = a\,\mathbb{E}[X] + b\,\mathbb{E}[Y]\)</span> holds for all random variables on a common sample space, with no independence assumption. (Independence is required for the separate statement <span class="math inline">\(\mathbb{E}[XY] = \mathbb{E}[X]\,\mathbb{E}[Y]\)</span>.)</li>
 <li><strong>Variance.</strong> <span class="math inline">\(\operatorname{Var}(X) =
 \mathbb{E}\big[(X - \mathbb{E}X)^2\big] =
-\mathbb{E}[X^2] - (\mathbb{E}X)^2\)</span> measures spread about the mean, and for independent random variables variances add. The identity <span class="math inline">\(\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2\)</span> of <a href="../weeks/w01.html">W01</a> is an instance.</li>
+\mathbb{E}[X^2] - (\mathbb{E}X)^2\)</span> measures spread about the mean, and for independent random variables variances add. The identity <span class="math inline">\(\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2\)</span> of W01 is an instance.</li>
 </ul>
-<p>Finally, the <strong>conditional expectation</strong> <span class="math inline">\(\mathbb{E}[X \mid Y = y]\)</span> is the mean of the conditional distribution of <span class="math inline">\(X\)</span> given <span class="math inline">\(Y = y\)</span>, regarded as a function of <span class="math inline">\(y\)</span>. It is the minimum-mean-squared-error prediction of <span class="math inline">\(X\)</span> from the observation <span class="math inline">\(Y = y\)</span> (proved in <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>), and the denoiser <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma]\)</span> of <a href="../weeks/w01.html">W01</a> is precisely a conditional expectation.</p>
+<p>Finally, the <strong>conditional expectation</strong> <span class="math inline">\(\mathbb{E}[X \mid Y = y]\)</span> is the mean of the conditional distribution of <span class="math inline">\(X\)</span> given <span class="math inline">\(Y = y\)</span>, regarded as a function of <span class="math inline">\(y\)</span>. It is the minimum-mean-squared-error prediction of <span class="math inline">\(X\)</span> from the observation <span class="math inline">\(Y = y\)</span> (proved in <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a>), and the denoiser <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma]\)</span> of W01 is precisely a conditional expectation.</p>
 </section>
 <section id="the-four-objects-in-one-table" class="level2">
 <h2 class="anchored" data-anchor-id="the-four-objects-in-one-table">The four objects, in one table</h2>
@@ -734,10 +653,8 @@ p(y \mid x) = \frac{p(x, y)}{p(x)} .
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
 <ol type="1">
 <li>For two fair coin tosses with <span class="math inline">\(X\)</span> the number of heads: write out <span class="math inline">\(\Omega\)</span>, the values <span class="math inline">\(X(\omega)\)</span> for all four outcomes, and the pmf of <span class="math inline">\(X\)</span>; verify that the pmf sums to 1 using the additivity axiom.</li>
-<li>For the sky-and-rain table, compute <span class="math inline">\(\mathbb{P}(\text{cloudy} \mid \text{rain})\)</span> by Bayes’ rule from <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy})\)</span> and the marginals, and confirm the result by direct computation from the table.</li>
 <li>Exhibit (a) a pdf exceeding 3 at some point; (b) a random variable whose expectation is not an attainable value; (c) two dependent random variables for which <span class="math inline">\(\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]\)</span> nevertheless holds, illustrating that linearity requires no independence.</li>
 <li>Let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span> and <span class="math inline">\(X = U^2\)</span>. Compute <span class="math inline">\(\mathbb{E}[X]\)</span> twice: directly via <span class="math inline">\(\mathbb{E}[g(U)]\)</span>, and by first deriving the CDF and pdf of <span class="math inline">\(X\)</span>. Compare the effort required.</li>
-<li>In the mixture model <span class="math inline">\(z \sim \text{Bernoulli}(\pi)\)</span>, <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)\)</span>: identify the joint <span class="math inline">\(p(x, z)\)</span>, both marginals, and both conditionals. State which of these objects the <a href="../tutorials/05-two-point-diffusion.html">W01 denoiser</a> computes, and which the ancestral sampler of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> uses.</li>
 </ol>
 
 
@@ -1171,13 +1088,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../weeks/w17.html" class="pagination-link" aria-label="W17: Flows, Applications &amp; Wrap-up">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">W17: Flows, Applications &amp; Wrap-up</span>
+      <a href="../tutorials/05-two-point-diffusion.html" class="pagination-link" aria-label="01 · The World's Smallest Diffusion Model">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">01 · The World’s Smallest Diffusion Model</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/02-distributions-mle.html" class="pagination-link" aria-label="Distributions and Maximum Likelihood">
-        <span class="nav-page-text">Distributions and Maximum Likelihood</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/16-joints-conditionals.html" class="pagination-link" aria-label="03 · Joint, Conditional, Marginal — and Bayes">
+        <span class="nav-page-text">03 · Joint, Conditional, Marginal — and Bayes</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
