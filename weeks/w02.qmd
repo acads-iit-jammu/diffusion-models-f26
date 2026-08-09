@@ -51,7 +51,225 @@ above. Not required for anything in lecture:
 - [The Likelihood Lens](../materials/likelihood-lens.html) — pdf and likelihood as two slices of one surface; draggable data with a live MLE.
 - [Sampling as a Map](../materials/sampling-as-a-map.html) — ancestral sampling, then the same generator as one deterministic map; slide σ → 0 for the two-point staircase.
 
-*Lecture notes/board scans will be posted here.*
+## Notes — Bayes' rule, and why inference is the inverse problem
+
+### Generation runs forward; inference runs backward
+
+Almost every model in this course is written in the **forward** direction. You
+posit some unobserved state, and you write down a mechanism that turns it into
+data:
+
+$$
+\underbrace{z}_{\text{latent, what we care about}}
+\;\longrightarrow\;
+\underbrace{x}_{\text{observed, what we get}} ,
+\qquad \text{specified by } p(x \mid z).
+$$
+
+Writing $p(x \mid z)$ is usually the easy half. It is a *mechanism* — a
+simulator, a physical story, a noise model — and you can often just state it.
+
+But that is rarely what you want. You do not observe $z$; you observe $x$, and
+you want to reason back to the cause. That is the **inverse problem**:
+
+$$
+\underbrace{x}_{\text{observed}} \;\longrightarrow\; \underbrace{z}_{\text{inferred}},
+\qquad \text{wanted: } p(z \mid x).
+$$
+
+| | Forward | Inverse |
+|---|---|---|
+| Direction | cause $\to$ effect | effect $\to$ cause |
+| Object | $p(x \mid z)$ | $p(z \mid x)$ |
+| Typical status | given, by modelling | wanted, must be computed |
+| Names | generative model, sampling distribution, simulator | inference, inversion, the posterior |
+
+You cannot simply invert the arrow, because the forward map is generally
+**many-to-one**: different latent states can produce the very same observation.
+Knowing $x$ therefore does not determine $z$ — it only makes some values of $z$
+more plausible than others. Something extra is needed to break the tie, and that
+something is what you believed about $z$ before looking. Bayes' rule is exactly
+the bookkeeping that combines the two:
+
+$$
+\underbrace{p(z \mid x)}_{\text{posterior}}
+\;=\;
+\frac{\overbrace{p(x \mid z)}^{\text{likelihood}}\;\overbrace{p(z)}^{\text{prior}}}
+     {\underbrace{p(x)}_{\text{evidence}}},
+\qquad
+p(x) = \sum_z p(x \mid z)\,p(z).
+$$
+
+This is the single most useful thing in the course's toolkit: **it is the bridge
+from the direction you can write down to the direction you want.**
+
+### A toy example: did the student understand "or"?
+
+A student is set ten short questions on the logical connective **or**. We would
+like to know whether they have actually grasped it — but "understanding" is not
+something we can measure. We can only mark the answers.
+
+- **Latent** $z \in \{0, 1\}$: the student understands the concept, or does not.
+  This is the *inferential goal*.
+- **Observable** $x \in \{0, 1, \dots, 10\}$: the number of questions correct.
+  This is all we ever see.
+
+Now the forward model — the **sampling distribution** that says how marks are
+produced given the latent state. A student who understands still slips
+occasionally; one who does not can still get items right by guessing or by luck
+in which items came up. Take each item as independent with
+
+$$
+x \mid z = 1 \;\sim\; \text{Binomial}(10,\ 0.9),
+\qquad
+x \mid z = 0 \;\sim\; \text{Binomial}(10,\ 0.4).
+$$
+
+::: {.callout-note}
+## The marks scale does not matter
+
+Nothing above depends on marks running $0$ to $10$. The same structure works for
+a single right/wrong item ($x \in \{0,1\}$, a Bernoulli), or a percentage score
+$0$–$100$, or a graded rubric. All that changes is the count distribution you
+put on the observable. What stays fixed is the shape of the problem: a latent
+you want, an observable you get, and a sampling distribution connecting them.
+:::
+
+Suppose the student scores $x = 7$. Take a neutral prior $p(z=1) = 0.5$. Then
+
+$$
+\frac{p(z=1 \mid x=7)}{p(z=0 \mid x=7)}
+= \underbrace{\frac{\binom{10}{7} 0.9^{7} 0.1^{3}}{\binom{10}{7} 0.4^{7} 0.6^{3}}}_{\text{likelihood ratio}}
+\times \underbrace{\frac{0.5}{0.5}}_{\text{prior odds}}
+= \Big(\tfrac{0.9}{0.4}\Big)^{7}\Big(\tfrac{0.1}{0.6}\Big)^{3}
+= 1.352 ,
+$$
+
+so $p(z = 1 \mid x = 7) = 1.352 / 2.352 = \mathbf{0.575}$.
+
+Two things are worth noticing. The binomial coefficient $\binom{10}{7}$ appears
+in both the numerator and the denominator and **cancels** — it describes how many
+ways the marks could have been arranged, which is the same under either
+hypothesis, so it carries no evidence. And $7/10$, which sounds like a decent
+score, is barely informative here: it moves us from $50\%$ to $58\%$.
+
+Across the range of possible scores:
+
+| Score $x$ | 3 | 5 | 7 | 9 | 10 |
+|---|---|---|---|---|---|
+| $p(z = 1 \mid x)$ | 0.000 | 0.007 | 0.575 | 0.996 | 1.000 |
+
+The posterior is not a smooth reflection of the mark — it is nearly flat at the
+extremes and swings sharply in the middle, where the two hypotheses actually
+disagree.
+
+And the prior genuinely matters. At the same score $x = 7$:
+
+| Prior $p(z=1)$ | 0.2 | 0.5 | 0.8 |
+|---|---|---|---|
+| Posterior $p(z=1 \mid x=7)$ | 0.253 | 0.575 | 0.844 |
+
+Same evidence, three different conclusions. This is not a defect. It is the
+honest statement that seven out of ten is weak evidence, and weak evidence does
+not overturn what you already knew.
+
+### The sampling distribution *is* the likelihood
+
+The expression $p(x \mid z)$ has been doing two jobs above, and it is worth
+separating them, because this is the distinction
+[Distributions and Maximum Likelihood](../tutorials/02-distributions-mle.qmd)
+makes in the parametric setting.
+
+| Hold fixed | Vary | You get | Sums to 1? |
+|---|---|---|---|
+| the latent $z$ | the data $x$ | the **sampling distribution** — how marks come out | yes, over $x$ |
+| the observed data $x$ | the latent $z$ | the **likelihood** — how well each $z$ explains what we saw | no |
+
+It is one formula read in two directions. Forward, it generates. Backward, it
+scores. Bayes' rule is what converts the backward reading into an actual
+probability distribution over $z$, by weighting with the prior and renormalising.
+
+### Bayesian Knowledge Tracing
+
+The toy example freezes the student in time. Real learners *learn*, so the latent
+state changes as they work — and the natural extension is exactly the model used
+in intelligent tutoring systems: **Bayesian Knowledge Tracing** (Corbett and
+Anderson, 1995, *User Modeling and User-Adapted Interaction*).
+
+BKT keeps the same two-layer structure and lets the latent evolve:
+
+- a hidden binary skill state $z_t \in \{\text{not known}, \text{known}\}$;
+- an observed response $x_t \in \{\text{incorrect}, \text{correct}\}$ at each
+  opportunity $t$.
+
+Four parameters specify it, and each is a conditional probability:
+
+| Parameter | Meaning |
+|---|---|
+| $P(L_0)$ | probability the skill is known before any practice — the **prior** |
+| $P(T)$ | probability of learning it at an opportunity, if not yet known — the **transition** |
+| $P(G)$ | probability of answering correctly *without* knowing it — the **guess** |
+| $P(S)$ | probability of answering incorrectly *while* knowing it — the **slip** |
+
+So the emission model is $P(\text{correct} \mid \text{known}) = 1 - P(S)$ and
+$P(\text{correct} \mid \text{not known}) = P(G)$. Standard BKT assumes no
+forgetting.
+
+Tracing a student is then a two-step recursion, repeated per question — and the
+first step is precisely Bayes' rule:
+
+1. **Update on the evidence.** With $L$ the current probability the skill is
+   known, a correct answer gives
+   $$
+   L^{+} \;=\; \frac{L\,(1 - P(S))}{L\,(1 - P(S)) + (1-L)\,P(G)} ,
+   $$
+   and an incorrect answer gives
+   $L^{-} = L\,P(S) \,/\, [\,L\,P(S) + (1-L)(1 - P(G))\,]$.
+2. **Predict forward through learning.** $L \leftarrow L^{\pm} + (1 - L^{\pm})\,P(T)$.
+
+For instance with $L = 0.4$, $P(S) = 0.10$, $P(G) = 0.25$, $P(T) = 0.20$, a
+correct answer raises the belief to
+$0.36 / 0.51 = 0.706$, and the learning step then carries it to
+$0.706 + 0.294 \times 0.20 = 0.765$ before the next question. An incorrect answer
+instead drops it to $0.04/0.49 = 0.082$.
+
+::: {.callout-tip}
+## The shape to remember
+
+A latent state you care about, an observable you actually get, a forward model
+connecting them, and Bayes running the inference backwards — repeated over a
+sequence. That is BKT, and it is also a hidden Markov model, a Kalman filter,
+and, as the next few weeks will show, a diffusion model.
+:::
+
+### Why this is the shape of the whole course
+
+Diffusion models are an inverse problem, and it is worth being blunt about the
+terminology, because it inverts what you might expect.
+
+- The **forward process** of a diffusion model is the *corruption*:
+  $x_0 \to x_\sigma = x_0 + \sigma z$. We write it down ourselves, in closed
+  form, and it is trivial to sample. This is the easy direction.
+- **Generating an image** means going the other way — recovering a plausible
+  clean $x_0$ from a noisy $x_\sigma$. The clean signal is the latent; the noisy
+  observation is the data.
+
+So in a diffusion model, *generation is the inference problem*. That is why the
+central object of the course is a posterior, and why the optimal denoiser is a
+posterior **mean**:
+
+$$
+\mathbb{E}[x_0 \mid x_\sigma]
+= \tanh\!\Big(\frac{x_\sigma}{\sigma^2}\Big)
+\quad\text{for the two-point dataset of }
+$$
+[W01](../weeks/w01.qmd) — which, as
+[Joint, Marginal, Conditional](../tutorials/11-joint-conditional-bayes.qmd) shows,
+is nothing but Bayes' rule applied to two Gaussian shelves and then averaged.
+Swap "understands the concept" for "was a $+1$", and "ten marks" for "one noisy
+measurement", and it is the same calculation you did above.
+
+*Board scans from the lecture will be added here.*
 
 ## After Class
 
