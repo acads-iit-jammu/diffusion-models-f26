@@ -1,0 +1,362 @@
+% ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · IIT Jammu
+% HW 2 — Distributions and Maximum Likelihood
+% Build:  latexmk -pdf hw2.tex     (or: pdflatex hw2.tex)
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue]{hyperref}
+
+\newcommand{\pts}[1]{\hfill\textbf{(#1pts)}}
+\newcommand{\pt}[1]{\hfill\textbf{(#1pt)}}
+\newcommand{\total}[1]{\par\medskip\noindent\textbf{Total: #1 points}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\sig}{\operatorname{\sigma}}
+
+% (a) (b) (c) labelling, without enumitem
+\renewcommand{\theenumi}{\alph{enumi}}
+\renewcommand{\labelenumi}{(\theenumi)}
+\newenvironment{parts}
+  {\begin{enumerate}\setlength{\itemsep}{0.45em}\setlength{\parskip}{0pt}}
+  {\end{enumerate}}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries HW 2 — Distributions and Maximum Likelihood}\\[0.4em]
+  {\small Mathematical Foundations of Diffusion Models · Monsoon 2026 · IIT Jammu}
+\end{center}
+
+\medskip
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Released} & Monday 10 August 2026 \\
+\textbf{Due}      & Tuesday 25 August 2026, in class \\
+\textbf{Marks}    & 50 points --- graded on correctness \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\noindent
+\textbf{Graded on correctness.} Unlike HW 1, this set is marked on the work
+itself. Marks are carried by the \emph{reasoning} as much as the final answer: a
+correct number with no derivation earns very little, and a wrong number reached
+by a sound argument earns most of the credit. Show every step you actually used.
+Solutions are posted after the deadline.
+
+\bigskip
+\hrule
+\medskip
+
+\noindent
+\textbf{Notation used throughout.} Three things this sheet leans on.
+
+\begin{itemize}\setlength{\itemsep}{0.4em}
+  \item \textbf{i.i.d.} — \emph{independent and identically distributed}. Saying
+        $x_1,\dots,x_n$ are i.i.d.\ from some distribution means each was drawn
+        from the \emph{same} distribution, and no draw influenced any other. It is
+        what lets you multiply the individual probabilities together to get the
+        probability of the whole sample.
+  \item \textbf{Density vs likelihood} — the same formula, read in two
+        directions. Fix the parameters and let the data vary and you have a
+        \emph{density} (or pmf): it describes how data comes out, and it
+        integrates or sums to $1$. Fix the observed data and let the
+        \emph{parameters} vary and you have the \emph{likelihood}: a score saying
+        how well each candidate parameter explains what you actually saw. It does
+        \emph{not} integrate to $1$ over the parameters, and it is not a
+        distribution over them. Maximum likelihood means: pick the parameter with
+        the best score.
+  \item \textbf{$\Gamma$ and $B$} (Problem 1 only) — $\Gamma$ is the factorial
+        extended to non-integers, and the only property you need is
+        $\Gamma(z+1) = z\,\Gamma(z)$. The Beta function
+        $B(\alpha,\beta) = \Gamma(\alpha)\Gamma(\beta)/\Gamma(\alpha+\beta)$ is
+        just the constant that makes the Beta density integrate to $1$.
+\end{itemize}
+
+\medskip
+\noindent
+Show your working. Where you set a derivative to zero, say why the critical point
+is a maximum and not a minimum.
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 1}
+
+A seed company sells lots of 500 seeds. Not every seed germinates, and the
+\emph{germination rate} — the fraction of a lot that sprouts — is not the same
+number for every lot: soil, storage and harvest conditions all vary, so across
+lots the rate itself scatters somewhere in $[0,1]$.
+
+To model a quantity that is confined to $[0,1]$ and varies, the standard choice is
+the \textbf{Beta} distribution. For shape parameters $\alpha, \beta > 0$ its
+density is
+
+\[
+  f(x; \alpha, \beta) \;=\; \frac{1}{B(\alpha,\beta)}\,
+  x^{\alpha - 1}\,(1-x)^{\beta - 1},
+  \qquad 0 < x < 1,
+\]
+
+and $f = 0$ outside $[0,1]$, where
+
+\[
+  B(\alpha,\beta) \;=\; \int_0^1 t^{\alpha-1}(1-t)^{\beta-1}\,dt
+  \;=\; \frac{\Gamma(\alpha)\,\Gamma(\beta)}{\Gamma(\alpha+\beta)} .
+\]
+
+Larger $\alpha$ pushes the mass towards $1$, larger $\beta$ towards $0$, and both
+large together concentrates it. What the company wants to quote is the average
+germination rate and how much it varies from lot to lot — so, the mean and the
+variance.
+
+Compute both \emph{from the definition of expectation}: integrate against the
+density. Do not quote a formula.
+
+\begin{parts}
+  \item Show that $f$ integrates to $1$. (One line, given the definition of
+        $B$ above.) \pt{1}
+  \item Compute $\EE[X] = \int_0^1 x\,f(x;\alpha,\beta)\,dx$. The trick
+        throughout: multiplying by $x$ turns the integrand into another Beta
+        kernel with $\alpha$ shifted, so the integral is a ratio of Beta
+        functions. Then use $\Gamma(z+1) = z\Gamma(z)$. \pts{3}
+  \item Compute $\EE[X^2]$ the same way. \pts{3}
+  \item Deduce $\Var(X) = \EE[X^2] - (\EE[X])^2$ and simplify to a single
+        fraction. \pts{2}
+  \item Check your mean at $\alpha = \beta$, and say why that value is obvious
+        from the shape of the density without doing any integration. \pt{1}
+\end{parts}
+
+\total{10}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 2}
+
+Probabilities are awkward to work with directly: they are trapped in $[0,1]$, so
+you cannot add to one without risking leaving the interval. The standard fix is
+to move to the \textbf{log-odds} scale. If an event has probability $u$, its odds
+are $u/(1-u)$ and its log-odds are
+
+\[
+  \operatorname{logit}(u) \;=\; \log\!\frac{u}{1-u},
+\]
+
+which stretches $(0,1)$ out onto the whole real line. This is the \emph{inverse}
+of the sigmoid $\sig(z) = 1/(1+e^{-z})$, the function that has been squashing
+scores into probabilities all through this course.
+
+Here is the question. Suppose a probability is itself uncertain, and completely
+unknown — model it as $U \sim \mathrm{Uniform}(0,1)$, every value equally
+plausible. Push it to the log-odds scale:
+
+\[
+  X \;=\; \operatorname{logit}(U).
+\]
+
+Uniform noise on $(0,1)$ goes in; some distribution over all of $\mathbb{R}$
+comes out. Which one?
+
+\begin{parts}
+  \item Verify that $\operatorname{logit}$ and $\sig$ really are inverse:
+        show $\sig(\operatorname{logit}(u)) = u$. \pt{1}
+  \item Find the CDF of $X$ directly. Start from $F_X(x) = \PP(X \le x)$,
+        rearrange $\log\frac{U}{1-U} \le x$ into a statement about $U$ alone, and
+        then use $\PP(U \le c) = c$ for a uniform. \pts{3}
+  \item Differentiate to get the density $f_X$. Show it can be written in all
+        three of these ways, and check it integrates to $1$:
+        \[
+          f_X(x) \;=\; \sig(x)\big(1 - \sig(x)\big)
+                  \;=\; \frac{e^{-x}}{(1+e^{-x})^{2}}
+                  \;=\; \frac{1}{2\big(\cosh x + 1\big)} .
+        \]
+        \pts{3}
+  \item Show $f_X(-x) = f_X(x)$, and deduce $\EE[X]$ without integrating. \pts{2}
+  \item This distribution has a name — state it. Then explain in one or two
+        sentences why the answer to (b) was a foregone conclusion before you did
+        any algebra. \pt{1}
+\end{parts}
+
+\noindent\textit{Part (e) is the real content. Feeding a uniform through the
+inverse of a CDF is precisely how one samples from that CDF — so applying
+$\sig^{-1}$ to a uniform could only ever produce the law whose CDF is $\sig$.
+This is the same ``sampling is transport'' idea the course uses when it writes a
+sample as $Q(U)$.}
+
+\total{10}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 3}
+
+A website is testing a new checkout page. It is shown to $n$ visitors, chosen
+independently of one another, and each either completes a purchase or does not.
+The conversion probability $p \in (0,1)$ is unknown — estimating it is the entire
+point of running the test.
+
+Record $x_i = 1$ if visitor $i$ converts and $0$ otherwise, so
+$x_1,\dots,x_n$ are i.i.d.\ $\mathrm{Bernoulli}(p)$, and let
+
+\[
+  S \;=\; \sum_{i=1}^{n} x_i
+\]
+
+be the total number of conversions. Notice that the raw data is the whole
+sequence of $0$s and $1$s, but the number you would actually report is $S$.
+
+\begin{parts}
+  \item Write $\PP(x_i = x)$ for $x \in \{0,1\}$ as a \emph{single} expression in
+        $p$ and $x$, with no cases. (This one line makes part (c) painless.)
+        \pt{1}
+  \item Show that $S \sim \mathrm{Binomial}(n,p)$, that is
+        $\PP(S = k) = \binom{n}{k}p^{k}(1-p)^{n-k}$. Your argument needs three
+        steps: why any one specific sequence with $k$ conversions has probability
+        $p^{k}(1-p)^{n-k}$; how many such sequences there are; and why you are
+        allowed to add their probabilities. \pts{3}
+  \item Write the likelihood $L(p)$ of the observed sequence and the
+        log-likelihood $\ell(p)$. \pts{2}
+  \item Derive the maximum likelihood estimator $\hat p$ from $\ell'(p) = 0$, and
+        confirm it is a maximum using $\ell''(p)$. Is the answer the one your
+        intuition would have guessed? \pts{3}
+  \item Does anything change if you start instead from the Binomial likelihood
+        for $S$, rather than the Bernoulli likelihood for the whole sequence?
+        Say what happens to $\binom{n}{k}$, and why. \pt{1}
+\end{parts}
+
+\total{10}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 4}
+
+A lab buys a second-hand instrument. Its datasheet is missing, so nobody knows
+the range over which it reports: readings are known to be spread evenly across
+some interval, but the endpoints of that interval are part of what has been lost.
+
+Model $n$ readings as i.i.d.\ from $\mathrm{Uniform}(a,b)$ with $a < b$ both
+unknown, and recover the calibration from the data.
+
+\begin{parts}
+  \item Write down the likelihood $L(a,b)$ for the whole sample. Take care: the
+        density equals $1/(b-a)$ only \emph{inside} the interval and $0$ outside,
+        so your expression must record that every observation lies in $[a,b]$.
+        \pts{3}
+  \item Explain why setting $\partial \ell/\partial a = 0$ and
+        $\partial \ell/\partial b = 0$ does \emph{not} work here. \pts{2}
+  \item Argue directly from the shape of $L$ — not by differentiating — that
+        \[
+          \hat a = \min_i x_i, \qquad \hat b = \max_i x_i .
+        \]
+        \pts{3}
+  \item The estimated interval $[\hat a, \hat b]$ is always contained inside the
+        true $[a,b]$. What does that say about whether $\hat b - \hat a$ is an
+        unbiased estimate of the true width $b-a$, and in which direction it goes
+        wrong? Would collecting more readings help? \pts{2}
+\end{parts}
+
+\noindent\textit{Set this beside Problem 3. There, the maximum was found by
+calculus. Here calculus is the wrong instrument entirely and the answer falls out
+of the support constraint. Recognising which situation you are in is the skill
+being tested.}
+
+\total{10}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 5}
+
+A postal sorting machine reads the handwritten digit on an envelope and must
+decide which of the $K = 10$ classes $\{0,1,\dots,9\}$ it is. From the image
+$x_i$ a network produces not one number but a \emph{vector} of $K$ scores,
+
+\[
+  z_i \;=\; \big(z_{i1}, \dots, z_{iK}\big) \;=\; f_\theta(x_i) \;\in\; \mathbb{R}^{K},
+\]
+
+one score per class, unconstrained in sign or size. These are called
+\textbf{logits}. To report probabilities they are passed through the
+\textbf{softmax}
+
+\[
+  q_{ik} \;=\; \frac{e^{z_{ik}}}{\sum_{m=1}^{K} e^{z_{im}}},
+  \qquad k = 1,\dots,K .
+\]
+
+The true label is written \textbf{one-hot}: $y_i = (y_{i1},\dots,y_{iK})$ with
+$y_{ik} = 1$ for the correct class and $0$ for the other $K-1$. So exactly one
+entry is a $1$, and $\sum_k y_{ik} = 1$.
+
+The machine is trained by minimising the \textbf{cross-entropy loss}
+
+\[
+  \mathrm{CE}(\theta) \;=\; -\frac{1}{n}\sum_{i=1}^{n}\sum_{k=1}^{K}
+    y_{ik}\,\log q_{ik} .
+\]
+
+Like every loss in this course, it is not a formula to be accepted. It is a
+maximum-likelihood estimator wearing a different hat, and this problem takes the
+hat off.
+
+\begin{parts}
+  \item \textbf{Softmax is a distribution.} Show that $q_{ik} > 0$ for every $k$
+        and that $\sum_{k=1}^{K} q_{ik} = 1$, so the output really is a pmf over
+        the $K$ classes. Then show that softmax is \emph{shift-invariant}: adding
+        the same constant $c$ to every logit leaves $q_i$ unchanged. What does
+        that say about how many of the $K$ logits are genuinely free? \pts{2}
+  \item \textbf{The sampling distribution.} State the distribution of the label
+        $y_i$ given the image $x_i$ that the machine is implicitly assuming, with
+        $q_i$ as its parameter vector. Write its pmf as a \emph{single}
+        expression in $y_i$ and $q_i$, with no cases and no summation over
+        classes --- the one-hot encoding is what makes this possible. \pts{2}
+  \item \textbf{The generative model, and its assumptions.} Write the likelihood
+        of the whole labelled dataset under that assumption. Take the logarithm,
+        negate, divide by $n$, and show you land exactly on $\mathrm{CE}(\theta)$.
+        Then state the three modelling assumptions you used: one about the
+        \emph{form} of each individual label's distribution, one about the
+        relationship \emph{across} the $n$ envelopes, and one about what role the
+        images $x_i$ themselves play. \pts{3}
+  \item \textbf{The gradient.} For a single envelope, write $\ell(z) = -\sum_k
+        y_k \log q_k$ with $q = \mathrm{softmax}(z)$. Show first that
+        \[
+          \frac{\partial \log q_k}{\partial z_j} \;=\; \delta_{kj} - q_j,
+          \qquad
+          \delta_{kj} = \begin{cases} 1 & k = j\\ 0 & k \ne j\end{cases}
+        \]
+        and deduce
+        \[
+          \frac{\partial \ell}{\partial z_j} \;=\; q_j - y_j ,
+        \]
+        that is, predicted minus observed --- in every coordinate at once. Say
+        where in your derivation you used $\sum_k y_k = 1$. \pts{2}
+  \item \textbf{Back to two classes.} Set $K = 2$. Show that
+        $q_2 = \sig(z_2 - z_1)$, and hence that the loss above collapses to the
+        binary cross-entropy of the lecture notes with a single logit
+        $z = z_2 - z_1$. Which part of (a) explains why two logits were one too
+        many? \pt{1}
+\end{parts}
+
+\noindent\textit{Part (b) deserves the most thought. The machine is not
+generating envelopes --- it is generating \emph{labels}, conditionally on images
+it takes as given. That is why what you write down is a conditional sampling
+distribution, and why the likelihood that follows is a conditional one. Part (d)
+explains why this loss is so pleasant to optimise: the gradient is just the
+error, which is exactly the form the denoiser objective takes later in the
+course.}
+
+\total{10}
+
+\end{document}

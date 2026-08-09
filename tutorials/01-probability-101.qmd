@@ -1,8 +1,9 @@
-# Probability & Random Variables {.unnumbered}
+# 02 · Probability & Random Variables {.unnumbered}
 
-*A standalone tutorial (used in [W02](../weeks/w02.qmd)): the probability the
+*A standalone tutorial (used in W02): the probability the
 course actually uses, built from the ground up — sample spaces, events, random
-variables, joint and marginal distributions, conditioning, and expectation.
+variables, and expectation. Joints, conditionals and Bayes' rule follow in
+[the next concept](./16-joints-conditionals.qmd).
 Readers already comfortable with these notions may proceed directly to
 [Distributions and Maximum Likelihood](./02-distributions-mle.qmd).*
 
@@ -200,79 +201,6 @@ about one variable's value. It costs you something the moment you want two
 variables to live on the same outcome — then you need a sample space rich enough
 to carry both, which is the subject of the next section.
 
-## Joint distributions
-
-Let $X$ and $Y$ be two random variables defined on the same sample space — two
-numerical features of the same outcome. Their **joint distribution** specifies
-$p(x, y) = \mathbb{P}(X = x \text{ and } Y = y)$ in the discrete case, or a joint
-density $f(x, y)$ whose volumes are probabilities in the continuous case. The joint
-distribution is a complete description of the pair: every probabilistic statement
-about $(X, Y)$ can be computed from it.
-
-The following discrete joint distribution serves as the running example (the state
-of a morning sky and the occurrence of rain):
-
-| $p(x,y)$ | $Y{=}$ rain | $Y{=}$ no rain | row sum |
-|---|:---:|:---:|:---:|
-| $X{=}$ cloudy | 0.20 | 0.25 | **0.45** |
-| $X{=}$ clear | 0.05 | 0.50 | **0.55** |
-| column sum | **0.25** | **0.75** | 1 |
-
-: {tbl-colwidths="[34,22,22,22]"}
-
-## Marginal distributions
-
-The **marginal** distribution of $X$ describes $X$ alone, with $Y$ disregarded. It
-is obtained by summing (or, for densities, integrating) the joint distribution over
-the other variable:
-
-$$
-p(x) = \sum_y p(x, y),
-\qquad\text{or}\qquad
-f(x) = \int f(x, y)\, dy .
-$$
-
-In the table these are the row and column sums — the margins of the table, which is
-the origin of the term: $\mathbb{P}(\text{cloudy}) = 0.45$ and
-$\mathbb{P}(\text{rain}) = 0.25$. The operation is justified directly by the
-additivity axiom: the event "cloudy" is the disjoint union of "cloudy and rain" and
-"cloudy and no rain". Marginalization recurs throughout the course; in the mixture
-model of [Generative AI, in Its Simplest Form](./04-genai-simplest-form.qmd), the observed density
-$p(x) = \sum_z p(z)\, p(x \mid z)$ is precisely the joint distribution of
-$(x, z)$ with the latent variable summed out.
-
-## Conditional distributions and Bayes' rule
-
-The **conditional** distribution of $Y$ given $X = x$ is defined, whenever
-$p(x) > 0$, by
-
-$$
-p(y \mid x) = \frac{p(x, y)}{p(x)} .
-$$
-
-The definition restricts attention to the outcomes consistent with $X = x$ and
-renormalizes their probabilities to total 1. In the running example,
-$\mathbb{P}(\text{rain} \mid \text{cloudy}) = 0.20 / 0.45 \approx 0.44$,
-compared with the unconditional $\mathbb{P}(\text{rain}) = 0.25$.
-
-Applying the definition in both directions and eliminating the joint yields
-**Bayes' rule**,
-
-$$
-\boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
-$$
-
-which converts a conditional in one direction into the conditional in the other.
-The tanh denoiser of [W01](../weeks/w01.qmd) is an application of this identity,
-with $x$ the clean data point and $y$ the noisy observation; it is derived in full
-in [The World's Smallest Diffusion Model](./05-two-point-diffusion.qmd).
-
-$X$ and $Y$ are **independent** if $p(x, y) = p(x)\, p(y)$ for all $x, y$ —
-equivalently, if $p(y \mid x) = p(y)$, so that conditioning on $X$ conveys no
-information about $Y$. In the table, $0.20 \ne 0.45 \times 0.25$, so the two
-variables are dependent. The i.i.d. assumption underlying the likelihoods of [Distributions and Maximum Likelihood](./02-distributions-mle.qmd)
-are an independence statement applied to repeated observations.
-
 ## Expectation
 
 The **expectation** of a random variable is the probability-weighted average of its
@@ -307,13 +235,13 @@ Two properties carry most of the weight in this course.
   \mathbb{E}[X^2] - (\mathbb{E}X)^2$ measures spread about the mean, and for
   independent random variables variances add. The identity
   $\operatorname{Var}(x_0 + \sigma z) = 1 + \sigma^2$ of
-  [W01](../weeks/w01.qmd) is an instance.
+  W01 is an instance.
 
 Finally, the **conditional expectation** $\mathbb{E}[X \mid Y = y]$ is the mean of
 the conditional distribution of $X$ given $Y = y$, regarded as a function of $y$. It
 is the minimum-mean-squared-error prediction of $X$ from the observation $Y = y$
 (proved in [Distributions and Maximum Likelihood](./02-distributions-mle.qmd)), and the denoiser
-$\mathbb{E}[x_0 \mid x_\sigma]$ of [W01](../weeks/w01.qmd) is precisely a
+$\mathbb{E}[x_0 \mid x_\sigma]$ of W01 is precisely a
 conditional expectation.
 
 ## The four objects, in one table
@@ -352,10 +280,6 @@ the real line.
 1. For two fair coin tosses with $X$ the number of heads: write out $\Omega$, the
    values $X(\omega)$ for all four outcomes, and the pmf of $X$; verify that the
    pmf sums to 1 using the additivity axiom.
-2. For the sky-and-rain table, compute
-   $\mathbb{P}(\text{cloudy} \mid \text{rain})$ by Bayes' rule from
-   $\mathbb{P}(\text{rain} \mid \text{cloudy})$ and the marginals, and confirm
-   the result by direct computation from the table.
 3. Exhibit (a) a pdf exceeding 3 at some point; (b) a random variable whose
    expectation is not an attainable value; (c) two dependent random variables for
    which $\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$ nevertheless holds,
@@ -363,10 +287,4 @@ the real line.
 4. Let $U \sim \text{Uniform}(0,1)$ and $X = U^2$. Compute $\mathbb{E}[X]$ twice:
    directly via $\mathbb{E}[g(U)]$, and by first deriving the CDF and pdf of $X$.
    Compare the effort required.
-5. In the mixture model $z \sim \text{Bernoulli}(\pi)$,
-   $x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)$: identify the joint
-   $p(x, z)$, both marginals, and both conditionals. State which of these objects
-   the [W01 denoiser](./05-two-point-diffusion.qmd) computes, and which the
-   ancestral sampler of
-   [Generative AI, in Its Simplest Form](./04-genai-simplest-form.qmd) uses.
 

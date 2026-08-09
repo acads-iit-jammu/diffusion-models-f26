@@ -1,8 +1,8 @@
 # W01: Generative Modeling I {.unnumbered}
 
-**Dates:** Wed Jul 29, 2026 (single lecture)
+**Dates:** Wed Jul 29, 2026 (single lecture) — *held on the earlier Mon/Tue/Wed morning slot, before the move to Mon/Tue/Fri afternoons*
 
-**Slot/Venue:** Mon 9:00–9:50 · Tue 10:00–10:50 · Wed 11:00–11:50 · 11AC4004
+**Slot/Venue:** Mon · Tue · Fri, 1:00–1:50 pm · 11AC4004
 
 **Syllabus module:** M1 — Course overview; data distributions and model families
 
@@ -26,7 +26,7 @@
 
 <iframe src="../materials/w01-deck-03-toy-example.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W01 deck 3: the toy example"></iframe>
 
-- Companion tutorial: [The World's Smallest Diffusion Model](../tutorials/05-two-point-diffusion.qmd) — a complete diffusion model on a two-point dataset, every step exact.
+- Lecture notes: [00 · Introduction and Motivation](../tutorials/04-genai-simplest-form.qmd) and [01 · The World's Smallest Diffusion Model](../tutorials/05-two-point-diffusion.qmd) — a complete diffusion model on a two-point dataset, every step exact, as a statement of what we want to understand in high dimensions.
 - [Interactive demo](../materials/two-point-diffusion-demo.html) used in the lecture: forward melting, the tanh denoiser, and reverse-time generation.
 - Warm-up demo: [Progressively Adding Noise](../materials/one-point-noise-demo.html) — one point at 0, kicked by noise; one walker, then many, with the √t envelope and the live Gaussian cross-section.
 

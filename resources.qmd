@@ -6,6 +6,7 @@
 
 ## Reference
 
+- Peter Holderrieth, Ezra Erives. **An Introduction to Flow Matching and Diffusion Models.** [arXiv:2506.02070](https://arxiv.org/abs/2506.02070). The MIT 6.S184 lecture notes, and the closest thing to a parallel text for this course: self-contained, built from first principles, and it develops the ODE/SDE background before deriving flow matching and denoising diffusion. Read it alongside the primary text when you want a second derivation of the same result — it reaches the reverse-time and probability-flow material of Modules 5–6 by a flow-matching route rather than a score-matching one.
 - G. A. Pavliotis. *Stochastic Processes and Applications: Diffusion Processes, the Fokker-Planck and Langevin Equations.* Springer, 2014 — for the stochastic-processes machinery of Modules 5–6.
 
 ## Supplementary Reading

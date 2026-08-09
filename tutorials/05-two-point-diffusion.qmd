@@ -1,12 +1,14 @@
-# The World's Smallest Diffusion Model {.unnumbered}
+# 01 · The World's Smallest Diffusion Model {.unnumbered}
 
-*Standalone tutorial accompanying [W01](../weeks/w01.qmd). Interactive version:
-[live demo](../materials/two-point-diffusion-demo.html) — every figure in this note, animated.*
+*The second note of the introduction, and the reason the course exists. It builds
+a **complete** diffusion model on a dataset of two points: forward noising, the
+optimal denoiser, the score, and reverse-time generation — every step exact, in
+closed form, with nothing learned and nothing approximated.*
 
-Diffusion models generate images from pure noise. Before we spend forty lectures on the
-mathematics, this note builds a **complete diffusion model with a dataset of two points**
-— small enough that every quantity the course will later approximate with a neural
-network can be computed *exactly*, with nothing beyond Bayes' rule.
+*Read it as a statement of the goal. **This is what we want to understand in high
+dimensions.** Everything the course does later is an attempt to recover these same
+five objects when the data is images instead of two numbers, and the closed forms
+are gone. The final section names precisely which step breaks first.*
 
 ## The dataset
 

@@ -1,6 +1,6 @@
-# Distributions and Maximum Likelihood {.unnumbered}
+# 04 · Distributions and Maximum Likelihood {.unnumbered}
 
-*Standalone tutorial accompanying [W02](../weeks/w02.qmd). Interactive versions:
+*Standalone tutorial accompanying W02. Interactive versions:
 [the Distribution Playground](../materials/distributions-playground.html) and
 [the Likelihood Lens](../materials/likelihood-lens.html).*
 
@@ -22,7 +22,7 @@ families used throughout the course.
 : {tbl-colwidths="[22,30,14,14,20]"}
 
 A sentence of habitat for each: the **Uniform** encodes total ignorance on an interval;
-the **Normal** is what sums of many small independent effects look like ([W01](../weeks/w01.qmd)'s warm-up
+the **Normal** is what sums of many small independent effects look like (W01's warm-up
 demo *is* this statement); the **Gamma** models positive, right-skewed quantities such
 as waiting times; the **Beta** lives on $(0,1)$ and models proportions and
 probabilities; a **mixture** models data with subpopulations — clusters — and is the
@@ -168,7 +168,7 @@ $$
 — the same objective, rewritten.
 
 **The connection to this course.** The latent posterior of
-[W01](../weeks/w01.qmd)
+W01
 $\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)$ is precisely this
 model with logit $s(x) = 2x/\sigma^2$: the optimal classifier of the hidden
 component is a Bernoulli model whose log-odds are linear in the observation.

@@ -1,59 +1,108 @@
-# W02: Generative Modeling II {.unnumbered}
+# 03 · Joint, Conditional, Marginal — and Bayes {.unnumbered}
 
-**Dates:** Mon Aug 3, Tue Aug 4, Wed Aug 5, 2026
+*The second concept in the spine, and the point at which probability starts being
+useful. One new move — put **two** numbers on the same outcome instead of one —
+produces the whole multivariate vocabulary: joints, marginals, conditionals, and
+Bayes' rule. Everything here is elementary; the measure-theoretic version is
+[in Perspectives](./11-joint-conditional-bayes.qmd) and is not needed.*
 
-**Slot/Venue:** Mon 9:00–9:50 · Tue 10:00–10:50 · Wed 11:00–11:50 · 11AC4004
+::: {.callout-note}
+## Where this sits
 
-**Syllabus module:** M1 — Maximum-likelihood estimation; KL divergence; empirical risk minimization
+Follows [Probability & Random Variables](./01-probability-101.qmd), which
+introduced a single random variable on a sample space. Here two random variables
+share an outcome, and that co-residence is the entire subject. The W02 primer
+deck [Probability, Joints, Conditionals and Bayes](../materials/w02-deck-00-probability-joints.html){target="_blank"}
+develops the same material from a 4 × 4 table of dice counts.
+:::
 
-## Pre-read
+## Two numbers on one outcome
 
-*To be posted (typically by the weekend before) — section references into the primary text.*
+Let $X$ and $Y$ be two random variables defined on the **same** sample space —
+two numerical features read off the same outcome $\omega$. Height and weight of
+one person; today's price and tomorrow's price of one stock; the clean image and
+its noisy version from one generation run.
 
-## In Class
+That sharing is the whole idea. "$X$ and $Y$ are jointly distributed" is not an
+extra assumption bolted on; it is the statement that a single $\omega$ determines
+both numbers at once, which is exactly why they can be correlated.
 
-**Slides** (&#8592; &#8594; arrows or click the edges to navigate):
+## Joint distributions
 
-*Primer — Probability, Joints, Conditionals and Bayes* ([open fullscreen](../materials/w02-deck-00-probability-joints.html){target="_blank"}) — the probability background the rest of the week assumes, developed from a single 4 &#215; 4 table of dice counts:
+Let $X$ and $Y$ be two random variables defined on the same sample space — two
+numerical features of the same outcome. Their **joint distribution** specifies
+$p(x, y) = \mathbb{P}(X = x \text{ and } Y = y)$ in the discrete case, or a joint
+density $f(x, y)$ whose volumes are probabilities in the continuous case. The joint
+distribution is a complete description of the pair: every probabilistic statement
+about $(X, Y)$ can be computed from it.
 
-<iframe src="../materials/w02-deck-00-probability-joints.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 primer deck: probability, joints, conditionals and Bayes"></iframe>
+The following discrete joint distribution serves as the running example (the state
+of a morning sky and the occurrence of rain):
 
-*Part 1 — Distributions and Maximum Likelihood* ([open fullscreen](../materials/w02-deck-01-distributions-mle.html){target="_blank"}):
+| $p(x,y)$ | $Y{=}$ rain | $Y{=}$ no rain | row sum |
+|---|:---:|:---:|:---:|
+| $X{=}$ cloudy | 0.20 | 0.25 | **0.45** |
+| $X{=}$ clear | 0.05 | 0.50 | **0.55** |
+| column sum | **0.25** | **0.75** | 1 |
 
-<iframe src="../materials/w02-deck-01-distributions-mle.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 1: distributions and MLE"></iframe>
+: {tbl-colwidths="[34,22,22,22]"}
 
-*Part 2 — Generative AI, in Its Simplest Form* ([open fullscreen](../materials/w02-deck-02-genai-maps.html){target="_blank"}):
+## Marginal distributions
 
-<iframe src="../materials/w02-deck-02-genai-maps.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 2: generative AI in its simplest form"></iframe>
+The **marginal** distribution of $X$ describes $X$ alone, with $Y$ disregarded. It
+is obtained by summing (or, for densities, integrating) the joint distribution over
+the other variable:
 
-*Part 3 — The Map, Proved* ([open fullscreen](../materials/w02-deck-03-map-limit.html){target="_blank"}):
+$$
+p(x) = \sum_y p(x, y),
+\qquad\text{or}\qquad
+f(x) = \int f(x, y)\, dy .
+$$
 
-<iframe src="../materials/w02-deck-03-map-limit.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 3: the map, proved"></iframe>
+In the table these are the row and column sums — the margins of the table, which is
+the origin of the term: $\mathbb{P}(\text{cloudy}) = 0.45$ and
+$\mathbb{P}(\text{rain}) = 0.25$. The operation is justified directly by the
+additivity axiom: the event "cloudy" is the disjoint union of "cloudy and rain" and
+"cloudy and no rain". Marginalization recurs throughout the course; in the mixture
+model of [Generative AI, in Its Simplest Form](./04-genai-simplest-form.qmd), the observed density
+$p(x) = \sum_z p(z)\, p(x \mid z)$ is precisely the joint distribution of
+$(x, z)$ with the latent variable summed out.
 
-**Tutorials for this week** (standalone documents, under the Tutorials section):
+## Conditional distributions and Bayes' rule
 
-- [Probability & Random Variables](../tutorials/01-probability-101.qmd) — sample spaces, events, random variables as maps out of outcomes, joints, conditioning, and expectation.
-- [Distributions and Maximum Likelihood](../tutorials/02-distributions-mle.qmd) — the five families, the pdf-vs-likelihood distinction, the Gaussian MLE, and the BCE aside.
-- [Generative AI, in Its Simplest Form](../tutorials/04-genai-simplest-form.qmd) — conditional generation and sampling as a map.
-- [The Deterministic Map, Proved](../tutorials/06-map-proved.qmd) — full proofs, including the score flow as the quantile transport.
+The **conditional** distribution of $Y$ given $X = x$ is defined, whenever
+$p(x) > 0$, by
 
-*Optional, under Tutorials · Advanced* — the measure-theoretic footing behind the
-above. Not required for anything in lecture:
+$$
+p(y \mid x) = \frac{p(x, y)}{p(x)} .
+$$
 
-- [Measuring Things — From Length to Probability](../tutorials/10-measuring-things.qmd) — measure, the Lebesgue integral, Kolmogorov's axioms, random variables as measurable functions, pushforward, expectation.
-- [Joint, Marginal, Conditional — and Bayes](../tutorials/11-joint-conditional-bayes.qmd) — joints as mountains, marginals as shadows, conditionals as renormalized slices, and the sigmoid/tanh posterior the W01 denoiser uses.
+The definition restricts attention to the outcomes consistent with $X = x$ and
+renormalizes their probabilities to total 1. In the running example,
+$\mathbb{P}(\text{rain} \mid \text{cloudy}) = 0.20 / 0.45 \approx 0.44$,
+compared with the unconditional $\mathbb{P}(\text{rain}) = 0.25$.
 
-**Interactive demos**
+Applying the definition in both directions and eliminating the joint yields
+**Bayes' rule**,
 
-- [The Measure Playground](../materials/measure-playground.html) — a σ-algebra as what a report tells you, and expectation as the area under the quantile curve.
-- [The Joint Slicer](../materials/joint-slicer.html) — four joints with identical marginals, plus the two-shelf mixed joint with a live posterior.
-- [The Distribution Playground](../materials/distributions-playground.html) — see, sample, fit, sample from the fit (and the single-Gaussian-on-mixture trap).
-- [The Likelihood Lens](../materials/likelihood-lens.html) — pdf and likelihood as two slices of one surface; draggable data with a live MLE.
-- [Sampling as a Map](../materials/sampling-as-a-map.html) — ancestral sampling, then the same generator as one deterministic map; slide σ → 0 for the two-point staircase.
+$$
+\boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
+$$
 
-## Notes — Bayes' rule, and why inference is the inverse problem
+which converts a conditional in one direction into the conditional in the other.
+The tanh denoiser of W01 is an application of this identity,
+with $x$ the clean data point and $y$ the noisy observation; it is derived in full
+in [The World's Smallest Diffusion Model](./05-two-point-diffusion.qmd).
 
-### Generation runs forward; inference runs backward
+$X$ and $Y$ are **independent** if $p(x, y) = p(x)\, p(y)$ for all $x, y$ —
+equivalently, if $p(y \mid x) = p(y)$, so that conditioning on $X$ conveys no
+information about $Y$. In the table, $0.20 \ne 0.45 \times 0.25$, so the two
+variables are dependent. The i.i.d. assumption underlying the likelihoods of [Distributions and Maximum Likelihood](./02-distributions-mle.qmd)
+are an independence statement applied to repeated observations.
+
+## Bayes' rule, and why inference is the inverse problem
+
+#### Generation runs forward; inference runs backward
 
 Almost every model in this course is written in the **forward** direction. You
 posit some unobserved state, and you write down a mechanism that turns it into
@@ -103,7 +152,7 @@ $$
 This is the single most useful thing in the course's toolkit: **it is the bridge
 from the direction you can write down to the direction you want.**
 
-### A toy example: did the student understand "or"?
+#### A toy example: did the student understand "or"?
 
 A student is set ten short questions on the logical connective **or**. We would
 like to know whether they have actually grasped it — but "understanding" is not
@@ -173,11 +222,11 @@ Same evidence, three different conclusions. This is not a defect. It is the
 honest statement that seven out of ten is weak evidence, and weak evidence does
 not overturn what you already knew.
 
-### The sampling distribution *is* the likelihood
+#### The sampling distribution *is* the likelihood
 
 The expression $p(x \mid z)$ has been doing two jobs above, and it is worth
 separating them, because this is the distinction
-[Distributions and Maximum Likelihood](../tutorials/02-distributions-mle.qmd)
+[Distributions and Maximum Likelihood](./02-distributions-mle.qmd)
 makes in the parametric setting.
 
 | Hold fixed | Vary | You get | Sums to 1? |
@@ -189,7 +238,7 @@ It is one formula read in two directions. Forward, it generates. Backward, it
 scores. Bayes' rule is what converts the backward reading into an actual
 probability distribution over $z$, by weighting with the prior and renormalising.
 
-### Bayesian Knowledge Tracing
+#### Bayesian Knowledge Tracing
 
 The toy example freezes the student in time. Real learners *learn*, so the latent
 state changes as they work — and the natural extension is exactly the model used
@@ -242,7 +291,7 @@ sequence. That is BKT, and it is also a hidden Markov model, a Kalman filter,
 and, as the next few weeks will show, a diffusion model.
 :::
 
-### Why this is the shape of the whole course
+#### Why this is the shape of the whole course
 
 Diffusion models are an inverse problem, and it is worth being blunt about the
 terminology, because it inverts what you might expect.
@@ -263,14 +312,35 @@ $$
 = \tanh\!\Big(\frac{x_\sigma}{\sigma^2}\Big)
 \quad\text{for the two-point dataset of }
 $$
-[W01](../weeks/w01.qmd) — which, as
-[Joint, Marginal, Conditional](../tutorials/11-joint-conditional-bayes.qmd) shows,
+W01 — which, as
+[Joint, Marginal, Conditional](./11-joint-conditional-bayes.qmd) shows,
 is nothing but Bayes' rule applied to two Gaussian shelves and then averaged.
 Swap "understands the concept" for "was a $+1$", and "ten marks" for "one noisy
 measurement", and it is the same calculation you did above.
 
-*Board scans from the lecture will be added here.*
+## Exercises
 
-## After Class
-
-*Exercises and pointers will be posted here.*
+1. Two fair coin tosses. Let $X$ be the result of the first toss and $Y$ the
+   total number of heads. Write the joint as a table, compute both marginals, and
+   compute both families of conditionals. Verify Bayes' rule on
+   $\mathbb{P}(X = H \mid Y = 1)$.
+2. For the sky-and-rain table above, compute
+   $\mathbb{P}(\text{cloudy} \mid \text{rain})$ by Bayes' rule from
+   $\mathbb{P}(\text{rain} \mid \text{cloudy})$ and the marginals, then confirm it
+   by reading the table directly.
+3. Construct two *different* joint distributions on $\{0,1\}^2$ that have the same
+   pair of marginals. What does this show about whether marginals determine a
+   joint?
+4. Show that if $p(x,y) = p(x)p(y)$ then every conditional $p(y \mid x)$ equals
+   $p(y)$ — independence means the conditional does not move as you change what
+   you condition on.
+5. In the mixture model $z \sim \text{Bernoulli}(\pi)$,
+   $x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)$: identify the joint $p(x,z)$, both
+   marginals, and both conditionals. State which of these the
+   [W01 denoiser](./05-two-point-diffusion.qmd) computes, and which the ancestral
+   sampler of
+   [Generative AI, in Its Simplest Form](./04-genai-simplest-form.qmd) uses.
+6. A generative model produces a noisy observation $x_t$ from a clean signal
+   $x_0$. Which direction is easy to write down, $p(x_t \mid x_0)$ or
+   $p(x_0 \mid x_t)$? Which one does generation require? Name the rule that
+   converts one into the other.

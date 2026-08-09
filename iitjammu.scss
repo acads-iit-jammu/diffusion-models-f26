@@ -89,3 +89,92 @@ pre {
   background-image: linear-gradient(160deg, #f6faff 0, #eef4fb 100%);
   border-left: 3px solid #4da3ff;
 }
+
+/* Curriculum week cards */
+
+.wk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.wk-card {
+  border: 1px solid lighten(#4da3ff, 22%);
+  border-radius: 10px;
+  border-left: 4px solid #003f87;
+  background: #fcfdff;
+  padding: 0.9rem 1.05rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.wk-card.wk-break {
+  border-left-color: #b9c6d6;
+  background: #f7f8fa;
+}
+
+.wk-card .wk-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7a8d;
+}
+
+.wk-card .wk-top b { color: #003f87; font-weight: 700; }
+
+.wk-card .wk-title {
+  font-family: "Roboto Slab", Georgia, serif;
+  font-size: 1.06rem;
+  font-weight: 600;
+  color: #002d63;
+  line-height: 1.25;
+}
+
+.wk-card .wk-sum {
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: #3d4753;
+  margin: 0.15rem 0 0.2rem;
+}
+
+.wk-card .wk-row {
+  font-size: 0.87rem;
+  line-height: 1.5;
+  border-top: 1px solid #eaf3ff;
+  padding-top: 0.4rem;
+}
+
+.wk-card .wk-row .wk-lab {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a97a6;
+  margin-bottom: 0.1rem;
+}
+
+.wk-card p { margin: 0; }
+
+.wk-card .wk-due,
+.wk-card .wk-due a { color: #b3541e; font-weight: 600; }
+
+.wk-card.wk-tbd { border-left-style: dashed; border-left-color: #b9c6d6; background: #fcfcfd; }
+.wk-card.wk-tbd .wk-title { color: #7c8899; font-weight: 500; font-style: italic; }
+.wk-card.wk-tbd .wk-top b { color: #6b7a8d; }
+.wk-card .wk-row ul { margin: .15rem 0 0; padding-left: 1.05rem; }
+.wk-card .wk-row li { margin: 0 0 .12rem; line-height: 1.4; }
+.wk-card .wk-row li::marker { color: #9fb3c8; }
+
+/* Deck wrapper pages */
+.deck-meta { display:block; font-size:.9rem; color:#5b6672; margin:-.4rem 0 1.1rem; }
+.deck-open { display:inline-block; background:#003f87; color:#fff !important; text-decoration:none !important;
+  padding:.6rem 1.15rem; border-radius:6px; font-weight:600; font-size:.95rem; margin:.4rem 0 0; }
+.deck-open:hover { background:#0056b8; }
+.deck-frame { width:100%; aspect-ratio:16/10; border:1px solid #cfe0f5; border-radius:8px;
+  margin:1.25rem 0 .4rem; background:#0b1e3a; }

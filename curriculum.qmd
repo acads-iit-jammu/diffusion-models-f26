@@ -1,0 +1,269 @@
+# Curriculum {.unnumbered}
+
+*What is taught in which week. The course itself is organised by **concept** —
+the numbered Lecture Notes in the sidebar, which read linearly and do not shift
+when a lecture does. This page is the timetable laid over them: each card gives a
+week's dates and the notes it covers. Assessment dates are on
+[Assignments](./assignments.qmd).*
+
+::: {.callout-note}
+## Three kinds of material
+
+**Lecture Notes** are the numbered spine and follow the lectures. **Tutorials**
+sit alongside a note and go deeper on one thing. **Perspectives** are optional
+reinterpretations — a transport reading of the subject, and the measure-theoretic
+foundations — and nothing in the lectures depends on them. **Draft** is material not yet
+settled.
+:::
+
+Lectures meet **Monday, Tuesday and Friday, 1:00–1:50 pm** in 11AC4004.
+
+---
+
+## Week by week
+
+::: {.wk-grid}
+
+::: {.wk-card}
+<span class="wk-top"><b>W01</b> · Jul 29<span>M1</span></span>
+
+[Course Overview]{.wk-title}
+
+[What the course is, how it is assessed, and why diffusion models are worth a semester. A first look at the object of study: a model that produces samples rather than one that scores them.]{.wk-sum}
+
+::: {.wk-row}
+[Decks]{.wk-lab}
+
+- [01 · Course Mechanics](./decks/01-mechanics.qmd)
+- [02 · Why Diffusion Models?](./decks/02-motivation.qmd)
+- [03 · The World's Smallest Diffusion Model](./decks/03-two-point.qmd)
+:::
+
+::: {.wk-row}
+[Materials]{.wk-lab}
+
+- [Two-point diffusion demo](./materials/two-point-diffusion-demo.html)
+- [One-point noise demo](./materials/one-point-noise-demo.html)
+:::
+
+:::
+
+::: {.wk-card}
+<span class="wk-top"><b>W02</b> · Aug 3–5<span>M1</span></span>
+
+[Introduction, Motivation and Foundations]{.wk-title}
+
+[What a generative model is, and the smallest complete example — a diffusion model on two data points, exact at every step. Then probability from the ground up, ending at maximum likelihood in **one dimension**.]{.wk-sum}
+
+::: {.wk-row}
+[Lecture notes]{.wk-lab}
+
+- [00 · Introduction and Motivation](./tutorials/04-genai-simplest-form.qmd)
+- [01 · The World's Smallest Diffusion Model](./tutorials/05-two-point-diffusion.qmd)
+- [02 · Probability & Random Variables](./tutorials/01-probability-101.qmd)
+- [03 · Joint, Conditional, Marginal — and Bayes](./tutorials/16-joints-conditionals.qmd)
+- [04 · Distributions and Maximum Likelihood](./tutorials/02-distributions-mle.qmd)
+:::
+
+::: {.wk-row}
+[Decks]{.wk-lab}
+
+- [04 · Probability, Joints, Conditionals and Bayes](./decks/04-probability-joints.qmd)
+- [05 · Distributions and Maximum Likelihood](./decks/05-distributions-mle.qmd)
+- [06 · Generative AI, in Its Simplest Form](./decks/06-genai-simplest-form.qmd)
+:::
+
+::: {.wk-row}
+[Materials]{.wk-lab}
+
+- [Joint slicer](./materials/joint-slicer.html)
+- [Distributions playground](./materials/distributions-playground.html)
+- [Likelihood lens](./materials/likelihood-lens.html)
+- [Sampling as a map](./materials/sampling-as-a-map.html)
+:::
+
+:::
+
+::: {.wk-card}
+<span class="wk-top"><b>W03</b> · Aug 10, 11, 14<span>M1–2</span></span>
+
+[Multivariate Extensions, and Comparing Distributions]{.wk-title}
+
+[Maximum likelihood in many dimensions — **supervised**, where closed forms mostly vanish, and **unsupervised**, which is density estimation. Where that runs out, and the segue it forces: stop describing distributions, start **comparing** them.]{.wk-sum}
+
+::: {.wk-row}
+[Lecture notes]{.wk-lab}
+
+- [05 · The Multivariate Gaussian](./tutorials/12-multivariate-gaussian.qmd)
+- 06 · Maximum Likelihood in Many Dimensions *(planned)*
+- 07 · High-Dimensional Density Estimation *(planned)*
+- [08 · Comparing Distributions](./tutorials/15-comparing-distributions.qmd)
+:::
+
+::: {.wk-row}
+[Materials]{.wk-lab}
+
+- [Gaussian Lab](./materials/gaussian-lab.html)
+- Tutorial: [Inequalities Worth Knowing](./tutorials/13-inequalities.qmd)
+- [HW 1](./homeworks/hw1.pdf) & [HW 2](./homeworks/hw2.pdf) released Mon Aug 10
+:::
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W04</b> · Aug 17, 18, 21<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+::: {.wk-row}
+[Deadline]{.wk-lab}
+
+- [**[HW 1](./homeworks/hw1.pdf) due Tue Aug 18, in class**]{.wk-due}
+:::
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W05</b> · Aug 24, 25, 28<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+::: {.wk-row}
+[Deadline]{.wk-lab}
+
+- [**[HW 2](./homeworks/hw2.pdf) due Tue Aug 25, in class**]{.wk-due}
+:::
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W06</b> · Aug 31, Sep 1, 4<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W07</b> · Sep 7, 8, 11<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W08</b> · Sep 14, 15, 18<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+:::
+
+::: {.wk-card .wk-break}
+<span class="wk-top"><b>W09</b> · Sep 21–25<span>—</span></span>
+
+[Break]{.wk-title}
+
+::: {.wk-row}
+[Examinations]{.wk-lab}
+
+- Mid-semester examination window **Sep 18 – 23**
+- No classes Monday or Tuesday; Friday Sep 25 to be confirmed
+:::
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W10</b> · Sep 28, 29, Oct 2<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W11</b> · Oct 5, 6, 9<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W12</b> · Oct 12, 13, 16<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W13</b> · Oct 23<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+::: {.wk-row}
+[Holidays]{.wk-lab}
+
+- Monday and Tuesday are Dussehra holidays
+- Single lecture this week
+:::
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W14</b> · Oct 26, 27, 30<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W15</b> · Nov 2, 3, 6<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+:::
+
+::: {.wk-card .wk-break}
+<span class="wk-top"><b>W16</b> · Nov 9–13<span>—</span></span>
+
+[Break]{.wk-title}
+
+::: {.wk-row}
+[Holidays]{.wk-lab}
+
+- No classes — the Diwali cluster runs **Nov 9 – 11**
+- Friday Nov 13 to be confirmed
+:::
+
+:::
+
+::: {.wk-card .wk-tbd}
+<span class="wk-top"><b>W17</b> · Nov 16, 17, 20<span>TBD</span></span>
+
+[To be decided]{.wk-title}
+
+::: {.wk-row}
+[Examinations]{.wk-lab}
+
+- Last teaching week
+- End-semester examination window **Nov 23 – 30**
+:::
+
+:::
+
+:::
+## Modules
+
+- **M1** — Foundations and high-dimensional density estimation
+- **M2** — Gaussian calculus and the forward process
+- **M3** — Denoising diffusion
+- **M4** — Score matching
+- **M5** — Continuous time
+- **M6** — Flows and wrap-up
+
+## Examinations
+
+| | |
+|---|---|
+| Mid-semester | Sep 18 – 23, 2026 |
+| End-semester | Nov 23 – 30, 2026 |
+
+Full assessment scheme on the [Course](./course.qmd) page; homework release and
+due dates on [Assignments](./assignments.qmd).

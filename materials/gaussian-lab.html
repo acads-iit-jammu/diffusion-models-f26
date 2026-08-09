@@ -1,0 +1,518 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Gaussian Lab</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+      --heat: 57, 135, 229;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+    --heat: 57, 135, 229;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --heat: 42, 120, 214;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout, .seg, table {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  canvas { display: block; width: 100%; touch-action: none; }
+  #c-biv { height: 360px; } #c-lin { height: 360px; } #c-clt { height: 300px; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.35rem; }
+  input[type="range"] { width: 108px; accent-color: var(--data); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.2em;
+    display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.8rem; cursor: pointer;
+    font-family: system-ui, sans-serif; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data); color: #fff; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid);
+    padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; W03 demo</p>
+    <h1>The Gaussian Lab</h1>
+    <p class="dek">Three things about the multivariate normal, made draggable: what the
+    covariance actually controls, what a linear map does to it, and why sums of almost
+    anything end up here.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I &#183; The bivariate normal</span>&#931; is the whole story</h2>
+    <p>Below is N(&#956;,&#8202;&#931;) in two dimensions: the heatmap is the density, the
+    ellipses are level sets, and the curves on the edges are the two marginals. Only
+    &#931; controls the <em>shape</em> — &#956; just slides it around.</p>
+
+    <p><strong>Set &#961; = 0</strong> and watch the readout: the joint density becomes exactly
+    the product of the two marginals, and the ellipses straighten to axis-aligned. That is
+    the whole content of &#8220;&#931; diagonal &#8658; independent coordinates&#8221;, and
+    with &#963;&#8321; = &#963;&#8322; it is the isotropic N(0,&#8202;I) that diffusion models
+    add as noise.</p>
+
+    <figure>
+      <div class="figlabel"><span>p(x,&#8202;y) with 1&#963;, 2&#963; contours and both marginals</span></div>
+      <canvas id="c-biv" role="img" aria-label="Heatmap of a bivariate normal density with one- and two-sigma contour ellipses and marginal curves along the edges."></canvas>
+      <div class="controls">
+        <label>&#956;&#8321; <input id="s-m1" type="range" min="-1.5" max="1.5" step="0.1" value="0"><span class="val" id="v-m1">0.0</span></label>
+        <label>&#956;&#8322; <input id="s-m2" type="range" min="-1.5" max="1.5" step="0.1" value="0"><span class="val" id="v-m2">0.0</span></label>
+        <label>&#963;&#8321; <input id="s-s1" type="range" min="0.4" max="1.8" step="0.05" value="1"><span class="val" id="v-s1">1.00</span></label>
+        <label>&#963;&#8322; <input id="s-s2" type="range" min="0.4" max="1.8" step="0.05" value="1"><span class="val" id="v-s2">1.00</span></label>
+        <label>&#961; <input id="s-rho" type="range" min="-0.9" max="0.9" step="0.05" value="0.6"><span class="val" id="v-rho">0.60</span></label>
+      </div>
+      <div class="readout" id="r-biv"></div>
+      <figcaption>The contours are the sets where the Mahalanobis distance
+      (x&#8722;&#956;)&#7488;&#931;&#8315;&#185;(x&#8722;&#956;) is constant — always ellipses,
+      with axes along the eigenvectors of &#931; and half-lengths proportional to the square
+      roots of its eigenvalues.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II &#183; Linear maps</span>A Gaussian stays a Gaussian</h2>
+    <p>Start from standard normal noise z &#8764; N(0,&#8202;I) — the round cloud — and apply
+    an affine map x = Az + b. The cloud shears and rotates, but it never stops being
+    Gaussian: the new law is exactly N(b,&#8202;AA&#7488;). Drag the entries of A and watch
+    the covariance readout follow.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>grey: z &#8764; N(0,&#8202;I) &#183; blue: x = Az + b</span>
+        <span class="seg" id="seg-preset" role="group" aria-label="Preset matrices"></span>
+      </div>
+      <canvas id="c-lin" role="img" aria-label="A round cloud of standard normal samples and its image under an adjustable linear map, shown as an elongated rotated cloud with the unit circle and its image ellipse."></canvas>
+      <div class="controls">
+        <label>a&#8321;&#8321; <input id="s-a11" type="range" min="-2" max="2" step="0.05" value="1.4"><span class="val" id="v-a11">1.40</span></label>
+        <label>a&#8321;&#8322; <input id="s-a12" type="range" min="-2" max="2" step="0.05" value="0.7"><span class="val" id="v-a12">0.70</span></label>
+        <label>a&#8322;&#8321; <input id="s-a21" type="range" min="-2" max="2" step="0.05" value="0"><span class="val" id="v-a21">0.00</span></label>
+        <label>a&#8322;&#8322; <input id="s-a22" type="range" min="-2" max="2" step="0.05" value="0.8"><span class="val" id="v-a22">0.80</span></label>
+      </div>
+      <div class="readout" id="r-lin"></div>
+      <figcaption>The unit circle (grey) maps to the ellipse (blue) — that image <em>is</em> the
+      one-&#963; contour of the new law. Run this backwards and you get whitening: given any
+      &#931;, factor it as LL&#7488; and z = L&#8315;&#185;(x&#8722;&#956;) is standard normal
+      again.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act III &#183; The CLT</span>Add enough of anything</h2>
+    <p>Pick a source distribution — none of them Gaussian — draw n of them, add them up,
+    standardise, and repeat. The histogram is what you get; the curve is the standard
+    normal. Raise n and watch.</p>
+
+    <figure>
+      <div class="figlabel">
+        <span>standardised sum of n draws, against N(0,&#8202;1)</span>
+        <span class="seg" id="seg-src" role="group" aria-label="Choose the source distribution"></span>
+      </div>
+      <canvas id="c-clt" role="img" aria-label="Histogram of standardised sums of independent draws with the standard normal density overlaid, converging as the number of summands increases."></canvas>
+      <div class="controls">
+        <label>n <input id="s-n" type="range" min="1" max="40" step="1" value="1"><span class="val" id="v-n">1</span></label>
+        <button id="b-resample" type="button">resample</button>
+      </div>
+      <div class="readout" id="r-clt"></div>
+      <figcaption>The rate depends on the source: a symmetric one like the uniform is
+      already close at n = 3, while a lopsided one like the exponential, or a two-valued
+      one like a coin flip, takes far longer. The limit is the same regardless — which is
+      what makes it a theorem worth having.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="takeaway"><strong>One object, three views.</strong> &#931; alone fixes the shape
+    of a Gaussian; linear maps move it around inside the same family, with
+    &#931; &#8614; A&#931;A&#7488;; and sums of independent things drift towards it no matter
+    where they started. That last fact is why a noise model you did not choose still ends up
+    Gaussian — and why this course adds Gaussian noise rather than anything else.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion tutorial on the <a href="https://acads-iit-jammu.github.io/diffusion-models-f26">course site</a>.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const SQRT2PI = Math.sqrt(2 * Math.PI);
+  const nPdf = (v, m, s) => Math.exp(-((v - m) ** 2) / (2 * s * s)) / (s * SQRT2PI);
+
+  function setupCanvas(id, draw) {
+    const el = document.getElementById(id), ctx = el.getContext("2d");
+    const st = { el, ctx, w: 0, h: 0 };
+    function resize() {
+      const dpr = window.devicePixelRatio || 1, r = el.getBoundingClientRect();
+      st.w = r.width; st.h = r.height;
+      el.width = Math.round(r.width * dpr); el.height = Math.round(r.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(st);
+    }
+    new ResizeObserver(resize).observe(el);
+    st.redraw = () => draw(st);
+    return st;
+  }
+  const bind = (id, vid, set, fmt, after) => {
+    const el = document.getElementById(id), v = document.getElementById(vid);
+    el.addEventListener("input", () => { set(+el.value); v.textContent = fmt(+el.value); after(); });
+  };
+
+  // ---------------- Act I: the bivariate normal ----------------
+  let M1 = 0, M2 = 0, S1 = 1, S2 = 1, RHO = 0.6;
+  const L = 4;
+  const bivPdf = (x, y) => {
+    const d = 1 - RHO * RHO;
+    const zx = (x - M1) / S1, zy = (y - M2) / S2;
+    return Math.exp(-(zx * zx - 2 * RHO * zx * zy + zy * zy) / (2 * d)) /
+           (2 * Math.PI * S1 * S2 * Math.sqrt(d));
+  };
+
+  const biv = setupCanvas("c-biv", (st) => {
+    const { ctx, w, h } = st;
+    const pad = { l: 30, r: 46, t: 42, b: 26 };
+    const X = (x) => pad.l + (x + L) / (2 * L) * (w - pad.l - pad.r);
+    const Y = (y) => pad.t + (L - y) / (2 * L) * (h - pad.t - pad.b);
+    ctx.clearRect(0, 0, w, h);
+
+    // density heatmap, normalised by the grid maximum
+    const n = 150, vals = new Float64Array(n * n);
+    let peak = 0;
+    for (let r = 0; r < n; r++) {
+      const y = L - 2 * L * r / (n - 1);
+      for (let c = 0; c < n; c++) {
+        const v = bivPdf(-L + 2 * L * c / (n - 1), y);
+        vals[r * n + c] = v; if (v > peak) peak = v;
+      }
+    }
+    const off = document.createElement("canvas"); off.width = n; off.height = n;
+    const octx = off.getContext("2d"), img = octx.createImageData(n, n);
+    const [hr, hg, hb] = css("--heat").split(",").map((v) => +v.trim());
+    for (let i = 0; i < n * n; i++) {
+      const a = Math.pow(vals[i] / (peak || 1), 0.7) * 0.85;
+      img.data[i * 4] = hr; img.data[i * 4 + 1] = hg; img.data[i * 4 + 2] = hb;
+      img.data[i * 4 + 3] = Math.round(Math.min(a, 1) * 255);
+    }
+    octx.putImageData(img, 0, 0);
+    ctx.drawImage(off, pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b);
+    ctx.strokeStyle = css("--axis"); ctx.lineWidth = 1;
+    ctx.strokeRect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b);
+
+    // 1-sigma and 2-sigma contour ellipses, parameterised from the covariance
+    const c11 = S1 * S1, c22 = S2 * S2, c12 = RHO * S1 * S2;
+    const tr = c11 + c22, det = c11 * c22 - c12 * c12;
+    const disc = Math.sqrt(Math.max(tr * tr / 4 - det, 0));
+    const l1 = tr / 2 + disc, l2 = tr / 2 - disc;
+    const th = Math.abs(c12) < 1e-12 ? (c11 >= c22 ? 0 : Math.PI / 2)
+                                     : Math.atan2(l1 - c11, c12);
+    ctx.strokeStyle = css("--lik"); ctx.lineWidth = 2;
+    for (const k of [1, 2]) {
+      ctx.beginPath();
+      for (let i = 0; i <= 128; i++) {
+        const t = i / 128 * 2 * Math.PI;
+        const ex = k * Math.sqrt(Math.max(l1, 0)) * Math.cos(t);
+        const ey = k * Math.sqrt(Math.max(l2, 0)) * Math.sin(t);
+        const px = X(M1 + ex * Math.cos(th) - ey * Math.sin(th));
+        const py = Y(M2 + ex * Math.sin(th) + ey * Math.cos(th));
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.globalAlpha = k === 1 ? 1 : 0.5; ctx.stroke(); ctx.globalAlpha = 1;
+    }
+
+    // marginals on the edges
+    const sc = 30 / nPdf(0, 0, 0.4);
+    ctx.strokeStyle = css("--muted"); ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    for (let i = 0; i <= 160; i++) {
+      const x = -L + 2 * L * i / 160;
+      const py = pad.t - 5 - nPdf(x, M1, S1) * sc;
+      i === 0 ? ctx.moveTo(X(x), py) : ctx.lineTo(X(x), py);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    for (let i = 0; i <= 160; i++) {
+      const y = -L + 2 * L * i / 160;
+      const px = w - pad.r + 5 + nPdf(y, M2, S2) * sc;
+      i === 0 ? ctx.moveTo(px, Y(y)) : ctx.lineTo(px, Y(y));
+    }
+    ctx.stroke();
+    ctx.font = "10px system-ui, sans-serif"; ctx.fillStyle = css("--muted");
+    ctx.textAlign = "left"; ctx.textBaseline = "top";
+    ctx.fillText("marginal of x", pad.l + 4, 4);
+  });
+
+  function renderBiv() {
+    const c11 = S1 * S1, c22 = S2 * S2, c12 = RHO * S1 * S2;
+    // is the joint the product of its marginals? true exactly when rho = 0
+    const indep = Math.abs(RHO) < 1e-9;
+    const probe = [[0.7, -0.4], [1.3, 1.1]];
+    let worst = 0;
+    for (const [x, y] of probe)
+      worst = Math.max(worst, Math.abs(bivPdf(x, y) - nPdf(x, M1, S1) * nPdf(y, M2, S2)));
+    document.getElementById("r-biv").innerHTML =
+      "&#931; = <span class='mono'>[[" + c11.toFixed(2) + ", " + c12.toFixed(2) + "], [" +
+      c12.toFixed(2) + ", " + c22.toFixed(2) + "]]</span>" +
+      " &nbsp;&#183;&nbsp; det&#8202;&#931; = <b>" + (c11 * c22 - c12 * c12).toFixed(3) + "</b>" +
+      "<br>max |p(x,y) &#8722; p(x)p(y)| over two probe points: <b>" + worst.toExponential(1) +
+      "</b> &#8212; " + (indep
+        ? "<b>zero: the joint factorises</b>, the coordinates are independent"
+        : "non-zero: the joint is <b>not</b> the product of its marginals");
+  }
+  const upBiv = () => { biv.redraw(); renderBiv(); };
+  bind("s-m1", "v-m1", (v) => M1 = v, (v) => v.toFixed(1), upBiv);
+  bind("s-m2", "v-m2", (v) => M2 = v, (v) => v.toFixed(1), upBiv);
+  bind("s-s1", "v-s1", (v) => S1 = v, (v) => v.toFixed(2), upBiv);
+  bind("s-s2", "v-s2", (v) => S2 = v, (v) => v.toFixed(2), upBiv);
+  bind("s-rho", "v-rho", (v) => RHO = v, (v) => v.toFixed(2), upBiv);
+
+  // ---------------- Act II: affine maps ----------------
+  let A11 = 1.4, A12 = 0.7, A21 = 0.0, A22 = 0.8;
+  // one fixed cloud of standard normal draws, so the picture only changes with A
+  const Z = (() => {
+    let s = 12345;
+    const rnd = () => (s = (1103515245 * s + 12345) % 2147483648) / 2147483648;
+    const out = [];
+    for (let i = 0; i < 900; i++) {
+      const u = Math.max(rnd(), 1e-9), v = rnd();
+      out.push([Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v),
+                Math.sqrt(-2 * Math.log(u)) * Math.sin(2 * Math.PI * v)]);
+    }
+    return out;
+  })();
+
+  const lin = setupCanvas("c-lin", (st) => {
+    const { ctx, w, h } = st;
+    const LL = 5, pad = 16;
+    const X = (x) => pad + (x + LL) / (2 * LL) * (w - 2 * pad);
+    const Y = (y) => pad + (LL - y) / (2 * LL) * (h - 2 * pad);
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(X(-LL), Y(0)); ctx.lineTo(X(LL), Y(0));
+    ctx.moveTo(X(0), Y(-LL)); ctx.lineTo(X(0), Y(LL)); ctx.stroke();
+
+    // source cloud
+    ctx.fillStyle = css("--muted"); ctx.globalAlpha = 0.5;
+    for (const [a, b] of Z) { ctx.beginPath(); ctx.arc(X(a), Y(b), 1.4, 0, 6.284); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    // image cloud
+    ctx.fillStyle = css("--data"); ctx.globalAlpha = 0.62;
+    for (const [a, b] of Z) {
+      ctx.beginPath(); ctx.arc(X(A11 * a + A12 * b), Y(A21 * a + A22 * b), 1.7, 0, 6.284); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // unit circle and its image
+    const circle = (map, col, wid) => {
+      ctx.strokeStyle = col; ctx.lineWidth = wid; ctx.beginPath();
+      for (let i = 0; i <= 160; i++) {
+        const t = i / 160 * 2 * Math.PI, p = map(Math.cos(t), Math.sin(t));
+        i === 0 ? ctx.moveTo(X(p[0]), Y(p[1])) : ctx.lineTo(X(p[0]), Y(p[1]));
+      }
+      ctx.stroke();
+    };
+    circle((a, b) => [a, b], css("--muted"), 1.5);
+    circle((a, b) => [A11 * a + A12 * b, A21 * a + A22 * b], css("--lik"), 2.4);
+  });
+
+  function renderLin() {
+    // Sigma = A A^T
+    const c11 = A11 * A11 + A12 * A12;
+    const c12 = A11 * A21 + A12 * A22;
+    const c22 = A21 * A21 + A22 * A22;
+    const det = A11 * A22 - A12 * A21;
+    const rho = c12 / Math.sqrt(Math.max(c11 * c22, 1e-12));
+    document.getElementById("r-lin").innerHTML =
+      "&#931; = AA&#7488; = <span class='mono'>[[" + c11.toFixed(2) + ", " + c12.toFixed(2) +
+      "], [" + c12.toFixed(2) + ", " + c22.toFixed(2) + "]]</span>" +
+      " &nbsp;&#183;&nbsp; corr = <b>" + rho.toFixed(3) + "</b>" +
+      " &nbsp;&#183;&nbsp; det&#8202;A = <b>" + det.toFixed(3) + "</b>" +
+      (Math.abs(det) < 1e-3
+        ? " &#8212; <b>singular</b>: the cloud collapses to a line and the law has no density"
+        : "");
+  }
+  const upLin = () => { lin.redraw(); renderLin(); };
+  bind("s-a11", "v-a11", (v) => A11 = v, (v) => v.toFixed(2), upLin);
+  bind("s-a12", "v-a12", (v) => A12 = v, (v) => v.toFixed(2), upLin);
+  bind("s-a21", "v-a21", (v) => A21 = v, (v) => v.toFixed(2), upLin);
+  bind("s-a22", "v-a22", (v) => A22 = v, (v) => v.toFixed(2), upLin);
+
+  const PRESETS = [
+    { label: "identity", a: [1, 0, 0, 1] },
+    { label: "stretch",  a: [1.8, 0, 0, 0.5] },
+    { label: "shear",    a: [1.4, 0.7, 0, 0.8] },
+    { label: "rotate 30°", a: [Math.cos(Math.PI / 6), -Math.sin(Math.PI / 6),
+                              Math.sin(Math.PI / 6),  Math.cos(Math.PI / 6)] },
+    { label: "singular", a: [1, 0.5, 2, 1] },
+  ];
+  const segP = document.getElementById("seg-preset");
+  for (const p of PRESETS) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = p.label;
+    b.addEventListener("click", () => {
+      [A11, A12, A21, A22] = p.a;
+      const ids = ["s-a11", "s-a12", "s-a21", "s-a22"], vs = ["v-a11", "v-a12", "v-a21", "v-a22"];
+      p.a.forEach((v, i) => {
+        document.getElementById(ids[i]).value = String(v);
+        document.getElementById(vs[i]).textContent = v.toFixed(2);
+      });
+      upLin();
+    });
+    segP.appendChild(b);
+  }
+
+  // ---------------- Act III: the CLT ----------------
+  const SOURCES = [
+    { key: "unif", label: "uniform",     draw: (r) => r(), mean: 0.5, sd: Math.sqrt(1 / 12) },
+    { key: "exp",  label: "exponential", draw: (r) => -Math.log(Math.max(r(), 1e-12)), mean: 1, sd: 1 },
+    { key: "bern", label: "coin flip",   draw: (r) => (r() < 0.3 ? 1 : 0), mean: 0.3, sd: Math.sqrt(0.21) },
+    { key: "bim",  label: "two spikes",  draw: (r) => (r() < 0.5 ? -1 : 1) + 0.12 * (r() - 0.5),
+      mean: 0, sd: Math.sqrt(1 + 0.12 * 0.12 / 12) },
+  ];
+  let srcKey = "unif", NSUM = 1, seed = 987654321;
+  const segS = document.getElementById("seg-src");
+  for (const s of SOURCES) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = s.label;
+    b.setAttribute("aria-pressed", String(s.key === srcKey));
+    b.addEventListener("click", () => {
+      srcKey = s.key;
+      Array.from(segS.children).forEach((c, i) =>
+        c.setAttribute("aria-pressed", String(SOURCES[i].key === srcKey)));
+      upClt();
+    });
+    segS.appendChild(b);
+  }
+
+  function sample() {
+    const src = SOURCES.find((s) => s.key === srcKey);
+    let st = seed;
+    const rnd = () => (st = (1103515245 * st + 12345) % 2147483648) / 2147483648;
+    const M = 20000, out = new Float64Array(M);
+    const denom = src.sd * Math.sqrt(NSUM);
+    for (let i = 0; i < M; i++) {
+      let s = 0;
+      for (let k = 0; k < NSUM; k++) s += src.draw(rnd);
+      out[i] = (s - NSUM * src.mean) / denom;
+    }
+    return out;
+  }
+
+  const clt = setupCanvas("c-clt", (st) => {
+    const { ctx, w, h } = st;
+    const pad = { l: 14, r: 14, t: 14, b: 24 }, R = 4, BINS = 61;
+    ctx.clearRect(0, 0, w, h);
+    const data = sample();
+    const bins = new Float64Array(BINS);
+    let inRange = 0;
+    for (const v of data) {
+      if (v < -R || v >= R) continue;
+      bins[Math.floor((v + R) / (2 * R) * BINS)]++; inRange++;
+    }
+    const bw = 2 * R / BINS;
+    const X = (x) => pad.l + (x + R) / (2 * R) * (w - pad.l - pad.r);
+    const yMax = 0.55;
+    const Y = (d) => h - pad.b - (d / yMax) * (h - pad.t - pad.b);
+    // histogram, normalised to a density
+    ctx.fillStyle = css("--data-soft");
+    for (let i = 0; i < BINS; i++) {
+      const dens = bins[i] / (data.length * bw);
+      const x0 = X(-R + i * bw), x1 = X(-R + (i + 1) * bw);
+      ctx.fillRect(x0, Y(dens), Math.max(x1 - x0 - 0.6, 0.6), h - pad.b - Y(dens));
+    }
+    // the standard normal
+    ctx.strokeStyle = css("--lik"); ctx.lineWidth = 2.4; ctx.beginPath();
+    for (let i = 0; i <= 200; i++) {
+      const x = -R + 2 * R * i / 200;
+      i === 0 ? ctx.moveTo(X(x), Y(nPdf(x, 0, 1))) : ctx.lineTo(X(x), Y(nPdf(x, 0, 1)));
+    }
+    ctx.stroke();
+    ctx.strokeStyle = css("--axis"); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, h - pad.b); ctx.lineTo(w - pad.r, h - pad.b); ctx.stroke();
+    ctx.font = "10px system-ui, sans-serif"; ctx.fillStyle = css("--muted");
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (const t of [-3, -2, -1, 0, 1, 2, 3]) ctx.fillText(String(t), X(t), h - pad.b + 4);
+
+    // total-variation-style gap between histogram and normal
+    let gap = 0;
+    for (let i = 0; i < BINS; i++) {
+      const c = -R + (i + 0.5) * bw;
+      gap += Math.abs(bins[i] / (data.length * bw) - nPdf(c, 0, 1)) * bw;
+    }
+    document.getElementById("r-clt").innerHTML =
+      "n = <b>" + NSUM + "</b> summand" + (NSUM === 1 ? "" : "s") +
+      " &nbsp;&#183;&nbsp; mismatch with N(0,&#8202;1): <b>" + gap.toFixed(3) + "</b>" +
+      " (smaller is closer)" +
+      (NSUM === 1 ? " &#8212; this is the source distribution itself, standardised" : "") +
+      " &nbsp;&#183;&nbsp; <span class='mono'>" +
+      ((inRange / data.length) * 100).toFixed(1) + "%</span> of draws shown";
+  });
+  const upClt = () => clt.redraw();
+  bind("s-n", "v-n", (v) => NSUM = Math.round(v), (v) => String(Math.round(v)), upClt);
+  document.getElementById("b-resample").addEventListener("click", () => {
+    seed = (seed * 1103515245 + 12345) % 2147483648; upClt();
+  });
+
+  renderBiv(); renderLin();
+  const redrawAll = () => { biv.redraw(); lin.redraw(); clt.redraw(); renderBiv(); renderLin(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
+  new MutationObserver(redrawAll).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

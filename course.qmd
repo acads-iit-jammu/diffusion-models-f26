@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Lectures** | Monday 9:00–9:50 · Tuesday 10:00–10:50 · Wednesday 11:00–11:50 |
+| **Lectures** | Monday · Tuesday · Friday, 1:00–1:50 pm |
 | **Venue** | 11AC4004 |
 | **Instructors** | [Uma Satyaranjan](https://iitjammu.ac.in/faculty/~umasatyaranjan) · [Soma S Dhavala](https://dhavala.github.io/) |
 | **Prerequisite** | CS-3-12 (MO) — Machine Learning |
@@ -32,7 +32,7 @@ From the [IIT Jammu academic calendar for 2^nd^/3^rd^/4^th^ year UG students, Se
 
 ^\*^ Class tests are conducted with internal arrangements; whether and how this course uses them will be announced with the assessment scheme.
 
-**Institute holidays that affect our slots:** Wed Aug 26 (Milad-un-Nabi), Mon Oct 19 & Tue Oct 20 (Dussehra), Mon Nov 9 – Wed Nov 11 (Diwali cluster).
+**Institute holidays that affect our slots:** Mon Oct 19 & Tue Oct 20 (Dussehra) — W13 therefore runs on Fri Oct 23 only; and Mon Nov 9 & Tue Nov 10 of the Diwali cluster (Mon Nov 9 – Wed Nov 11). Wed Aug 26 (Milad-un-Nabi) no longer affects us, since Wednesday is not a class day under the Mon/Tue/Fri slot.
 
 ## Assessment
 
@@ -51,29 +51,16 @@ See the [Assignments](./assignments.qmd) page for the individual homeworks, exam
 
 ## Weekly Plan
 
-Lectures run Mon/Tue/Wed; with the holidays above and the mid-sem week, the semester provides **exactly 40 lecture slots — matching the syllabus's 40 hours**. Readings refer to the [primary text](./resources.qmd) (*The Principles of Diffusion Models*, arXiv:2510.21890). The plan is tentative in pacing, not in coverage.
+Lectures run **Monday, Tuesday and Friday, 1:00–1:50 pm** in 11AC4004. With the
+holidays below and the mid-semester week, the semester provides **41 lecture
+slots** against the syllabus's 40 hours — one spare. Readings refer to the
+[primary text](./resources.qmd) (*The Principles of Diffusion Models*,
+arXiv:2510.21890).
 
-| Week | Class days | Module · Topics |
-|:---:|---|---|
-| [01](weeks/w01.qmd) | Jul 29 | **M1** Course overview; generative modeling: data distributions and model families *(1 lecture)* |
-| [02](weeks/w02.qmd) | Aug 3, 4, 5 | **M1** Maximum-likelihood estimation; KL divergence; empirical risk minimization |
-| [03](weeks/w03.qmd) | Aug 10, 11, 12 | **M1** Challenges of high-dimensional density estimation · **M2** multivariate Gaussians |
-| [04](weeks/w04.qmd) | Aug 17, 18, 19 | **M2** Conditioning & marginalization; linear transformations; discrete-time Markov chains. *CT-1 window opens Aug 19* |
-| [05](weeks/w05.qmd) | Aug 24, 25 | **M2** Noise accumulation through repeated Gaussian perturbation *(no Wed class — Milad-un-Nabi)* |
-| [06](weeks/w06.qmd) | Aug 31, Sep 1, 2 | **M3** DDPM: forward diffusion process; concept of the reverse process |
-| [07](weeks/w07.qmd) | Sep 7, 8, 9 | **M3** Variational lower bound; decomposition of KL terms; reduction to noise-prediction loss |
-| [08](weeks/w08.qmd) | Sep 14, 15, 16 | **M4** Score functions; score matching. *Mid-sem begins Fri Sep 18* |
-| [09](weeks/w09.qmd) | — | **Mid-Semester Examinations (Sep 18–23)** — covers M1–M3 and W08's score-matching material |
-| [10](weeks/w10.qmd) | Sep 28, 29, 30 | **M4** Denoising score matching; synthesis |
-| [11](weeks/w11.qmd) | Oct 5, 6, 7 | **M5** Random walks and Brownian motion; the concept of an SDE |
-| [12](weeks/w12.qmd) | Oct 12, 13, 14 | **M5** Heat-equation intuition; Fokker–Planck equation. *CT-2 window opens Oct 14* |
-| [13](weeks/w13.qmd) | Oct 21 | **M5** Continuous formulation of the forward equation *(1 lecture — Mon/Tue are Dussehra holidays)* |
-| [14](weeks/w14.qmd) | Oct 26, 27, 28 | **M5** wrap-up · **M6** Heuristic derivation of reverse-time drift |
-| [15](weeks/w15.qmd) | Nov 2, 3, 4 | **M6** Entropy & information-flow interpretation; probability flow ODE |
-| [16](weeks/w16.qmd) | — | **No classes — holidays Mon Nov 9 – Wed Nov 11 (Diwali cluster)** |
-| [17](weeks/w17.qmd) | Nov 16, 17, 18 | **M6** Neural ODEs and flow-based models; applications & extensions; course wrap-up |
-
-: {tbl-colwidths="[7,16,77]"}
+The week-by-week plan lives on the **[Curriculum](./curriculum.qmd)** page, which
+gives each week's dates, module, theme, and the lecture notes covering it. It is
+the single timetable for the course; this page carries the assessment scheme and
+the module accounting only. The plan is tentative in pacing, not in coverage.
 
 ::: {.callout-note}
 Module hours per the syllabus: M1–M4 are 6 hours each; M5–M6 are 8 hours each (40 total). The 40 available slots cover this exactly, so any lecture lost to unforeseen events will be made up on a compensatory day.

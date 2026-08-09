@@ -1,0 +1,66 @@
+# W02: Generative Modeling II {.unnumbered}
+
+**Dates:** Mon Aug 3, Tue Aug 4, Wed Aug 5, 2026 — *held on the earlier Mon/Tue/Wed morning slot, before the move to Mon/Tue/Fri afternoons*
+
+**Slot/Venue:** Mon · Tue · Fri, 1:00–1:50 pm · 11AC4004
+
+**Syllabus module:** M1 — Maximum-likelihood estimation; KL divergence; empirical risk minimization
+
+## Pre-read
+
+*To be posted (typically by the weekend before) — section references into the primary text.*
+
+## In Class
+
+**Slides** (&#8592; &#8594; arrows or click the edges to navigate):
+
+*Primer — Probability, Joints, Conditionals and Bayes* ([open fullscreen](../materials/w02-deck-00-probability-joints.html){target="_blank"}) — the probability background the rest of the week assumes, developed from a single 4 &#215; 4 table of dice counts:
+
+<iframe src="../materials/w02-deck-00-probability-joints.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 primer deck: probability, joints, conditionals and Bayes"></iframe>
+
+*Part 1 — Distributions and Maximum Likelihood* ([open fullscreen](../materials/w02-deck-01-distributions-mle.html){target="_blank"}):
+
+<iframe src="../materials/w02-deck-01-distributions-mle.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 1: distributions and MLE"></iframe>
+
+*Part 2 — Generative AI, in Its Simplest Form* ([open fullscreen](../materials/w02-deck-02-genai-maps.html){target="_blank"}):
+
+<iframe src="../materials/w02-deck-02-genai-maps.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 2: generative AI in its simplest form"></iframe>
+
+*Part 3 — The Map, Proved* ([open fullscreen](../materials/w02-deck-03-map-limit.html){target="_blank"}):
+
+<iframe src="../materials/w02-deck-03-map-limit.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W02 deck 3: the map, proved"></iframe>
+
+**Tutorials for this week** (standalone documents, under the Tutorials section):
+
+- [Probability & Random Variables](../tutorials/01-probability-101.qmd) — sample spaces, events, random variables as maps out of outcomes, joints, conditioning, and expectation.
+- [Distributions and Maximum Likelihood](../tutorials/02-distributions-mle.qmd) — the five families, the pdf-vs-likelihood distinction, the Gaussian MLE, and the BCE aside.
+- [Generative AI, in Its Simplest Form](../tutorials/04-genai-simplest-form.qmd) — conditional generation and sampling as a map.
+- [The Deterministic Map, Proved](../tutorials/06-map-proved.qmd) — full proofs, including the score flow as the quantile transport.
+
+*Optional, under Tutorials · Advanced* — the measure-theoretic footing behind the
+above. Not required for anything in lecture:
+
+- [Measuring Things — From Length to Probability](../tutorials/10-measuring-things.qmd) — measure, the Lebesgue integral, Kolmogorov's axioms, random variables as measurable functions, pushforward, expectation.
+- [Joint, Marginal, Conditional — and Bayes](../tutorials/11-joint-conditional-bayes.qmd) — joints as mountains, marginals as shadows, conditionals as renormalized slices, and the sigmoid/tanh posterior the W01 denoiser uses.
+
+**Interactive demos**
+
+- [The Measure Playground](../materials/measure-playground.html) — a σ-algebra as what a report tells you, and expectation as the area under the quantile curve.
+- [The Joint Slicer](../materials/joint-slicer.html) — four joints with identical marginals, plus the two-shelf mixed joint with a live posterior.
+- [The Distribution Playground](../materials/distributions-playground.html) — see, sample, fit, sample from the fit (and the single-Gaussian-on-mixture trap).
+- [The Likelihood Lens](../materials/likelihood-lens.html) — pdf and likelihood as two slices of one surface; draggable data with a live MLE.
+- [Sampling as a Map](../materials/sampling-as-a-map.html) — ancestral sampling, then the same generator as one deterministic map; slide σ → 0 for the two-point staircase.
+
+## Notes
+
+The lecture notes for this week live with the concepts they belong to:
+
+- [03 · Joint, Conditional, Marginal — and Bayes](../tutorials/16-joints-conditionals.qmd) — including Bayes as the inverse problem, and Bayesian Knowledge Tracing.
+- [04 · Distributions and Maximum Likelihood](../tutorials/02-distributions-mle.qmd)
+- [00 · Introduction and Motivation](../tutorials/04-genai-simplest-form.qmd)
+
+*Board scans from the lecture will be added here.*
+
+## After Class
+
+*Exercises and pointers will be posted here.*

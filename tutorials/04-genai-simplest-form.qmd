@@ -1,13 +1,74 @@
-# Generative AI, in Its Simplest Form {.unnumbered}
+# 00 · Introduction and Motivation {.unnumbered}
 
-*Standalone tutorial accompanying [W02](../weeks/w02.qmd). Interactive version:
+*The first note of the course. It says what the subject is, what the rest of the
+material is for, and then earns the claim that organises everything with the
+smallest possible example. Interactive version:
 [Sampling as a Map](../materials/sampling-as-a-map.html).*
 
-This note presents the same tiny generator twice — first as a **hierarchy you sample
-conditionally** (a Bayesian model), then as a **deterministic map applied to uniform
-randomness** — and then makes the claim that carries the rest of the course: every modern
-generative sampler, diffusion included, is the second picture — once all of its
-random inputs are exposed — with a learned ingredient in place of the formula.
+## What this course is about
+
+A **generative model** is a thing that produces samples. Show it a pile of
+handwritten digits and it should produce new handwritten digits — not ones from
+the pile, and not noise, but plausible new members of the same population.
+
+The difficulty is that nobody hands you the population. You get a finite pile of
+examples, and from that pile you must build something that can generate more. Put
+formally: given samples $x_1,\dots,x_n$ drawn from an unknown
+$p_{\text{data}}$, construct a procedure that draws fresh samples from something
+close to $p_{\text{data}}$.
+
+Two observations shape everything that follows.
+
+**Sampling is not the same as knowing the density.** You do not need a formula for
+$p_{\text{data}}(x)$ in order to draw from it, and — as the course will show —
+for images you could not write one down anyway. What you need is a *procedure*.
+
+**Every such procedure turns simple randomness into structured output.** Somewhere
+in the machine there is a coin flip, a uniform draw, or a burst of Gaussian noise,
+and everything downstream of it is arithmetic. That is the picture this note
+builds, and the rest of the course is about how to *learn* the arithmetic when the
+target is complicated.
+
+### The route, in one paragraph
+
+We start with probability itself — random variables, joints, conditionals, Bayes —
+because generation runs forward from a latent cause to an observation while
+inference runs backward, and Bayes is the bridge. Then distributions and maximum
+likelihood in one dimension, where fitting has closed forms. Then the multivariate
+Gaussian, the one family closed under everything linear, which is why every
+tractable calculation in this subject goes through it. Then the wall: in high
+dimension, estimating a density directly stops working, even with structure. That
+failure is what forces the modern approach — stop describing distributions and
+start **comparing** them, which is why distances and divergences become central.
+Diffusion models are then one particular, very effective answer.
+
+### How the material is organised
+
+**Lecture Notes** are the numbered spine, in reading order, and follow the
+lectures. **Tutorials** sit alongside and go deeper on one thing.
+**Perspectives** are optional reinterpretations — a transport reading of the whole
+subject, and the measure-theoretic foundations — and nothing in the lectures
+depends on them. The [Curriculum](../curriculum.qmd) page lists the sequence and
+maps it to weeks.
+
+### Where to start
+
+Read this note, then
+[01 · The World's Smallest Diffusion Model](./05-two-point-diffusion.qmd), which
+builds a complete working diffusion model on a dataset of two points, with every
+step in closed form. Nothing in it is approximated and nothing is learned — which
+makes it the clearest possible statement of *what we are trying to do in high
+dimensions*, and of exactly which step stops being computable once the data is
+images rather than two numbers.
+
+## The simplest generative model there is
+
+The rest of this note presents one tiny generator twice — first as a **hierarchy
+you sample conditionally** (a Bayesian model), then as a **deterministic map
+applied to uniform randomness** — and then makes the claim that carries the rest
+of the course: every modern generative sampler, diffusion included, is the second
+picture, once all of its random inputs are exposed, with a learned ingredient in
+place of the formula.
 
 ## View 1: conditional generation (a hierarchical model)
 

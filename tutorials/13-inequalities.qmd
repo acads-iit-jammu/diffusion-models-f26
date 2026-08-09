@@ -1,0 +1,170 @@
+# Inequalities Worth Knowing {.unnumbered}
+
+*A standalone tutorial, and a short one. Five inequalities that between them
+justify most of the "and therefore it concentrates" steps in this course. Each is
+stated, proved in a few lines, and given the job it actually does. The last two
+sections are the payoff: how a bound that knows only the mean and variance
+already forces data to cluster, and where that bound is far too pessimistic — a
+gap the [Advanced](./14-why-gaussian.qmd) tutorial then turns into an argument for
+the Gaussian.*
+
+## 1. Markov: the one everything else comes from
+
+For a **non-negative** random variable $X \ge 0$ and any $a > 0$,
+
+$$
+\boxed{\;\mathbb{P}(X \ge a) \;\le\; \frac{\mathbb{E}[X]}{a}.\;}
+$$
+
+*Proof.* Since $X \ge 0$, we have $X \ge a\,\mathbf{1}\{X \ge a\}$ pointwise —
+check the two cases: if $X \ge a$ the right side is $a \le X$; otherwise it is
+$0 \le X$. Take expectations and use monotonicity:
+$\mathbb{E}[X] \ge a\,\mathbb{P}(X \ge a)$. $\square$
+
+That is the entire proof, and it is worth noticing how little it uses: only
+non-negativity and the mean. In exchange, the bound is usually weak. Its value is
+that it needs almost nothing, and that everything below is a corollary of it
+applied to a cleverly chosen non-negative quantity.
+
+## 2. Chebyshev: mean and variance force concentration
+
+Apply Markov to $(X - \mu)^2$, which is non-negative, with threshold $k^2\sigma^2$:
+
+$$
+\mathbb{P}\big(|X - \mu| \ge k\sigma\big)
+= \mathbb{P}\big((X-\mu)^2 \ge k^2\sigma^2\big)
+\le \frac{\mathbb{E}[(X-\mu)^2]}{k^2\sigma^2}
+= \frac{\sigma^2}{k^2\sigma^2},
+$$
+
+so for any random variable with finite variance and any $k > 0$,
+
+$$
+\boxed{\;\mathbb{P}\big(|X - \mu| \ge k\sigma\big) \;\le\; \frac{1}{k^{2}}.\;}
+$$
+
+**Read what this says.** It assumes *nothing* about the shape of the
+distribution — not symmetry, not unimodality, not a density. Knowing only the
+mean and the variance, at most $1/4$ of the mass can sit two standard deviations
+or more from the mean, at most $1/9$ beyond three. Variance is not merely a
+summary of spread; it is a *budget* that limits how much mass can be far out.
+
+| $k$ | Chebyshev bound $1/k^2$ | Actual, if Gaussian |
+|---|---|---|
+| 1 | 1.000 | 0.317 |
+| 2 | 0.250 | 0.0455 |
+| 3 | 0.111 | 0.0027 |
+| 4 | 0.0625 | 0.0000633 |
+
+The right column is the point of the [Advanced tutorial](./14-why-gaussian.qmd).
+Chebyshev is tight — there are distributions attaining it — but for the Gaussian
+it is wildly pessimistic, off by a factor of nearly $1000$ at $k=4$. Something
+much stronger is true for the shapes we actually meet, and asking *why* leads
+straight to the normal distribution.
+
+## 3. Jensen: which way convexity bends an average
+
+For a **convex** $\varphi$ and integrable $X$,
+
+$$
+\boxed{\;\varphi\big(\mathbb{E}[X]\big) \;\le\; \mathbb{E}\big[\varphi(X)\big].\;}
+$$
+
+For concave $\varphi$ the inequality reverses.
+
+*Proof.* Convexity means the graph lies above each of its tangent lines. Take the
+tangent at $m = \mathbb{E}[X]$: there is a slope $c$ with
+$\varphi(x) \ge \varphi(m) + c(x - m)$ for all $x$. Take expectations; the linear
+term has expectation zero. $\square$
+
+Three uses you will meet:
+
+- $\mathbb{E}[X^2] \ge (\mathbb{E}X)^2$, i.e. **variance is non-negative** — Jensen with $\varphi(x)=x^2$.
+- $\log \mathbb{E}[X] \ge \mathbb{E}[\log X]$ — $\log$ is concave. This single line is what makes the **ELBO** a lower bound on the log-evidence.
+- $\mathrm{KL}(p \,\|\, q) \ge 0$, with equality only when $p = q$ — Jensen applied to $-\log$. Every "this divergence is non-negative, so minimising it makes sense" argument is this.
+
+## 4. Cauchy–Schwarz, and correlation being bounded
+
+$$
+\boxed{\;\big|\mathbb{E}[XY]\big| \;\le\; \sqrt{\mathbb{E}[X^2]\,\mathbb{E}[Y^2]}.\;}
+$$
+
+*Proof.* For every $t$, $0 \le \mathbb{E}[(X - tY)^2] = \mathbb{E}[X^2] - 2t\,\mathbb{E}[XY] + t^2\mathbb{E}[Y^2]$.
+A quadratic in $t$ that is never negative has non-positive discriminant:
+$4(\mathbb{E}[XY])^2 - 4\mathbb{E}[X^2]\mathbb{E}[Y^2] \le 0$. $\square$
+
+Applied to centred variables this says exactly that the correlation coefficient
+lies in $[-1,1]$, with $|\rho| = 1$ precisely when $Y$ is an affine function of
+$X$. That is the fact underlying the constraint $|\rho| < 1$ everywhere in
+[the multivariate Gaussian reference](./12-multivariate-gaussian.qmd) — at
+$|\rho| = 1$ the covariance matrix is singular and the ellipse collapses to a line.
+
+## 5. The union bound
+
+For any events $A_1, A_2, \dots$ — **no independence required** —
+
+$$
+\boxed{\;\mathbb{P}\Big(\bigcup_i A_i\Big) \;\le\; \sum_i \mathbb{P}(A_i).\;}
+$$
+
+*Proof.* Countable subadditivity, which follows from countable additivity by
+disjointifying: replace $A_i$ by $A_i \setminus \bigcup_{j<i}A_j$, which is
+contained in $A_i$ and hence no more probable. $\square$
+
+Crude, and indispensable. It is how you go from "each of $d$ coordinates is
+unlikely to be extreme" to "no coordinate is extreme", at a cost of a factor $d$.
+In high dimension that factor is the whole difficulty: with $d = 784$, an event of
+probability $10^{-3}$ per coordinate gives no useful bound at all across
+coordinates, which is one honest way to see why high-dimensional density
+estimation is hard.
+
+## 6. Putting Markov to work: the weak law
+
+The inequalities are not decoration. Here is a complete theorem in three lines.
+
+Let $X_1,\dots,X_n$ be i.i.d.\ with mean $\mu$ and finite variance $\sigma^2$, and
+let $\bar X_n$ be their average. Then
+$\mathbb{E}[\bar X_n] = \mu$ and, because variances of independent variables add,
+$\operatorname{Var}(\bar X_n) = \sigma^2/n$. Chebyshev gives, for any
+$\varepsilon > 0$,
+
+$$
+\mathbb{P}\big(|\bar X_n - \mu| \ge \varepsilon\big) \;\le\; \frac{\sigma^2}{n\varepsilon^2}
+\;\xrightarrow[n\to\infty]{}\; 0 .
+$$
+
+That is the **weak law of large numbers**, proved entirely from Markov. Note what
+it does and does not give: it says the average concentrates, but it says nothing
+about the *shape* of the fluctuation around $\mu$. Rescaling by $\sqrt{n}$ instead
+of $n$ and asking what shape survives is the central limit theorem — and the
+answer being Gaussian, always, is the subject of the next tutorial.
+
+::: {.callout-tip}
+## Key takeaway
+
+Markov is the whole toolkit: it needs only non-negativity, and Chebyshev, the weak
+law and most concentration results are Markov applied to a well-chosen
+non-negative quantity. What you buy with more assumptions is *sharpness* —
+Chebyshev's $1/k^2$ decay becomes the Gaussian's $e^{-k^2/2}$ once you know more
+than two moments, and closing that gap is exactly the question the Advanced track
+takes up.
+:::
+
+## Exercises
+
+1. Show Markov is tight: find a non-negative $X$ and an $a$ for which
+   $\mathbb{P}(X \ge a) = \mathbb{E}[X]/a$ exactly. (Two atoms suffice.)
+2. Show Chebyshev is tight at $k = 2$: construct a distribution with mean $0$,
+   variance $1$, and exactly $1/4$ of its mass at distance $\ge 2$.
+3. Why does Markov require $X \ge 0$? Give a random variable with
+   $\mathbb{E}[X] = 0$ for which the conclusion fails without it.
+4. Use Jensen to show $\mathbb{E}[1/X] \ge 1/\mathbb{E}[X]$ for a positive random
+   variable, and give an example where the inequality is strict.
+5. Use Cauchy–Schwarz to prove $|\rho| \le 1$, and characterise exactly when
+   $|\rho| = 1$.
+6. A vector has $d$ coordinates, each of which exceeds $3\sigma$ with probability
+   at most $0.0027$. Bound the probability that *some* coordinate does, for
+   $d = 10$ and $d = 784$. At what $d$ does the union bound stop saying anything?
+7. Compare the Chebyshev bound at $k=3$ with the true Gaussian tail. By what
+   factor is Chebyshev too pessimistic? Now do the same at $k=5$ and comment on
+   how the gap grows.

@@ -1,0 +1,40 @@
+# W03: High Dimensions & Gaussians {.unnumbered}
+
+**Dates:** Mon Aug 10, Tue Aug 11, Fri Aug 14, 2026
+
+**Slot/Venue:** Mon · Tue · Fri, 1:00–1:50 pm · 11AC4004
+
+**Syllabus module:** M1 — Challenges of high-dimensional density estimation · M2 — multivariate Gaussians
+
+## Pre-read
+
+*To be posted (typically by the weekend before) — section references into the primary text.*
+
+## In Class
+
+**Tutorials for this week** (standalone documents, under the Tutorials section):
+
+- [The Multivariate Gaussian — A Working Reference](../tutorials/12-multivariate-gaussian.qmd) — the density, the results table, linear transformations, marginals and conditionals.
+- [Inequalities Worth Knowing](../tutorials/13-inequalities.qmd) — Markov, Chebyshev, Jensen, Cauchy–Schwarz, the union bound, and the weak law in three lines.
+- [Comparing Distributions](../tutorials/15-comparing-distributions.qmd) — KS, transport cost, KL and its link to maximum likelihood, and the two families of divergence.
+
+*Optional, under Tutorials · Advanced:*
+
+- [Why the Gaussian?](../tutorials/14-why-gaussian.qmd) — four independent arguments that arrive at the same density.
+
+**Interactive demo**
+
+- [The Gaussian Lab](../materials/gaussian-lab.html) — the bivariate normal and what Σ controls; affine maps of a Gaussian cloud; and the central limit theorem with four non-Gaussian sources.
+
+## Notes
+
+The lecture notes for this week live with the concepts they belong to:
+
+- [05 · The Multivariate Gaussian](../tutorials/12-multivariate-gaussian.qmd) — the density, Σ, identity covariance, linear maps, and the CLT.
+- [08 · Comparing Distributions](../tutorials/15-comparing-distributions.qmd) — KS, transport cost, KL and maximum likelihood, and the two families of divergence.
+
+*Board scans from the lecture will be added here.*
+
+## After Class
+
+*Exercises and pointers will be posted here.*

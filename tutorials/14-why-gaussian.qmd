@@ -1,0 +1,252 @@
+# Why the Gaussian? Four Arguments for One Density {.unnumbered}
+
+*An **Advanced** tutorial. Optional: nothing in the lectures depends on it. The
+question it answers is the one that nags after you have used the normal
+distribution for a while — where does that formula actually come from? Writing
+$e^{-x^2/2}$ and calling it natural is not an explanation. Four independent
+arguments arrive at it, each starting from a different demand, and the fact that
+they converge is the real reason the Gaussian is not just convenient but
+inevitable.*
+
+::: {.callout-note}
+## Prerequisites and where this sits
+
+Builds on [Inequalities Worth Knowing](./13-inequalities.qmd) — particularly
+Chebyshev, which is where §1 starts — and on
+[The Multivariate Gaussian](./12-multivariate-gaussian.qmd) for the $d$-dimensional
+statements in §2. The working versions of everything here are in the Foundations
+track; read this when you want to know why the working versions look the way they
+do.
+:::
+
+## 1. The gap Chebyshev leaves open
+
+Start where the Foundations tutorial stopped. Chebyshev says that for *any* law
+with mean $\mu$ and variance $\sigma^2$,
+
+$$
+\mathbb{P}\big(|X - \mu| \ge k\sigma\big) \le \frac{1}{k^{2}} .
+$$
+
+It is a genuine theorem and it is tight — some distribution attains it for each
+$k$. But look at what it costs to be that general:
+
+| $k$ | Chebyshev $1/k^2$ | Gaussian $\mathbb{P}(|Z|\ge k)$ | ratio |
+|---|---|---|---|
+| 1 | 1.000 | 0.3173 | 3.2 |
+| 2 | 0.250 | 0.04550 | 5.5 |
+| 3 | 0.1111 | 0.002700 | 41 |
+| 4 | 0.0625 | 0.0000633 | 987 |
+
+Chebyshev's tail decays **polynomially**, like $k^{-2}$. The Gaussian's decays
+like $e^{-k^2/2}$ — not merely faster, but in a different regime altogether. By
+$k=4$ the bound is a thousand times too pessimistic.
+
+So the honest question is not "why is the Gaussian's tail small" but: **what extra
+assumption, beyond a finite variance, buys you $e^{-k^2/2}$ instead of $k^{-2}$?**
+Chebyshev is what you can say knowing two moments and nothing else. Each of the
+arguments below adds one structural demand — symmetry, or additivity, or
+ignorance — and each time the answer that comes back is $e^{-x^2/2}$.
+
+## 2. Symmetry plus independence, and the density falls out
+
+This is the argument that lets you *see* the density rather than be handed it. It
+is due to Herschel (1850) and Maxwell (1860), who each wanted the distribution of
+errors in two dimensions.
+
+Impose exactly two demands on a density $f$ on $\mathbb{R}^2$:
+
+1. **The coordinates are independent** — $f(x,y) = g(x)\,g(y)$ for some
+   one-dimensional $g$, the same in each coordinate.
+2. **The density is rotationally symmetric** — $f(x,y)$ depends on $(x,y)$ only
+   through the radius $\sqrt{x^2+y^2}$. Errors have no preferred direction.
+
+Both are natural for a measurement error: the horizontal and vertical components
+of a miss should not influence each other, and no direction on the target should
+be special. Now watch what they force together.
+
+Write the second demand as $f(x,y) = h(x^2+y^2)$. Combining with the first,
+
+$$
+g(x)\,g(y) = h(x^2 + y^2).
+$$
+
+Set $y = 0$: $g(x)g(0) = h(x^2)$, so $h(u) = g(\sqrt{u})\,g(0)$. Substituting back,
+
+$$
+g(x)\,g(y) \;=\; g\big(\sqrt{x^2+y^2}\big)\,g(0).
+$$
+
+Define $\varphi(u) = g(\sqrt{u})/g(0)$ for $u \ge 0$. The relation becomes
+
+$$
+\varphi(u)\,\varphi(v) \;=\; \varphi(u+v),
+$$
+
+which is **Cauchy's exponential functional equation**. Its only measurable
+solutions are $\varphi(u) = e^{cu}$. Therefore
+
+$$
+g(t) \;=\; g(0)\,e^{c t^{2}},
+$$
+
+and for $g$ to be integrable we need $c < 0$. Write $c = -1/(2\sigma^2)$ and
+normalise:
+
+$$
+\boxed{\;g(t) = \frac{1}{\sqrt{2\pi}\,\sigma}\,e^{-t^{2}/2\sigma^{2}}.\;}
+$$
+
+The Gaussian, with no probabilistic input at all — only "independent coordinates"
+and "no preferred direction", plus the requirement that the answer be a density.
+
+::: {.callout-important}
+## What that argument really shows
+
+The exponent is quadratic because the *only* rotation-invariant quantity built
+from independent coordinates is the sum of squares, and the only way to turn a sum
+into a product is to exponentiate. That is the whole mechanism:
+$e^{-\frac12\sum x_i^2} = \prod e^{-x_i^2/2}$. Read it in reverse and it is
+exactly §2 of [the multivariate reference](./12-multivariate-gaussian.qmd):
+$\mathcal{N}(0,I)$ factorises into independent coordinates *because* its exponent
+is a sum of squares.
+
+It also explains the shape of the level sets. Rotational symmetry gives circles;
+apply a linear map and circles become **ellipses**, which is why every
+multivariate Gaussian contour is an ellipsoid and no other shape ever appears.
+
+The Gaussian is the *only* density with independent coordinates and rotational
+symmetry. Try $e^{-|t|}$: the product $e^{-|x|}e^{-|y|} = e^{-(|x|+|y|)}$ has
+diamond-shaped level sets, not circles. It fails, and so does everything else.
+:::
+
+## 3. Maximum entropy: the least committed choice
+
+A second demand, of a completely different kind. Suppose all you are willing to
+assert about a quantity is its mean and its variance. Among all densities with
+those two moments, which should you pick?
+
+The principled answer is: the one that assumes the least — that is, the one of
+**maximum entropy**, $h(p) = -\int p \log p$. Committing to anything with lower
+entropy means smuggling in structure you have no evidence for.
+
+**The answer is the Gaussian.** Let $q = \mathcal{N}(\mu,\sigma^2)$ and let $p$ be
+any density with the same mean and variance. Then
+
+$$
+0 \;\le\; \mathrm{KL}(p \,\|\, q) \;=\; \int p \log \frac{p}{q}
+\;=\; -h(p) - \int p \log q ,
+$$
+
+using $\mathrm{KL} \ge 0$, which is Jensen from
+[the inequalities tutorial](./13-inequalities.qmd). Now the second term: because
+$\log q$ is a *quadratic* in $x$, the integral $\int p \log q$ depends on $p$ only
+through its mean and variance — which are the same as $q$'s by assumption. So
+$\int p\log q = \int q \log q = -h(q)$, and the display rearranges to
+
+$$
+h(p) \;\le\; h(q),
+$$
+
+with equality exactly when $p = q$. $\square$
+
+The step that makes it work is worth naming: **$\log$ of a Gaussian is a
+quadratic, and a quadratic only sees two moments.** Fix a different pair of
+constraints and you get a different maximum-entropy family — fix the mean alone on
+$[0,\infty)$ and you get the exponential; fix nothing but a bounded range and you
+get the uniform. The Gaussian is the maximum-entropy answer to precisely the
+question "I know the mean and the variance".
+
+Numerically, at variance $1$: Gaussian $h = 1.4189$ nats, Laplace $1.3466$,
+uniform $1.2425$ — the Gaussian wins, as it must.
+
+## 4. The central limit theorem: additivity
+
+The third demand is additivity. Let $X_1, X_2, \dots$ be i.i.d.\ with mean $\mu$
+and finite variance $\sigma^2$ — **no other assumption about their distribution**.
+Then
+
+$$
+\frac{1}{\sigma\sqrt{n}}\sum_{i=1}^{n}(X_i - \mu)
+\;\xrightarrow[n\to\infty]{d}\;
+\mathcal{N}(0,1).
+$$
+
+The weak law of §6 of the inequalities tutorial said the average concentrates on
+$\mu$. The CLT says what the *residual fluctuation* looks like once you magnify it
+by the right amount: divide by $n$ and everything collapses to a point; divide by
+$\sqrt{n}$ and a fixed shape survives — and that shape is the Gaussian, whatever
+you started from.
+
+Act III of [the Gaussian Lab](../materials/gaussian-lab.html){target="_blank"}
+makes the convergence visible, and also makes visible that the *rate* depends
+heavily on the source: a symmetric one like the uniform is close by $n=3$, while
+a lopsided exponential or a two-valued coin flip takes far longer. The limit is
+identical; only the approach differs.
+
+**Why this is an argument for the Gaussian and not merely a fact about sums.**
+Measurement error is typically the accumulation of many small independent
+perturbations. So is thermal noise, and so is the pixel noise in a sensor. If a
+quantity is a sum of many small independent contributions and you know nothing
+about the individual terms, the CLT says you already know the shape of the total.
+That is why Gaussian noise models are so often right without anyone having
+checked.
+
+**And it explains stability.** The Gaussian is a *fixed point* of adding: sum two
+independent Gaussians and you get a Gaussian, with variances adding. It is the
+only distribution with finite variance that is stable in this sense, which is why
+it is the limit — anything else would be changed by the very operation the limit
+is built from.
+
+## 5. Four demands, one density
+
+| Demand | Argument | What forces the exponent |
+|---|---|---|
+| Only two moments known | Chebyshev (§1) | *nothing* — this is the weak baseline the others improve on |
+| Independent coordinates, no preferred direction | Herschel–Maxwell (§2) | sum of squares is the only rotation-invariant form |
+| Assume as little as possible given mean and variance | maximum entropy (§3) | $\log$-Gaussian is quadratic, so it only sees two moments |
+| Sum of many small independent effects | central limit theorem (§4) | stability under addition |
+
+Four different starting points — a symmetry, an epistemic principle, a limit
+theorem — and one density at the end of each. That convergence is what earns the
+Gaussian its place. It is not that it is convenient, though it is; it is that
+several quite different demands each single it out uniquely.
+
+::: {.callout-tip}
+## Why this course adds Gaussian noise
+
+Every argument above is also a reason the forward process of a diffusion model
+uses $\mathcal{N}(0,\sigma^2 I)$ rather than anything else. It is isotropic, so no
+direction of image space is privileged (§2). It is the least committed choice
+given a noise scale (§3). It is stable under composition, so many small steps
+equal one big step with variances added (§4) — which is what makes
+$p(x_t \mid x_0)$ available in closed form at every $t$ instead of only
+step-by-step. And it is closed under the linear maps the model applies, per
+[the multivariate reference](./12-multivariate-gaussian.qmd).
+
+Choose any other noise and all four properties fail at once.
+:::
+
+## Exercises
+
+1. Complete the Herschel–Maxwell derivation carefully. Where exactly is
+   measurability (or continuity) of $\varphi$ used, and what goes wrong without
+   it? *(Cauchy's equation has pathological non-measurable solutions.)*
+2. Show that $e^{-|x|}e^{-|y|}$ is not rotationally symmetric by finding two
+   points at the same radius with different densities. Sketch its level sets.
+3. Carry the Herschel–Maxwell argument into $d$ dimensions and show it yields
+   $\mathcal{N}(0,\sigma^2 I_d)$. Which of the two demands does a *non-isotropic*
+   Gaussian $\mathcal{N}(0,\Sigma)$ violate?
+4. Verify the maximum-entropy proof's key step: show explicitly that
+   $\int p \log q$ depends on $p$ only through $\int x\,p$ and $\int x^2 p$ when
+   $q$ is Gaussian.
+5. Find the maximum-entropy density on $[0,\infty)$ subject to a fixed mean.
+   *(Answer: exponential. The same Lagrangian argument, with a different
+   constraint.)*
+6. Compute the Chebyshev bound and the true Gaussian tail at $k = 6$. How large is
+   the discrepancy, and which of §§2–4 explains why the true tail is so much
+   thinner?
+7. *(Stability.)* Show directly, using the MGF from
+   [the multivariate reference](./12-multivariate-gaussian.qmd), that a sum of two
+   independent Gaussians is Gaussian with variances adding. Then explain why this
+   makes the Gaussian a natural candidate for the CLT limit.

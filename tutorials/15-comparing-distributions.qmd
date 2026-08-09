@@ -1,0 +1,353 @@
+# 08 · Comparing Distributions: From CDFs to KL, and the Two Families {.unnumbered}
+
+*A standalone tutorial accompanying W03. One question runs
+through it: given two distributions, how far apart are they? The answer is not
+unique, and the choices form two families with genuinely different behaviour. We
+start where the answer is easiest — one dimension, where you can just compare
+CDFs — and find that three familiar quantities are three different norms of the
+same gap. Then KL, its relationship to maximum likelihood, and finally the map of
+which divergence each family of generative model is actually minimising.*
+
+## 1. In one dimension, compare the CDFs
+
+Two distributions $P$ and $Q$ on $\mathbb{R}$, with CDFs $F$ and $G$. The CDF
+determines the distribution completely, so any honest measure of "how different
+are $P$ and $Q$" can be read off the gap
+
+$$
+\Delta(x) \;=\; F(x) - G(x).
+$$
+
+That is a function. To turn a function into a single number you take a norm — and
+the three standard choices give three quantities you have already met or are
+about to.
+
+$$
+\underbrace{\sup_x |\Delta(x)|}_{\textbf{Kolmogorov–Smirnov}}
+\qquad
+\underbrace{\int |\Delta(x)|\,dx}_{\textbf{Wasserstein-1}}
+\qquad
+\underbrace{\int \Delta(x)^2\,w(x)\,dx}_{\textbf{Cramér–von Mises}}
+$$
+
+The $L^\infty$, $L^1$ and $L^2$ norms of one object. That is the whole taxonomy of
+one-dimensional distances-between-CDFs.
+
+### The Kolmogorov–Smirnov statistic
+
+$$
+D(P,Q) \;=\; \sup_x \big| F(x) - G(x) \big| .
+$$
+
+The largest vertical gap between the two CDF curves. It is always in $[0,1]$, it
+is a genuine metric, and it is **distribution-free** in a useful sense: if you
+replace $P$ by any strictly increasing transformation of itself and do the same to
+$Q$, $D$ does not change — because relabelling the axis slides both curves
+identically. That invariance is why the KS *test* has a universal critical value
+table that does not depend on what you are testing.
+
+Its empirical version is what you would actually compute: replace $F$ by the
+empirical CDF $\hat F_n(x) = \frac1n\#\{i : x_i \le x\}$, a staircase with a step
+of $1/n$ at each sample, and take the sup — which is attained at one of the data
+points, so it is a finite maximum.
+
+For $P = \mathcal{N}(0,1)$ and $Q = \mathcal{N}(\mu,1)$ the sup sits at $x=\mu/2$
+by symmetry, giving $D = 2\Phi(\mu/2) - 1$: $0.197$ at $\mu = 0.5$, $0.383$ at
+$\mu=1$, $0.954$ at $\mu = 4$. Notice how it **saturates** — by $\mu = 4$ it has
+nearly exhausted its range and can barely distinguish $\mu = 4$ from $\mu = 40$.
+
+### The $L^1$ norm is a transport cost
+
+Take the same gap and integrate its absolute value instead of maximising it:
+
+$$
+\int_{-\infty}^{\infty} \big| F(x) - G(x)\big|\,dx \;=\; W_1(P,Q),
+$$
+
+the **Wasserstein-1 distance** — and this is exactly the quantity
+[Transport You Can Compute](./09-discrete-transport.qmd) derives as the cheapest
+way to move the mass of $P$ onto $Q$ when moving a unit of mass a distance $|x-y|$
+costs $|x-y|$. The area between the CDF curves *is* the transport bill.
+
+So the bridge to transport is not an analogy. In one dimension the optimal
+transport cost and an $L^1$ norm of the CDF gap are the same number, and the
+monotone (quantile) coupling is what achieves it.
+
+Unlike KS, $W_1$ does **not** saturate: for $\mathcal{N}(0,1)$ against
+$\mathcal{N}(\mu,1)$ it equals exactly $|\mu|$, growing without bound. It answers
+"how far?" rather than "how distinguishable?", and that difference will turn out
+to matter a great deal in §6.
+
+### And the $L^2$ norm
+
+$\int (F-G)^2 w\,dx$ gives the **Cramér–von Mises** family; with the weight
+$w = 1/(G(1-G))$ it is the **Anderson–Darling** statistic, which up-weights the
+tails and is correspondingly better at detecting differences out there. These are
+goodness-of-fit tools rather than modelling objectives, so we will not use them
+further — but they belong on the map.
+
+### Histograms: the same story, discretised
+
+For distributions on a finite ordered set of bins, the integral becomes a sum and
+$W_1$ becomes the **Earth Mover's Distance**:
+$W_1(p,q) = \sum_k |F_p(k) - F_q(k)|$, which is the discrete transport problem of
+[tutorial 09](./09-discrete-transport.qmd) — solvable exactly as a min-cost flow,
+with the [Transport Plan Lab](../materials/transport-plan-lab.html){target="_blank"}
+to play with.
+
+::: {.callout-warning}
+## Where this whole approach stops working
+
+Every construction above needs a **CDF**, and a CDF needs the real line to be
+ordered — $F(x) = \mathbb{P}(X \le x)$ has no meaning without $\le$. In
+$\mathbb{R}^d$ there is no canonical order, no canonical CDF, and no canonical
+"area between the curves".
+
+Transport survives, because a cost $c(x,y)$ makes sense in any dimension — but the
+closed form is gone and you are solving an optimisation. What we need instead is a
+way to compare distributions **pointwise**, using only the values of the two
+densities at the same point and never their order. That is KL.
+:::
+
+## 2. KL divergence
+
+For distributions with densities $p$ and $q$,
+
+$$
+\boxed{\;\mathrm{KL}(p \,\|\, q) \;=\; \int p(x)\,\log\frac{p(x)}{q(x)}\,dx
+\;=\; \mathbb{E}_{x\sim p}\!\left[\log\frac{p(x)}{q(x)}\right].\;}
+$$
+
+No ordering, no CDF, no dimension limit: it compares the two densities *at each
+point*, through their ratio, and averages the log-ratio under $p$.
+
+**It is non-negative**, $\mathrm{KL}(p\|q) \ge 0$ with equality only when
+$p = q$ almost everywhere. This is Jensen from
+[the inequalities tutorial](./13-inequalities.qmd): $-\log$ is convex, so
+
+$$
+\mathrm{KL}(p\|q) = \mathbb{E}_p\!\left[-\log\frac{q}{p}\right]
+\;\ge\; -\log \mathbb{E}_p\!\left[\frac{q}{p}\right] = -\log\!\int q = 0 .
+$$
+
+**It is not a metric.** It is asymmetric, $\mathrm{KL}(p\|q) \neq \mathrm{KL}(q\|p)$,
+and fails the triangle inequality. Hence *divergence*, not distance.
+
+**It is infinite when supports disagree.** If $p(x) > 0$ somewhere $q(x) = 0$, the
+integrand is $+\infty$. This is not a technicality — §6 is about the consequences.
+
+**Gaussian closed form**, which is why this course can compute with it:
+
+$$
+\mathrm{KL}\big(\mathcal{N}(\mu_1,\sigma_1^2)\,\big\|\,\mathcal{N}(\mu_2,\sigma_2^2)\big)
+= \log\frac{\sigma_2}{\sigma_1} + \frac{\sigma_1^2 + (\mu_1-\mu_2)^2}{2\sigma_2^2} - \frac12 .
+$$
+
+With equal variances this collapses to $(\mu_1-\mu_2)^2/2\sigma^2$ — a squared
+distance. Every KL term in a diffusion model's training objective is an instance
+of this formula, which is the reason the objective reduces to a sum of squared
+errors.
+
+## 3. KL is maximum likelihood in disguise
+
+This is the connection that makes KL more than one option among many.
+
+Let $p_{\text{data}}$ be the true distribution and $p_\theta$ your model. Expand:
+
+$$
+\mathrm{KL}(p_{\text{data}} \,\|\, p_\theta)
+= \underbrace{\int p_{\text{data}}\log p_{\text{data}}}_{-H(p_{\text{data}}),\ \text{no } \theta}
+\;-\; \int p_{\text{data}}\log p_\theta .
+$$
+
+The first term does not involve $\theta$ at all. So
+
+$$
+\arg\min_\theta \mathrm{KL}(p_{\text{data}}\|p_\theta)
+= \arg\max_\theta \; \mathbb{E}_{x \sim p_{\text{data}}}\big[\log p_\theta(x)\big],
+$$
+
+and replacing the expectation by its sample average over $x_1,\dots,x_n$ gives
+
+$$
+\arg\max_\theta \;\frac1n\sum_{i=1}^n \log p_\theta(x_i),
+$$
+
+which is **exactly the maximum likelihood estimator** of
+[Distributions and Maximum Likelihood](./02-distributions-mle.qmd).
+
+::: {.callout-tip}
+## The sentence to remember
+
+**Maximum likelihood *is* minimising the forward KL from the data distribution to
+the model.** Every time you fit by MLE — the Gaussian fit, logistic regression via
+BCE, a normalizing flow — you are minimising $\mathrm{KL}(p_{\text{data}}\|p_\theta)$
+whether or not anyone says so. The empirical average is just the Monte Carlo
+estimate of an integral you never write down.
+:::
+
+### Which way round? Forward and reverse KL behave differently
+
+Because KL is asymmetric, the two directions optimise for different things.
+
+| | $\mathrm{KL}(p_{\text{data}}\|p_\theta)$ — **forward** | $\mathrm{KL}(p_\theta\|p_{\text{data}})$ — **reverse** |
+|---|---|---|
+| Penalises | $p_\theta$ small where data is | $p_\theta$ large where data is not |
+| Behaviour | **mode-covering**: spreads to cover all the data | **mode-seeking**: locks onto one mode |
+| Failure mode | blurry averages over modes | ignores modes entirely |
+| Used by | maximum likelihood, flows, diffusion bounds | variational inference, the VAE's $q$ |
+
+The forward direction cannot afford $p_\theta \approx 0$ anywhere the data lives —
+the log ratio explodes — so it hedges and covers. The reverse direction is
+integrated under $p_\theta$, so it simply avoids putting mass in the wrong place
+and is content to ignore parts of the target. This is exactly the
+single-Gaussian-fitted-to-a-mixture trap of tutorial 02, now with a name.
+
+## 4. KL is one of a family: the $f$-divergences
+
+Fix a convex $f$ with $f(1) = 0$ and define
+
+$$
+D_f(p \,\|\, q) \;=\; \int q(x)\, f\!\left(\frac{p(x)}{q(x)}\right) dx .
+$$
+
+Convexity plus $f(1)=0$ gives $D_f \ge 0$ with equality at $p=q$, by Jensen — the
+same one-line argument as for KL. Different $f$, different divergence:
+
+| $f(t)$ | Divergence | Note |
+|---|---|---|
+| $t\log t$ | $\mathrm{KL}(p\|q)$ | forward KL |
+| $-\log t$ | $\mathrm{KL}(q\|p)$ | reverse KL |
+| $\tfrac12\lvert t-1\rvert$ | total variation | the only one that is also a metric |
+| $(t-1)^2$ | $\chi^2$ | heavy penalty on ratio spikes |
+| $(\sqrt t - 1)^2$ | squared Hellinger | bounded, symmetric |
+| $t\log\frac{2t}{t+1} + \log\frac{2}{t+1}$ | Jensen–Shannon | symmetric, bounded by $\log 2$ |
+
+All of these share one structural feature, and it is the one that matters: they
+depend on $p$ and $q$ **only through the pointwise ratio $p/q$**. They never look
+at *where* the points are. Move a lump of $q$'s mass from just beside $p$ to a
+mile away and no $f$-divergence notices, because the ratio at every point is
+unchanged.
+
+## 5. Wasserstein is *not* an $f$-divergence
+
+This is worth stating plainly, because it is a common and consequential slip.
+
+$W_1$ cannot be written as $\int q\,f(p/q)$ for any $f$. It is not in this family
+at all. It belongs to a **second** family, the **integral probability metrics**:
+
+$$
+d_{\mathcal{F}}(p,q) \;=\; \sup_{f \in \mathcal{F}}
+\left| \mathbb{E}_{p}[f] - \mathbb{E}_{q}[f] \right| ,
+$$
+
+defined by a class $\mathcal{F}$ of test functions rather than by a convex $f$
+applied to a ratio.
+
+| Class $\mathcal{F}$ | Resulting IPM |
+|---|---|
+| $\{f : \lVert f\rVert_{\mathrm{Lip}} \le 1\}$ | **Wasserstein-1** (Kantorovich–Rubinstein duality) |
+| unit ball of an RKHS | **maximum mean discrepancy** (MMD) |
+| $\{f : \lVert f \rVert_\infty \le \tfrac12\}$ | **total variation** |
+
+The two families are genuinely different, and the reason is the one flagged above:
+$f$-divergences see only ratios and are blind to geometry; IPMs test against
+functions defined on the space and therefore *do* see distance.
+
+**Total variation is the intersection.** It is an $f$-divergence
+($f(t) = \tfrac12|t-1|$) and an IPM (bounded test functions) and a metric. It is
+essentially the only member of both families — which is a good way to remember
+that the families are otherwise disjoint.
+
+## 6. Why the distinction is not pedantry: disjoint supports
+
+Take $P$ uniform on $[0,1]$ and $Q$ uniform on $[d, d+1]$ — the same shape, shifted
+by $d$. Watch what each measure reports as $d$ grows:
+
+| shift $d$ | overlap | $\mathrm{KL}$ | JS | TV | $W_1$ |
+|---|---|---|---|---|---|
+| 0.5 | 0.5 | $\infty$ | $< \log 2$ | 0.50 | 0.50 |
+| 1.0 | 0 | $\infty$ | $\log 2$ | 1 | 1.00 |
+| 2.0 | 0 | $\infty$ | $\log 2$ | 1 | 2.00 |
+| 5.0 | 0 | $\infty$ | $\log 2$ | 1 | 5.00 |
+
+Once the supports separate, every $f$-divergence **stops responding**. KL is
+already infinite; JS is pinned at $\log 2$; TV is pinned at 1. They report "as
+different as possible" and cannot distinguish a near miss from a wild one. Their
+gradients with respect to $d$ are zero — so a model trained on them gets no signal
+telling it which way to move.
+
+$W_1$ reports $d$. It keeps growing, and its gradient points home.
+
+::: {.callout-important}
+## This is the WGAN argument
+
+Arjovsky, Chintala and Bottou (2017) built Wasserstein GAN on exactly this
+observation. A generator's output distribution is supported on a
+low-dimensional manifold in a high-dimensional space — the manifold hypothesis of
+[Measuring Things](./10-measuring-things.qmd) — and so is the data. Two such
+manifolds generically intersect in a set of measure zero, so the supports are
+*essentially disjoint from the start*, and JS (which the original GAN minimises at
+an optimal discriminator) is pinned at $\log 2$ with vanishing gradient. Replacing
+it with $W_1$, estimated through the Kantorovich–Rubinstein dual with a
+Lipschitz-constrained critic, restores a usable gradient.
+
+Notice that the same fact motivates diffusion models' use of noise, for the same
+reason: convolving with a Gaussian makes the supports overlap, so the
+ratio-based quantities become finite and informative again.
+:::
+
+## 7. The map: what is each model family minimising?
+
+| Model | Objective, in divergence terms |
+|---|---|
+| **Maximum likelihood / normalizing flows** | forward $\mathrm{KL}(p_{\text{data}}\|p_\theta)$, exactly (§3) |
+| **VAE / autoencoders** | maximise the ELBO $= \log p(x) - \mathrm{KL}(q(z\mid x)\,\|\,p(z\mid x))$; the trainable form contains an explicit $\mathrm{KL}(q(z\mid x)\,\|\,p(z))$ against the prior |
+| **Original GAN** | at an optimal discriminator, Jensen–Shannon — an $f$-divergence |
+| **$f$-GAN** | any $f$-divergence, via its variational (Fenchel) representation |
+| **WGAN** | $W_1$ — an IPM, deliberately not an $f$-divergence |
+| **MMD nets** | MMD — also an IPM |
+| **Diffusion models** | a variational bound that decomposes into a sum of KLs between Gaussians, each with the closed form of §2; equivalently, denoising score matching |
+
+Read down that column and the structure the whole field shares comes into view:
+**every generative model is minimising some divergence between the data
+distribution and the model's**. What distinguishes the families is *which*
+divergence, and — because it is usually not computable directly — *how they get at
+it*: a bound (VAE), a learned dual (GAN, WGAN), a closed form after adding noise
+(diffusion), or exactly (flows).
+
+::: {.callout-tip}
+## Key takeaway
+
+In one dimension everything is a norm of the CDF gap: sup gives
+Kolmogorov–Smirnov, $L^1$ gives Wasserstein-1 which is a transport cost, $L^2$
+gives Cramér–von Mises. Beyond one dimension the CDF fails and two families take
+over. **$f$-divergences** — KL, JS, TV, $\chi^2$ — compare densities through their
+pointwise ratio and are blind to distance, which makes them infinite or saturated
+when supports disagree. **Integral probability metrics** — Wasserstein, MMD —
+compare through test functions and do see distance, which is why they keep working
+when the supports come apart. Total variation is the one member of both.
+:::
+
+## Exercises
+
+1. For $P = \mathcal{N}(0,1)$ and $Q = \mathcal{N}(\mu,1)$, show the KS statistic
+   is $2\Phi(\mu/2)-1$ by finding where the CDF gap is maximised. Evaluate at
+   $\mu = 1$ and $\mu = 4$ and comment on the saturation.
+2. Show $\int|F-G|\,dx = W_1$ for these two Gaussians equals exactly $|\mu|$, and
+   explain why it does not saturate.
+3. Derive $\mathrm{KL}(\mathcal{N}(\mu_1,\sigma^2)\|\mathcal{N}(\mu_2,\sigma^2))
+   = (\mu_1-\mu_2)^2/2\sigma^2$ from the general Gaussian formula, and say why this
+   makes diffusion training objectives reduce to squared errors.
+4. Prove $\mathrm{KL} \ge 0$ using Jensen, and identify exactly where equality
+   requires $p = q$ almost everywhere.
+5. Give two distributions with $\mathrm{KL}(p\|q)$ finite and
+   $\mathrm{KL}(q\|p) = \infty$. *(Hint: make one support strictly contain the other.)*
+6. Verify that $f(t) = t\log t$ gives KL and $f(t) = \tfrac12|t-1|$ gives total
+   variation in the definition $D_f = \int q f(p/q)$.
+7. Explain in your own words why no $f$-divergence can distinguish "$Q$ is just
+   beside $P$" from "$Q$ is a mile away", once the supports are disjoint. Then say
+   what an IPM does differently.
+8. For $P$ uniform on $[0,1]$ and $Q$ uniform on $[d,d+1]$ with $d > 1$, compute
+   $W_1$, TV and JS. Which of the three would give a usable training gradient in
+   $d$, and why?
