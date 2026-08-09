@@ -1,0 +1,296 @@
+% ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · IIT Jammu
+% HW 1 — Random Variables, Joints, Conditionals, Bayes
+% Build:  latexmk -pdf hw1.tex     (or: pdflatex hw1.tex)
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue]{hyperref}
+
+\newcommand{\pts}[1]{\hfill\textbf{(#1pts)}}
+\newcommand{\pt}[1]{\hfill\textbf{(#1pt)}}
+\newcommand{\total}[1]{\par\medskip\noindent\textbf{Total: #1 points}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\EE}{\mathbb{E}}
+
+% (a) (b) (c) labelling, without enumitem
+\renewcommand{\theenumi}{\alph{enumi}}
+\renewcommand{\labelenumi}{(\theenumi)}
+\newenvironment{parts}
+  {\begin{enumerate}\setlength{\itemsep}{0.45em}\setlength{\parskip}{0pt}}
+  {\end{enumerate}}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries HW 1 — Random Variables, Joints, Conditionals, Bayes}\\[0.4em]
+  {\small Mathematical Foundations of Diffusion Models · Monsoon 2026 · IIT Jammu}
+\end{center}
+
+\medskip
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Released} & Monday 10 August 2026 \\
+\textbf{Due}      & Tuesday 18 August 2026, in class \\
+\textbf{Marks}    & 50 points --- graded for completion \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\noindent
+\textbf{Graded for completion.} Credit is for a genuine attempt at every part, not
+for arriving at the right answer. Attempt everything, and write down your
+reasoning even where you are unsure — a wrong answer with visible working earns
+full credit, a blank does not. Solutions are posted after the deadline; check your
+own work against them, and bring anything that still does not make sense to class.
+
+\medskip
+\noindent
+Show your working. Give exact fractions and decimals to three places.
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 1}
+
+Roll one fair six-sided die, once. Before the questions, here is what each symbol
+in them means.
+
+\begin{itemize}\setlength{\itemsep}{0.4em}
+  \item $\Omega$ is the \textbf{sample space}: the set of every outcome the
+        experiment could produce. For this die an outcome is just the face that
+        comes up.
+  \item $\omega$ is a single \textbf{outcome} — one particular thing that
+        happened, one element of $\Omega$. Exactly one $\omega$ occurs each time
+        you roll.
+  \item An \textbf{event} is any subset $A \subseteq \Omega$: a yes/no question
+        about the outcome. ``The face is even'' is the event $\{2,4,6\}$, and it
+        occurs precisely when the $\omega$ that happened lies inside it.
+  \item A \textbf{random variable} is a function $X : \Omega \to \mathbb{R}$ that
+        attaches a number to \emph{each outcome}. It is not random and it is not a
+        variable: it is an ordinary deterministic function. All the randomness sits
+        in which $\omega$ turns up.
+\end{itemize}
+
+\noindent
+Two random variables on this die:
+
+\begin{itemize}\setlength{\itemsep}{0.4em}
+  \item $X(\omega) = \omega$ — read the face and report it as a number. So
+        $X(4) = 4$. (This one is the identity function; it looks like it is doing
+        nothing, and that is the point: the outcome already \emph{is} a number
+        here, which is not true in general.)
+  \item $Y(\omega) = 1$ if $\omega$ is prime, and $0$ otherwise — report whether
+        the face is prime. So $Y(3) = 1$ and $Y(4) = 0$.
+\end{itemize}
+
+\begin{parts}
+  \item Write down $\Omega$ explicitly, and say how many distinct events this
+        experiment has. Justify the count in one line. \pts{2}
+  \item List the two sets $\{\omega : Y(\omega) = 1\}$ and
+        $\{\omega : Y(\omega) = 0\}$. (Read the notation as ``all outcomes
+        $\omega$ for which $Y$ returns that value''.) \pts{2}
+  \item A classmate says ``$Y$ maps the event $\{2,3,5\}$ to $1$''. Explain why
+        this is the wrong description of what $Y$ does, given what a random
+        variable takes as its input. \pts{3}
+  \item Compute $\PP(Y = 1)$ and $\PP(X \le 3,\ Y = 1)$. In each case name the
+        event whose probability you are computing before you compute it. \pts{3}
+\end{parts}
+
+\total{10}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 2}
+
+A workshop runs three machines, $A$, $B$ and $C$, which all make the same part.
+Every finished part is inspected and given one of three quality grades:
+
+\begin{center}
+\begin{tabular}{cl}
+\toprule
+Grade & Meaning \\
+\midrule
+1 & within tight tolerance — ships as premium \\
+2 & within tolerance — ships as standard \\
+3 & out of tolerance — sent for rework \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+A day's output of 200 parts is inspected, and each part is recorded twice over:
+which machine made it, and what grade it received. The counts are
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+        & grade 1 & grade 2 & grade 3 \\
+\midrule
+machine $A$   & 40 & 20 & 10 \\
+machine $B$   & 15 & 35 & 20 \\
+machine $C$   & 10 & 15 & 35 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Now pick one of the 200 parts uniformly at random, and let $X \in \{A,B,C\}$ be
+the machine that made it and $Y \in \{1,2,3\}$ its grade. Both are random
+variables on the same outcome — the part you picked.
+
+The question behind the arithmetic is whether the machine a part came from tells
+you anything about the grade it is likely to get. If it does, the workshop has a
+machine worth investigating.
+
+\begin{parts}
+  \item Compute the row totals, column totals, and both marginal distributions
+        $\PP(X = \cdot)$ and $\PP(Y = \cdot)$. \pts{2}
+  \item Compute $\PP(Y = \cdot \mid X = A)$ and $\PP(Y = \cdot \mid X = C)$.
+        Comparing the two, does knowing the machine change what you expect of the
+        grade — that is, are $X$ and $Y$ dependent? \pts{3}
+  \item A part is pulled off the standard-grade pile, so you know only that
+        $Y = 2$. Compute $\PP(X = B \mid Y = 2)$, stating which total you divided
+        by and why it is not 200. \pts{2}
+  \item If machine and grade were unrelated, how many of the 200 parts would you
+        expect to be grade-1 parts from machine $A$? Compare with the observed
+        count, and say what the comparison suggests. \pts{3}
+\end{parts}
+
+\total{10}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 3}
+
+A university holds a campus health camp and offers every student a quick
+finger-prick blood-glucose screen for \textbf{type 2 diabetes}. Among students of
+this age group roughly \textbf{1 in 100} has the condition, very often without
+knowing it.
+
+The screen is not a diagnosis; it only flags who should be sent for a proper
+fasting-glucose or HbA1c test. Suppose it behaves as follows:
+
+\begin{itemize}\setlength{\itemsep}{0.3em}
+  \item it is positive for $95\%$ of students who \emph{do} have type 2 diabetes;
+  \item it is also positive for $10\%$ of students who do \emph{not} — a single
+        high reading can follow a recent meal, an illness, poor sleep, or ordinary
+        day-to-day variation.
+\end{itemize}
+
+\noindent
+Let $D$ be the event ``the student has type 2 diabetes'' and $+$ the event ``the
+screen reads positive''. A student is picked at random from those screened.
+
+\begin{parts}
+  \item Write the three given numbers in conditional-probability notation. \pts{2}
+  \item Compute $\PP(+)$: the fraction of screened students who get a positive
+        reading. \pts{3}
+  \item Compute $\PP(D \mid +)$: given a positive reading, the probability the
+        student actually has the condition. \pts{3}
+  \item The screen catches $95\%$ of true cases, yet your answer to (c) is far
+        below $95\%$. Explain why. Then say which of the three given numbers you
+        would change, and in which direction, to raise $\PP(D \mid +)$ the most.
+        \pts{2}
+\end{parts}
+
+\noindent\textit{Check: redo (b) and (c) by imagining the camp screens 10{,}000
+students, and filling in a $2 \times 2$ table of counts. Same answer, easier
+arithmetic.}
+
+\medskip
+\noindent\textit{The figures above are illustrative and chosen to keep the
+arithmetic clean; they are not the published operating characteristics of any
+particular test. The structure, though, is real, and it is exactly why a positive
+screening result triggers a confirmatory test rather than a diagnosis.}
+
+\total{10}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 4}
+
+Let $(X,Y)$ have joint density $f(x,y) = c\,(x+y)$ on $0 \le x \le 1$,
+$0 \le y \le 2$, and $f = 0$ elsewhere.
+
+\begin{parts}
+  \item Find $c$. \pts{2}
+  \item Find $f_X(x)$ and $f_Y(y)$ with their ranges, and verify each integrates
+        to $1$. \pts{3}
+  \item Find $f(y \mid x)$ and verify it integrates to $1$ over $y$. \pts{3}
+  \item Are $X$ and $Y$ independent? Justify by explicit comparison. \pts{2}
+\end{parts}
+
+\total{10}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Problem 5}
+
+Two machines feed the same conveyor. Machine $1$ is the older unit and runs
+$60\%$ of the output; machine $2$ runs the rest. At the end of the line every
+item is inspected and its surface defects counted: $0$, $1$ or $2$.
+
+Here is the difference from Problem 2, and it is the whole point. There, the
+machine was written on the inspection sheet, so you observed \emph{both}
+variables and could build the full table. Here the two machines' output mixes on
+the shared conveyor, and by the time an item reaches inspection nobody knows
+which machine made it. So the machine label $Z$ is \textbf{latent} — never
+observed — while the defect count $X$ is all you get to see.
+
+It still matters. If one machine is drifting out of adjustment you want to know
+which one, so you can stop the line and service it; but the only evidence
+available is defect counts. Recovering $Z$ from $X$ is an inference problem, and
+Bayes' rule is what does it.
+
+The two machines have different defect profiles:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+                            & $X=0$ & $X=1$ & $X=2$ \\
+\midrule
+$\PP(X = \cdot \mid Z = 1)$ & 0.7 & 0.2 & 0.1 \\
+$\PP(X = \cdot \mid Z = 2)$ & 0.2 & 0.3 & 0.5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Pick an inspected item at random. Write $Z \in \{1,2\}$ for the machine that made
+it and $X \in \{0,1,2\}$ for its defect count. You see $X$; you want $Z$.
+
+\begin{parts}
+  \item Using $p(z,x) = p(z)\,p(x \mid z)$, write the full $2 \times 3$ joint
+        table and check it sums to $1$. \pts{2}
+  \item Compute $\PP(X = x)$ for each $x$, stating which variable you summed
+        out. This is the defect distribution the inspector actually sees, with the
+        machine identity averaged away. \pts{2}
+  \item An item is found with $x$ defects. Compute $\PP(Z = 1 \mid X = x)$ for
+        each of $x = 0, 1, 2$ — the belief that the older machine made it. \pts{3}
+  \item Compute $\EE[Z \mid X = x]$ for each $x$, and explain why these values
+        need not lie in $\{1,2\}$ — and so what such a number is telling the
+        engineer. \pts{2}
+  \item Verify that $\EE\big[\EE[Z \mid X]\big] = \EE[Z]$. \pt{1}
+\end{parts}
+
+\noindent\textit{Parts (c) and (d) are, in miniature, what a diffusion model's
+denoiser computes: a posterior over a hidden quantity given a noisy observation,
+then its mean. The continuous version $\EE[x_0 \mid x_\sigma]$ appears in the
+tutorial ``The World's Smallest Diffusion Model''.}
+
+\total{10}
+
+\end{document}

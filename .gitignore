@@ -4,3 +4,11 @@ private/
 /_site/
 *.quarto_ipynb
 .claude/
+
+# LaTeX build artefacts (keep the .tex source and the built .pdf)
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+homeworks/*.log
+homeworks/*.out
