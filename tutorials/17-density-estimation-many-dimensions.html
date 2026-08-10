@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>06 · Estimating a Density in Many Dimensions – ID-5-02 (TO)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/15-comparing-distributions.html" rel="next">
+<link href="../tutorials/12-multivariate-gaussian.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/17-density-estimation-many-dimensions.html">06 · Estimating a Density in Many Dimensions</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">ID-5-02 (TO)</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Syllabus</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../curriculum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Curriculum</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assignments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lecture Notes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">00 · Introduction and Motivation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/17-density-estimation-many-dimensions.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">06 · Estimating a Density in Many Dimensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Decks</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Course Mechanics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-02-motivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Why Diffusion Models?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-03-toy-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-00-probability-joints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-01-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-02-genai-maps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w03-deck-01-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · The Multivariate Gaussian</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inequalities Worth Knowing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Perspectives</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Deterministic Map, Proved</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/09-discrete-transport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-03-map-limit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deck · The Map, Proved</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Draft</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Probability-Flow ODE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resources</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-estimator-and-its-three-line-derivation" id="toc-the-estimator-and-its-three-line-derivation" class="nav-link active" data-scroll-target="#the-estimator-and-its-three-line-derivation">1. The estimator, and its three-line derivation</a></li>
+  <li><a href="#where-it-collapses-n-p" id="toc-where-it-collapses-n-p" class="nav-link" data-scroll-target="#where-it-collapses-n-p">2. Where it collapses: <span class="math inline">\(n &lt; p\)</span></a></li>
+  <li><a href="#estimate-the-precision-not-the-covariance" id="toc-estimate-the-precision-not-the-covariance" class="nav-link" data-scroll-target="#estimate-the-precision-not-the-covariance">3. Estimate the precision, not the covariance</a></li>
+  <li><a href="#the-other-structural-assumptions" id="toc-the-other-structural-assumptions" class="nav-link" data-scroll-target="#the-other-structural-assumptions">4. The other structural assumptions</a></li>
+  <li><a href="#one-gaussian-is-not-enough-mixtures-and-em" id="toc-one-gaussian-is-not-enough-mixtures-and-em" class="nav-link" data-scroll-target="#one-gaussian-is-not-enough-mixtures-and-em">5. One Gaussian is not enough: mixtures and EM</a></li>
+  <li><a href="#give-up-on-parameters-kernel-density-estimation" id="toc-give-up-on-parameters-kernel-density-estimation" class="nav-link" data-scroll-target="#give-up-on-parameters-kernel-density-estimation">6. Give up on parameters: kernel density estimation</a></li>
+  <li><a href="#another-route-entirely-be-bayesian" id="toc-another-route-entirely-be-bayesian" class="nav-link" data-scroll-target="#another-route-entirely-be-bayesian">7. Another route entirely: be Bayesian</a></li>
+  <li><a href="#where-this-sits-in-the-landscape" id="toc-where-this-sits-in-the-landscape" class="nav-link" data-scroll-target="#where-this-sits-in-the-landscape">8. Where this sits in the landscape</a></li>
+  <li><a href="#why-this-was-hard-and-what-actually-solved-it" id="toc-why-this-was-hard-and-what-actually-solved-it" class="nav-link" data-scroll-target="#why-this-was-hard-and-what-actually-solved-it">9. Why this was hard, and what actually solved it</a></li>
+  <li><a href="#the-bridge-from-describing-to-comparing" id="toc-the-bridge-from-describing-to-comparing" class="nav-link" data-scroll-target="#the-bridge-from-describing-to-comparing">10. The bridge: from describing to comparing</a></li>
+  <li><a href="#where-each-piece-returns" id="toc-where-each-piece-returns" class="nav-link" data-scroll-target="#where-each-piece-returns">11. Where each piece returns</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/17-density-estimation-many-dimensions.html">06 · Estimating a Density in Many Dimensions</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">06 · Estimating a Density in Many Dimensions</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>We know what a multivariate Gaussian is. Now fit one. The maximum likelihood estimator is the sample covariance and the derivation is three lines — and then it collapses, because in almost every application that matters there are fewer samples than variables. This note is about what you do next: impose structure, estimate the inverse rather than the thing itself, and watch every classical method run into the same wall. It ends with the honest verdict on why an entire decade of statistics could not solve this and deep learning did.</em></p>
+<section id="the-estimator-and-its-three-line-derivation" class="level2">
+<h2 class="anchored" data-anchor-id="the-estimator-and-its-three-line-derivation">1. The estimator, and its three-line derivation</h2>
+<p>Let <span class="math inline">\(x_1,\dots,x_n\)</span> be i.i.d. draws from <span class="math inline">\(\mathcal{N}_p(\mu,\Sigma)\)</span>. The log-likelihood is</p>
+<p><span class="math display">\[
+\ell(\mu,\Sigma) = -\frac{n}{2}\log\det\Sigma
+- \frac12 \sum_{i=1}^{n}(x_i-\mu)^{\!\top}\Sigma^{-1}(x_i-\mu) + \text{const}.
+\]</span></p>
+<p>Differentiating in <span class="math inline">\(\mu\)</span> gives <span class="math inline">\(\hat\mu = \bar x\)</span>, exactly as in one dimension. For <span class="math inline">\(\Sigma\)</span> the clean route is to reparametrise by the <strong>precision matrix</strong> <span class="math inline">\(\Theta = \Sigma^{-1}\)</span> and use the trace trick — a scalar equals its own trace, and the trace is cyclic:</p>
+<p><span class="math display">\[
+\sum_i (x_i-\bar x)^{\!\top}\Theta(x_i-\bar x)
+= \sum_i \operatorname{tr}\!\big(\Theta (x_i-\bar x)(x_i-\bar x)^{\!\top}\big)
+= n\operatorname{tr}(\Theta S),
+\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+S = \frac1n \sum_{i=1}^{n} (x_i - \bar x)(x_i - \bar x)^{\!\top}
+\]</span></p>
+<p>is the sample covariance. The log-likelihood becomes, up to constants,</p>
+<p><span class="math display">\[
+\boxed{\;\ell(\Theta) = \frac{n}{2}\Big(\log\det\Theta - \operatorname{tr}(S\Theta)\Big).\;}
+\]</span></p>
+<p>This is <strong>concave in <span class="math inline">\(\Theta\)</span></strong> (<span class="math inline">\(\log\det\)</span> is concave on positive definite matrices, the trace term is linear), so setting the gradient to zero is enough. Using <span class="math inline">\(\partial \log\det\Theta/\partial\Theta = \Theta^{-1}\)</span> and <span class="math inline">\(\partial \operatorname{tr}(S\Theta)/\partial\Theta = S\)</span>:</p>
+<p><span class="math display">\[
+\Theta^{-1} - S = 0 \quad\Longrightarrow\quad \hat\Sigma = S .
+\]</span></p>
+<p><strong>The MLE of the covariance is the sample covariance</strong>, with divisor <span class="math inline">\(n\)</span> rather than <span class="math inline">\(n-1\)</span> — biased, exactly as in the univariate case. And since maximum likelihood is invariant under reparametrisation, the MLE of the <em>correlation</em> matrix is the sample correlation matrix: standardise <span class="math inline">\(S\)</span> by its own diagonal.</p>
+<p>Two things to notice, because both matter in a moment. The likelihood depends on the data <strong>only through <span class="math inline">\(\bar x\)</span> and <span class="math inline">\(S\)</span></strong> — they are sufficient. And written in <span class="math inline">\(\Theta\)</span>, the problem is a concave maximisation, which is what will later let us bolt a penalty onto it and still have something solvable.</p>
+</section>
+<section id="where-it-collapses-n-p" class="level2">
+<h2 class="anchored" data-anchor-id="where-it-collapses-n-p">2. Where it collapses: <span class="math inline">\(n &lt; p\)</span></h2>
+<p>The estimator is a formula, so it always returns <em>something</em>. Whether that something is usable is another matter.</p>
+<p><span class="math inline">\(S\)</span> is a sum of <span class="math inline">\(n\)</span> rank-one matrices, and centring costs one more degree of freedom, so</p>
+<p><span class="math display">\[
+\operatorname{rank}(S) \;\le\; \min(n-1,\; p).
+\]</span></p>
+<p>If <span class="math inline">\(n \le p\)</span> then <span class="math inline">\(S\)</span> is <strong>singular</strong>: <span class="math inline">\(\det S = 0\)</span>, <span class="math inline">\(S^{-1}\)</span> does not exist, and the fitted density does not exist either — the formula in note 05 divides by <span class="math inline">\((\det\Sigma)^{1/2}\)</span>. Maximum likelihood has not given a bad answer; it has given a degenerate one, a Gaussian concentrated on the <span class="math inline">\((n-1)\)</span>-dimensional subspace the data happens to span.</p>
+<p>Numerically, with <span class="math inline">\(p = 8\)</span> and <span class="math inline">\(n = 5\)</span>: <span class="math inline">\(\operatorname{rank}(S) = 4\)</span>, and <span class="math inline">\(\det S\)</span> comes out around <span class="math inline">\(-10^{-62}\)</span> — a number whose <em>sign is wrong</em>, which is what floating-point arithmetic does with a determinant that is exactly zero.</p>
+<p>The counting explains why this is the normal case, not a corner case. A full <span class="math inline">\(\Sigma\)</span> costs <span class="math inline">\(p(p+1)/2\)</span> parameters, plus <span class="math inline">\(p\)</span> for the mean:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(p\)</span></th>
+<th>free parameters</th>
+<th>samples you would like</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10</td>
+<td>65</td>
+<td>hundreds</td>
+</tr>
+<tr class="even">
+<td>100</td>
+<td>5,150</td>
+<td>tens of thousands</td>
+</tr>
+<tr class="odd">
+<td>784 (an MNIST digit)</td>
+<td>308,504</td>
+<td>millions</td>
+</tr>
+<tr class="even">
+<td>20,000 (human genes)</td>
+<td><strong>200,030,000</strong></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The motivating example: gene regulatory networks
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Measure the expression of <span class="math inline">\(p \approx 20{,}000\)</span> genes across <span class="math inline">\(n \approx 200\)</span> tissue samples. You want to know which genes regulate which — that is a question about the <em>dependence structure</em> of a <span class="math inline">\(20{,}000\)</span>-dimensional distribution, estimated from two hundred points.</p>
+<p>There are two hundred million covariance parameters and two hundred observations. This is not a hard estimation problem; as stated it is not an estimation problem at all. Without further assumptions the data cannot identify the answer, and no cleverness recovers information that was never collected.</p>
+<p><span class="math inline">\(n \ll p\)</span> is the <em>typical</em> regime in genomics, neuroimaging, finance and text — not the exception.</p>
+</div>
+</div>
+</section>
+<section id="estimate-the-precision-not-the-covariance" class="level2">
+<h2 class="anchored" data-anchor-id="estimate-the-precision-not-the-covariance">3. Estimate the precision, not the covariance</h2>
+<p>The move that rescues this is to change the target. Instead of estimating <span class="math inline">\(\Sigma\)</span> and inverting it, estimate <span class="math inline">\(\Theta = \Sigma^{-1}\)</span> directly. Three reasons, and the third is the real one.</p>
+<p><strong>It is the natural parameter.</strong> We already saw the likelihood is concave in <span class="math inline">\(\Theta\)</span> and linear in <span class="math inline">\(S\)</span>. Penalised versions stay convex.</p>
+<p><strong>Inverting a bad estimate is worse than estimating the inverse.</strong> Small eigenvalues of <span class="math inline">\(S\)</span> — and when <span class="math inline">\(n &lt; p\)</span>, some are exactly zero — become enormous eigenvalues of <span class="math inline">\(S^{-1}\)</span>. Inversion amplifies precisely the directions the data constrains least.</p>
+<p><strong>Zeros in <span class="math inline">\(\Theta\)</span> mean conditional independence.</strong> This is the fact that makes the whole programme work. For a Gaussian,</p>
+<p><span class="math display">\[
+\boxed{\;\Theta_{ij} = 0
+\quad\Longleftrightarrow\quad
+X_i \perp\!\!\!\perp X_j \;\big|\; X_{\setminus\{i,j\}}. \;}
+\]</span></p>
+<p>More precisely, the <strong>partial correlation</strong> — the correlation between <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_j\)</span> once every other variable has been regressed out — is read straight off the precision matrix:</p>
+<p><span class="math display">\[
+\rho_{ij \,\mid\, \text{rest}} \;=\; \frac{-\Theta_{ij}}{\sqrt{\Theta_{ii}\Theta_{jj}}}.
+\]</span></p>
+<p>An example worth carrying. Take three variables with an AR(1) correlation structure, <span class="math inline">\(\operatorname{corr}(X_i,X_j) = 0.6^{|i-j|}\)</span>:</p>
+<p><span class="math display">\[
+\Sigma = \begin{pmatrix} 1 &amp; 0.6 &amp; 0.36 \\ 0.6 &amp; 1 &amp; 0.6 \\ 0.36 &amp; 0.6 &amp; 1\end{pmatrix},
+\qquad
+\Theta = \Sigma^{-1} = \begin{pmatrix} 1.5625 &amp; -0.9375 &amp; 0 \\ -0.9375 &amp; 2.125 &amp; -0.9375 \\ 0 &amp; -0.9375 &amp; 1.5625 \end{pmatrix}.
+\]</span></p>
+<p><span class="math inline">\(\Theta_{13} = 0\)</span> exactly, and direct computation confirms <span class="math inline">\(\operatorname{Cov}(X_1, X_3 \mid X_2) = 0\)</span>. But the <em>marginal</em> correlation between <span class="math inline">\(X_1\)</span> and <span class="math inline">\(X_3\)</span> is <span class="math inline">\(0.36\)</span>, comfortably non-zero. The dependence is real; it is simply <strong>entirely mediated by <span class="math inline">\(X_2\)</span></strong>. Covariance sees the association; precision sees whether it is direct.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The Gaussian graphical model
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Draw a graph on <span class="math inline">\(p\)</span> nodes with an edge between <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> whenever <span class="math inline">\(\Theta_{ij} \ne 0\)</span>. That graph <em>is</em> the conditional independence structure of the distribution — the Markov graph. For gene networks this is exactly the object of interest: an edge means “these two genes are associated even after accounting for all others”, which is the closest observational data gets to direct regulation.</p>
+<p>The idea dates to Dempster’s <em>covariance selection</em> (1972). What changed in the 2000s was the ability to fit it when <span class="math inline">\(p \gg n\)</span>.</p>
+</div>
+</div>
+<p><strong>Sparsity as the assumption.</strong> A biologist will tell you each gene is regulated by a handful of others, not by twenty thousand. So assume most <span class="math inline">\(\Theta_{ij}\)</span> are zero, and estimate under that assumption. Penalise with an <span class="math inline">\(\ell_1\)</span> norm, which sets coefficients exactly to zero rather than merely shrinking them:</p>
+<p><span class="math display">\[
+\hat\Theta = \arg\max_{\Theta \succ 0}\;
+\Big\{ \log\det\Theta - \operatorname{tr}(S\Theta) - \lambda \textstyle\sum_{i\ne j} |\Theta_{ij}| \Big\}.
+\]</span></p>
+<p>This is the <strong>graphical lasso</strong> (Yuan &amp; Lin 2007; Banerjee et al.&nbsp;2008; Friedman, Hastie &amp; Tibshirani 2008). It is concave-plus-concave, so it is a convex problem with a unique solution — and crucially, for <span class="math inline">\(\lambda &gt; 0\)</span> the solution is <strong>positive definite even when <span class="math inline">\(S\)</span> is singular</strong>. The penalty repairs the rank deficiency. A closely related route is neighbourhood selection (Meinshausen &amp; Bühlmann 2006): run a lasso regression of each variable on all the others and patch the supports together.</p>
+<p>The tuning parameter <span class="math inline">\(\lambda\)</span> buys sparsity with bias, and choosing it is its own literature.</p>
+</section>
+<section id="the-other-structural-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="the-other-structural-assumptions">4. The other structural assumptions</h2>
+<p>Sparsity of <span class="math inline">\(\Theta\)</span> is one prior belief. It is not the only reasonable one, and the right one depends on what the coordinates <em>are</em>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Assumption</th>
+<th>Structure imposed</th>
+<th>When it is reasonable</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Sparse precision</strong></td>
+<td>most <span class="math inline">\(\Theta_{ij} = 0\)</span></td>
+<td>networks; few direct interactions</td>
+</tr>
+<tr class="even">
+<td><strong>Banded / tapered</strong></td>
+<td><span class="math inline">\(\Sigma_{ij} \approx 0\)</span> for <span class="math inline">\(|i-j|\)</span> large</td>
+<td>coordinates have an order — time, position along a genome</td>
+</tr>
+<tr class="odd">
+<td><strong>Thresholded</strong></td>
+<td>small entries of <span class="math inline">\(S\)</span> set to zero</td>
+<td>many negligible marginal associations</td>
+</tr>
+<tr class="even">
+<td><strong>Shrinkage</strong></td>
+<td><span class="math inline">\(\hat\Sigma = (1-\alpha)S + \alpha\, \tau I\)</span></td>
+<td>no structural belief, just want invertibility</td>
+</tr>
+<tr class="odd">
+<td><strong>Factor model</strong></td>
+<td><span class="math inline">\(\Sigma = BB^{\!\top} + D\)</span>, <span class="math inline">\(B\)</span> tall and thin</td>
+<td>a few latent drivers — finance, psychometrics</td>
+</tr>
+<tr class="even">
+<td><strong>Low-rank + sparse</strong></td>
+<td><span class="math inline">\(\Sigma = L + S\)</span></td>
+<td>latent factors <em>and</em> local interactions</td>
+</tr>
+<tr class="odd">
+<td><strong>Isotropic / diagonal</strong></td>
+<td><span class="math inline">\(\Sigma = \sigma^2 I\)</span> or diagonal</td>
+<td>the crude default; independence assumed</td>
+</tr>
+</tbody>
+</table>
+<p>Shrinkage deserves a line of its own: the Ledoit–Wolf estimator (2004) mixes <span class="math inline">\(S\)</span> with a scaled identity and chooses the mixing weight to minimise expected squared error. It assumes nothing about structure, always produces an invertible matrix, and is the sensible default when you have no scientific reason to prefer a shape. Banding and thresholding with rate guarantees are due to Bickel and Levina (2008).</p>
+<p><strong>The common thread.</strong> Every one of these replaces “estimate <span class="math inline">\(p(p+1)/2\)</span> numbers” with “estimate far fewer, having assumed the rest away”. The assumption is doing the work. Its content is not statistical but scientific, and if it is wrong the estimate is confidently wrong.</p>
+</section>
+<section id="one-gaussian-is-not-enough-mixtures-and-em" class="level2">
+<h2 class="anchored" data-anchor-id="one-gaussian-is-not-enough-mixtures-and-em">5. One Gaussian is not enough: mixtures and EM</h2>
+<p>Real data is not unimodal. The next model up is a <strong>mixture of Gaussians</strong>:</p>
+<p><span class="math display">\[
+p(x) = \sum_{k=1}^{K} \pi_k\, \mathcal{N}(x; \mu_k, \Sigma_k),
+\qquad \pi_k \ge 0, \ \textstyle\sum_k \pi_k = 1,
+\]</span></p>
+<p>which is exactly the latent-variable construction of note 03 — draw a component <span class="math inline">\(z \sim \text{Categorical}(\pi)\)</span>, then draw <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z,\Sigma_z)\)</span>, then forget <span class="math inline">\(z\)</span>. Mixtures are dense in a useful sense: with enough components you can approximate essentially any density.</p>
+<p>The log-likelihood now contains a log of a sum, which does not separate, and there is no closed form. The standard tool is <strong>expectation–maximisation</strong>, which alternates:</p>
+<ul>
+<li><strong>E-step</strong> — compute the <em>responsibility</em> of component <span class="math inline">\(k\)</span> for point <span class="math inline">\(i\)</span>, which is a posterior over the latent label by Bayes’ rule: <span class="math display">\[
+\gamma_{ik} = \frac{\pi_k\,\mathcal{N}(x_i;\mu_k,\Sigma_k)}{\sum_{m}\pi_m\,\mathcal{N}(x_i;\mu_m,\Sigma_m)};
+\]</span></li>
+<li><strong>M-step</strong> — refit each component as if the responsibilities were the labels: <span class="math inline">\(\hat\pi_k = \frac1n\sum_i \gamma_{ik}\)</span>, <span class="math inline">\(\hat\mu_k = \frac{\sum_i \gamma_{ik}x_i}{\sum_i \gamma_{ik}}\)</span>, and similarly a responsibility-weighted covariance.</li>
+</ul>
+<p>EM is coordinate ascent on a lower bound of the log-likelihood — the same <strong>ELBO</strong> that will reappear when we derive the diffusion training objective. It therefore increases the likelihood at every step, and converges to a stationary point.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Two failure modes worth knowing
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Local optima.</strong> EM converges to a stationary point, not the global maximum, and different initialisations give different answers. Restart it.</p>
+<p><strong>The likelihood is unbounded.</strong> Put one component’s mean exactly on a data point and shrink its variance: the density at that point diverges, and so does the likelihood. At <span class="math inline">\(\sigma = 10^{-4}\)</span> the peak density is already <span class="math inline">\(\approx 4000\)</span>. There is <em>no</em> maximum likelihood estimator for a Gaussian mixture — the supremum is <span class="math inline">\(+\infty\)</span>, attained by a degenerate spike. What EM finds is a well-behaved local maximum, and implementations add a variance floor or a prior to stay away from the cliff.</p>
+</div>
+</div>
+<p>And the counting problem has not gone away: <span class="math inline">\(K\)</span> full covariances cost <span class="math inline">\(K \cdot p(p+3)/2\)</span> parameters. For MNIST with <span class="math inline">\(K=10\)</span> that is over three million.</p>
+</section>
+<section id="give-up-on-parameters-kernel-density-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="give-up-on-parameters-kernel-density-estimation">6. Give up on parameters: kernel density estimation</h2>
+<p>The nonparametric alternative makes no assumption about shape at all. Put a small bump on every observation and add them up:</p>
+<p><span class="math display">\[
+\hat p_h(x) = \frac{1}{n h^p} \sum_{i=1}^{n} K\!\left(\frac{x - x_i}{h}\right).
+\]</span></p>
+<p>In one dimension this is excellent and its theory is complete. The bandwidth <span class="math inline">\(h\)</span> trades bias against variance, and with the optimal choice the mean integrated squared error decays like</p>
+<p><span class="math display">\[
+\text{MISE} \;\asymp\; n^{-4/(p+4)}
+\]</span></p>
+<p>for a second-order kernel and a twice-differentiable density. Read the exponent. At <span class="math inline">\(p=1\)</span> it is <span class="math inline">\(n^{-4/5}\)</span>, nearly the parametric <span class="math inline">\(n^{-1}\)</span>. As <span class="math inline">\(p\)</span> grows it approaches <span class="math inline">\(n^{0}\)</span> — <em>no convergence at all</em>.</p>
+<p>Invert it and ask how many samples you need to match, in <span class="math inline">\(p\)</span> dimensions, the accuracy that <span class="math inline">\(n = 100\)</span> buys in one:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(p\)</span></th>
+<th>samples required</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>100</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>251</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>~4,000</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>~400,000</td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td>~<span class="math inline">\(4 \times 10^{9}\)</span></td>
+</tr>
+<tr class="even">
+<td>50</td>
+<td>~<span class="math inline">\(4 \times 10^{21}\)</span></td>
+</tr>
+<tr class="odd">
+<td>100</td>
+<td>~<span class="math inline">\(4 \times 10^{41}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>At <span class="math inline">\(p = 100\)</span> — still a <em>small</em> problem by modern standards — the requirement exceeds the number of atoms in the observable universe by a wide margin. This is not an artefact of KDE. It is a <strong>minimax lower bound</strong>: over the class of smooth densities, <em>no</em> estimator does better than <span class="math inline">\(n^{-2s/(2s+p)}\)</span> for smoothness <span class="math inline">\(s\)</span>. The obstruction is information-theoretic, not algorithmic.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The curse of dimensionality, stated plainly
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Local methods need neighbours, and in high dimension nothing has any. To capture a fraction <span class="math inline">\(f\)</span> of the data in a hypercube you need side length <span class="math inline">\(f^{1/p}\)</span>: at <span class="math inline">\(p = 100\)</span>, capturing 1% of the data requires a cube spanning <span class="math inline">\(0.01^{1/100} =
+0.955\)</span> of the range of <em>every</em> coordinate. A “local” neighbourhood is nearly the entire space, so local averaging averages over everything and estimates nothing.</p>
+<p>Every classical density estimator is local averaging in some disguise. They all inherit this.</p>
+</div>
+</div>
+</section>
+<section id="another-route-entirely-be-bayesian" class="level2">
+<h2 class="anchored" data-anchor-id="another-route-entirely-be-bayesian">7. Another route entirely: be Bayesian</h2>
+<p>Everything so far produces a <strong>point estimate</strong> — one matrix, one mixture. The Bayesian alternative refuses to pick: put a prior on the parameters, condition on the data, and report the whole posterior.</p>
+<p><strong>Conjugacy makes the Gaussian case exact.</strong> With an inverse-Wishart prior <span class="math inline">\(\Sigma \sim \mathcal{IW}(\Psi,\nu)\)</span>, the posterior is again inverse-Wishart,</p>
+<p><span class="math display">\[
+\Sigma \mid x_{1:n} \;\sim\; \mathcal{IW}\big(\Psi + nS,\; \nu + n\big),
+\]</span></p>
+<p>and the posterior mean <span class="math inline">\((\Psi + nS)/(\nu + n - p - 1)\)</span> is a <strong>shrinkage estimator</strong> — the sample covariance pulled toward the prior scale <span class="math inline">\(\Psi\)</span>. Compare §4: this is Ledoit–Wolf shrinkage, arrived at from a different direction.</p>
+<p>Look at what that fixes. When <span class="math inline">\(n &lt; p\)</span>, <span class="math inline">\(nS\)</span> is singular. But <span class="math inline">\(\Psi\)</span> is positive definite, so <span class="math inline">\(\Psi + nS\)</span> is positive definite too, and the posterior is proper whenever <span class="math inline">\(\nu &gt; p-1\)</span>. With <span class="math inline">\(p=8\)</span>, <span class="math inline">\(n=5\)</span>: the scatter matrix has rank 4, the posterior scale has rank 8, and the posterior mean is positive definite. <strong>The prior repairs the rank deficiency</strong> — not by penalising, but by supplying the information the data lacks. Which is exactly what a penalty does too, and that is not a coincidence:</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Penalties are log-priors
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Maximising <span class="math inline">\(\log p(\text{data} \mid \theta) - \lambda \|\theta\|_1\)</span> is maximising <span class="math inline">\(\log p(\text{data}\mid\theta) + \log p(\theta)\)</span> for a Laplace prior. <strong>The graphical lasso is the MAP estimate under a Laplace prior on the off-diagonal entries of <span class="math inline">\(\Theta\)</span>.</strong> Every penalty in §3–§4 has a prior behind it: ridge is Gaussian, lasso is Laplace, and the modern shrinkage priors — spike-and-slab, horseshoe — have no penalty analogue at all, which is part of their appeal.</p>
+</div>
+</div>
+<p><strong>Sparsity, done properly.</strong> A spike-and-slab prior puts an atom at zero on each <span class="math inline">\(\Theta_{ij}\)</span>, so the posterior assigns genuine probability to each <em>graph</em>. Instead of one estimated network you get a distribution over networks, and the posterior inclusion probability of an edge is a direct answer to “is this regulatory link real?”.</p>
+<p><strong>Nonparametric Bayes.</strong> A Dirichlet process mixture of Gaussians is a mixture with infinitely many components, of which finitely many are ever used. It removes the need to choose <span class="math inline">\(K\)</span> in §5 — the number of clusters is inferred rather than tuned.</p>
+<p><strong>The cost is computation.</strong> Outside conjugate cases the posterior is intractable, so it is explored by <strong>Markov chain Monte Carlo</strong>: construct a chain whose stationary distribution is the posterior and run it. Gibbs sampling for conditionally conjugate blocks, Metropolis–Hastings in general, Hamiltonian Monte Carlo and NUTS when gradients are available. Variational inference is the cheaper approximation, trading exactness for speed.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What Bayes buys, and what it does not
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Buys:</strong> honest uncertainty. A credible interval on every entry of <span class="math inline">\(\Theta\)</span>, a posterior probability for every edge, automatic regularisation, and no cross-validation for <span class="math inline">\(\lambda\)</span> — give it a hyperprior and integrate it out. For a scientific question like “which of these edges would survive more data?” this is the right tool and the penalised point estimate simply cannot answer.</p>
+<p><strong>Does not buy:</strong> escape from the curse. MCMC mixes slowly in high dimension, the space of graphs is combinatorial, and convergence is genuinely hard to certify. At <span class="math inline">\(p = 20{,}000\)</span> it is not a contender. The difficulty has moved from statistics to computation, but it has not gone away.</p>
+</div>
+</div>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+MCMC is closer to this course than it looks
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An MCMC sampler draws from a distribution it can only evaluate <strong>up to a normalising constant</strong> — which is precisely the obstacle that makes density estimation hard. One such sampler, <strong>Langevin dynamics</strong>, updates</p>
+<p><span class="math display">\[
+x \;\leftarrow\; x + \tfrac{\varepsilon}{2}\,\nabla_x \log p(x) + \sqrt{\varepsilon}\, z,
+\qquad z \sim \mathcal{N}(0,I),
+\]</span></p>
+<p>and notice what it needs: only <span class="math inline">\(\nabla_x \log p(x)\)</span>, the <strong>score</strong>. The normalising constant differentiates away. This is the same score that appeared in note 01 via Tweedie’s formula, and the same object Module 4 will learn from data.</p>
+<p>Score-based generative models are, genealogically, MCMC with a learned score. The line from this section to the end of the course is short.</p>
+</div>
+</div>
+</section>
+<section id="where-this-sits-in-the-landscape" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-sits-in-the-landscape">8. Where this sits in the landscape</h2>
+<p>Everything above is <strong>unsupervised</strong>: there are no labels, only <span class="math inline">\(x\)</span>’s, and the goal is the distribution itself. It is worth naming what else lives here and what lives next door, because the difficulty is not the same.</p>
+<p><strong>Other unsupervised problems.</strong> <em>Clustering</em> — partition the data, which is a Gaussian mixture with hard assignments (<span class="math inline">\(k\)</span>-means is EM with spherical components and responsibilities rounded to 0/1). <em>Dimension reduction</em> — PCA is the factor model of §4 read as an estimator; manifold learning is its nonlinear cousin. <em>Latent variable modelling</em> — factor analysis, topic models, and eventually VAEs. <em>Anomaly detection</em> — density estimation with a threshold on the output.</p>
+<p><strong>Supervised problems</strong>, by contrast, estimate a conditional: regression wants <span class="math inline">\(\mathbb{E}[y \mid x]\)</span>, classification wants <span class="math inline">\(\mathbb{P}(y \mid x)\)</span>. These are <em>easier</em>, and it is worth being precise about why: you need one number per input rather than a normalised function over the whole space, there is a label telling you when you are wrong, and you never have to compute a normalising constant. A classifier can be excellent while knowing nothing about <span class="math inline">\(p(x)\)</span>.</p>
+<p>This course stays in unsupervised density estimation, because generation demands the full distribution. You cannot sample from a conditional mean.</p>
+</section>
+<section id="why-this-was-hard-and-what-actually-solved-it" class="level2">
+<h2 class="anchored" data-anchor-id="why-this-was-hard-and-what-actually-solved-it">9. Why this was hard, and what actually solved it</h2>
+<p>Roughly 2000–2010 was an extraordinarily active decade on precisely this problem. Sparsity, <span class="math inline">\(\ell_1\)</span> penalties, oracle inequalities, minimax rates over structured classes, the graphical lasso, compressed sensing. It produced beautiful and permanent mathematics, and it did not produce a model that can generate a photograph.</p>
+<p><strong>Why not.</strong> The classical programme’s answer to <span class="math inline">\(n \ll p\)</span> was: <em>impose structure you can write down and verify</em>. Sparse. Banded. Low-rank. Those are strong assumptions, deliberately simple so that theorems are provable and parameters interpretable. But the structure in a natural image is not sparsity in pixel covariance. It is edges composing into textures composing into objects — a deep, nonlinear, compositional structure that no one can write as a constraint on a matrix. Classical methods were limited not by their estimators but by the poverty of the structures they could express.</p>
+<p><strong>What deep learning changed</strong> — four moves, none of which is “more data” alone:</p>
+<ol type="1">
+<li><strong>Learn the structure instead of assuming it.</strong> A network’s layers are a parametrisation of compositional structure. You do not have to know the shape of the dependence; you fit it.</li>
+<li><strong>Stop evaluating the density.</strong> KDE estimates <span class="math inline">\(p(x)\)</span> at points, and that is what the curse taxes. Modern generative models never do. A GAN or a flow learns a <em>map</em> from noise to data; a diffusion model learns the <em>score</em> <span class="math inline">\(\nabla_x \log p(x)\)</span>. Learning a map is a supervised-flavoured regression problem, and it dodges the normalising constant entirely.</li>
+<li><strong>Exploit the manifold.</strong> Real data occupies a thin, curved, low-dimensional subset of its ambient space. That is exactly the singular case of note 05 where the density does not exist — fatal for classical estimation, harmless for a model that only has to produce samples on the manifold.</li>
+<li><strong>Amortise.</strong> Parameters are shared across all inputs by a single network, so the parameter count grows with model size rather than with <span class="math inline">\(p^2\)</span>.</li>
+</ol>
+<p>The two-point model of note 01 is the seed of this: it never wrote down <span class="math inline">\(p_\text{data}\)</span>: it learned the map <span class="math inline">\(\mathbb{E}[x_0 \mid x_\sigma]\)</span> and integrated.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What statistics still has that deep learning does not
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The honest accounting runs both ways. Ask a diffusion model which genes regulate which and it has no answer — it produces samples, not a graph, and offers no <span class="math inline">\(p\)</span>-value, no confidence set, no testable conditional independence. The graphical lasso answers exactly that question, with guarantees.</p>
+<p>They optimise different objectives. Statistics wanted <strong>interpretable, verifiable structure</strong> in a regime with almost no data. Deep learning wanted <strong>samples that look right</strong>, given a great deal of it. Deep learning did not solve the classical problem; it found a version of the problem where the curse of dimensionality is not the binding constraint, and solved that instead.</p>
+<p>Knowing which question you are asking is the whole skill.</p>
+</div>
+</div>
+</section>
+<section id="the-bridge-from-describing-to-comparing" class="level2">
+<h2 class="anchored" data-anchor-id="the-bridge-from-describing-to-comparing">10. The bridge: from describing to comparing</h2>
+<p>Every method above tried to <strong>write down</strong> <span class="math inline">\(p_\text{data}\)</span> — as a Gaussian, a sparse graphical model, a mixture, a sum of kernels, a posterior. All of them hit the same wall from different sides.</p>
+<p>So change the question. And the surprise is that we have already been asking the new one without noticing.</p>
+<p><strong>Maximum likelihood was always a comparison.</strong> Take the average log-likelihood and let <span class="math inline">\(n\)</span> grow; by the law of large numbers it converges to an expectation under the true distribution:</p>
+<p><span class="math display">\[
+\frac1n \sum_{i=1}^{n} \log p_\theta(x_i)
+\;\xrightarrow[n\to\infty]{}\;
+\mathbb{E}_{p_\text{data}}\big[\log p_\theta(X)\big].
+\]</span></p>
+<p>Now add and subtract <span class="math inline">\(\mathbb{E}_{p_\text{data}}[\log p_\text{data}(X)]\)</span>:</p>
+<p><span class="math display">\[
+\mathbb{E}_{p_\text{data}}\big[\log p_\theta\big]
+= \underbrace{-\,H(p_\text{data})}_{\text{does not involve } \theta}
+\;-\; \mathrm{KL}\big(p_\text{data} \,\|\, p_\theta\big).
+\]</span></p>
+<p>The entropy term is a constant as far as <span class="math inline">\(\theta\)</span> is concerned. Therefore</p>
+<p><span class="math display">\[
+\boxed{\;\arg\max_\theta \ \text{likelihood}
+\;=\; \arg\min_\theta \ \mathrm{KL}\big(p_\text{data} \,\|\, p_\theta\big).\;}
+\]</span></p>
+<p><em>(Check it numerically: over a grid of candidate means, average log-likelihood plus KL is constant to sampling error, and the two optima coincide exactly.)</em></p>
+<p><strong>Fitting was never “describe the data”. It was “get close to the data distribution”.</strong> We just never had to name the notion of closeness, because likelihood chose one for us.</p>
+<p>Naming it is the pivot, because it exposes a choice we did not know we were making. If “fit” means “make <span class="math inline">\(p_\theta\)</span> close to <span class="math inline">\(p_\text{data}\)</span>”, then: <strong>close in what sense?</strong> And some senses do not require a density at all — which is exactly the escape route, since the density is the thing we cannot get.</p>
+<p><strong>Three ways KL specifically fails us.</strong></p>
+<ol type="1">
+<li><strong>It needs densities.</strong> <span class="math inline">\(\mathrm{KL}(p\|q) = \int p \log(p/q)\)</span> is meaningless unless both have densities. On a manifold — the situation of §8 and of real image data — <span class="math inline">\(p_\text{data}\)</span> has no density with respect to Lebesgue measure, and the definition does not apply.</li>
+<li><strong>Disjoint supports send it to infinity.</strong> If <span class="math inline">\(p_\theta\)</span> puts no mass where <span class="math inline">\(p_\text{data}\)</span> lives, <span class="math inline">\(\mathrm{KL} = \infty\)</span>. Two distributions on nearby but non-overlapping manifolds are infinitely far apart no matter how nearly they touch — and infinity has no useful gradient. A model initialised anywhere sensible gets no signal telling it which way to move.</li>
+<li><strong>It is asymmetric</strong>, and the two orders behave differently: <span class="math inline">\(\mathrm{KL}(p_\text{data}\|p_\theta)\)</span> is mode-covering and punishes missing mass; <span class="math inline">\(\mathrm{KL}(p_\theta\|p_\text{data})\)</span> is mode-seeking and punishes spurious mass. Neither is “the” distance.</li>
+</ol>
+<p>What we want instead is a comparison that stays finite between distributions with disjoint support, and degrades gracefully as they separate — one that measures <em>how far</em> the mass must move, not whether the supports overlap. That is the <strong>Wasserstein</strong> distance, and it is the reason WGAN replaced the original GAN objective.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What the next note does
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It turns out the sensible comparisons fall into <strong>two families</strong>, meeting in almost one place:</p>
+<ul>
+<li><strong><span class="math inline">\(f\)</span>-divergences</strong> — KL, reverse KL, Jensen–Shannon, <span class="math inline">\(\chi^2\)</span>, total variation. Built by integrating a convex function of the density <em>ratio</em>, so they all need densities and all suffer failure (1) and (2) above.</li>
+<li><strong>Integral probability metrics</strong> — Wasserstein, MMD, total variation. Built by maximising a difference of <em>expectations</em> over a class of test functions, so they need only the ability to draw samples.</li>
+</ul>
+<p>Total variation is the one distribution in both families. <strong>Wasserstein is an IPM and is not an <span class="math inline">\(f\)</span>-divergence</strong> — which is precisely why it survives disjoint supports where every <span class="math inline">\(f\)</span>-divergence saturates.</p>
+<p>That is note 07. Once you can measure the gap between two distributions without writing either of them down, you can train a generative model — and the rest of this course is the construction of one particular, very well-behaved way of doing so.</p>
+</div>
+</div>
+</section>
+<section id="where-each-piece-returns" class="level2">
+<h2 class="anchored" data-anchor-id="where-each-piece-returns">11. Where each piece returns</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>From this note</th>
+<th>Where it reappears</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\ell(\Theta) = \log\det\Theta - \operatorname{tr}(S\Theta)\)</span></td>
+<td>the Gaussian KL formula in note 07</td>
+</tr>
+<tr class="even">
+<td>Latent variable + marginalise</td>
+<td>the ELBO, and the diffusion training objective</td>
+</tr>
+<tr class="odd">
+<td>EM as bound optimisation</td>
+<td>the variational lower bound of Module 3</td>
+</tr>
+<tr class="even">
+<td>Curse of dimensionality</td>
+<td>why we learn a score instead of a density</td>
+</tr>
+<tr class="odd">
+<td>Langevin / MCMC with a score</td>
+<td>Module 4: score matching, and Module 5’s SDEs</td>
+</tr>
+<tr class="even">
+<td>Penalties are log-priors</td>
+<td>the ELBO’s prior term, read the same way</td>
+</tr>
+<tr class="odd">
+<td>Manifold / singular covariance</td>
+<td>why <span class="math inline">\(p(x)\)</span> is the wrong object for images</td>
+</tr>
+<tr class="even">
+<td>“Compare, don’t describe”</td>
+<td>note 07, and the whole of Modules 3–6</td>
+</tr>
+</tbody>
+</table>
+<p>The segue is §10: if estimating <span class="math inline">\(p_\text{data}\)</span> directly is hopeless, stop describing distributions and start <strong>comparing</strong> them. That is note 07.</p>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Derive <span class="math inline">\(\hat\mu = \bar x\)</span> from <span class="math inline">\(\partial\ell/\partial\mu = 0\)</span>, and confirm it does not depend on <span class="math inline">\(\Sigma\)</span>.</li>
+<li>Verify the trace trick line by line for <span class="math inline">\(n=2\)</span>, <span class="math inline">\(p=2\)</span>.</li>
+<li>Show <span class="math inline">\(\operatorname{rank}(S) \le n-1\)</span>. <em>(Hint: the centred vectors satisfy one linear constraint.)</em></li>
+<li>For the AR(1) example of §3, invert <span class="math inline">\(\Sigma\)</span> by hand and confirm <span class="math inline">\(\Theta_{13} = 0\)</span>. Then compute <span class="math inline">\(\operatorname{Cov}(X_1,X_3 \mid X_2)\)</span> from the block formula of note 05 and check the two agree.</li>
+<li>Construct a <span class="math inline">\(3\times3\)</span> correlation matrix whose <em>marginal</em> correlations are all non-zero but whose precision matrix has a zero. What does the graph look like?</li>
+<li>Show the Gaussian mixture likelihood is unbounded: exhibit a parameter sequence sending it to <span class="math inline">\(+\infty\)</span>. Why does this not happen with a single Gaussian?</li>
+<li>Show <span class="math inline">\(k\)</span>-means is EM for a mixture with <span class="math inline">\(\Sigma_k = \sigma^2 I\)</span> in the limit <span class="math inline">\(\sigma \to 0\)</span>.</li>
+<li>Using MISE <span class="math inline">\(\asymp n^{-4/(p+4)}\)</span>, find the <span class="math inline">\(n\)</span> needed at <span class="math inline">\(p = 30\)</span> to match the accuracy of <span class="math inline">\(n = 1000\)</span> at <span class="math inline">\(p = 2\)</span>. Comment.</li>
+<li>Show that the inverse-Wishart posterior scale <span class="math inline">\(\Psi + nS\)</span> is positive definite whenever <span class="math inline">\(\Psi\)</span> is, even if <span class="math inline">\(S\)</span> is singular. What is the Bayesian analogue of “the penalty repaired the rank deficiency”?</li>
+<li>Show the graphical lasso is the MAP estimate under a Laplace prior on the off-diagonal entries of <span class="math inline">\(\Theta\)</span>. What prior gives ridge?</li>
+<li>Prove <span class="math inline">\(\arg\max_\theta \mathbb{E}[\log p_\theta] = \arg\min_\theta
+\mathrm{KL}(p_\text{data}\|p_\theta)\)</span>, and say exactly where you used that the entropy does not depend on <span class="math inline">\(\theta\)</span>.</li>
+<li>Let <span class="math inline">\(p = \delta_0\)</span> and <span class="math inline">\(q = \delta_\varepsilon\)</span> be point masses. Compute <span class="math inline">\(\mathrm{KL}(p\|q)\)</span> and the Wasserstein-1 distance as <span class="math inline">\(\varepsilon \to 0\)</span>. Which one is useful for gradient descent, and why?</li>
+<li>Write the Langevin update for <span class="math inline">\(p = \mathcal{N}(\mu,\sigma^2)\)</span> explicitly. Confirm the normalising constant never appears.</li>
+<li>A <span class="math inline">\(p=50\)</span> dataset has <span class="math inline">\(n=40\)</span> samples. Which estimator from §4 would you choose and why? What scientific claim does your choice commit you to?</li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/acads-iit-jammu\.github\.io\/diffusion-models-f26");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../tutorials/12-multivariate-gaussian.html" class="pagination-link" aria-label="05 · The Multivariate Gaussian — A Working Reference">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">05 · The Multivariate Gaussian — A Working Reference</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../tutorials/15-comparing-distributions.html" class="pagination-link" aria-label="07 · Comparing Distributions: From CDFs to KL, and the Two Families">
+        <span class="nav-page-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

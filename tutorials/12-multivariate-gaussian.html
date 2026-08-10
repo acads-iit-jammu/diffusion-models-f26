@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/15-comparing-distributions.html" rel="next">
+<link href="../tutorials/17-density-estimation-many-dimensions.html" rel="next">
 <link href="../tutorials/02-distributions-mle.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -220,8 +220,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/17-density-estimation-many-dimensions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Estimating a Density in Many Dimensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">08 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
+ <span class="menu-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
   </div>
 </li>
       </ul>
@@ -237,38 +243,44 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../decks/01-mechanics.html" class="sidebar-item-text sidebar-link">
+  <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">01 · Course Mechanics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../decks/02-motivation.html" class="sidebar-item-text sidebar-link">
+  <a href="../materials/w01-deck-02-motivation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">02 · Why Diffusion Models?</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../decks/03-two-point.html" class="sidebar-item-text sidebar-link">
+  <a href="../materials/w01-deck-03-toy-example.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../decks/04-probability-joints.html" class="sidebar-item-text sidebar-link">
+  <a href="../materials/w02-deck-00-probability-joints.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../decks/05-distributions-mle.html" class="sidebar-item-text sidebar-link">
+  <a href="../materials/w02-deck-01-distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../decks/06-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../materials/w02-deck-02-genai-maps.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w03-deck-01-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · The Multivariate Gaussian</span></a>
   </div>
 </li>
       </ul>
@@ -343,7 +355,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../decks/map-proved.html" class="sidebar-item-text sidebar-link">
+  <a href="../materials/w02-deck-03-map-limit.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Deck · The Map, Proved</span></a>
   </div>
 </li>
@@ -388,7 +400,12 @@ window.Quarto = {
   </ul></li>
   <li><a href="#identity-covariance-the-joint-is-a-product" id="toc-identity-covariance-the-joint-is-a-product" class="nav-link" data-scroll-target="#identity-covariance-the-joint-is-a-product">2. Identity covariance: the joint <em>is</em> a product</a></li>
   <li><a href="#the-results-in-one-table" id="toc-the-results-in-one-table" class="nav-link" data-scroll-target="#the-results-in-one-table">3. The results, in one table</a></li>
-  <li><a href="#linear-transformations-which-is-the-whole-engine" id="toc-linear-transformations-which-is-the-whole-engine" class="nav-link" data-scroll-target="#linear-transformations-which-is-the-whole-engine">4. Linear transformations, which is the whole engine</a></li>
+  <li><a href="#linear-transformations-which-is-the-whole-engine" id="toc-linear-transformations-which-is-the-whole-engine" class="nav-link" data-scroll-target="#linear-transformations-which-is-the-whole-engine">4. Linear transformations, which is the whole engine</a>
+  <ul class="collapse">
+  <li><a href="#the-moment-generating-function" id="toc-the-moment-generating-function" class="nav-link" data-scroll-target="#the-moment-generating-function">The moment generating function</a></li>
+  <li><a href="#the-mgf-of-a-gaussian" id="toc-the-mgf-of-a-gaussian" class="nav-link" data-scroll-target="#the-mgf-of-a-gaussian">The MGF of a Gaussian</a></li>
+  <li><a href="#the-affine-theorem-one-step-at-a-time" id="toc-the-affine-theorem-one-step-at-a-time" class="nav-link" data-scroll-target="#the-affine-theorem-one-step-at-a-time">The affine theorem, one step at a time</a></li>
+  </ul></li>
   <li><a href="#marginals-and-conditionals" id="toc-marginals-and-conditionals" class="nav-link" data-scroll-target="#marginals-and-conditionals">5. Marginals and conditionals</a></li>
   <li><a href="#sums-and-why-noise-accumulates-the-way-it-does" id="toc-sums-and-why-noise-accumulates-the-way-it-does" class="nav-link" data-scroll-target="#sums-and-why-noise-accumulates-the-way-it-does">6. Sums, and why noise accumulates the way it does</a></li>
   <li><a href="#where-each-result-gets-used" id="toc-where-each-result-gets-used" class="nav-link" data-scroll-target="#where-each-result-gets-used">7. Where each result gets used</a></li>
@@ -558,14 +575,108 @@ Diagonal <span class="math inline">\(\Sigma\)</span> means independent — but o
 \operatorname{Cov}(Y) = \mathbb{E}\big[(Y - A\mu - b)(\cdot)^{\!\top}\big]
 = \mathbb{E}\big[A(X-\mu)(X-\mu)^{\!\top}A^{\!\top}\big] = A\Sigma A^{\!\top}.
 \]</span></p>
-<p><strong>Why the result is still Gaussian.</strong> That is the content. The quickest argument uses the MGF: for any <span class="math inline">\(t\)</span>,</p>
+<p><strong>Why the result is still Gaussian.</strong> That is the content, and it deserves more than one line. The argument runs through the moment generating function, so we build that first.</p>
+<section id="the-moment-generating-function" class="level3">
+<h3 class="anchored" data-anchor-id="the-moment-generating-function">The moment generating function</h3>
+<p>For a random vector <span class="math inline">\(X\)</span> in <span class="math inline">\(\mathbb{R}^d\)</span>, define</p>
 <p><span class="math display">\[
-\mathbb{E}\big[e^{t^{\!\top}Y}\big]
-= e^{t^{\!\top}b}\,\mathbb{E}\big[e^{(A^{\!\top}t)^{\!\top}X}\big]
-= e^{t^{\!\top}b}\exp\!\Big((A^{\!\top}t)^{\!\top}\mu + \tfrac12 (A^{\!\top}t)^{\!\top}\Sigma (A^{\!\top}t)\Big)
-= \exp\!\Big(t^{\!\top}(A\mu + b) + \tfrac12 t^{\!\top}A\Sigma A^{\!\top} t\Big),
+M_X(t) \;=\; \mathbb{E}\big[e^{t^{\!\top}X}\big], \qquad t \in \mathbb{R}^d .
 \]</span></p>
-<p>which is exactly the MGF of <span class="math inline">\(\mathcal{N}(A\mu+b, A\Sigma A^{\!\top})\)</span>. Since the MGF determines the distribution, done.</p>
+<p>It is called <em>moment generating</em> because differentiating at the origin returns the moments. In one dimension, expanding <span class="math inline">\(e^{tX} = \sum_k t^k X^k / k!\)</span> and differentiating term by term gives <span class="math inline">\(M^{(k)}(0) = \mathbb{E}[X^k]\)</span>. In <span class="math inline">\(d\)</span> dimensions the same expansion gives</p>
+<p><span class="math display">\[
+\nabla M_X(0) = \mathbb{E}[X] = \mu, \qquad
+\nabla^2 M_X(0) = \mathbb{E}\big[XX^{\!\top}\big] = \Sigma + \mu\mu^{\!\top} .
+\]</span></p>
+<p>So the MGF packages every moment into a single function of <span class="math inline">\(t\)</span>.</p>
+<p><strong>The property we actually need is stronger than that.</strong> It is the <em>uniqueness theorem</em>: if <span class="math inline">\(M_X(t) = M_Y(t)\)</span> for all <span class="math inline">\(t\)</span> in some open neighbourhood of the origin, then <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> have the <strong>same distribution</strong>. The MGF does not merely summarise a law — it determines it. That is what licenses an argument of the form “compute an MGF, recognise it, conclude”.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+One caveat, stated honestly
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The MGF characterises a distribution <em>when it exists in a neighbourhood of <span class="math inline">\(0\)</span></em>, and not every distribution has one — <span class="math inline">\(\mathbb{E}[e^{tX}]\)</span> is infinite for all <span class="math inline">\(t \ne 0\)</span> for a Cauchy, and for all <span class="math inline">\(t &gt; 0\)</span> for a lognormal. The fix is the <strong>characteristic function</strong> <span class="math inline">\(\varphi_X(t) = \mathbb{E}[e^{i t^{\!\top}X}]\)</span>, which exists for every distribution because <span class="math inline">\(|e^{i\theta}| = 1\)</span>, and which satisfies the same uniqueness theorem. Every argument below goes through verbatim with <span class="math inline">\(\varphi\)</span> in place of <span class="math inline">\(M\)</span> and <span class="math inline">\(it\)</span> in place of <span class="math inline">\(t\)</span>. For the Gaussian the MGF exists for all <span class="math inline">\(t \in \mathbb{R}^d\)</span>, so we may use the simpler object.</p>
+</div>
+</div>
+</section>
+<section id="the-mgf-of-a-gaussian" class="level3">
+<h3 class="anchored" data-anchor-id="the-mgf-of-a-gaussian">The MGF of a Gaussian</h3>
+<p>Take the scalar case first, <span class="math inline">\(X \sim \mathcal{N}(\mu,\sigma^2)\)</span>:</p>
+<p><span class="math display">\[
+M_X(t) = \int_{-\infty}^{\infty} e^{tx}\,
+\frac{1}{\sqrt{2\pi\sigma^2}}\, e^{-(x-\mu)^2/2\sigma^2}\, dx .
+\]</span></p>
+<p>Everything is in the exponent, so <strong>complete the square</strong> there. Writing the two terms over a common denominator and grouping,</p>
+<p><span class="math display">\[
+tx - \frac{(x-\mu)^2}{2\sigma^2}
+\;=\;
+\underbrace{\mu t + \tfrac12 \sigma^2 t^2}_{\text{free of } x}
+\;-\; \frac{\big(x - \mu - \sigma^2 t\big)^2}{2\sigma^2} .
+\]</span></p>
+<p>(Multiply out both sides to check it; the cross terms are what force the <span class="math inline">\(\tfrac12\sigma^2t^2\)</span>.) The first part comes outside the integral, and what is left is a Gaussian density with mean <span class="math inline">\(\mu + \sigma^2 t\)</span> and variance <span class="math inline">\(\sigma^2\)</span>, which integrates to <span class="math inline">\(1\)</span>. Hence</p>
+<p><span class="math display">\[
+\boxed{\;M_X(t) = \exp\!\Big(\mu t + \tfrac12 \sigma^2 t^2\Big).\;}
+\]</span></p>
+<p>Note the shape: <strong>the exponent is a quadratic in <span class="math inline">\(t\)</span>.</strong> Everything that follows is a consequence of that one fact.</p>
+<p>Now <span class="math inline">\(d\)</span> dimensions. For <span class="math inline">\(Z \sim \mathcal{N}(0, I_d)\)</span> the coordinates are independent standard normals, so the expectation factorises:</p>
+<p><span class="math display">\[
+M_Z(t) = \mathbb{E}\Big[\textstyle\prod_i e^{t_i Z_i}\Big]
+= \prod_i \mathbb{E}\big[e^{t_i Z_i}\big]
+= \prod_i e^{t_i^2/2}
+= e^{\frac12 t^{\!\top}t} .
+\]</span></p>
+<p>For general <span class="math inline">\(X \sim \mathcal{N}(\mu,\Sigma)\)</span>, factor <span class="math inline">\(\Sigma = LL^{\!\top}\)</span> and substitute <span class="math inline">\(x = \mu + Lu\)</span> in the defining integral. The Jacobian is the constant <span class="math inline">\(\det L\)</span>, which cancels against the <span class="math inline">\((\det\Sigma)^{1/2} = |\det L|\)</span> in the normalising constant, and the quadratic form becomes <span class="math inline">\(u^{\!\top}u\)</span>. What remains is the standard-normal integral evaluated at <span class="math inline">\(L^{\!\top}t\)</span>:</p>
+<p><span class="math display">\[
+M_X(t) = e^{t^{\!\top}\mu}\, M_Z\big(L^{\!\top}t\big)
+= e^{t^{\!\top}\mu}\, e^{\frac12 (L^{\!\top}t)^{\!\top}(L^{\!\top}t)}
+= \exp\!\Big(t^{\!\top}\mu + \tfrac12 t^{\!\top}LL^{\!\top}t\Big),
+\]</span></p>
+<p>so</p>
+<p><span class="math display">\[
+\boxed{\;M_X(t) = \exp\!\Big(t^{\!\top}\mu + \tfrac12\, t^{\!\top}\Sigma\, t\Big).\;}
+\]</span></p>
+<p>This is a change of variables inside an integral, not an appeal to the affine theorem — so there is no circularity in using it to prove that theorem next.</p>
+</section>
+<section id="the-affine-theorem-one-step-at-a-time" class="level3">
+<h3 class="anchored" data-anchor-id="the-affine-theorem-one-step-at-a-time">The affine theorem, one step at a time</h3>
+<p>Compute the MGF of <span class="math inline">\(Y = AX + b\)</span> and see what it turns out to be.</p>
+<p><span class="math display">\[
+M_Y(t) \;=\; \mathbb{E}\big[e^{t^{\!\top}Y}\big]
+\;=\; \mathbb{E}\big[e^{t^{\!\top}(AX+b)}\big]
+\qquad\text{(definition, then substitute } Y)
+\]</span></p>
+<p><span class="math display">\[
+=\; e^{t^{\!\top}b}\; \mathbb{E}\big[e^{t^{\!\top}AX}\big]
+\qquad\text{($b$ is constant, so } e^{t^{\!\top}b} \text{ leaves the expectation)}
+\]</span></p>
+<p><span class="math display">\[
+=\; e^{t^{\!\top}b}\; \mathbb{E}\big[e^{(A^{\!\top}t)^{\!\top}X}\big]
+\qquad\text{(since } t^{\!\top}A = (A^{\!\top}t)^{\!\top})
+\]</span></p>
+<p>That third line is the move that makes the whole thing work: the matrix has been pushed <strong>off the random vector and onto the argument of the MGF</strong>. The expectation is now <span class="math inline">\(M_X\)</span> evaluated at the point <span class="math inline">\(A^{\!\top}t\)</span>, and we know <span class="math inline">\(M_X\)</span>:</p>
+<p><span class="math display">\[
+=\; e^{t^{\!\top}b}\, \exp\!\Big((A^{\!\top}t)^{\!\top}\mu
++ \tfrac12 (A^{\!\top}t)^{\!\top}\Sigma\,(A^{\!\top}t)\Big)
+\qquad\text{(apply the Gaussian MGF)}
+\]</span></p>
+<p><span class="math display">\[
+=\; \exp\!\Big(t^{\!\top}b + t^{\!\top}\!A\mu
++ \tfrac12\, t^{\!\top}\!A\Sigma A^{\!\top} t\Big)
+\qquad\text{(transpose each piece)}
+\]</span></p>
+<p><span class="math display">\[
+=\; \exp\!\Big(t^{\!\top}\big(A\mu + b\big)
++ \tfrac12\, t^{\!\top}\big(A\Sigma A^{\!\top}\big) t\Big)
+\qquad\text{(collect the linear terms)}
+\]</span></p>
+<p><strong>Now read the answer.</strong> It has the form <span class="math inline">\(\exp\big(t^{\!\top}m + \tfrac12
+t^{\!\top}S\,t\big)\)</span> — a linear term plus a quadratic term, which is precisely the shape of a Gaussian MGF, with <span class="math inline">\(m = A\mu+b\)</span> and <span class="math inline">\(S = A\Sigma A^{\!\top}\)</span>. By the uniqueness theorem, a distribution with that MGF <em>is</em> <span class="math inline">\(\mathcal{N}(A\mu+b,
+A\Sigma A^{\!\top})\)</span>. <span class="math inline">\(\square\)</span></p>
+<p><strong>What made it work.</strong> A Gaussian MGF is the exponential of a quadratic in <span class="math inline">\(t\)</span>. Substituting <span class="math inline">\(A^{\!\top}t\)</span> into a quadratic yields another quadratic — that is the entire mechanism, and it is why the family is closed. Push a distribution whose MGF is <em>not</em> the exponential of a quadratic through the same steps and you land on a function of a different shape, which is a different family. Closure under linear maps is not a lucky property of the Gaussian; it is a restatement of the fact that its log-MGF is quadratic.</p>
 <p><strong>Sampling and whitening are this result, read in the two directions.</strong> Factor <span class="math inline">\(\Sigma = LL^{\!\top}\)</span> (Cholesky, or <span class="math inline">\(\Sigma^{1/2}\)</span> from the eigendecomposition). Then</p>
 <ul>
 <li><em>forward</em>, <span class="math inline">\(z \sim \mathcal{N}(0,I) \Rightarrow \mu + Lz \sim \mathcal{N}(\mu, LL^{\!\top}) = \mathcal{N}(\mu,\Sigma)\)</span> — this is how you sample any Gaussian from standard noise;</li>
@@ -588,6 +699,7 @@ The reason this family and no other
 <p><strong>Interactive demo</strong> — <a href="../materials/gaussian-lab.html" target="_blank">The Gaussian Lab</a></p>
 <iframe src="../materials/gaussian-lab.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: the bivariate normal and its covariance, affine maps of a Gaussian cloud, and the central limit theorem">
 </iframe>
+</section>
 </section>
 <section id="marginals-and-conditionals" class="level2">
 <h2 class="anchored" data-anchor-id="marginals-and-conditionals">5. Marginals and conditionals</h2>
@@ -1109,8 +1221,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/15-comparing-distributions.html" class="pagination-link" aria-label="08 · Comparing Distributions: From CDFs to KL, and the Two Families">
-        <span class="nav-page-text">08 · Comparing Distributions: From CDFs to KL, and the Two Families</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/17-density-estimation-many-dimensions.html" class="pagination-link" aria-label="06 · Estimating a Density in Many Dimensions">
+        <span class="nav-page-text">06 · Estimating a Density in Many Dimensions</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
