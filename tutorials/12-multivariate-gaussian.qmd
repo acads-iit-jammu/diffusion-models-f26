@@ -128,18 +128,166 @@ $$
 = \mathbb{E}\big[A(X-\mu)(X-\mu)^{\!\top}A^{\!\top}\big] = A\Sigma A^{\!\top}.
 $$
 
-**Why the result is still Gaussian.** That is the content. The quickest argument
-uses the MGF: for any $t$,
+**Why the result is still Gaussian.** That is the content, and it deserves more
+than one line. The argument runs through the moment generating function, so we
+build that first.
+
+### The moment generating function
+
+For a random vector $X$ in $\mathbb{R}^d$, define
 
 $$
-\mathbb{E}\big[e^{t^{\!\top}Y}\big]
-= e^{t^{\!\top}b}\,\mathbb{E}\big[e^{(A^{\!\top}t)^{\!\top}X}\big]
-= e^{t^{\!\top}b}\exp\!\Big((A^{\!\top}t)^{\!\top}\mu + \tfrac12 (A^{\!\top}t)^{\!\top}\Sigma (A^{\!\top}t)\Big)
-= \exp\!\Big(t^{\!\top}(A\mu + b) + \tfrac12 t^{\!\top}A\Sigma A^{\!\top} t\Big),
+M_X(t) \;=\; \mathbb{E}\big[e^{t^{\!\top}X}\big], \qquad t \in \mathbb{R}^d .
 $$
 
-which is exactly the MGF of $\mathcal{N}(A\mu+b, A\Sigma A^{\!\top})$. Since the
-MGF determines the distribution, done.
+It is called *moment generating* because differentiating at the origin returns
+the moments. In one dimension, expanding $e^{tX} = \sum_k t^k X^k / k!$ and
+differentiating term by term gives $M^{(k)}(0) = \mathbb{E}[X^k]$. In $d$
+dimensions the same expansion gives
+
+$$
+\nabla M_X(0) = \mathbb{E}[X] = \mu, \qquad
+\nabla^2 M_X(0) = \mathbb{E}\big[XX^{\!\top}\big] = \Sigma + \mu\mu^{\!\top} .
+$$
+
+So the MGF packages every moment into a single function of $t$.
+
+**The property we actually need is stronger than that.** It is the *uniqueness
+theorem*: if $M_X(t) = M_Y(t)$ for all $t$ in some open neighbourhood of the
+origin, then $X$ and $Y$ have the **same distribution**. The MGF does not merely
+summarise a law — it determines it. That is what licenses an argument of the form
+"compute an MGF, recognise it, conclude".
+
+::: {.callout-warning}
+## One caveat, stated honestly
+
+The MGF characterises a distribution *when it exists in a neighbourhood of $0$*,
+and not every distribution has one — $\mathbb{E}[e^{tX}]$ is infinite for all
+$t \ne 0$ for a Cauchy, and for all $t > 0$ for a lognormal. The fix is the
+**characteristic function** $\varphi_X(t) = \mathbb{E}[e^{i t^{\!\top}X}]$, which
+exists for every distribution because $|e^{i\theta}| = 1$, and which satisfies the
+same uniqueness theorem. Every argument below goes through verbatim with
+$\varphi$ in place of $M$ and $it$ in place of $t$. For the Gaussian the MGF
+exists for all $t \in \mathbb{R}^d$, so we may use the simpler object.
+:::
+
+### The MGF of a Gaussian
+
+Take the scalar case first, $X \sim \mathcal{N}(\mu,\sigma^2)$:
+
+$$
+M_X(t) = \int_{-\infty}^{\infty} e^{tx}\,
+\frac{1}{\sqrt{2\pi\sigma^2}}\, e^{-(x-\mu)^2/2\sigma^2}\, dx .
+$$
+
+Everything is in the exponent, so **complete the square** there. Writing the two
+terms over a common denominator and grouping,
+
+$$
+tx - \frac{(x-\mu)^2}{2\sigma^2}
+\;=\;
+\underbrace{\mu t + \tfrac12 \sigma^2 t^2}_{\text{free of } x}
+\;-\; \frac{\big(x - \mu - \sigma^2 t\big)^2}{2\sigma^2} .
+$$
+
+(Multiply out both sides to check it; the cross terms are what force the
+$\tfrac12\sigma^2t^2$.) The first part comes outside the integral, and what is
+left is a Gaussian density with mean $\mu + \sigma^2 t$ and variance $\sigma^2$,
+which integrates to $1$. Hence
+
+$$
+\boxed{\;M_X(t) = \exp\!\Big(\mu t + \tfrac12 \sigma^2 t^2\Big).\;}
+$$
+
+Note the shape: **the exponent is a quadratic in $t$.** Everything that follows is
+a consequence of that one fact.
+
+Now $d$ dimensions. For $Z \sim \mathcal{N}(0, I_d)$ the coordinates are
+independent standard normals, so the expectation factorises:
+
+$$
+M_Z(t) = \mathbb{E}\Big[\textstyle\prod_i e^{t_i Z_i}\Big]
+= \prod_i \mathbb{E}\big[e^{t_i Z_i}\big]
+= \prod_i e^{t_i^2/2}
+= e^{\frac12 t^{\!\top}t} .
+$$
+
+For general $X \sim \mathcal{N}(\mu,\Sigma)$, factor $\Sigma = LL^{\!\top}$ and
+substitute $x = \mu + Lu$ in the defining integral. The Jacobian is the constant
+$\det L$, which cancels against the $(\det\Sigma)^{1/2} = |\det L|$ in the
+normalising constant, and the quadratic form becomes $u^{\!\top}u$. What remains
+is the standard-normal integral evaluated at $L^{\!\top}t$:
+
+$$
+M_X(t) = e^{t^{\!\top}\mu}\, M_Z\big(L^{\!\top}t\big)
+= e^{t^{\!\top}\mu}\, e^{\frac12 (L^{\!\top}t)^{\!\top}(L^{\!\top}t)}
+= \exp\!\Big(t^{\!\top}\mu + \tfrac12 t^{\!\top}LL^{\!\top}t\Big),
+$$
+
+so
+
+$$
+\boxed{\;M_X(t) = \exp\!\Big(t^{\!\top}\mu + \tfrac12\, t^{\!\top}\Sigma\, t\Big).\;}
+$$
+
+This is a change of variables inside an integral, not an appeal to the affine
+theorem — so there is no circularity in using it to prove that theorem next.
+
+### The affine theorem, one step at a time
+
+Compute the MGF of $Y = AX + b$ and see what it turns out to be.
+
+$$
+M_Y(t) \;=\; \mathbb{E}\big[e^{t^{\!\top}Y}\big]
+\;=\; \mathbb{E}\big[e^{t^{\!\top}(AX+b)}\big]
+\qquad\text{(definition, then substitute } Y)
+$$
+
+$$
+=\; e^{t^{\!\top}b}\; \mathbb{E}\big[e^{t^{\!\top}AX}\big]
+\qquad\text{($b$ is constant, so } e^{t^{\!\top}b} \text{ leaves the expectation)}
+$$
+
+$$
+=\; e^{t^{\!\top}b}\; \mathbb{E}\big[e^{(A^{\!\top}t)^{\!\top}X}\big]
+\qquad\text{(since } t^{\!\top}A = (A^{\!\top}t)^{\!\top})
+$$
+
+That third line is the move that makes the whole thing work: the matrix has been
+pushed **off the random vector and onto the argument of the MGF**. The
+expectation is now $M_X$ evaluated at the point $A^{\!\top}t$, and we know $M_X$:
+
+$$
+=\; e^{t^{\!\top}b}\, \exp\!\Big((A^{\!\top}t)^{\!\top}\mu
++ \tfrac12 (A^{\!\top}t)^{\!\top}\Sigma\,(A^{\!\top}t)\Big)
+\qquad\text{(apply the Gaussian MGF)}
+$$
+
+$$
+=\; \exp\!\Big(t^{\!\top}b + t^{\!\top}\!A\mu
++ \tfrac12\, t^{\!\top}\!A\Sigma A^{\!\top} t\Big)
+\qquad\text{(transpose each piece)}
+$$
+
+$$
+=\; \exp\!\Big(t^{\!\top}\big(A\mu + b\big)
++ \tfrac12\, t^{\!\top}\big(A\Sigma A^{\!\top}\big) t\Big)
+\qquad\text{(collect the linear terms)}
+$$
+
+**Now read the answer.** It has the form $\exp\big(t^{\!\top}m + \tfrac12
+t^{\!\top}S\,t\big)$ — a linear term plus a quadratic term, which is precisely the
+shape of a Gaussian MGF, with $m = A\mu+b$ and $S = A\Sigma A^{\!\top}$. By the
+uniqueness theorem, a distribution with that MGF *is* $\mathcal{N}(A\mu+b,
+A\Sigma A^{\!\top})$. $\square$
+
+**What made it work.** A Gaussian MGF is the exponential of a quadratic in $t$.
+Substituting $A^{\!\top}t$ into a quadratic yields another quadratic — that is the
+entire mechanism, and it is why the family is closed. Push a distribution whose
+MGF is *not* the exponential of a quadratic through the same steps and you land on
+a function of a different shape, which is a different family. Closure under linear
+maps is not a lucky property of the Gaussian; it is a restatement of the fact that
+its log-MGF is quadratic.
 
 **Sampling and whitening are this result, read in the two directions.** Factor
 $\Sigma = LL^{\!\top}$ (Cholesky, or $\Sigma^{1/2}$ from the eigendecomposition).

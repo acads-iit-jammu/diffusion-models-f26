@@ -83,5 +83,10 @@ properly (it drives the browser and waits) — not currently installed.
   directly, delete them yourself.
 - `quarto render a.qmd b.qmd` renders only the **first** file. Always loop, or
   use `build-decks.sh`.
+- Not all LaTeX survives the MathML conversion, and failure is **silent**:
+  Pandoc emits the raw `$$...$$` into the slide instead of an equation. The one
+  that bit us was `\small` inside `\text{}`. Put step annotations outside the
+  math as `[caption]{.step}` rather than inside it. `build-decks.sh` now warns
+  when any unconverted math survives a build.
 - The output filename matches the source and *is* the public URL. Renaming a
   deck breaks live links.

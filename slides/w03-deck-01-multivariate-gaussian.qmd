@@ -1,0 +1,322 @@
+---
+title: "The Multivariate Gaussian"
+subtitle: "W03 · Part 1 — what Σ controls, and why affine maps never leave the family"
+author: "Uma Satyaranjan · Soma S Dhavala"
+date: "ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"
+date-format: "[ID-5-02 (TO) · Monsoon 2026 · IIT Jammu]"
+---
+
+## Where we are
+
+- W02 ended at maximum likelihood in **one** dimension
+- Data is not one-dimensional: an MNIST digit is a point in $\mathbb{R}^{784}$
+- Today: the one family that survives everything we do to it
+
+::: {.note}
+The claim to keep in view: almost every operation in this course is **linear** —
+adding noise, blending signal and noise, projecting, marginalising. The Gaussian
+is closed under all of them, with parameters you can compute in closed form.
+:::
+
+## The density
+
+For $X \sim \mathcal{N}(\mu, \Sigma)$ in $\mathbb{R}^d$, with $\Sigma$ symmetric
+positive definite,
+
+$$p(x) = \frac{1}{(2\pi)^{d/2}\,(\det\Sigma)^{1/2}}
+\exp\!\Big(-\tfrac12 (x-\mu)^{\!\top}\Sigma^{-1}(x-\mu)\Big)$$
+
+- The exponent is a **quadratic form** — so level sets are ellipsoids, always
+- $\mu$ moves the centre; $\Sigma$ sets the shape, spread and tilt
+- $\det\Sigma$ in the constant is the volume factor that makes it integrate to 1
+
+## What it costs to go multivariate
+
+A full $\Sigma$ has $\tfrac{d(d+1)}{2}$ free entries, plus $d$ for the mean:
+
+$$\frac{d(d+3)}{2}\ \text{parameters}$$
+
+| $d$ | parameters |
+|---|---|
+| 2 | 5 |
+| 10 | 65 |
+| 784 (MNIST) | **308,504** |
+
+::: {.note}
+This is the first honest sign of trouble in high dimension — and the reason
+structure (diagonal, low-rank, factorised) is not laziness but necessity.
+:::
+
+## Identity covariance: the joint *is* a product
+
+Set $\mu = 0$, $\Sigma = I$. The exponent becomes a **sum of squares**, and a sum
+in the exponent is a product outside it:
+
+$$p(x) = \frac{1}{(2\pi)^{d/2}} e^{-\frac12 \sum_i x_i^2}
+= \prod_{i=1}^{d} \frac{1}{\sqrt{2\pi}} e^{-x_i^2/2}$$
+
+So $\mathcal{N}(0,I)$ is exactly $d$ independent standard normals.
+
+::: {.note}
+Diagonal $\Sigma$ $\Rightarrow$ independent coordinates — but **only because it is
+Gaussian**. In general, uncorrelated does not imply independent.
+:::
+
+## The results, in one table
+
+$X \sim \mathcal{N}(\mu,\Sigma)$ throughout.
+
+| Result | Statement |
+|---|---|
+| **Affine map** | $AX + b \sim \mathcal{N}(A\mu + b,\ A\Sigma A^{\!\top})$ |
+| **Projection** | $a^{\!\top}X \sim \mathcal{N}(a^{\!\top}\mu,\ a^{\!\top}\Sigma a)$ |
+| **Marginal** | $X_S \sim \mathcal{N}(\mu_S, \Sigma_{SS})$ — delete the other rows and columns |
+| **Independent sum** | $X + Y \sim \mathcal{N}(\mu+\nu,\ \Sigma + T)$ |
+| **Whitening** | $\Sigma = LL^{\!\top} \Rightarrow L^{-1}(X-\mu) \sim \mathcal{N}(0,I)$ |
+| **MGF** | $\mathbb{E}\big[e^{t^{\!\top}X}\big] = \exp\!\big(t^{\!\top}\mu + \tfrac12 t^{\!\top}\Sigma t\big)$ |
+
+The first line is the engine. Everything above it is a special case — and we
+prove it now.
+
+## The claim
+
+::: {.note}
+**Theorem.** Let $X \sim \mathcal{N}(\mu,\Sigma)$ in $\mathbb{R}^d$, and let
+$A \in \mathbb{R}^{m\times d}$, $b \in \mathbb{R}^m$. Then
+
+$$Y = AX + b \;\sim\; \mathcal{N}\big(A\mu + b,\ A\Sigma A^{\!\top}\big).$$
+:::
+
+Two separate things to establish, and it is worth not conflating them:
+
+1. the **mean and covariance** are what the formula says — true for *any*
+   distribution with two moments, no normality involved;
+2. the result is **still Gaussian** — this is the part with content.
+
+## Step 1 — mean and covariance need no normality
+
+Linearity of expectation:
+
+$$\mathbb{E}[Y] = A\,\mathbb{E}[X] + b = A\mu + b$$
+
+::: {.fragment}
+And straight from the definition of covariance, using
+$Y - \mathbb{E}[Y] = A(X - \mu)$:
+
+$$\operatorname{Cov}(Y) = \mathbb{E}\big[(Y-\mathbb{E}Y)(Y-\mathbb{E}Y)^{\!\top}\big]
+= \mathbb{E}\big[A(X-\mu)(X-\mu)^{\!\top}A^{\!\top}\big]$$
+:::
+
+::: {.fragment}
+$A$ is constant, so it comes outside the expectation:
+
+$$\operatorname{Cov}(Y) = A\,\mathbb{E}\big[(X-\mu)(X-\mu)^{\!\top}\big]\,A^{\!\top} = A\Sigma A^{\!\top}$$
+:::
+
+::: {.fragment}
+Note $b$ has vanished — shifting cannot change a covariance.
+:::
+
+## Detour: the moment generating function
+
+For a random vector $X$ in $\mathbb{R}^d$,
+
+$$M_X(t) \;=\; \mathbb{E}\big[e^{t^{\!\top}X}\big], \qquad t \in \mathbb{R}^d$$
+
+::: {.fragment}
+**Why "moment generating".** Expand $e^{tX} = \sum_k t^k X^k/k!$ and
+differentiate at the origin — each derivative pulls down one moment:
+
+$$\nabla M_X(0) = \mu, \qquad \nabla^2 M_X(0) = \mathbb{E}\big[XX^{\!\top}\big] = \Sigma + \mu\mu^{\!\top}$$
+:::
+
+::: {.fragment}
+One function of $t$, carrying every moment of $X$.
+:::
+
+## Why the MGF is enough
+
+::: {.note}
+**Uniqueness theorem.** If $M_X(t) = M_Y(t)$ for all $t$ in some open
+neighbourhood of the origin, then $X$ and $Y$ have the **same distribution**.
+:::
+
+The MGF does not merely summarise a law — it *determines* it. That is what
+licenses the whole strategy: **compute an MGF, recognise its shape, conclude.**
+
+::: {.fragment}
+**The honest caveat.** Not every distribution has an MGF — $\mathbb{E}[e^{tX}]$
+is infinite for a Cauchy at every $t \ne 0$. The repair is the characteristic
+function $\varphi_X(t) = \mathbb{E}[e^{i t^{\!\top}X}]$, which always exists
+($|e^{i\theta}|=1$) and obeys the same theorem. For the Gaussian the MGF exists
+everywhere, so we use the simpler object.
+:::
+
+## The MGF of a Gaussian — scalar case
+
+$X \sim \mathcal{N}(\mu,\sigma^2)$. Everything lives in the exponent:
+
+$$M_X(t) = \int e^{tx}\,\frac{1}{\sqrt{2\pi\sigma^2}}\,e^{-(x-\mu)^2/2\sigma^2}\,dx$$
+
+::: {.fragment}
+**Complete the square** in the exponent:
+
+$$tx - \frac{(x-\mu)^2}{2\sigma^2}
+= \underbrace{\mu t + \tfrac12\sigma^2 t^2}_{\text{free of } x}
+\;-\; \frac{(x - \mu - \sigma^2 t)^2}{2\sigma^2}$$
+:::
+
+::: {.fragment}
+The first part leaves the integral; the rest is a Gaussian density with mean
+$\mu + \sigma^2 t$, which integrates to $1$:
+
+$$\boxed{\;M_X(t) = \exp\!\big(\mu t + \tfrac12 \sigma^2 t^2\big)\;}$$
+:::
+
+## …and in $d$ dimensions
+
+For $Z \sim \mathcal{N}(0,I)$ the coordinates are independent, so the
+expectation factorises:
+
+$$M_Z(t) = \prod_i \mathbb{E}\big[e^{t_i Z_i}\big] = \prod_i e^{t_i^2/2} = e^{\frac12 t^{\!\top}t}$$
+
+::: {.fragment}
+For $X \sim \mathcal{N}(\mu,\Sigma)$, substitute $x = \mu + Lu$ with
+$\Sigma = LL^{\!\top}$. The Jacobian $\det L$ cancels the $(\det\Sigma)^{1/2}$ in
+the constant, leaving the standard case at $L^{\!\top}t$:
+
+$$\boxed{\;M_X(t) = \exp\!\Big(t^{\!\top}\mu + \tfrac12\, t^{\!\top}\Sigma\, t\Big)\;}$$
+:::
+
+::: {.fragment}
+**Remember the shape: the exponent is a quadratic in $t$.** Everything below
+follows from that alone. (This was a change of variables in an integral, not the
+affine theorem — so no circularity.)
+:::
+
+## Step 2 — compute the MGF of $Y = AX + b$
+
+$$M_Y(t) = \mathbb{E}\big[e^{t^{\!\top}Y}\big] = \mathbb{E}\big[e^{t^{\!\top}(AX+b)}\big]$$
+
+[definition of the MGF, then substitute $Y = AX+b$]{.step}
+
+::: {.fragment}
+$$= e^{t^{\!\top}b}\;\mathbb{E}\big[e^{t^{\!\top}AX}\big]$$
+
+[$b$ is constant, so $e^{t^{\!\top}b}$ leaves the expectation]{.step}
+:::
+
+::: {.fragment}
+$$= e^{t^{\!\top}b}\;\mathbb{E}\big[e^{(A^{\!\top}t)^{\!\top}X}\big]$$
+
+[since $t^{\!\top}A = (A^{\!\top}t)^{\!\top}$]{.step}
+:::
+
+::: {.fragment}
+**That third line is the move.** The matrix has been pushed off the random vector
+and onto the *argument*. The expectation is now just $M_X$ evaluated at the point
+$A^{\!\top}t$ — and we know $M_X$.
+:::
+
+## Step 2 — recognise what comes out
+
+Apply the Gaussian MGF at $A^{\!\top}t$:
+
+$$M_Y(t) = e^{t^{\!\top}b}\exp\!\Big((A^{\!\top}t)^{\!\top}\mu + \tfrac12 (A^{\!\top}t)^{\!\top}\Sigma (A^{\!\top}t)\Big)$$
+
+::: {.fragment}
+$$= \exp\!\Big(t^{\!\top}b + t^{\!\top}\!A\mu + \tfrac12\, t^{\!\top}\!A\Sigma A^{\!\top}t\Big)$$
+
+[transpose each piece]{.step}
+:::
+
+::: {.fragment}
+$$= \exp\!\Big(t^{\!\top}\big(A\mu + b\big) + \tfrac12\, t^{\!\top}\big(A\Sigma A^{\!\top}\big)t\Big)$$
+
+[collect the linear terms]{.step}
+:::
+
+::: {.fragment}
+**Now read it.** The result has the form $\exp\big(t^{\!\top}m + \tfrac12 t^{\!\top}S t\big)$
+— linear plus quadratic, exactly a Gaussian MGF, with $m = A\mu+b$ and
+$S = A\Sigma A^{\!\top}$. By uniqueness, $Y$ *is* that Gaussian. $\blacksquare$
+:::
+
+## What actually did the work
+
+- The Gaussian MGF has a **quadratic exponent**, and $A^{\!\top}t$ substituted
+  into a quadratic is still a quadratic. That is the whole mechanism
+- Push almost any other family through a linear map and the functional form
+  changes — you leave the family and lose the closed form
+- Equivalently, by change of variables: $y = Ax+b$ has $x = A^{-1}(y-b)$ and a
+  *constant* Jacobian $|\det A|^{-1}$, so a quadratic exponent stays quadratic.
+  The MGF route is shorter and does not need $A$ invertible
+
+::: {.note}
+This closure is the entire reason diffusion models are analytically tractable:
+$p(x_t \mid x_0)$ has a closed form at every $t$ because every step is affine.
+:::
+
+## Read it in both directions
+
+Factor $\Sigma = LL^{\!\top}$ (Cholesky, or $\Sigma^{1/2}$).
+
+**Forward — sampling.** Take $z \sim \mathcal{N}(0,I)$ and set $A = L$, $b = \mu$:
+
+$$\mu + Lz \;\sim\; \mathcal{N}\big(\mu,\ L I L^{\!\top}\big) = \mathcal{N}(\mu,\Sigma)$$
+
+**Backward — whitening.** Take $A = L^{-1}$, $b = -L^{-1}\mu$:
+
+$$L^{-1}(X - \mu) \;\sim\; \mathcal{N}\big(0,\ L^{-1}\Sigma L^{-\top}\big) = \mathcal{N}(0,I)$$
+
+::: {.note}
+One theorem, applied twice. This is why you may always assume $\mathcal{N}(0,I)$
+without loss of generality — and how a sampler turns standard noise into any
+Gaussian you like.
+:::
+
+## The degenerate case
+
+If $\operatorname{rank}(A) < d$, then $A\Sigma A^{\!\top}$ is **singular**:
+$\det = 0$, and the density formula breaks down.
+
+$$A = \begin{pmatrix} 1 & 2 \\ 2 & 4\end{pmatrix}
+\quad\Longrightarrow\quad \det\big(A\Sigma A^{\!\top}\big) = 0$$
+
+- The law is still Gaussian, but it lives on a **lower-dimensional subspace**
+- It has no density with respect to Lebesgue measure on $\mathbb{R}^m$
+- The theorem survives; only the *density formula* fails
+
+::: {.note}
+This is the same singularity as the manifold hypothesis, reached deliberately
+rather than by accident. Real image data is believed to sit on exactly such a
+thin set.
+:::
+
+## See it move
+
+Act II drags $A$ and watches the ellipse follow $A\Sigma A^{\!\top}$; the
+*singular* preset collapses the cloud onto a line.
+
+```{=html}
+<iframe src="gaussian-lab.html" style="width:100%;height:66%;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="The Gaussian Lab"></iframe>
+```
+
+## Where this lands
+
+| Today | Where it returns |
+|---|---|
+| $AX+b$ closure | $p(x_t \mid x_0)$ in closed form at every noise level |
+| $\mu + Lz$ | how every Gaussian sample is drawn, from standard noise |
+| Whitening | why $\mathcal{N}(0,I)$ costs no generality |
+| Independent sum | variances add — the $\sqrt{t}$ envelope of the forward process |
+| Singular $A\Sigma A^{\!\top}$ | data on a manifold; why densities are the wrong object there |
+
+## {.accent}
+
+::: {.quote}
+Affine maps move a Gaussian's mean and reshape its covariance — but never take
+it out of the family.
+
+<small>Reference: 05 · The Multivariate Gaussian. Tutorial: Inequalities Worth Knowing. Demo: The Gaussian Lab.</small>
+:::

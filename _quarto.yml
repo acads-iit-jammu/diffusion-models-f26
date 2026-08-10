@@ -18,6 +18,7 @@ project:
     - materials/joint-slicer.html
     - materials/transport-plan-lab.html
     - materials/gaussian-lab.html
+    - materials/w03-deck-01-multivariate-gaussian.html
     - materials/img/**
     - materials/site_libs/**
     - homeworks/*.pdf
@@ -54,6 +55,7 @@ book:
         - tutorials/16-joints-conditionals.qmd
         - tutorials/02-distributions-mle.qmd
         - tutorials/12-multivariate-gaussian.qmd
+        - tutorials/17-density-estimation-many-dimensions.qmd
         - tutorials/15-comparing-distributions.qmd
     - part: "Decks"
       chapters:
@@ -69,6 +71,8 @@ book:
           text: "05 · Distributions and Maximum Likelihood"
         - href: materials/w02-deck-02-genai-maps.html
           text: "06 · Generative AI, in Its Simplest Form"
+        - href: materials/w03-deck-01-multivariate-gaussian.html
+          text: "07 · The Multivariate Gaussian"
     - part: "Tutorials"
       chapters:
         - tutorials/13-inequalities.qmd
