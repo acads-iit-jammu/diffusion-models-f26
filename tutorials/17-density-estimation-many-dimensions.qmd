@@ -299,6 +299,15 @@ accuracy that $n = 100$ buys in one:
 | 50 | ~$4 \times 10^{21}$ |
 | 100 | ~$4 \times 10^{41}$ |
 
+**Interactive** — [The Bandwidth Lab](../materials/kde-lab.html){target="_blank"}
+builds the estimate one kernel at a time, then lets you sweep $h$ against a
+three-component Gaussian mixture and watch it fail in both directions. Its third
+panel plots the integrated squared error against $h$: the curve is U-shaped, and
+its minimum slides left as $n$ grows, which is $h^\star \propto n^{-1/5}$ made
+visible.
+
+<iframe src="../materials/kde-lab.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: kernel density estimation in one dimension, and the effect of bandwidth"></iframe>
+
 At $p = 100$ — still a *small* problem by modern standards — the requirement
 exceeds the number of atoms in the observable universe by a wide margin. This is
 not an artefact of KDE. It is a **minimax lower bound**: over the class of

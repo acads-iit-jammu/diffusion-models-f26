@@ -1,0 +1,490 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Bandwidth Lab</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --true: #7a7a72;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+      --true: #9b9b92;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+    --true: #9b9b92;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --true: #7a7a72;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout, .seg, table {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  canvas { display: block; width: 100%; touch-action: none; }
+  #c-build { height: 330px; } #c-band { height: 340px; } #c-err { height: 300px; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.35rem; }
+  input[type="range"] { width: 122px; accent-color: var(--data); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.2em;
+    display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.8rem; cursor: pointer;
+    font-family: system-ui, sans-serif; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data); color: #fff; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  .legend { font-size: 0.78rem; color: var(--muted); display: flex; gap: 1.1rem;
+    flex-wrap: wrap; margin-top: 0.5rem; }
+  .legend i { display: inline-block; width: 1.5rem; height: 0; vertical-align: middle;
+    margin-right: 0.35rem; }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid);
+    padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; W03 demo</p>
+    <h1>The Bandwidth Lab</h1>
+    <p class="dek">A kernel density estimate is a pile of little Gaussians, one per data
+    point. Everything hinges on how wide you make them. Too narrow and you are drawing
+    the sample; too wide and you are drawing nothing at all.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I</span>One bump per data point</h2>
+    <p>The data below is drawn from a mixture of <b>three</b> normal distributions. Forget
+    that for a moment and look only at the estimate: put a Gaussian of width <i>h</i> on
+    top of every observation, divide by <i>n</i> so the total area is one, and add them up.
+    That sum is the kernel density estimate</p>
+    <p style="text-align:center" class="mono">p&#770;<sub>h</sub>(x) = (1/nh) &#8721;<sub>i</sub> &#966;((x &#8722; x<sub>i</sub>)/h)</p>
+    <figure>
+      <p class="figlabel"><span>Individual kernels, and their sum</span><span id="lab-build"></span></p>
+      <canvas id="c-build"></canvas>
+      <div class="controls">
+        <label>bandwidth <i>h</i> <input id="s-h1" type="range" min="0.05" max="1.60" step="0.01" value="0.35"><span class="val" id="v-h1">0.35</span></label>
+        <label>n <input id="s-n1" type="range" min="5" max="60" step="1" value="18"><span class="val" id="v-n1">18</span></label>
+        <button id="b-resample1">Resample</button>
+        <span class="seg">
+          <button id="t-kern" aria-pressed="true">Show kernels</button>
+        </span>
+      </div>
+      <div class="legend">
+        <span><i style="border-top:2px solid var(--data)"></i>estimate p&#770;<sub>h</sub></span>
+        <span><i style="border-top:1.5px solid var(--lik)"></i>individual kernels</span>
+        <span><i style="border-top:2px solid var(--axis)"></i>samples (rug)</span>
+      </div>
+      <figcaption>With few points the bumps are visible as bumps. Widen <i>h</i> and they
+      merge into a single smooth curve; narrow it and each observation becomes its own
+      spike. Nothing else is going on &#8212; a KDE really is just this sum.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II</span>Bandwidth is the whole game</h2>
+    <p>Now the truth is drawn too, in grey, so you can see what is being estimated. The
+    three components sit at different places with different widths and weights. Sweep
+    <i>h</i> across its range and watch the estimate fail in two opposite ways.</p>
+    <figure>
+      <p class="figlabel"><span>Estimate against the truth</span><span id="lab-band"></span></p>
+      <canvas id="c-band"></canvas>
+      <div class="controls">
+        <label>bandwidth <i>h</i> <input id="s-h2" type="range" min="0.02" max="2.00" step="0.01" value="0.30"><span class="val" id="v-h2">0.30</span></label>
+        <label>n <input id="s-n2" type="range" min="20" max="2000" step="10" value="200"><span class="val" id="v-n2">200</span></label>
+        <button id="b-resample2">Resample</button>
+        <button id="b-silver">Use Silverman&#8217;s rule</button>
+      </div>
+      <div class="controls" style="border-top:none; padding-top:0; margin-top:0.35rem">
+        <span class="seg">
+          <button data-preset="0" aria-pressed="true">Three separated</button>
+          <button data-preset="1">Two close, one far</button>
+          <button data-preset="2">Unequal weights</button>
+        </span>
+      </div>
+      <p class="readout" id="r-band"></p>
+      <figcaption>Small <i>h</i>: low bias, high variance &#8212; the estimate chases individual
+      samples and invents modes that are not there. Large <i>h</i>: low variance, high bias
+      &#8212; real modes are smeared together and the estimate is confidently smooth and
+      wrong. The interesting question is where in between to stand.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act III</span>There is a best <i>h</i>, and it moves</h2>
+    <p>Because we know the truth here, we can score every bandwidth. Below is the
+    <b>integrated squared error</b> &#8747;(p&#770;<sub>h</sub> &#8722; p)&#178;dx as a function of
+    <i>h</i>, computed on the current sample. The curve is U-shaped: variance falls and
+    bias rises, and the minimum is the compromise.</p>
+    <figure>
+      <p class="figlabel"><span>Error against bandwidth</span><span id="lab-err"></span></p>
+      <canvas id="c-err"></canvas>
+      <div class="controls">
+        <label>n <input id="s-n3" type="range" min="20" max="2000" step="10" value="200"><span class="val" id="v-n3">200</span></label>
+        <button id="b-resample3">Resample</button>
+        <span class="seg">
+          <button id="t-avg" aria-pressed="false">Average 20 samples</button>
+        </span>
+      </div>
+      <p class="readout" id="r-err"></p>
+      <figcaption>Push <i>n</i> up and two things happen: the whole curve drops, and its
+      minimum slides left &#8212; more data buys you the right to be less smooth. The optimal
+      bandwidth shrinks like n<sup>&#8722;1/5</sup> and the error it achieves falls only like
+      n<sup>&#8722;4/5</sup>, which is already slower than the parametric n<sup>&#8722;1</sup>.</figcaption>
+    </figure>
+    <p class="takeaway"><strong>And that is in one dimension.</strong> The exponent is
+    n<sup>&#8722;4/(p+4)</sup> in p dimensions. At p&#160;=&#160;10 matching this accuracy takes
+    roughly 400,000 samples; at p&#160;=&#160;100 it takes more samples than there are atoms
+    within reach. The U-curve does not disappear in high dimension &#8212; it just flattens
+    out at a level of error you cannot afford.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion to lecture note 06 on the <a href="https://acads-iit-jammu.github.io/diffusion-models-f26">course site</a>.
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- small deterministic PRNG so "Resample" is reproducible ---------- */
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+let seed = 12345;
+function gaussPair(rnd) {           // Box-Muller
+  let u = 0, v = 0;
+  while (u === 0) u = rnd();
+  while (v === 0) v = rnd();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+/* ---------- the three-component mixtures ---------- */
+const PRESETS = [
+  { name: "Three separated",
+    comp: [{ w: 0.35, m: -2.6, s: 0.55 }, { w: 0.30, m: 0.2, s: 0.50 }, { w: 0.35, m: 2.8, s: 0.75 }] },
+  { name: "Two close, one far",
+    comp: [{ w: 0.35, m: -0.9, s: 0.45 }, { w: 0.35, m: 0.5, s: 0.45 }, { w: 0.30, m: 4.0, s: 0.80 }] },
+  { name: "Unequal weights",
+    comp: [{ w: 0.70, m: -1.2, s: 0.90 }, { w: 0.22, m: 1.8, s: 0.40 }, { w: 0.08, m: 3.6, s: 0.30 }] }
+];
+let preset = 0;
+const comps = () => PRESETS[preset].comp;
+
+const NORM = 1 / Math.sqrt(2 * Math.PI);
+const phi = u => NORM * Math.exp(-0.5 * u * u);
+function truePdf(x) {
+  const c = comps(); let s = 0;
+  for (let k = 0; k < c.length; k++) s += c[k].w * phi((x - c[k].m) / c[k].s) / c[k].s;
+  return s;
+}
+function drawSample(n, sd) {
+  const rnd = mulberry32(sd), c = comps(), out = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    const u = rnd(); let acc = 0, k = 0;
+    for (; k < c.length - 1; k++) { acc += c[k].w; if (u < acc) break; }
+    out[i] = c[k].m + c[k].s * gaussPair(rnd);
+  }
+  return out;
+}
+function kde(x, xs, h) {
+  let s = 0;
+  for (let i = 0; i < xs.length; i++) s += phi((x - xs[i]) / h);
+  return s / (xs.length * h);
+}
+/* Silverman's rule of thumb, robust form */
+function silverman(xs) {
+  const n = xs.length, a = Array.from(xs).sort((p, q) => p - q);
+  const mean = a.reduce((p, q) => p + q, 0) / n;
+  const sd = Math.sqrt(a.reduce((p, q) => p + (q - mean) * (q - mean), 0) / (n - 1));
+  const q = f => a[Math.min(n - 1, Math.max(0, Math.floor(f * (n - 1))))];
+  const iqr = q(0.75) - q(0.25);
+  const scale = iqr > 0 ? Math.min(sd, iqr / 1.349) : sd;
+  return 0.9 * scale * Math.pow(n, -0.2);
+}
+/* ---------- integrated squared error ----------
+   Computed by binning the sample once and convolving with the kernel, so the
+   cost is independent of n. The direct grid-by-sample loop is O(grid x n) and
+   took 8.5 s for the averaged curve at n = 2000 — long enough to freeze the
+   page. Binned, the same curve is milliseconds. */
+const XLO = -6, XHI = 7, NG = 400, DX = (XHI - XLO) / (NG - 1);
+const NB = 512, BW = (XHI - XLO) / NB;
+let TRUEG = new Float64Array(NB);
+function refreshTrueGrid() {
+  for (let j = 0; j < NB; j++) TRUEG[j] = truePdf(XLO + (j + 0.5) * BW);
+}
+function binIt(xs) {
+  const c = new Float64Array(NB);
+  for (let i = 0; i < xs.length; i++) {
+    const b = Math.floor((xs[i] - XLO) / BW);
+    if (b >= 0 && b < NB) c[b] += 1;
+  }
+  return c;
+}
+function iseBinned(counts, n, h) {
+  const K = Math.min(NB, Math.ceil(4 * h / BW));
+  const w = new Float64Array(2 * K + 1);
+  for (let k = -K; k <= K; k++) w[k + K] = phi(k * BW / h) / (n * h);
+  let s = 0;
+  for (let j = 0; j < NB; j++) {
+    let v = 0;
+    const lo = Math.max(0, j - K), hi = Math.min(NB - 1, j + K);
+    for (let i = lo; i <= hi; i++) { const ci = counts[i]; if (ci) v += ci * w[i - j + K]; }
+    const d = v - TRUEG[j];
+    s += d * d;
+  }
+  return s * BW;
+}
+const ise = (xs, h) => iseBinned(binIt(xs), xs.length, h);
+/* cheapest honest reference: the bandwidth that actually minimises ISE here */
+function bestH(xs, lo, hi, steps) {
+  const c = binIt(xs), n = xs.length;
+  let best = Infinity, hb = lo;
+  for (let j = 0; j < steps; j++) {
+    const h = lo + (hi - lo) * j / (steps - 1), e = iseBinned(c, n, h);
+    if (e < best) { best = e; hb = h; }
+  }
+  return { h: hb, ise: best };
+}
+
+/* ---------- canvas plumbing ---------- */
+function setup(id) {
+  const cv = document.getElementById(id), ctx = cv.getContext("2d");
+  const fit = () => {
+    const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: r.width, h: r.height };
+  };
+  return { cv, ctx, fit };
+}
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function axes(ctx, box, xlo, xhi, ylo, yhi, xlabel, ylabel) {
+  const { L, R, T, B, w, h } = box;
+  ctx.clearRect(0, 0, w, h);
+  ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1; ctx.font = "11px system-ui";
+  ctx.fillStyle = css("--muted");
+  for (let i = 0; i <= 4; i++) {
+    const y = T + (B - T) * i / 4;
+    ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(R, y); ctx.stroke();
+    const v = yhi - (yhi - ylo) * i / 4;
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.fillText(v.toFixed(2), L - 6, y);
+  }
+  ctx.strokeStyle = css("--axis");
+  ctx.beginPath(); ctx.moveTo(L, B); ctx.lineTo(R, B); ctx.stroke();
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  const step = (xhi - xlo) <= 3 ? 0.5 : 2;
+  for (let v = Math.ceil(xlo / step) * step; v <= xhi; v += step) {
+    const x = L + (R - L) * (v - xlo) / (xhi - xlo);
+    ctx.fillText(String(+v.toFixed(2)), x, B + 6);
+  }
+  ctx.textAlign = "right"; ctx.fillText(xlabel, R, B + 20);
+  ctx.textAlign = "left"; ctx.textBaseline = "top"; ctx.fillText(ylabel, L, T - 14);
+}
+const mapx = (v, box, lo, hi) => box.L + (box.R - box.L) * (v - lo) / (hi - lo);
+const mapy = (v, box, lo, hi) => box.B - (box.B - box.T) * (v - lo) / (hi - lo);
+function curve(ctx, box, xlo, xhi, ylo, yhi, f, colour, width, dash) {
+  ctx.save(); ctx.beginPath(); ctx.setLineDash(dash || []);
+  ctx.strokeStyle = colour; ctx.lineWidth = width;
+  const N = 320;
+  for (let i = 0; i < N; i++) {
+    const x = xlo + (xhi - xlo) * i / (N - 1);
+    const px = mapx(x, box, xlo, xhi), py = mapy(f(x), box, ylo, yhi);
+    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  }
+  ctx.stroke(); ctx.restore();
+}
+
+/* ================= Act I ================= */
+const A = setup("c-build");
+let n1 = 18, h1 = 0.35, showK = true, seed1 = seed;
+let xs1 = drawSample(n1, seed1);
+function drawA() {
+  const d = A.fit(), box = { L: 44, R: d.w - 10, T: 18, B: d.h - 26, w: d.w, h: d.h };
+  const ymax = 0.62;
+  axes(A.ctx, box, XLO, XHI, 0, ymax, "x", "density");
+  if (showK) {
+    for (let i = 0; i < xs1.length; i++) {
+      const xi = xs1[i];
+      curve(A.ctx, box, XLO, XHI, 0, ymax,
+        x => phi((x - xi) / h1) / (xs1.length * h1), css("--lik"), 1.1);
+    }
+  }
+  A.ctx.strokeStyle = css("--axis"); A.ctx.lineWidth = 1.4;
+  for (let i = 0; i < xs1.length; i++) {
+    const px = mapx(xs1[i], box, XLO, XHI);
+    A.ctx.beginPath(); A.ctx.moveTo(px, box.B); A.ctx.lineTo(px, box.B - 9); A.ctx.stroke();
+  }
+  curve(A.ctx, box, XLO, XHI, 0, ymax, x => kde(x, xs1, h1), css("--data"), 2.2);
+  document.getElementById("lab-build").textContent = "n = " + xs1.length + " · h = " + h1.toFixed(2);
+}
+
+/* ================= Act II ================= */
+const Bp = setup("c-band");
+let n2 = 200, h2 = 0.30, seed2 = seed + 1;
+let xs2 = drawSample(n2, seed2);
+function drawB() {
+  const d = Bp.fit(), box = { L: 44, R: d.w - 10, T: 18, B: d.h - 26, w: d.w, h: d.h };
+  let ymax = 0;
+  for (let i = 0; i < NG; i++) ymax = Math.max(ymax, truePdf(XLO + i * DX), kde(XLO + i * DX, xs2, h2));
+  ymax = Math.max(0.35, ymax * 1.15);
+  axes(Bp.ctx, box, XLO, XHI, 0, ymax, "x", "density");
+  curve(Bp.ctx, box, XLO, XHI, 0, ymax, truePdf, css("--true"), 2, [6, 4]);
+  Bp.ctx.strokeStyle = css("--axis"); Bp.ctx.lineWidth = 0.7; Bp.ctx.globalAlpha = 0.55;
+  for (let i = 0; i < xs2.length; i++) {
+    const px = mapx(xs2[i], box, XLO, XHI);
+    Bp.ctx.beginPath(); Bp.ctx.moveTo(px, box.B); Bp.ctx.lineTo(px, box.B - 7); Bp.ctx.stroke();
+  }
+  Bp.ctx.globalAlpha = 1;
+  curve(Bp.ctx, box, XLO, XHI, 0, ymax, x => kde(x, xs2, h2), css("--data"), 2.4);
+  document.getElementById("lab-band").textContent = "n = " + n2 + " · h = " + h2.toFixed(2);
+  const sv = silverman(xs2), e = ise(xs2, h2), opt = bestH(xs2, 0.03, 2.0, 48);
+  let verdict;
+  if (h2 < opt.h * 0.55) verdict = "undersmoothed — you are drawing the sample, not the density";
+  else if (h2 > opt.h * 1.9) verdict = "oversmoothed — the modes have been erased";
+  else verdict = "about right";
+  document.getElementById("r-band").innerHTML =
+    "ISE = <b>" + e.toFixed(4) + "</b> · best possible here is <b>" + opt.ise.toFixed(4) +
+    "</b> at h = <b>" + opt.h.toFixed(3) + "</b> · " + verdict +
+    "<br><span style='color:var(--muted)'>Silverman&rsquo;s rule says " + sv.toFixed(3) +
+    " — about " + (sv / opt.h).toFixed(1) + "&times; too wide, because it assumes the target is a " +
+    "single normal and this one has three modes.</span>";
+}
+
+/* ================= Act III ================= */
+const C = setup("c-err");
+let n3 = 200, avg = false, seed3 = seed + 2;
+const HLO = 0.06, HHI = 2.0, NH = 60;
+function errCurve() {
+  const out = new Float64Array(NH);
+  const reps = avg ? 20 : 1;
+  for (let r = 0; r < reps; r++) {
+    const xs = drawSample(n3, seed3 + r * 977), c = binIt(xs);
+    for (let j = 0; j < NH; j++) out[j] += iseBinned(c, n3, HLO + (HHI - HLO) * j / (NH - 1));
+  }
+  for (let j = 0; j < NH; j++) out[j] /= reps;
+  return out;
+}
+function drawC() {
+  const d = C.fit(), box = { L: 52, R: d.w - 10, T: 18, B: d.h - 26, w: d.w, h: d.h };
+  const e = errCurve();
+  let emax = 0, jmin = 0;
+  for (let j = 0; j < NH; j++) { emax = Math.max(emax, e[j]); if (e[j] < e[jmin]) jmin = j; }
+  emax *= 1.1;
+  axes(C.ctx, box, HLO, HHI, 0, emax, "bandwidth h", "integrated squared error");
+  C.ctx.beginPath(); C.ctx.strokeStyle = css("--data"); C.ctx.lineWidth = 2.2;
+  for (let j = 0; j < NH; j++) {
+    const px = mapx(HLO + (HHI - HLO) * j / (NH - 1), box, HLO, HHI);
+    const py = mapy(e[j], box, 0, emax);
+    j ? C.ctx.lineTo(px, py) : C.ctx.moveTo(px, py);
+  }
+  C.ctx.stroke();
+  const hstar = HLO + (HHI - HLO) * jmin / (NH - 1);
+  const pxs = mapx(hstar, box, HLO, HHI);
+  C.ctx.strokeStyle = css("--lik"); C.ctx.lineWidth = 1.4; C.ctx.setLineDash([4, 4]);
+  C.ctx.beginPath(); C.ctx.moveTo(pxs, box.T); C.ctx.lineTo(pxs, box.B); C.ctx.stroke();
+  C.ctx.setLineDash([]);
+  C.ctx.fillStyle = css("--lik"); C.ctx.beginPath();
+  C.ctx.arc(pxs, mapy(e[jmin], box, 0, emax), 4, 0, 6.284); C.ctx.fill();
+  document.getElementById("lab-err").textContent = "n = " + n3 + (avg ? " · averaged over 20 samples" : "");
+  document.getElementById("r-err").innerHTML =
+    "best h here = <b>" + hstar.toFixed(3) + "</b> · error there = <b>" + e[jmin].toFixed(4) +
+    "</b> · h&#8902;&#183;n<sup>1/5</sup> = <b>" + (hstar * Math.pow(n3, 0.2)).toFixed(2) +
+    "</b><br><span style='color:var(--muted)'>That last number stays roughly constant as you " +
+    "move n — which is the statement h&#8902; &#8733; n<sup>&#8722;1/5</sup>.</span>";
+}
+
+/* ---------- wiring ---------- */
+const $ = id => document.getElementById(id);
+function bind(slider, valEl, fmt, set) {
+  const el = $(slider);
+  el.addEventListener("input", () => { set(parseFloat(el.value)); $(valEl).textContent = fmt(parseFloat(el.value)); });
+}
+bind("s-h1", "v-h1", v => v.toFixed(2), v => { h1 = v; drawA(); });
+bind("s-n1", "v-n1", v => String(v), v => { n1 = v; xs1 = drawSample(n1, seed1); drawA(); });
+$("b-resample1").onclick = () => { seed1 = (seed1 * 1103515245 + 12345) >>> 0; xs1 = drawSample(n1, seed1); drawA(); };
+$("t-kern").onclick = function () { showK = !showK; this.setAttribute("aria-pressed", String(showK)); drawA(); };
+
+bind("s-h2", "v-h2", v => v.toFixed(2), v => { h2 = v; drawB(); });
+bind("s-n2", "v-n2", v => String(v), v => { n2 = v; xs2 = drawSample(n2, seed2); drawB(); });
+$("b-resample2").onclick = () => { seed2 = (seed2 * 1103515245 + 12345) >>> 0; xs2 = drawSample(n2, seed2); drawB(); };
+$("b-silver").onclick = () => {
+  h2 = Math.min(2, Math.max(0.02, silverman(xs2)));
+  $("s-h2").value = String(h2); $("v-h2").textContent = h2.toFixed(2); drawB();
+};
+document.querySelectorAll("[data-preset]").forEach(b => {
+  b.onclick = () => {
+    preset = +b.dataset.preset; refreshTrueGrid();
+    document.querySelectorAll("[data-preset]").forEach(o => o.setAttribute("aria-pressed", String(o === b)));
+    xs1 = drawSample(n1, seed1); xs2 = drawSample(n2, seed2);
+    drawA(); drawB(); drawC();
+  };
+});
+
+bind("s-n3", "v-n3", v => String(v), v => { n3 = v; drawC(); });
+$("b-resample3").onclick = () => { seed3 = (seed3 * 1103515245 + 12345) >>> 0; drawC(); };
+$("t-avg").onclick = function () { avg = !avg; this.setAttribute("aria-pressed", String(avg)); drawC(); };
+
+function redraw() { refreshTrueGrid(); drawA(); drawB(); drawC(); }
+window.addEventListener("resize", redraw);
+if (window.matchMedia) {
+  const m = window.matchMedia("(prefers-color-scheme: dark)");
+  (m.addEventListener ? m.addEventListener.bind(m, "change") : m.addListener.bind(m))(redraw);
+}
+redraw();
+</script>
