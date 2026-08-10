@@ -700,6 +700,9 @@ Two failure modes worth knowing
 </tr>
 </tbody>
 </table>
+<p><strong>Interactive</strong> — <a href="../materials/kde-lab.html" target="_blank">The Bandwidth Lab</a> builds the estimate one kernel at a time, then lets you sweep <span class="math inline">\(h\)</span> against a three-component Gaussian mixture and watch it fail in both directions. Its third panel plots the integrated squared error against <span class="math inline">\(h\)</span>: the curve is U-shaped, and its minimum slides left as <span class="math inline">\(n\)</span> grows, which is <span class="math inline">\(h^\star \propto n^{-1/5}\)</span> made visible.</p>
+<iframe src="../materials/kde-lab.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: kernel density estimation in one dimension, and the effect of bandwidth">
+</iframe>
 <p>At <span class="math inline">\(p = 100\)</span> — still a <em>small</em> problem by modern standards — the requirement exceeds the number of atoms in the observable universe by a wide margin. This is not an artefact of KDE. It is a <strong>minimax lower bound</strong>: over the class of smooth densities, <em>no</em> estimator does better than <span class="math inline">\(n^{-2s/(2s+p)}\)</span> for smoothness <span class="math inline">\(s\)</span>. The obstruction is information-theoretic, not algorithmic.</p>
 <div class="callout callout-style-simple callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
