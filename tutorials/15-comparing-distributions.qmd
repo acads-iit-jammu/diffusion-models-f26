@@ -203,6 +203,29 @@ integrated under $p_\theta$, so it simply avoids putting mass in the wrong place
 and is content to ignore parts of the target. This is exactly the
 single-Gaussian-fitted-to-a-mixture trap of tutorial 02, now with a name.
 
+The gap is not subtle. Fit a single Gaussian to an equal mixture of
+$\mathcal{N}(-2, 0.7^2)$ and $\mathcal{N}(2, 0.7^2)$ and the two criteria give
+completely different answers, each of which the *other* criterion scores as
+terrible:
+
+| Fit | $\mu$ | $\sigma$ | $\mathrm{KL}(p\|q)$ | $\mathrm{KL}(q\|p)$ |
+|---|---|---|---|---|
+| forward optimum | $0.00$ | $2.12$ | **0.42** | 0.81 |
+| reverse optimum | $\pm1.98$ | $0.73$ | 6.84 | **0.69** |
+
+The forward optimum is exactly **moment matching** — for a Gaussian family,
+minimising $\mathrm{KL}(p\|q)$ means matching the mean and variance of $p$, which
+is why it lands between the modes where no data lives. The reverse optimum sits
+*on* a mode and is the same distance from either, so which one it finds depends
+entirely on where the optimiser starts.
+
+**Interactive** — [The KL Lab](../materials/kl-lab.html){target="_blank"} draws
+both optima together, shades the two integrands so you can see *where* each
+direction pays its penalty, and plots both objectives against $\mu$: forward KL
+has a single basin, reverse KL has one per mode with a barrier between them.
+
+<iframe src="../materials/kl-lab.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: forward and reverse KL fitted to the same bimodal target"></iframe>
+
 ## 4. KL is one of a family: the $f$-divergences
 
 Fix a convex $f$ with $f(1) = 0$ and define
@@ -229,37 +252,300 @@ at *where* the points are. Move a lump of $q$'s mass from just beside $p$ to a
 mile away and no $f$-divergence notices, because the ratio at every point is
 unchanged.
 
-## 5. Wasserstein is *not* an $f$-divergence
+## 5. Wasserstein, and what changes in more than one dimension
 
-This is worth stating plainly, because it is a common and consequential slip.
+So far $W_1$ has appeared only through its one-dimensional formula
+$\int |F - G|$. That formula is a happy accident of the line, and it is worth
+being precise about what the general object is before relying on it.
 
-$W_1$ cannot be written as $\int q\,f(p/q)$ for any $f$. It is not in this family
-at all. It belongs to a **second** family, the **integral probability metrics**:
+**The Kantorovich definition.** For $p \ge 1$ and distributions $P, Q$ on
+$\mathbb{R}^d$,
 
 $$
-d_{\mathcal{F}}(p,q) \;=\; \sup_{f \in \mathcal{F}}
-\left| \mathbb{E}_{p}[f] - \mathbb{E}_{q}[f] \right| ,
+W_p(P,Q) \;=\; \left( \inf_{\gamma \in \Pi(P,Q)}
+\int \lVert x - y \rVert^{p} \, d\gamma(x,y) \right)^{1/p},
 $$
 
-defined by a class $\mathcal{F}$ of test functions rather than by a convex $f$
-applied to a ratio.
+where $\Pi(P,Q)$ is the set of **couplings** — joint distributions on
+$\mathbb{R}^d \times \mathbb{R}^d$ whose marginals are $P$ and $Q$. A coupling is
+a plan for moving mass; the integral is what the plan costs; $W_p$ is the cost of
+the cheapest one. Nothing here mentions densities, which is exactly why it
+survives when densities do not exist.
 
-| Class $\mathcal{F}$ | Resulting IPM |
+### Why one dimension is special
+
+On the line there is a **total order**, and that changes everything. The optimal
+plan is forced to be monotone — cheapest transport never lets paths cross — and
+the monotone coupling is unique and explicit. It is the one matching quantile to
+quantile, which gives, **for every $p \ge 1$**,
+
+$$
+W_p(P,Q) = \left( \int_0^1 \big| F^{-1}(u) - G^{-1}(u) \big|^{p} du \right)^{1/p} .
+$$
+
+Sort both samples, subtract, average. $O(n \log n)$, and no optimisation at all.
+*(Checked against an exact assignment solver on 3,000-point samples: the sorted
+matching reproduces the optimal cost to machine precision at $p = 1, 2, 3$.)*
+
+::: {.callout-warning}
+## The CDF formula is $p = 1$ only
+
+The quantile formula above holds for all $p$. The **other** one-dimensional
+formula, the one in §1,
+
+$$
+W_1(P,Q) = \int_{-\infty}^{\infty} \big| F(x) - G(x) \big| \, dx ,
+$$
+
+does not generalise. At $p=1$ the area between the two *CDFs* happens to equal the
+area between the two *quantile functions* — the same region, measured along
+different axes — so the two expressions agree. For $p > 1$ that coincidence
+breaks, and $\big(\int |F-G|^p dx\big)^{1/p}$ is **not** $W_p$ and is not any
+Wasserstein distance.
+
+Concretely, for $\mathcal{N}(0,1)$ against $\mathcal{N}(1.5, 2^2)$:
+
+| quantity | value |
 |---|---|
-| $\{f : \lVert f\rVert_{\mathrm{Lip}} \le 1\}$ | **Wasserstein-1** (Kantorovich–Rubinstein duality) |
-| unit ball of an RKHS | **maximum mean discrepancy** (MMD) |
-| $\{f : \lVert f \rVert_\infty \le \tfrac12\}$ | **total variation** |
+| $\int_0^1 \lvert F^{-1}-G^{-1}\rvert\,du$ | 1.5586 |
+| $\int \lvert F-G\rvert\,dx$ | 1.5586 &nbsp;&nbsp;*(agree, as they must at $p=1$)* |
+| $W_2 = \big(\int_0^1 \lvert F^{-1}-G^{-1}\rvert^2 du\big)^{1/2}$ | **1.8028** |
+| $\big(\int \lvert F-G\rvert^2 dx\big)^{1/2}$ | **0.6918** &nbsp;&nbsp;*(not $W_2$, not anything)* |
 
-The two families are genuinely different, and the reason is the one flagged above:
-$f$-divergences see only ratios and are blind to geometry; IPMs test against
-functions defined on the space and therefore *do* see distance.
+When in doubt, work with quantiles: that form is the one that generalises in $p$.
+Neither form generalises in **dimension**, which is the subject of the rest of
+this section.
+:::
+
+For one-dimensional Gaussians the quantile integral collapses to a formula worth
+remembering, and it is the $d=1$ case of Bures–Wasserstein below:
+
+$$
+W_2\big(\mathcal{N}(\mu_1,\sigma_1^2),\ \mathcal{N}(\mu_2,\sigma_2^2)\big)
+= \sqrt{(\mu_1-\mu_2)^2 + (\sigma_1-\sigma_2)^2} .
+$$
+
+*(For the pair above: $\sqrt{1.5^2 + 1^2} = 1.8028$, matching the numeric
+quantile integral.)*
+
+**In $\mathbb{R}^d$ with $d > 1$ there is no total order**, so this construction
+simply has nothing to stand on. There is no quantile function, and no reason a
+cheapest plan should be expressible in closed form. What survives is weaker but
+still substantial:
+
+- **It is still a linear program.** For empirical measures on $n$ points each, the
+  Kantorovich problem is an $n \times n$ assignment problem. Exact solvers cost
+  about $O(n^3 \log n)$ — fine for thousands of points, hopeless for millions.
+- **The dual still holds.** Kantorovich–Rubinstein gives, for $p = 1$,
+  $W_1 = \sup_{\lVert f \rVert_{\mathrm{Lip}} \le 1} \mathbb{E}_P[f] - \mathbb{E}_Q[f]$,
+  which is what a WGAN critic estimates.
+- **Brenier's theorem replaces the quantile map.** If $P$ is absolutely
+  continuous, the optimal $p=2$ plan is *deterministic*: there is a map $T$ with
+  $T_\# P = Q$ attaining the infimum, and it is the **gradient of a convex
+  function**, $T = \nabla \varphi$. In one dimension "$\nabla\varphi$ with
+  $\varphi$ convex" means "increasing", so this is precisely the monotone quantile
+  map generalised. Convexity is what replaces the lost total order.
+
+### One case with a closed form: Gaussians
+
+Between $\mathcal{N}(m_1, C_1)$ and $\mathcal{N}(m_2, C_2)$ in any dimension,
+
+$$
+\boxed{\;W_2^2 \;=\; \lVert m_1 - m_2 \rVert^2
+\;+\; \operatorname{tr}\!\Big( C_1 + C_2 - 2\big(C_2^{1/2} C_1 C_2^{1/2}\big)^{1/2} \Big).\;}
+$$
+
+This is the **Bures–Wasserstein** distance. When the covariances commute — in
+particular when both are diagonal — the trace term collapses to
+$\lVert C_1^{1/2} - C_2^{1/2} \rVert_F^2$, so the means contribute Euclidean
+distance and the covariances contribute Frobenius distance between the *square
+roots*.
+
+*(Checked numerically: for a 2-D pair the formula gives $2.35331$, and exact
+optimal transport between $4{,}000$-point empirical samples gives $2.35356$.)*
+
+This is the formula behind the Fréchet Inception Distance, which is simply
+$W_2$ between two Gaussians fitted to network features — accurate only to the
+extent that those features really are Gaussian.
+
+### The two costs of using it in high dimension
+
+**Computation** is the visible cost, and it is the one people usually try to fix.
+Entropic regularisation adds $\varepsilon H(\gamma)$ to the objective, which makes
+it strictly convex and solvable by **Sinkhorn** iterations costing $O(n^2)$ each —
+fast and differentiable, at the price of a blurred plan and a biased distance.
+
+**Statistics** is the cost that actually bites. The empirical Wasserstein distance
+converges to the truth at rate
+
+$$
+\mathbb{E}\,W_p(P_n, P) \;\asymp\; n^{-1/d} \qquad (d > 2p),
+$$
+
+which is the curse of dimensionality again, in a new costume. Measured on
+independent samples from $\mathcal{N}(0, I_d)$:
+
+| $d$ | fitted slope of $\log W_2$ against $\log n$ | $-1/d$ |
+|---|---|---|
+| 5 | $-0.193$ | $-0.200$ |
+| 10 | $-0.106$ | $-0.100$ |
+| 20 | $-0.065$ | $-0.050$ |
+
+So a Wasserstein distance *estimated from samples* in high dimension is mostly
+noise, however exactly you solve the transport problem. Solving the wrong problem
+precisely does not help.
+
+**Sliced Wasserstein** is the standard dodge: project both distributions onto a
+random direction $\theta$, where the closed form applies, and average over
+directions,
+
+$$
+SW_p^p(P,Q) = \int_{\mathbb{S}^{d-1}} W_p^p\big(\theta_\# P,\ \theta_\# Q\big)\, d\theta .
+$$
+
+Each slice is a sort. It is a genuine metric, it is cheap, and it inherits the
+better one-dimensional rate — at the cost of being a weaker comparison that can
+be fooled by structure invisible to every projection.
+
+## 6. Integral probability metrics, in general
+
+Wasserstein and MMD are both instances of one construction. Given a class
+$\mathcal{F}$ of real-valued **test functions**,
+
+$$
+d_{\mathcal{F}}(P,Q) \;=\; \sup_{f \in \mathcal{F}}
+\Big| \mathbb{E}_{P}[f] - \mathbb{E}_{Q}[f] \Big| .
+$$
+
+Read it as a search for a **witness**: a single function on which the two
+distributions disagree as loudly as possible. If no test function can tell them
+apart, they are the same as far as $\mathcal{F}$ can see.
+
+Everything depends on how rich $\mathcal{F}$ is, and the choice is a genuine
+trade-off in both directions:
+
+- $\mathcal{F}$ too **small** and the metric is blind — it will report zero for
+  distributions that genuinely differ.
+- $\mathcal{F}$ too **large** and the supremum cannot be estimated from finitely
+  many samples — the empirical witness overfits, and the estimate is biased upward
+  no matter how much data you have.
+
+| Class $\mathcal{F}$ | Resulting IPM | Witness is |
+|---|---|---|
+| $\lVert f \rVert_{\mathrm{Lip}} \le 1$ | **Wasserstein-1** | a Lipschitz function — the WGAN critic |
+| unit ball of an RKHS $\mathcal{H}$ | **MMD** | available in closed form (§7) |
+| $\lVert f \rVert_\infty \le \tfrac12$ | **total variation** | an indicator of a set |
+| bounded, with bounded derivatives | Dudley metric | a smooth bump |
+
+Two structural remarks. First, **IPMs are symmetric and satisfy the triangle
+inequality** whenever $\mathcal{F}$ is symmetric ($f \in \mathcal{F} \Rightarrow
+-f \in \mathcal{F}$), so they are honest metrics — unlike KL. Second, and this is
+the substantive contrast with §4, an IPM is defined through **expectations of
+functions on the space**, so it knows how far apart points are. An
+$f$-divergence is defined through a *ratio of densities at the same point*, so it
+knows only how much the two disagree there, never how far anything had to move.
+That single difference is what §8 is about.
 
 **Total variation is the intersection.** It is an $f$-divergence
-($f(t) = \tfrac12|t-1|$) and an IPM (bounded test functions) and a metric. It is
-essentially the only member of both families — which is a good way to remember
-that the families are otherwise disjoint.
+($f(t) = \tfrac12|t-1|$) *and* an IPM (bounded test functions) *and* a metric —
+essentially the only member of both families, which is a good way to remember
+that they are otherwise disjoint.
 
-## 6. Why the distinction is not pedantry: disjoint supports
+## 7. Maximum mean discrepancy: the IPM you can actually compute
+
+Wasserstein's definition contains an infimum over couplings; the IPM form
+contains a supremum over functions. Both are optimisation problems. **MMD is the
+choice of $\mathcal{F}$ for which the optimisation can be solved in closed form**,
+and that is essentially the whole reason it exists.
+
+Take $\mathcal{F}$ to be the unit ball of a reproducing kernel Hilbert space
+$\mathcal{H}$ with kernel $k$. Define the **kernel mean embedding** of a
+distribution,
+
+$$
+\mu_P \;=\; \mathbb{E}_{X \sim P}\big[\, k(X, \cdot)\,\big] \;\in\; \mathcal{H},
+$$
+
+a single point in $\mathcal{H}$ that summarises the whole distribution. The
+reproducing property gives $\mathbb{E}_P[f] = \langle f, \mu_P\rangle$ for every
+$f \in \mathcal{H}$, so
+
+$$
+\mathrm{MMD}(P,Q) = \sup_{\lVert f \rVert_{\mathcal{H}} \le 1}
+\langle f, \mu_P - \mu_Q \rangle = \lVert \mu_P - \mu_Q \rVert_{\mathcal{H}} .
+$$
+
+The supremum is attained by the obvious witness, $f \propto \mu_P - \mu_Q$, and
+the value is just a norm. Expanding it,
+
+$$
+\boxed{\;\mathrm{MMD}^2(P,Q) = \mathbb{E}\,k(X,X') - 2\,\mathbb{E}\,k(X,Y) + \mathbb{E}\,k(Y,Y')\;}
+$$
+
+with $X, X' \sim P$ and $Y, Y' \sim Q$ independent. **Three expectations of a
+kernel — no densities, no couplings, no optimisation.** Replacing them by sample
+averages (dropping diagonal terms) gives an unbiased estimator computable in
+$O(n^2)$, or $O(n)$ with a linear-time variant.
+
+**Does it separate distributions?** Only if the kernel is **characteristic**,
+meaning $P \mapsto \mu_P$ is injective. The Gaussian RBF and Laplace kernels are;
+a linear kernel is not — it embeds only the mean, so it cannot distinguish any two
+distributions with the same mean. With a characteristic kernel,
+$\mathrm{MMD}(P,Q) = 0 \iff P = Q$.
+
+**A closed form to test against.** For $P = \mathcal{N}(a, I_d)$,
+$Q = \mathcal{N}(b, I_d)$ and Gaussian kernel of bandwidth $s$,
+
+$$
+\mathrm{MMD}^2 = \frac{2\,s^d}{(2+s^2)^{d/2}}
+\left(1 - \exp\!\Big(-\frac{\lVert a-b\rVert^2}{2(2+s^2)}\Big)\right).
+$$
+
+*(Checked: at $\lVert a - b\rVert = 1$ and $s = \sqrt{d}$, the formula gives
+$0.1175$, $0.0328$, $0.0072$ for $d = 2, 10, 50$, and the sample estimator returns
+$0.1214$, $0.0317$, $0.0071$.)*
+
+### The headline property, and its asterisk
+
+The MMD estimator converges at $n^{-1/2}$ **independently of the dimension** —
+there is no $n^{-1/d}$ anywhere. Measured slopes of $\log|\hat{}-\text{truth}|$
+against $\log n$: $-0.55$ at $d=2$, $-0.71$ at $d=10$, $-0.48$ at $d=50$. Against
+Wasserstein's $n^{-1/d}$ this looks like a free lunch.
+
+::: {.callout-warning}
+## It is not a free lunch
+
+Look again at the closed form above. For a *fixed* separation $\lVert a-b\rVert = 1$,
+the population MMD itself falls with dimension — $0.1175$, $0.0328$, $0.0072$ at
+$d = 2, 10, 50$. The **error** shrinks at $n^{-1/2}$ regardless of $d$, but the
+**signal** you are trying to detect shrinks too. What matters for a test is the
+ratio, and that still degrades.
+
+So the honest statement is: MMD moves the curse from the *estimation rate* into
+the *effect size*. It does not abolish it. It also depends on a bandwidth $s$ that
+you must choose — the median heuristic (set $s$ to the median pairwise distance)
+is the usual default and is a heuristic, not a theorem.
+:::
+
+MMD's real strengths are that it needs only samples, costs $O(n^2)$ with no inner
+optimisation, is differentiable in the samples — hence usable directly as a
+training loss, as in MMD-GAN — and comes with a clean two-sample test
+(Gretton et al.), which is how one asks "did my generative model actually match
+the data?" with a $p$-value attached.
+
+### Choosing between them
+
+| | $f$-divergence (KL, JS) | Wasserstein | MMD |
+|---|---|---|---|
+| Needs densities | yes | no | no |
+| Sees geometry | no | yes | partly — through the kernel |
+| Disjoint supports | saturates | degrades gracefully | degrades gracefully |
+| Closed form in $d$ dims | Gaussians only | Gaussians only (Bures) | any kernel, from samples |
+| Cost from $n$ samples | needs a density model | $O(n^3\log n)$, or $O(n^2)$ Sinkhorn | $O(n^2)$, no optimisation |
+| Estimation rate | — | $n^{-1/d}$ | $n^{-1/2}$, but shrinking signal |
+| A metric | no | yes | yes (characteristic kernel) |
+
+## 8. Why the distinction is not pedantry: disjoint supports
 
 Take $P$ uniform on $[0,1]$ and $Q$ uniform on $[d, d+1]$ — the same shape, shifted
 by $d$. Watch what each measure reports as $d$ grows:
@@ -297,7 +583,7 @@ reason: convolving with a Gaussian makes the supports overlap, so the
 ratio-based quantities become finite and informative again.
 :::
 
-## 7. The map: what is each model family minimising?
+## 9. The map: what is each model family minimising?
 
 | Model | Objective, in divergence terms |
 |---|---|
@@ -330,6 +616,30 @@ when the supports come apart. Total variation is the one member of both.
 :::
 
 ## Exercises
+
+1. Show that in one dimension the monotone coupling is optimal for any convex
+   cost, and deduce $W_1 = \int|F-G|$.
+2. Verify the Bures–Wasserstein formula for two diagonal Gaussians directly, and
+   confirm it reduces to $\lVert C_1^{1/2}-C_2^{1/2}\rVert_F^2$ plus the squared
+   mean gap.
+3. Why does the quantile construction fail in $\mathbb{R}^2$? Give two
+   distributions for which several distinct plans have the same cost.
+4. Brenier's map is $\nabla\varphi$ with $\varphi$ convex. What is $\varphi$ in
+   one dimension, and why is convexity the right generalisation of monotonicity?
+5. Take $P=\mathcal{N}(0,I_d)$ and $Q=\mathcal{N}(\delta e_1, I_d)$. Compute $W_2$
+   exactly. Now compute the sliced Wasserstein distance and compare.
+6. Show any IPM with a symmetric $\mathcal{F}$ obeys the triangle inequality.
+7. Show a linear kernel is not characteristic by exhibiting $P \ne Q$ with
+   $\mathrm{MMD}=0$.
+8. Derive the MMD expansion $\mathbb{E}k(X,X') - 2\mathbb{E}k(X,Y) +
+   \mathbb{E}k(Y,Y')$ from $\lVert \mu_P-\mu_Q\rVert^2_{\mathcal{H}}$.
+9. Using the Gaussian-kernel closed form, compute $\mathrm{MMD}^2$ at
+   $\lVert a-b\rVert=1$, $s=\sqrt{d}$, for $d=2,10,50$. Explain why the
+   dimension-free $n^{-1/2}$ rate is nevertheless not a free lunch.
+10. Why is the diagonal dropped from the MMD estimator? What happens if you
+    keep it?
+
+### Earlier exercises
 
 1. For $P = \mathcal{N}(0,1)$ and $Q = \mathcal{N}(\mu,1)$, show the KS statistic
    is $2\Phi(\mu/2)-1$ by finding where the CDF gap is maximised. Evaluate at

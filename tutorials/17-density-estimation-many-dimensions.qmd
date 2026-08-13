@@ -299,7 +299,7 @@ accuracy that $n = 100$ buys in one:
 | 50 | ~$4 \times 10^{21}$ |
 | 100 | ~$4 \times 10^{41}$ |
 
-**Interactive** — [The Bandwidth Lab](../materials/kde-lab.html){target="_blank"}
+**Interactive** — [The KDE Lab](../materials/kde-lab.html){target="_blank"}
 builds the estimate one kernel at a time, then lets you sweep $h$ against a
 three-component Gaussian mixture and watch it fail in both directions. Its third
 panel plots the integrated squared error against $h$: the curve is U-shaped, and
@@ -416,7 +416,175 @@ Score-based generative models are, genealogically, MCMC with a learned score.
 The line from this section to the end of the course is short.
 :::
 
-## 8. Where this sits in the landscape
+## 8. Sampling without estimating the density
+
+Notice what the MCMC of §7 quietly achieved. It produced draws from a posterior
+nobody could write down, and at no point did it build an estimate of that
+posterior. That distinction is the hinge of this whole note: **estimating a
+density and sampling from one are different problems**, and the second is very
+often the easier of the two. Generation only ever needed the second.
+
+Two classical algorithms make the point, and both need the target only **up to a
+normalising constant** — which is exactly the part that is unobtainable.
+
+### Rejection sampling: propose, then judge
+
+Pick a **proposal** $q$ you can sample, and a constant $M$ with
+$p(x) \le M\,q(x)$ for every $x$. Then repeat: draw $x \sim q$ and
+$u \sim \mathrm{Uniform}(0,1)$, and **accept** $x$ if
+
+$$
+u \;<\; \frac{p(x)}{M\,q(x)} .
+$$
+
+Accepted draws are distributed **exactly** as $p$ — not approximately. The proof
+is one line: the pair $(x, u\,M q(x))$ is uniform under the envelope $Mq$, and
+accepting keeps precisely those falling under $p$, so the survivors are uniform
+under $p$, whose $x$-marginal is $p$. The acceptance rate is $1/M$.
+
+The Bayesian case is the tidy one. Take the **prior** as the proposal and note
+that the posterior is $p(x) \propto q(x) L(x)$ for a likelihood $L$. If $L$ is
+bounded then $M = \max L / Z$ works, the ratio collapses, and the rule becomes
+
+$$
+\text{accept with probability } \frac{L(x)}{\max L} .
+$$
+
+No normalising constant, no evidence integral, no density estimate — just the
+likelihood evaluated at a point.
+
+::: {.callout-warning}
+## The envelope must actually exist
+
+It is easy to write down a proposal for which no valid $M$ exists. Take target
+$\mathcal{N}(-1,1)$ and proposal $\mathcal{N}(0,1)$: the ratio is
+
+$$
+\frac{p(x)}{q(x)} = e^{-x-\frac12} \;\xrightarrow[x\to-\infty]{}\; \infty ,
+$$
+
+so $\sup_x p/q = \infty$ and rejection sampling is simply unavailable. A proposal
+must have **heavier tails than the target** in every direction. Shifting a
+Gaussian is not enough; you have to widen it.
+:::
+
+And then the usual wall. Take target $\mathcal{N}(0,I_d)$ with a proposal
+$\mathcal{N}(0,\sigma^2 I_d)$, $\sigma > 1$. The optimal constant is
+$M = \sigma^{d}$, so the acceptance rate is $\sigma^{-d}$:
+
+| $d$ | rate at $\sigma = 1.1$ | rate at $\sigma = 1.5$ |
+|---|---|---|
+| 1 | 0.91 | 0.67 |
+| 10 | 0.39 | 0.017 |
+| 100 | $7 \times 10^{-5}$ | $2 \times 10^{-18}$ |
+
+A proposal *ten percent* too wide is already useless at $d = 100$. Rejection
+sampling is exact and, in high dimension, exactly worthless.
+
+### MCMC: stop proposing from scratch, and walk
+
+The fix is to stop drawing independently and instead move from where you already
+are. Gibbs sampling draws each coordinate from its conditional given the others;
+Metropolis–Hastings proposes a local step and accepts with a ratio. Both need $p$
+only through **ratios**, so the constant cancels again.
+
+What you buy is that the samples are no longer wasted. What you pay is that they
+are no longer independent — consecutive draws are correlated, and the chain must
+run a while before its distribution resembles the target at all.
+
+That last phrase deserves to be taken literally. For Gibbs on a standard
+bivariate normal with correlation $\rho$, the $x$-coordinate is exactly an AR(1)
+process with coefficient $\rho^2$, and the law of the chain at step $t$ started
+from $x_0$ is available in closed form:
+
+$$
+\boxed{\;x_t \mid x_0 \;\sim\; \mathcal{N}\big(\rho^{2t} x_0,\; 1 - \rho^{4t}\big).\;}
+$$
+
+The mean decays geometrically toward $0$ and the variance climbs toward $1$. So
+there is not one distribution here but a **sequence** of them, $p_0, p_1, p_2,
+\dots$, flowing toward $p_\infty$. Burn-in is the interval over which that flow is
+still visibly incomplete, and the lag-1 autocorrelation $\rho^2$ is why a
+strongly correlated target mixes slowly.
+
+**Interactive** — [The Sampling Lab](../materials/sampling-lab.html){target="_blank"}
+runs both algorithms: darts under an envelope for rejection, and for Gibbs a
+staircase walk, a trace plot, and 4,000 parallel chains whose histogram at step
+$t$ is drawn against the exact $p_t$ above.
+
+<iframe src="../materials/sampling-lab.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: rejection sampling and Gibbs sampling, with the chain's distribution evolving in time"></iframe>
+
+::: {.callout-tip}
+## A chain is a time series, and its law obeys a PDE
+
+$p_t \to p_\infty$ is the discrete-time shadow of the **Fokker–Planck** equation
+of Module 5, which describes exactly this: how a density evolves under stochastic
+dynamics. The continuous-time version of the walk is Langevin dynamics, and as
+§7 noted it needs only the score $\nabla_x \log p$.
+
+A diffusion model is this picture used deliberately. Its *forward* process is a
+chain run in the easy direction — toward a known Gaussian, no learning required.
+Its *reverse* process is the same flow run backwards, which is the hard direction
+and the one worth a semester.
+:::
+
+### The proposal is a generator; the test is a discriminator
+
+Look at rejection sampling structurally rather than procedurally. It has exactly
+two components: something that **produces candidates**, and something that
+**judges them**. That is the architecture of a generative adversarial network,
+with the proposal in the role of the generator and the acceptance test in the
+role of the discriminator.
+
+The parallel is not a loose analogy — both are **density-ratio** methods. The
+optimal discriminator for a GAN with generator distribution $p_g$ is
+
+$$
+D^{*}(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_g(x)} = \frac{r(x)}{1 + r(x)},
+\qquad r = \frac{p_{\text{data}}}{p_g},
+$$
+
+a strictly increasing function of the ratio $r$. Rejection sampling accepts with
+probability $p(x)/(M q(x))$ — the same ratio, differently scaled. Both machines
+run on $p/q$; they differ in what they know about it and what they do with it.
+
+| | rejection sampling | GAN |
+|---|---|---|
+| Generator | the proposal $q$ | a learned network |
+| Discriminator | $p(x)/Mq(x)$, computed exactly | a learned network estimating $r$ |
+| Density ratio | **known** — both densities can be evaluated | **estimated** from samples alone |
+| Rejected mass | discarded | becomes gradient: it says where to move |
+| Output | exact draws from $p$ | approximate draws, improving |
+
+The decisive difference is in the row about rejected mass. Rejection sampling
+throws a dart away and learns nothing; a GAN turns every failure into a signal
+telling the generator which way to go. That is what makes one method collapse in
+high dimension and the other not.
+
+::: {.callout-important}
+## The real limitation, in both classical methods
+
+In rejection sampling the proposal $q$ is chosen for convenience. In
+Metropolis–Hastings the proposal kernel is chosen for convenience. In Gibbs the
+"proposal" is whatever conditionals happen to be tractable. In every case a human
+picks a distribution because it is easy to sample, and then hopes it resembles
+the target — and in high dimension it does not, which is precisely the
+$\sigma^{-d}$ table above.
+
+**Modern generative models remove that choice: the proposal is learned.** A GAN
+learns a generator, a flow learns an invertible map, and a diffusion model learns
+a reverse process. Each replaces a hand-picked proposal with one fitted to the
+data.
+
+A diffusion model goes one step further and dispenses with the judge entirely.
+Because the forward process is a sequence of small Gaussian steps, each reverse
+step is *nearly* Gaussian and can be matched directly — there is nothing to
+accept or reject. The convenience-chosen proposal, the wasted draws, and the
+adversarial referee all disappear at once. That is the destination of this
+course.
+:::
+
+## 9. Where this sits in the landscape
 
 Everything above is **unsupervised**: there are no labels, only $x$'s, and the
 goal is the distribution itself. It is worth naming what else lives here and what
@@ -439,7 +607,7 @@ classifier can be excellent while knowing nothing about $p(x)$.
 This course stays in unsupervised density estimation, because generation demands
 the full distribution. You cannot sample from a conditional mean.
 
-## 9. Why this was hard, and what actually solved it
+## 10. Why this was hard, and what actually solved it
 
 Roughly 2000–2010 was an extraordinarily active decade on precisely this problem.
 Sparsity, $\ell_1$ penalties, oracle inequalities, minimax rates over structured
@@ -493,7 +661,7 @@ not the binding constraint, and solved that instead.
 Knowing which question you are asking is the whole skill.
 :::
 
-## 10. The bridge: from describing to comparing
+## 11. The bridge: from describing to comparing
 
 Every method above tried to **write down** $p_\text{data}$ — as a Gaussian, a
 sparse graphical model, a mixture, a sum of kernels, a posterior. All of them hit
@@ -584,7 +752,7 @@ this course is the construction of one particular, very well-behaved way of doin
 so.
 :::
 
-## 11. Where each piece returns
+## 12. Where each piece returns
 
 | From this note | Where it reappears |
 |---|---|
@@ -593,11 +761,13 @@ so.
 | EM as bound optimisation | the variational lower bound of Module 3 |
 | Curse of dimensionality | why we learn a score instead of a density |
 | Langevin / MCMC with a score | Module 4: score matching, and Module 5's SDEs |
+| $p_t \to p_\infty$ for a chain | the Fokker–Planck equation of Module 5 |
+| Proposal as generator, test as discriminator | GANs, and why diffusion needs neither |
 | Penalties are log-priors | the ELBO's prior term, read the same way |
 | Manifold / singular covariance | why $p(x)$ is the wrong object for images |
 | "Compare, don't describe" | note 07, and the whole of Modules 3–6 |
 
-The segue is §10: if estimating $p_\text{data}$ directly is hopeless, stop
+The segue is §11: if estimating $p_\text{data}$ directly is hopeless, stop
 describing distributions and start **comparing** them. That is note 07.
 
 ## Exercises
@@ -631,5 +801,17 @@ describing distributions and start **comparing** them. That is note 07.
     Which one is useful for gradient descent, and why?
 13. Write the Langevin update for $p = \mathcal{N}(\mu,\sigma^2)$ explicitly.
     Confirm the normalising constant never appears.
-14. A $p=50$ dataset has $n=40$ samples. Which estimator from §4 would you choose
+14. Prove that accepted draws in rejection sampling have law exactly $p$.
+    *(Hint: $(x, uMq(x))$ is uniform under the envelope.)*
+15. Show that for target $\mathcal{N}(0,I_d)$ and proposal
+    $\mathcal{N}(0,\sigma^2 I_d)$ with $\sigma>1$, the smallest valid constant is
+    $M = \sigma^{d}$. At what $d$ does $\sigma = 1.2$ become unusable?
+16. Explain why $\mathcal{N}(0,1)$ cannot be a rejection proposal for
+    $\mathcal{N}(-1,1)$, and give one that can.
+17. For Gibbs on the bivariate normal, derive
+    $x_t \mid x_0 \sim \mathcal{N}(\rho^{2t}x_0, 1-\rho^{4t})$ and the lag-1
+    autocorrelation $\rho^2$.
+18. Show the optimal GAN discriminator is $r/(1+r)$ with $r = p_\text{data}/p_g$,
+    and say what rejection sampling knows about $r$ that a GAN does not.
+19. A $p=50$ dataset has $n=40$ samples. Which estimator from §4 would you choose
    and why? What scientific claim does your choice commit you to?
