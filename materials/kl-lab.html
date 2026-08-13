@@ -1,0 +1,480 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The KL Lab</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --true: #7a7a72;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+      --true: #9b9b92;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+    --true: #9b9b92;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --true: #7a7a72;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout, .seg, table {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  canvas { display: block; width: 100%; touch-action: none; }
+  #c-fits { height: 330px; } #c-pay { height: 320px; } #c-land { height: 300px; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.35rem; }
+  input[type="range"] { width: 118px; accent-color: var(--data); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.2em;
+    display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.8rem; cursor: pointer;
+    font-family: system-ui, sans-serif; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data); color: #fff; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-top: 0.7rem; }
+  th, td { text-align: right; padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; font-size: 0.72rem;
+    letter-spacing: 0.08em; text-transform: uppercase; }
+  td.win { color: var(--ink); font-weight: 700; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  .legend { font-size: 0.78rem; color: var(--muted); display: flex; gap: 1.1rem;
+    flex-wrap: wrap; margin-top: 0.5rem; }
+  .legend i { display: inline-block; width: 1.5rem; height: 0; vertical-align: middle;
+    margin-right: 0.35rem; }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid);
+    padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; W03 demo</p>
+    <h1>The KL Lab</h1>
+    <p class="dek">KL divergence is not symmetric, and the asymmetry is not a technicality.
+    Fit the same single Gaussian to the same bimodal data and the two directions give
+    genuinely different answers: one covers everything, the other picks a mode and
+    ignores the rest.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I</span>Same target, same family, two answers</h2>
+    <p>The grey curve is the target <i>p</i>: a mixture of two Gaussians. The model family
+    is deliberately too poor to represent it &#8212; a <b>single</b> Gaussian <i>q</i>. There
+    is no fit that is right, so the choice of what "close" means decides everything.</p>
+    <p style="text-align:center" class="mono">
+      forward: KL(p&#8741;q) = &#8747; p log(p/q) &#160;&#160;&#160;&#160; reverse: KL(q&#8741;p) = &#8747; q log(q/p)
+    </p>
+    <figure>
+      <p class="figlabel"><span>Both optima, drawn together</span><span id="lab-fits"></span></p>
+      <canvas id="c-fits"></canvas>
+      <div class="controls">
+        <label>separation <input id="s-sep" type="range" min="0.4" max="7" step="0.1" value="4"><span class="val" id="v-sep">4.0</span></label>
+        <label>left weight <input id="s-w" type="range" min="0.1" max="0.9" step="0.02" value="0.5"><span class="val" id="v-w">0.50</span></label>
+        <label>widths <input id="s-sd" type="range" min="0.3" max="1.6" step="0.05" value="0.7"><span class="val" id="v-sd">0.70</span></label>
+      </div>
+      <div class="controls" style="border-top:none; padding-top:0; margin-top:0.35rem">
+        <span style="color:var(--muted)">reverse KL started from:</span>
+        <span class="seg">
+          <button data-start="-1" aria-pressed="true">left mode</button>
+          <button data-start="0">centre</button>
+          <button data-start="1">right mode</button>
+        </span>
+      </div>
+      <table>
+        <thead><tr><th>fit</th><th>&#956;</th><th>&#963;</th><th>KL(p&#8741;q)</th><th>KL(q&#8741;p)</th></tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+      <div class="legend">
+        <span><i style="border-top:2px dashed var(--true)"></i>target p</span>
+        <span><i style="border-top:2px solid var(--data)"></i>forward optimum</span>
+        <span><i style="border-top:2px solid var(--lik)"></i>reverse optimum</span>
+      </div>
+      <figcaption>Read the table across, not down. Each fit is the <i>best possible</i> under
+      its own criterion and looks terrible under the other &#8212; and the gap is not small.
+      Notice too that the reverse-KL answer changes with where you start it: the objective
+      has one basin per mode.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II</span>Where each direction pays its penalty</h2>
+    <p>Drag <i>q</i> yourself and watch the two integrands. Both are integrals of a
+    weighted log-ratio, but the <b>weight</b> differs, and that is the entire story: the
+    forward integrand is weighted by <i>p</i>, the reverse by <i>q</i>.</p>
+    <figure>
+      <p class="figlabel"><span>Pointwise contribution to each integral</span><span id="lab-pay"></span></p>
+      <canvas id="c-pay"></canvas>
+      <div class="controls">
+        <label>&#956; of q <input id="s-mu" type="range" min="-6" max="6" step="0.05" value="2"><span class="val" id="v-mu">2.00</span></label>
+        <label>&#963; of q <input id="s-sq" type="range" min="0.25" max="4" step="0.05" value="0.7"><span class="val" id="v-sq">0.70</span></label>
+        <button id="b-fwd">Snap to forward optimum</button>
+        <button id="b-rev">Snap to reverse optimum</button>
+      </div>
+      <p class="readout" id="r-pay"></p>
+      <div class="legend">
+        <span><i style="border-top:2px dashed var(--true)"></i>p</span>
+        <span><i style="border-top:2px solid var(--muted)"></i>q</span>
+        <span><i style="border-top:8px solid var(--data-soft)"></i>forward integrand p&#183;log(p/q)</span>
+        <span><i style="border-top:8px solid var(--lik-soft)"></i>reverse integrand q&#183;log(q/p)</span>
+      </div>
+      <figcaption>Put <i>q</i> on one mode. The forward integrand explodes over the
+      <i>abandoned</i> mode &#8212; p is large there and q is nearly zero, so log(p/q) is huge and
+      p weights it fully. The reverse integrand cannot see that region at all, because it
+      is weighted by q, which is zero there. Forward KL is <b>mass-covering</b>; reverse KL
+      is <b>zero-forcing</b>.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act III</span>Two landscapes</h2>
+    <p>Sweep the mean of <i>q</i> across the axis, holding &#963; at its best value for each
+    &#956;, and plot both objectives. The shapes are qualitatively different, and that
+    difference is why one optimisation is easy and the other depends on initialisation.</p>
+    <figure>
+      <p class="figlabel"><span>Objective against &#956;, with &#963; optimised</span><span id="lab-land"></span></p>
+      <canvas id="c-land"></canvas>
+      <p class="readout" id="r-land"></p>
+      <figcaption>Forward KL has a <b>single</b> minimum, sitting between the modes where no
+      data actually lives. Reverse KL has <b>one minimum per mode</b> and a barrier between
+      them &#8212; gradient descent finds whichever it started nearest, and never crosses.</figcaption>
+    </figure>
+    <p class="takeaway"><strong>Which one you are using is rarely a free choice.</strong>
+    Maximum likelihood <em>is</em> forward KL, so likelihood-trained models are
+    mass-covering: they put probability on everything they saw, which is one reason they
+    generate blurry averages. Variational inference and the ELBO minimise <em>reverse</em>
+    KL, so they are zero-forcing: they lock on and underestimate spread. Same data, same
+    family, opposite pathologies &#8212; from a single swap of argument order.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion to lecture note 07 on the <a href="https://acads-iit-jammu.github.io/diffusion-models-f26">course site</a>.
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- grid and densities ---------- */
+const XLO = -10, XHI = 10, N = 1201, DX = (XHI - XLO) / (N - 1);
+const XS = new Float64Array(N);
+for (let i = 0; i < N; i++) XS[i] = XLO + i * DX;
+const TINY = 1e-300, NORM = 1 / Math.sqrt(2 * Math.PI);
+
+let sep = 4.0, wL = 0.5, sdT = 0.7;          // target: two components
+const P = new Float64Array(N);
+function refreshTarget() {
+  const m1 = -sep / 2, m2 = sep / 2;
+  for (let i = 0; i < N; i++) {
+    const x = XS[i];
+    P[i] = wL * NORM * Math.exp(-0.5 * ((x - m1) / sdT) ** 2) / sdT
+         + (1 - wL) * NORM * Math.exp(-0.5 * ((x - m2) / sdT) ** 2) / sdT;
+  }
+}
+const Q = new Float64Array(N);
+function fillQ(mu, sd) {
+  for (let i = 0; i < N; i++) Q[i] = NORM * Math.exp(-0.5 * ((XS[i] - mu) / sd) ** 2) / sd;
+}
+/* trapezoid on the grid */
+function integ(f) {
+  let s = 0;
+  for (let i = 0; i < N; i++) s += f[i] * ((i === 0 || i === N - 1) ? 0.5 : 1);
+  return s * DX;
+}
+const TMP = new Float64Array(N);
+function klFwd(mu, sd) {                      // KL(p || q)
+  fillQ(mu, sd);
+  for (let i = 0; i < N; i++) TMP[i] = P[i] > 1e-14 ? P[i] * Math.log(P[i] / Math.max(Q[i], TINY)) : 0;
+  return integ(TMP);
+}
+function klRev(mu, sd) {                      // KL(q || p)
+  fillQ(mu, sd);
+  for (let i = 0; i < N; i++) TMP[i] = Q[i] > 1e-14 ? Q[i] * Math.log(Q[i] / Math.max(P[i], TINY)) : 0;
+  return integ(TMP);
+}
+/* forward optimum over Gaussians is exactly moment matching */
+function forwardOpt() {
+  const m1 = -sep / 2, m2 = sep / 2;
+  const ex = wL * m1 + (1 - wL) * m2;
+  const ex2 = wL * (sdT * sdT + m1 * m1) + (1 - wL) * (sdT * sdT + m2 * m2);
+  return { mu: ex, sd: Math.sqrt(ex2 - ex * ex) };
+}
+/* reverse optimum: coordinate descent with step halving, from a chosen start */
+function reverseOpt(mu0) {
+  let mu = mu0, ls = Math.log(sdT), best = klRev(mu, Math.exp(ls));
+  for (let step = 1.0; step > 1e-4; step *= 0.55) {
+    let moved = true;
+    while (moved) {
+      moved = false;
+      for (const d of [[step, 0], [-step, 0], [0, step], [0, -step]]) {
+        const m2 = mu + d[0], l2 = Math.min(Math.log(6), Math.max(Math.log(0.12), ls + d[1]));
+        const v = klRev(m2, Math.exp(l2));
+        if (v < best - 1e-12) { best = v; mu = m2; ls = l2; moved = true; }
+      }
+    }
+  }
+  return { mu: mu, sd: Math.exp(ls), kl: best };
+}
+/* best sd for a given mu, by golden-section on log sd */
+function bestSd(mu, fn) {
+  let a = Math.log(0.12), b = Math.log(6);
+  const gr = (Math.sqrt(5) - 1) / 2;
+  let c = b - gr * (b - a), d = a + gr * (b - a);
+  for (let k = 0; k < 34; k++) {
+    if (fn(mu, Math.exp(c)) < fn(mu, Math.exp(d))) b = d; else a = c;
+    c = b - gr * (b - a); d = a + gr * (b - a);
+  }
+  const m = Math.exp((a + b) / 2);
+  return { sd: m, val: fn(mu, m) };
+}
+
+/* ---------- canvas plumbing ---------- */
+function setup(id) {
+  const cv = document.getElementById(id), ctx = cv.getContext("2d");
+  const fit = () => {
+    const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: r.width, h: r.height };
+  };
+  return { cv, ctx, fit };
+}
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const mapx = (v, b, lo, hi) => b.L + (b.R - b.L) * (v - lo) / (hi - lo);
+const mapy = (v, b, lo, hi) => b.B - (b.B - b.T) * (v - lo) / (hi - lo);
+function axes(ctx, b, xlo, xhi, ylo, yhi, xlabel, ylabel, xstep) {
+  ctx.clearRect(0, 0, b.w, b.h);
+  ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+  ctx.font = "11px system-ui"; ctx.fillStyle = css("--muted");
+  for (let i = 0; i <= 4; i++) {
+    const y = b.T + (b.B - b.T) * i / 4;
+    ctx.beginPath(); ctx.moveTo(b.L, y); ctx.lineTo(b.R, y); ctx.stroke();
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.fillText((yhi - (yhi - ylo) * i / 4).toFixed(2), b.L - 6, y);
+  }
+  const y0 = mapy(0, b, ylo, yhi);
+  ctx.strokeStyle = css("--axis");
+  ctx.beginPath(); ctx.moveTo(b.L, y0); ctx.lineTo(b.R, y0); ctx.stroke();
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (let v = Math.ceil(xlo / xstep) * xstep; v <= xhi; v += xstep) {
+    ctx.fillText(String(+v.toFixed(2)), mapx(v, b, xlo, xhi), b.B + 6);
+  }
+  ctx.textAlign = "right"; ctx.fillText(xlabel, b.R, b.B + 20);
+  ctx.textAlign = "left"; ctx.textBaseline = "top"; ctx.fillText(ylabel, b.L, b.T - 14);
+}
+function plotArr(ctx, b, arr, xlo, xhi, ylo, yhi, colour, width, dash) {
+  ctx.save(); ctx.beginPath(); ctx.setLineDash(dash || []);
+  ctx.strokeStyle = colour; ctx.lineWidth = width;
+  for (let i = 0; i < N; i++) {
+    const px = mapx(XS[i], b, xlo, xhi), py = mapy(arr[i], b, ylo, yhi);
+    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  }
+  ctx.stroke(); ctx.restore();
+}
+function fillArr(ctx, b, arr, xlo, xhi, ylo, yhi, colour) {
+  ctx.save(); ctx.beginPath(); ctx.fillStyle = colour;
+  ctx.moveTo(mapx(XS[0], b, xlo, xhi), mapy(0, b, ylo, yhi));
+  for (let i = 0; i < N; i++) ctx.lineTo(mapx(XS[i], b, xlo, xhi), mapy(arr[i], b, ylo, yhi));
+  ctx.lineTo(mapx(XS[N - 1], b, xlo, xhi), mapy(0, b, ylo, yhi));
+  ctx.closePath(); ctx.fill(); ctx.restore();
+}
+
+/* ================= Act I ================= */
+const A = setup("c-fits");
+let revStart = -1;
+function actI() {
+  const d = A.fit(), b = { L: 46, R: d.w - 10, T: 18, B: d.h - 26, w: d.w, h: d.h };
+  const f = forwardOpt();
+  const start = revStart === 0 ? 0 : revStart * sep / 2;
+  const r = reverseOpt(start);
+  let ymax = 0;
+  for (let i = 0; i < N; i++) ymax = Math.max(ymax, P[i]);
+  const qf = new Float64Array(N), qr = new Float64Array(N);
+  fillQ(f.mu, f.sd); qf.set(Q);
+  fillQ(r.mu, r.sd); qr.set(Q);
+  for (let i = 0; i < N; i++) ymax = Math.max(ymax, qf[i], qr[i]);
+  ymax *= 1.15;
+  axes(A.ctx, b, XLO, XHI, 0, ymax, "x", "density", 2);
+  plotArr(A.ctx, b, P, XLO, XHI, 0, ymax, css("--true"), 2, [6, 4]);
+  plotArr(A.ctx, b, qf, XLO, XHI, 0, ymax, css("--data"), 2.4);
+  plotArr(A.ctx, b, qr, XLO, XHI, 0, ymax, css("--lik"), 2.4);
+  document.getElementById("lab-fits").textContent =
+    "separation " + sep.toFixed(1) + " · weights " + wL.toFixed(2) + "/" + (1 - wL).toFixed(2);
+  const ff = klFwd(f.mu, f.sd), fr = klRev(f.mu, f.sd);
+  const rf = klFwd(r.mu, r.sd), rr = klRev(r.mu, r.sd);
+  const cell = (v, win) => "<td" + (win ? " class='win'" : "") + ">" + v.toFixed(3) + "</td>";
+  document.getElementById("tb").innerHTML =
+    "<tr><td style='color:var(--data)'>forward optimum</td><td>" + f.mu.toFixed(2) + "</td><td>" + f.sd.toFixed(2) + "</td>" +
+      cell(ff, ff < rf) + cell(fr, fr < rr) + "</tr>" +
+    "<tr><td style='color:var(--lik)'>reverse optimum</td><td>" + r.mu.toFixed(2) + "</td><td>" + r.sd.toFixed(2) + "</td>" +
+      cell(rf, rf < ff) + cell(rr, rr < fr) + "</tr>";
+  return { f: f, r: r };
+}
+
+/* ================= Act II ================= */
+const B2 = setup("c-pay");
+let muQ = 2.0, sdQ = 0.7;
+function actII() {
+  const d = B2.fit(), b = { L: 46, R: d.w - 10, T: 22, B: d.h - 26, w: d.w, h: d.h };
+  fillQ(muQ, sdQ);
+  const q = Float64Array.from(Q);
+  const fi = new Float64Array(N), ri = new Float64Array(N);
+  for (let i = 0; i < N; i++) {
+    fi[i] = P[i] > 1e-14 ? P[i] * Math.log(P[i] / Math.max(q[i], TINY)) : 0;
+    ri[i] = q[i] > 1e-14 ? q[i] * Math.log(q[i] / Math.max(P[i], TINY)) : 0;
+  }
+  let ylo = 0, yhi = 0;
+  for (let i = 0; i < N; i++) {
+    yhi = Math.max(yhi, P[i], q[i], fi[i], ri[i]);
+    ylo = Math.min(ylo, fi[i], ri[i]);
+  }
+  yhi = Math.max(yhi * 1.1, 0.4); ylo = Math.min(ylo * 1.1, -0.05);
+  axes(B2.ctx, b, XLO, XHI, ylo, yhi, "x", "density / integrand", 2);
+  fillArr(B2.ctx, b, fi, XLO, XHI, ylo, yhi, css("--data-soft"));
+  fillArr(B2.ctx, b, ri, XLO, XHI, ylo, yhi, css("--lik-soft"));
+  plotArr(B2.ctx, b, P, XLO, XHI, ylo, yhi, css("--true"), 2, [6, 4]);
+  plotArr(B2.ctx, b, q, XLO, XHI, ylo, yhi, css("--muted"), 2);
+  const kf = integ(fi), kr = integ(ri);
+  document.getElementById("lab-pay").textContent = "q = N(" + muQ.toFixed(2) + ", " + sdQ.toFixed(2) + "²)";
+  document.getElementById("r-pay").innerHTML =
+    "KL(p&#8741;q) = <b>" + kf.toFixed(3) + "</b> &#183; KL(q&#8741;p) = <b>" + kr.toFixed(3) +
+    "</b> &#183; ratio <b>" + (kf / Math.max(kr, 1e-9)).toFixed(1) + "&times;</b>";
+}
+
+/* ================= Act III ================= */
+const C = setup("c-land");
+const NM = 90;
+function actIII() {
+  const d = C.fit(), b = { L: 46, R: d.w - 10, T: 18, B: d.h - 26, w: d.w, h: d.h };
+  const mlo = -sep / 2 - 3, mhi = sep / 2 + 3;
+  const fv = new Float64Array(NM), rv = new Float64Array(NM);
+  let ymax = 0;
+  for (let j = 0; j < NM; j++) {
+    const mu = mlo + (mhi - mlo) * j / (NM - 1);
+    fv[j] = bestSd(mu, klFwd).val;
+    rv[j] = bestSd(mu, klRev).val;
+    ymax = Math.max(ymax, fv[j], rv[j]);
+  }
+  ymax = Math.min(ymax, 6) * 1.08;
+  axes(C.ctx, b, mlo, mhi, 0, ymax, "μ of q", "divergence", 2);
+  const line = (arr, colour) => {
+    C.ctx.beginPath(); C.ctx.strokeStyle = colour; C.ctx.lineWidth = 2.3;
+    for (let j = 0; j < NM; j++) {
+      const px = mapx(mlo + (mhi - mlo) * j / (NM - 1), b, mlo, mhi);
+      const py = mapy(Math.min(arr[j], ymax), b, 0, ymax);
+      j ? C.ctx.lineTo(px, py) : C.ctx.moveTo(px, py);
+    }
+    C.ctx.stroke();
+  };
+  line(fv, css("--data")); line(rv, css("--lik"));
+  const mark = (arr, colour) => {
+    let jm = 0; for (let j = 0; j < NM; j++) if (arr[j] < arr[jm]) jm = j;
+    const mu = mlo + (mhi - mlo) * jm / (NM - 1);
+    C.ctx.fillStyle = colour; C.ctx.beginPath();
+    C.ctx.arc(mapx(mu, b, mlo, mhi), mapy(Math.min(arr[jm], ymax), b, 0, ymax), 4.5, 0, 6.284);
+    C.ctx.fill(); return mu;
+  };
+  const mf = mark(fv, css("--data")), mr = mark(rv, css("--lik"));
+  // count reverse-KL local minima
+  let nmin = 0;
+  for (let j = 1; j < NM - 1; j++) if (rv[j] < rv[j - 1] && rv[j] < rv[j + 1]) nmin++;
+  document.getElementById("lab-land").textContent = "σ optimised at each μ";
+  document.getElementById("r-land").innerHTML =
+    "<span style='color:var(--data)'>forward</span> minimum at μ = <b>" + mf.toFixed(2) +
+    "</b> &#183; <span style='color:var(--lik)'>reverse</span> minimum at μ = <b>" + mr.toFixed(2) +
+    "</b> &#183; reverse KL has <b>" + nmin + "</b> local " + (nmin === 1 ? "minimum" : "minima") +
+    " on this range";
+}
+
+/* ---------- wiring ---------- */
+const $ = id => document.getElementById(id);
+function redraw() { refreshTarget(); actI(); actII(); actIII(); }
+function bind(id, valId, fmt, set) {
+  const el = $(id);
+  el.addEventListener("input", () => {
+    set(parseFloat(el.value)); $(valId).textContent = fmt(parseFloat(el.value)); redraw();
+  });
+}
+bind("s-sep", "v-sep", v => v.toFixed(1), v => { sep = v; });
+bind("s-w", "v-w", v => v.toFixed(2), v => { wL = v; });
+bind("s-sd", "v-sd", v => v.toFixed(2), v => { sdT = v; });
+bind("s-mu", "v-mu", v => v.toFixed(2), v => { muQ = v; });
+bind("s-sq", "v-sq", v => v.toFixed(2), v => { sdQ = v; });
+document.querySelectorAll("[data-start]").forEach(btn => {
+  btn.onclick = () => {
+    revStart = +btn.dataset.start;
+    document.querySelectorAll("[data-start]").forEach(o => o.setAttribute("aria-pressed", String(o === btn)));
+    redraw();
+  };
+});
+$("b-fwd").onclick = () => {
+  const f = forwardOpt(); muQ = f.mu; sdQ = Math.min(4, f.sd);
+  $("s-mu").value = String(muQ); $("v-mu").textContent = muQ.toFixed(2);
+  $("s-sq").value = String(sdQ); $("v-sq").textContent = sdQ.toFixed(2);
+  redraw();
+};
+$("b-rev").onclick = () => {
+  const r = reverseOpt(revStart === 0 ? 0 : revStart * sep / 2);
+  muQ = Math.max(-6, Math.min(6, r.mu)); sdQ = Math.max(0.25, Math.min(4, r.sd));
+  $("s-mu").value = String(muQ); $("v-mu").textContent = muQ.toFixed(2);
+  $("s-sq").value = String(sdQ); $("v-sq").textContent = sdQ.toFixed(2);
+  redraw();
+};
+window.addEventListener("resize", redraw);
+if (window.matchMedia) {
+  const m = window.matchMedia("(prefers-color-scheme: dark)");
+  (m.addEventListener ? m.addEventListener.bind(m, "change") : m.addListener.bind(m))(redraw);
+}
+redraw();
+</script>

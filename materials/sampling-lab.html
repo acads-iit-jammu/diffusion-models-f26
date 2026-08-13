@@ -1,0 +1,492 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Sampling Lab</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --true: #7a7a72;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+      --true: #9b9b92;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --data: #3987e5; --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926; --lik-soft: rgba(217,89,38,0.20);
+    --true: #9b9b92;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6; --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834; --lik-soft: rgba(235,104,52,0.16);
+    --true: #7a7a72;
+  }
+  html { background: var(--page); }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+  header .eyebrow, .figlabel, .controls, .legend, button, .readout, .seg, table {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.75rem; }
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 40rem; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  canvas { display: block; width: 100%; touch-action: none; }
+  #c-rej { height: 300px; } #c-rejhist { height: 230px; margin-top: 0.9rem; }
+  #c-path { height: 300px; } #c-evolve { height: 260px; margin-top: 0.9rem; }
+  #c-trace { height: 210px; margin-top: 0.9rem; }
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.35rem; }
+  input[type="range"] { width: 118px; accent-color: var(--data); }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.2em;
+    display: inline-block; }
+  button { font-size: 0.8rem; font-weight: 600; color: var(--ink); background: transparent;
+    border: 1px solid var(--axis); border-radius: 6px; padding: 0.32rem 0.8rem; cursor: pointer;
+    font-family: system-ui, sans-serif; }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data); color: #fff; }
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+  figcaption { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.7rem; max-width: 40rem; }
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  .legend { font-size: 0.78rem; color: var(--muted); display: flex; gap: 1.1rem;
+    flex-wrap: wrap; margin-top: 0.5rem; }
+  .legend i { display: inline-block; width: 1.5rem; height: 0; vertical-align: middle;
+    margin-right: 0.35rem; }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--grid);
+    padding-top: 1.25rem; }
+  footer a { color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; W03 demo</p>
+    <h1>The Sampling Lab</h1>
+    <p class="dek">Two ways to draw from a distribution you can write down but cannot
+    sample directly. One throws darts and keeps the good ones; the other walks. Neither
+    ever estimates a density &#8212; and watching the second one converge is watching a
+    probability distribution evolve in time.</p>
+  </header>
+
+  <section>
+    <h2><span class="act">Act I</span>Rejection sampling: propose, then judge</h2>
+    <p>The setup is Bayesian and deliberately minimal. The <b>proposal</b> is a standard
+    normal prior; an observation at <b>&#8722;1</b> supplies the <b>likelihood</b>; the target
+    is the posterior they imply.</p>
+    <p style="text-align:center" class="mono">
+      q(x) = N(x; 0, 1) &#160;&#160;&#183;&#160;&#160; L(x) = exp(&#8722;(x+1)&#178;/2s&#178;) &#160;&#160;&#183;&#160;&#160; p(x) &#8733; q(x)L(x)
+    </p>
+    <p>Draw a candidate from the prior, then accept it with probability
+    <span class="mono">L(x)/max&#160;L</span>. Accepted points are distributed exactly as the
+    posterior &#8212; no normalising constant is ever computed, and no density is ever
+    estimated.</p>
+    <figure>
+      <p class="figlabel"><span>Darts under the envelope</span><span id="lab-rej"></span></p>
+      <canvas id="c-rej"></canvas>
+      <canvas id="c-rejhist"></canvas>
+      <div class="controls">
+        <label>likelihood width s <input id="s-s" type="range" min="0.4" max="2.0" step="0.05" value="1.0"><span class="val" id="v-s">1.00</span></label>
+        <button id="b-play1">Play</button>
+        <button id="b-step1">+200</button>
+        <button id="b-reset1">Reset</button>
+      </div>
+      <p class="readout" id="r-rej"></p>
+      <div class="legend">
+        <span><i style="border-top:2px dashed var(--muted)"></i>envelope M&#183;q</span>
+        <span><i style="border-top:2px solid var(--data)"></i>target posterior p</span>
+        <span><i style="border-top:2px solid var(--lik)"></i>likelihood L (scaled)</span>
+      </div>
+      <figcaption>Every dart lands uniformly under the envelope. Those falling under
+      <i>p</i> are kept, the rest discarded, and the histogram of survivors climbs onto the
+      posterior. Narrow the likelihood and the acceptance rate collapses &#8212; that
+      collapse is the whole weakness of the method, and it gets exponentially worse with
+      dimension.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="act">Act II</span>Gibbs: a walk, and a distribution in time</h2>
+    <p>Rejection sampling throws away work. A Markov chain instead <i>moves</i>: from the
+    current point, draw each coordinate from its conditional given the others. For a
+    bivariate normal with correlation &#961; both conditionals are normal with known mean
+    and standard deviation, which is exactly when Gibbs is available:</p>
+    <p style="text-align:center" class="mono">
+      x | y &#8764; N(&#961;y, 1&#8722;&#961;&#178;) &#160;&#160;&#160;&#160; y | x &#8764; N(&#961;x, 1&#8722;&#961;&#178;)
+    </p>
+    <figure>
+      <p class="figlabel"><span>One chain, walking</span><span id="lab-path"></span></p>
+      <canvas id="c-path"></canvas>
+      <canvas id="c-trace"></canvas>
+      <div class="controls">
+        <label>&#961; <input id="s-rho" type="range" min="0" max="0.98" step="0.01" value="0.9"><span class="val" id="v-rho">0.90</span></label>
+        <label>start x&#8320; <input id="s-x0" type="range" min="-6" max="6" step="0.5" value="6"><span class="val" id="v-x0">6.0</span></label>
+        <label>step t <input id="s-t" type="range" min="0" max="60" step="1" value="0"><span class="val" id="v-t">0</span></label>
+        <button id="b-play2">Play</button>
+        <button id="b-reset2">Reset</button>
+      </div>
+      <figcaption>The walk moves one axis at a time, which is why the path is a staircase.
+      Raise &#961; and the steps get shorter relative to the spread: the chain still gets
+      there, but it takes far longer, and neighbouring draws are strongly correlated.</figcaption>
+    </figure>
+    <p>Now the part worth pausing on. Run <b>4,000 independent chains</b> from the same
+    starting point and ask not where any one of them is, but how they are
+    <i>distributed</i> at step <i>t</i>. That distribution is a density evolving in time,
+    and here it is known exactly:</p>
+    <p style="text-align:center" class="mono">
+      x<sub>t</sub> | x<sub>0</sub> &#8764; N( &#961;<sup>2t</sup> x<sub>0</sub>, &#160; 1 &#8722; &#961;<sup>4t</sup> )
+    </p>
+    <figure>
+      <p class="figlabel"><span>The distribution at step t</span><span id="lab-evolve"></span></p>
+      <canvas id="c-evolve"></canvas>
+      <p class="readout" id="r-evolve"></p>
+      <div class="legend">
+        <span><i style="border-top:9px solid var(--data-soft)"></i>4,000 chains at step t</span>
+        <span><i style="border-top:2px solid var(--data)"></i>exact p<sub>t</sub></span>
+        <span><i style="border-top:2px dashed var(--true)"></i>stationary N(0,1)</span>
+      </div>
+      <figcaption>The mass starts as a spike at x&#8320; and slides toward the origin while
+      spreading, mean decaying like &#961;<sup>2t</sup> and variance climbing to one. Burn-in
+      is not a superstition &#8212; it is the length of time this picture is still visibly
+      wrong.</figcaption>
+    </figure>
+    <p class="takeaway"><strong>A chain is a time series, and its law obeys a
+    differential equation.</strong> What you just watched &#8212; p<sub>t</sub> flowing toward
+    p<sub>&#8734;</sub> &#8212; is the discrete-time shadow of the Fokker&#8211;Planck equation of
+    Module 5. Langevin dynamics is the continuous version, and it needs only
+    &#8711;<sub>x</sub>&#160;log&#160;p, the score. The forward process of a diffusion model is this
+    same picture run deliberately in the easy direction; the reverse process is the hard
+    one.</p>
+  </section>
+
+  <footer>
+    ID-5-02 (TO) &#183; Mathematical Foundations of Diffusion Models &#183; Monsoon 2026 &#183; IIT Jammu &#183;
+    companion to lecture note 06 on the <a href="https://acads-iit-jammu.github.io/diffusion-models-f26">course site</a>.
+  </footer>
+</div>
+
+<script>
+"use strict";
+const NORM = 1 / Math.sqrt(2 * Math.PI);
+const npdf = (x, m, s) => NORM * Math.exp(-0.5 * ((x - m) / s) ** 2) / s;
+let spare = null;
+function randn() {
+  if (spare !== null) { const v = spare; spare = null; return v; }
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  const r = Math.sqrt(-2 * Math.log(u));
+  spare = r * Math.sin(2 * Math.PI * v);
+  return r * Math.cos(2 * Math.PI * v);
+}
+function setup(id) {
+  const cv = document.getElementById(id), ctx = cv.getContext("2d");
+  const fit = () => {
+    const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: r.width, h: r.height };
+  };
+  return { cv, ctx, fit };
+}
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const mx = (v, b, lo, hi) => b.L + (b.R - b.L) * (v - lo) / (hi - lo);
+const my = (v, b, lo, hi) => b.B - (b.B - b.T) * (v - lo) / (hi - lo);
+function axes(ctx, b, xlo, xhi, ylo, yhi, xlabel, ylabel, xstep) {
+  ctx.clearRect(0, 0, b.w, b.h);
+  ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+  ctx.font = "11px system-ui"; ctx.fillStyle = css("--muted");
+  for (let i = 0; i <= 4; i++) {
+    const y = b.T + (b.B - b.T) * i / 4;
+    ctx.beginPath(); ctx.moveTo(b.L, y); ctx.lineTo(b.R, y); ctx.stroke();
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.fillText((yhi - (yhi - ylo) * i / 4).toFixed(2), b.L - 6, y);
+  }
+  ctx.strokeStyle = css("--axis");
+  const y0 = my(Math.max(ylo, Math.min(0, yhi)), b, ylo, yhi);
+  ctx.beginPath(); ctx.moveTo(b.L, y0); ctx.lineTo(b.R, y0); ctx.stroke();
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (let v = Math.ceil(xlo / xstep) * xstep; v <= xhi; v += xstep)
+    ctx.fillText(String(+v.toFixed(2)), mx(v, b, xlo, xhi), b.B + 6);
+  ctx.textAlign = "right"; ctx.fillText(xlabel, b.R, b.B + 20);
+  ctx.textAlign = "left"; ctx.textBaseline = "top"; ctx.fillText(ylabel, b.L, b.T - 14);
+}
+function fcurve(ctx, b, xlo, xhi, ylo, yhi, f, colour, w, dash) {
+  ctx.save(); ctx.beginPath(); ctx.setLineDash(dash || []);
+  ctx.strokeStyle = colour; ctx.lineWidth = w;
+  for (let i = 0; i < 260; i++) {
+    const x = xlo + (xhi - xlo) * i / 259;
+    const px = mx(x, b, xlo, xhi), py = my(f(x), b, ylo, yhi);
+    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  }
+  ctx.stroke(); ctx.restore();
+}
+
+/* ================= Act I — rejection sampling ================= */
+const R1 = setup("c-rej"), R2 = setup("c-rejhist");
+const RLO = -5, RHI = 4;
+let sLik = 1.0;
+let darts = [], nProp = 0, nAcc = 0;
+const HB = 60, HIST = new Float64Array(HB);
+const post = () => {                       // exact posterior: prior N(0,1) x likelihood
+  const v = sLik * sLik, sd = Math.sqrt(v / (1 + v));
+  return { mu: -1 / (1 + v), sd: sd };
+};
+const qd = x => npdf(x, 0, 1);
+const lik = x => Math.exp(-0.5 * ((x + 1) / sLik) ** 2);   // max is 1, at x = -1
+const target = x => { const P = post(); return npdf(x, P.mu, P.sd); };
+/* the envelope is M q with M chosen so that M q(x) >= p(x) everywhere; because
+   p(x) = q(x) L(x) / Z with L <= 1, M = 1/Z works and is tight. */
+const evidence = () => { const v = sLik * sLik; return npdf(-1, 0, Math.sqrt(1 + v)) * sLik * Math.sqrt(2 * Math.PI); };
+function resetRej() { darts = []; nProp = 0; nAcc = 0; HIST.fill(0); }
+function stepRej(k) {
+  for (let i = 0; i < k; i++) {
+    const x = randn(), u = Math.random();
+    nProp++;
+    const ok = u < lik(x);
+    if (ok) {
+      nAcc++;
+      const b = Math.floor((x - RLO) / (RHI - RLO) * HB);
+      if (b >= 0 && b < HB) HIST[b]++;
+    }
+    if (darts.length < 900) darts.push({ x: x, u: u, ok: ok });
+  }
+}
+function drawRej() {
+  const d = R1.fit(), b = { L: 46, R: d.w - 10, T: 18, B: d.h - 26, w: d.w, h: d.h };
+  const M = 1 / evidence();
+  let ymax = 0;
+  for (let i = 0; i <= 200; i++) {
+    const x = RLO + (RHI - RLO) * i / 200;
+    ymax = Math.max(ymax, M * qd(x), target(x));
+  }
+  ymax *= 1.12;
+  axes(R1.ctx, b, RLO, RHI, 0, ymax, "x", "density", 1);
+  for (const dt of darts) {
+    if (dt.x < RLO || dt.x > RHI) continue;
+    const py = my(dt.u * M * qd(dt.x), b, 0, ymax);
+    R1.ctx.fillStyle = dt.ok ? css("--data") : css("--lik");
+    R1.ctx.globalAlpha = dt.ok ? 0.5 : 0.16;
+    R1.ctx.beginPath(); R1.ctx.arc(mx(dt.x, b, RLO, RHI), py, 1.9, 0, 6.284); R1.ctx.fill();
+  }
+  R1.ctx.globalAlpha = 1;
+  fcurve(R1.ctx, b, RLO, RHI, 0, ymax, x => M * qd(x), css("--muted"), 2, [6, 4]);
+  fcurve(R1.ctx, b, RLO, RHI, 0, ymax, x => ymax * 0.9 * lik(x), css("--lik"), 1.6);
+  fcurve(R1.ctx, b, RLO, RHI, 0, ymax, target, css("--data"), 2.4);
+
+  const d2 = R2.fit(), b2 = { L: 46, R: d2.w - 10, T: 18, B: d2.h - 24, w: d2.w, h: d2.h };
+  const bw = (RHI - RLO) / HB;
+  let hmax = 0;
+  for (let i = 0; i < HB; i++) hmax = Math.max(hmax, nAcc ? HIST[i] / (nAcc * bw) : 0);
+  const P = post();
+  hmax = Math.max(hmax, npdf(P.mu, P.mu, P.sd)) * 1.15;
+  axes(R2.ctx, b2, RLO, RHI, 0, hmax, "x", "accepted samples", 1);
+  R2.ctx.fillStyle = css("--data-soft");
+  for (let i = 0; i < HB; i++) {
+    if (!HIST[i]) continue;
+    const h = HIST[i] / (nAcc * bw);
+    const x0 = mx(RLO + i * bw, b2, RLO, RHI), x1 = mx(RLO + (i + 1) * bw, b2, RLO, RHI);
+    R2.ctx.fillRect(x0, my(h, b2, 0, hmax), Math.max(1, x1 - x0 - 1), b2.B - my(h, b2, 0, hmax));
+  }
+  fcurve(R2.ctx, b2, RLO, RHI, 0, hmax, target, css("--data"), 2.4);
+
+  const rate = nProp ? nAcc / nProp : 0, theo = evidence();
+  document.getElementById("lab-rej").textContent = "s = " + sLik.toFixed(2) + " · M = " + M.toFixed(2);
+  document.getElementById("r-rej").innerHTML =
+    "proposed <b>" + nProp + "</b> · accepted <b>" + nAcc + "</b> (<b>" +
+    (100 * rate).toFixed(1) + "%</b>, theory " + (100 * theo).toFixed(1) + "%) · posterior N(<b>" +
+    P.mu.toFixed(3) + "</b>, <b>" + (P.sd * P.sd).toFixed(3) + "</b>)";
+}
+
+/* ================= Act II — Gibbs ================= */
+const G1 = setup("c-path"), G2 = setup("c-evolve"), G3 = setup("c-trace");
+let rho = 0.9, x0 = 6, tNow = 0;
+const TMAX = 60, ENS = 4000, NCH = 4;
+let path = [], traces = [], histT = [], meanT = [], sdT = [];
+function buildGibbs() {
+  // one visible chain (staircase), a few traces, and the ensemble histogram per step
+  path = []; traces = [];
+  let x = x0, y = x0;
+  path.push({ x: x, y: y });
+  for (let t = 0; t < TMAX; t++) {
+    y = rho * x + Math.sqrt(1 - rho * rho) * randn(); path.push({ x: x, y: y });
+    x = rho * y + Math.sqrt(1 - rho * rho) * randn(); path.push({ x: x, y: y });
+  }
+  for (let c = 0; c < NCH; c++) {
+    const tr = [x0]; let xx = x0;
+    for (let t = 0; t < TMAX; t++) {
+      const yy = rho * xx + Math.sqrt(1 - rho * rho) * randn();
+      xx = rho * yy + Math.sqrt(1 - rho * rho) * randn();
+      tr.push(xx);
+    }
+    traces.push(tr);
+  }
+  histT = []; meanT = []; sdT = [];
+  const ens = new Float64Array(ENS).fill(x0);
+  const push = () => {
+    const h = new Float64Array(HB2); let m = 0, s2 = 0;
+    for (let i = 0; i < ENS; i++) {
+      const v = ens[i]; m += v;
+      const bb = Math.floor((v - GLO) / (GHI - GLO) * HB2);
+      if (bb >= 0 && bb < HB2) h[bb]++;
+    }
+    m /= ENS;
+    for (let i = 0; i < ENS; i++) s2 += (ens[i] - m) ** 2;
+    histT.push(h); meanT.push(m); sdT.push(Math.sqrt(s2 / ENS));
+  };
+  push();
+  for (let t = 0; t < TMAX; t++) {
+    for (let i = 0; i < ENS; i++) {
+      const yy = rho * ens[i] + Math.sqrt(1 - rho * rho) * randn();
+      ens[i] = rho * yy + Math.sqrt(1 - rho * rho) * randn();
+    }
+    push();
+  }
+}
+const GLO = -8, GHI = 8, HB2 = 70;
+function drawGibbs() {
+  // (a) the staircase path
+  const d = G1.fit(), b = { L: 46, R: d.w - 10, T: 18, B: d.h - 26, w: d.w, h: d.h };
+  axes(G1.ctx, b, GLO, GHI, GLO, GHI, "x", "y", 2);
+  const s1 = Math.sqrt(1 - 0), sd = 1;
+  G1.ctx.strokeStyle = css("--grid"); G1.ctx.lineWidth = 1;
+  for (const k of [1, 2]) {                       // stationary contours
+    G1.ctx.beginPath();
+    for (let i = 0; i <= 90; i++) {
+      const a = 2 * Math.PI * i / 90;
+      const u = k * Math.cos(a), v = k * Math.sin(a);
+      const X = u, Y = rho * u + Math.sqrt(1 - rho * rho) * v;
+      const px = mx(X, b, GLO, GHI), py = my(Y, b, GLO, GHI);
+      i ? G1.ctx.lineTo(px, py) : G1.ctx.moveTo(px, py);
+    }
+    G1.ctx.closePath(); G1.ctx.stroke();
+  }
+  const upto = Math.min(path.length - 1, 2 * tNow);
+  G1.ctx.strokeStyle = css("--data"); G1.ctx.lineWidth = 1.1; G1.ctx.globalAlpha = 0.75;
+  G1.ctx.beginPath();
+  for (let i = 0; i <= upto; i++) {
+    const px = mx(path[i].x, b, GLO, GHI), py = my(path[i].y, b, GLO, GHI);
+    i ? G1.ctx.lineTo(px, py) : G1.ctx.moveTo(px, py);
+  }
+  G1.ctx.stroke(); G1.ctx.globalAlpha = 1;
+  G1.ctx.fillStyle = css("--lik");
+  G1.ctx.beginPath(); G1.ctx.arc(mx(path[upto].x, b, GLO, GHI), my(path[upto].y, b, GLO, GHI), 4, 0, 6.284); G1.ctx.fill();
+  document.getElementById("lab-path").textContent = "ρ = " + rho.toFixed(2) + " · step " + tNow;
+
+  // (b) traces — the chain as a time series
+  const d3 = G3.fit(), b3 = { L: 46, R: d3.w - 10, T: 18, B: d3.h - 24, w: d3.w, h: d3.h };
+  axes(G3.ctx, b3, 0, TMAX, GLO, GHI, "step t", "x", 10);
+  G3.ctx.strokeStyle = css("--muted"); G3.ctx.lineWidth = 1; G3.ctx.globalAlpha = 0.55;
+  for (const tr of traces) {
+    G3.ctx.beginPath();
+    for (let t = 0; t <= Math.min(tNow, TMAX); t++) {
+      const px = mx(t, b3, 0, TMAX), py = my(tr[t], b3, GLO, GHI);
+      t ? G3.ctx.lineTo(px, py) : G3.ctx.moveTo(px, py);
+    }
+    G3.ctx.stroke();
+  }
+  G3.ctx.globalAlpha = 1;
+  G3.ctx.strokeStyle = css("--data"); G3.ctx.lineWidth = 2;   // ensemble mean
+  G3.ctx.beginPath();
+  for (let t = 0; t <= Math.min(tNow, TMAX); t++) {
+    const px = mx(t, b3, 0, TMAX), py = my(meanT[t], b3, GLO, GHI);
+    t ? G3.ctx.lineTo(px, py) : G3.ctx.moveTo(px, py);
+  }
+  G3.ctx.stroke();
+
+  // (c) the distribution at step t, against its exact law
+  const d2 = G2.fit(), b2 = { L: 46, R: d2.w - 10, T: 18, B: d2.h - 24, w: d2.w, h: d2.h };
+  const mt = Math.pow(rho, 2 * tNow) * x0, st = Math.sqrt(Math.max(1e-6, 1 - Math.pow(rho, 4 * tNow)));
+  const bw = (GHI - GLO) / HB2, h = histT[tNow];
+  let hmax = npdf(0, 0, 1);
+  for (let i = 0; i < HB2; i++) hmax = Math.max(hmax, h[i] / (ENS * bw));
+  hmax = Math.max(hmax, npdf(mt, mt, st)) * 1.12;
+  axes(G2.ctx, b2, GLO, GHI, 0, hmax, "x", "p" + "ₜ", 2);
+  G2.ctx.fillStyle = css("--data-soft");
+  for (let i = 0; i < HB2; i++) {
+    if (!h[i]) continue;
+    const v = h[i] / (ENS * bw);
+    const xa = mx(GLO + i * bw, b2, GLO, GHI), xb = mx(GLO + (i + 1) * bw, b2, GLO, GHI);
+    G2.ctx.fillRect(xa, my(v, b2, 0, hmax), Math.max(1, xb - xa - 1), b2.B - my(v, b2, 0, hmax));
+  }
+  fcurve(G2.ctx, b2, GLO, GHI, 0, hmax, x => npdf(x, 0, 1), css("--true"), 2, [6, 4]);
+  fcurve(G2.ctx, b2, GLO, GHI, 0, hmax, x => npdf(x, mt, st), css("--data"), 2.4);
+  document.getElementById("lab-evolve").textContent = "step t = " + tNow + " · 4,000 chains";
+  document.getElementById("r-evolve").innerHTML =
+    "ensemble mean <b>" + meanT[tNow].toFixed(3) + "</b> (exact ρ<sup>2t</sup>x₀ = <b>" + mt.toFixed(3) +
+    "</b>) · sd <b>" + sdT[tNow].toFixed(3) + "</b> (exact <b>" + st.toFixed(3) + "</b>)" +
+    (Math.abs(mt) > 0.05 ? " · still burning in" : " · converged to within 0.05");
+}
+
+/* ---------- wiring ---------- */
+const $ = id => document.getElementById(id);
+let play1 = null, play2 = null;
+function bind(id, valId, fmt, set) {
+  const el = $(id);
+  el.addEventListener("input", () => { set(parseFloat(el.value)); $(valId).textContent = fmt(parseFloat(el.value)); });
+}
+bind("s-s", "v-s", v => v.toFixed(2), v => { sLik = v; resetRej(); drawRej(); });
+$("b-step1").onclick = () => { stepRej(200); drawRej(); };
+$("b-reset1").onclick = () => { resetRej(); drawRej(); };
+$("b-play1").onclick = function () {
+  if (play1) { clearInterval(play1); play1 = null; this.textContent = "Play"; }
+  else { this.textContent = "Pause"; play1 = setInterval(() => { stepRej(40); drawRej(); }, 60); }
+};
+bind("s-rho", "v-rho", v => v.toFixed(2), v => { rho = v; buildGibbs(); drawGibbs(); });
+bind("s-x0", "v-x0", v => v.toFixed(1), v => { x0 = v; buildGibbs(); drawGibbs(); });
+bind("s-t", "v-t", v => String(v), v => { tNow = v; drawGibbs(); });
+$("b-reset2").onclick = () => { tNow = 0; $("s-t").value = "0"; $("v-t").textContent = "0"; buildGibbs(); drawGibbs(); };
+$("b-play2").onclick = function () {
+  if (play2) { clearInterval(play2); play2 = null; this.textContent = "Play"; }
+  else {
+    this.textContent = "Pause";
+    play2 = setInterval(() => {
+      tNow = tNow >= TMAX ? 0 : tNow + 1;
+      $("s-t").value = String(tNow); $("v-t").textContent = String(tNow);
+      drawGibbs();
+    }, 180);
+  }
+};
+function redraw() { drawRej(); drawGibbs(); }
+window.addEventListener("resize", redraw);
+if (window.matchMedia) {
+  const m = window.matchMedia("(prefers-color-scheme: dark)");
+  (m.addEventListener ? m.addEventListener.bind(m, "change") : m.addListener.bind(m))(redraw);
+}
+resetRej(); stepRej(600); buildGibbs(); redraw();
+</script>

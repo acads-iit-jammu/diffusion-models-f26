@@ -401,10 +401,16 @@ window.Quarto = {
   <li><a href="#one-gaussian-is-not-enough-mixtures-and-em" id="toc-one-gaussian-is-not-enough-mixtures-and-em" class="nav-link" data-scroll-target="#one-gaussian-is-not-enough-mixtures-and-em">5. One Gaussian is not enough: mixtures and EM</a></li>
   <li><a href="#give-up-on-parameters-kernel-density-estimation" id="toc-give-up-on-parameters-kernel-density-estimation" class="nav-link" data-scroll-target="#give-up-on-parameters-kernel-density-estimation">6. Give up on parameters: kernel density estimation</a></li>
   <li><a href="#another-route-entirely-be-bayesian" id="toc-another-route-entirely-be-bayesian" class="nav-link" data-scroll-target="#another-route-entirely-be-bayesian">7. Another route entirely: be Bayesian</a></li>
-  <li><a href="#where-this-sits-in-the-landscape" id="toc-where-this-sits-in-the-landscape" class="nav-link" data-scroll-target="#where-this-sits-in-the-landscape">8. Where this sits in the landscape</a></li>
-  <li><a href="#why-this-was-hard-and-what-actually-solved-it" id="toc-why-this-was-hard-and-what-actually-solved-it" class="nav-link" data-scroll-target="#why-this-was-hard-and-what-actually-solved-it">9. Why this was hard, and what actually solved it</a></li>
-  <li><a href="#the-bridge-from-describing-to-comparing" id="toc-the-bridge-from-describing-to-comparing" class="nav-link" data-scroll-target="#the-bridge-from-describing-to-comparing">10. The bridge: from describing to comparing</a></li>
-  <li><a href="#where-each-piece-returns" id="toc-where-each-piece-returns" class="nav-link" data-scroll-target="#where-each-piece-returns">11. Where each piece returns</a></li>
+  <li><a href="#sampling-without-estimating-the-density" id="toc-sampling-without-estimating-the-density" class="nav-link" data-scroll-target="#sampling-without-estimating-the-density">8. Sampling without estimating the density</a>
+  <ul class="collapse">
+  <li><a href="#rejection-sampling-propose-then-judge" id="toc-rejection-sampling-propose-then-judge" class="nav-link" data-scroll-target="#rejection-sampling-propose-then-judge">Rejection sampling: propose, then judge</a></li>
+  <li><a href="#mcmc-stop-proposing-from-scratch-and-walk" id="toc-mcmc-stop-proposing-from-scratch-and-walk" class="nav-link" data-scroll-target="#mcmc-stop-proposing-from-scratch-and-walk">MCMC: stop proposing from scratch, and walk</a></li>
+  <li><a href="#the-proposal-is-a-generator-the-test-is-a-discriminator" id="toc-the-proposal-is-a-generator-the-test-is-a-discriminator" class="nav-link" data-scroll-target="#the-proposal-is-a-generator-the-test-is-a-discriminator">The proposal is a generator; the test is a discriminator</a></li>
+  </ul></li>
+  <li><a href="#where-this-sits-in-the-landscape" id="toc-where-this-sits-in-the-landscape" class="nav-link" data-scroll-target="#where-this-sits-in-the-landscape">9. Where this sits in the landscape</a></li>
+  <li><a href="#why-this-was-hard-and-what-actually-solved-it" id="toc-why-this-was-hard-and-what-actually-solved-it" class="nav-link" data-scroll-target="#why-this-was-hard-and-what-actually-solved-it">10. Why this was hard, and what actually solved it</a></li>
+  <li><a href="#the-bridge-from-describing-to-comparing" id="toc-the-bridge-from-describing-to-comparing" class="nav-link" data-scroll-target="#the-bridge-from-describing-to-comparing">11. The bridge: from describing to comparing</a></li>
+  <li><a href="#where-each-piece-returns" id="toc-where-each-piece-returns" class="nav-link" data-scroll-target="#where-each-piece-returns">12. Where each piece returns</a></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
@@ -700,7 +706,7 @@ Two failure modes worth knowing
 </tr>
 </tbody>
 </table>
-<p><strong>Interactive</strong> — <a href="../materials/kde-lab.html" target="_blank">The Bandwidth Lab</a> builds the estimate one kernel at a time, then lets you sweep <span class="math inline">\(h\)</span> against a three-component Gaussian mixture and watch it fail in both directions. Its third panel plots the integrated squared error against <span class="math inline">\(h\)</span>: the curve is U-shaped, and its minimum slides left as <span class="math inline">\(n\)</span> grows, which is <span class="math inline">\(h^\star \propto n^{-1/5}\)</span> made visible.</p>
+<p><strong>Interactive</strong> — <a href="../materials/kde-lab.html" target="_blank">The KDE Lab</a> builds the estimate one kernel at a time, then lets you sweep <span class="math inline">\(h\)</span> against a three-component Gaussian mixture and watch it fail in both directions. Its third panel plots the integrated squared error against <span class="math inline">\(h\)</span>: the curve is U-shaped, and its minimum slides left as <span class="math inline">\(n\)</span> grows, which is <span class="math inline">\(h^\star \propto n^{-1/5}\)</span> made visible.</p>
 <iframe src="../materials/kde-lab.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: kernel density estimation in one dimension, and the effect of bandwidth">
 </iframe>
 <p>At <span class="math inline">\(p = 100\)</span> — still a <em>small</em> problem by modern standards — the requirement exceeds the number of atoms in the observable universe by a wide margin. This is not an artefact of KDE. It is a <strong>minimax lower bound</strong>: over the class of smooth densities, <em>no</em> estimator does better than <span class="math inline">\(n^{-2s/(2s+p)}\)</span> for smoothness <span class="math inline">\(s\)</span>. The obstruction is information-theoretic, not algorithmic.</p>
@@ -779,15 +785,173 @@ x \;\leftarrow\; x + \tfrac{\varepsilon}{2}\,\nabla_x \log p(x) + \sqrt{\varepsi
 </div>
 </div>
 </section>
+<section id="sampling-without-estimating-the-density" class="level2">
+<h2 class="anchored" data-anchor-id="sampling-without-estimating-the-density">8. Sampling without estimating the density</h2>
+<p>Notice what the MCMC of §7 quietly achieved. It produced draws from a posterior nobody could write down, and at no point did it build an estimate of that posterior. That distinction is the hinge of this whole note: <strong>estimating a density and sampling from one are different problems</strong>, and the second is very often the easier of the two. Generation only ever needed the second.</p>
+<p>Two classical algorithms make the point, and both need the target only <strong>up to a normalising constant</strong> — which is exactly the part that is unobtainable.</p>
+<section id="rejection-sampling-propose-then-judge" class="level3">
+<h3 class="anchored" data-anchor-id="rejection-sampling-propose-then-judge">Rejection sampling: propose, then judge</h3>
+<p>Pick a <strong>proposal</strong> <span class="math inline">\(q\)</span> you can sample, and a constant <span class="math inline">\(M\)</span> with <span class="math inline">\(p(x) \le M\,q(x)\)</span> for every <span class="math inline">\(x\)</span>. Then repeat: draw <span class="math inline">\(x \sim q\)</span> and <span class="math inline">\(u \sim \mathrm{Uniform}(0,1)\)</span>, and <strong>accept</strong> <span class="math inline">\(x\)</span> if</p>
+<p><span class="math display">\[
+u \;&lt;\; \frac{p(x)}{M\,q(x)} .
+\]</span></p>
+<p>Accepted draws are distributed <strong>exactly</strong> as <span class="math inline">\(p\)</span> — not approximately. The proof is one line: the pair <span class="math inline">\((x, u\,M q(x))\)</span> is uniform under the envelope <span class="math inline">\(Mq\)</span>, and accepting keeps precisely those falling under <span class="math inline">\(p\)</span>, so the survivors are uniform under <span class="math inline">\(p\)</span>, whose <span class="math inline">\(x\)</span>-marginal is <span class="math inline">\(p\)</span>. The acceptance rate is <span class="math inline">\(1/M\)</span>.</p>
+<p>The Bayesian case is the tidy one. Take the <strong>prior</strong> as the proposal and note that the posterior is <span class="math inline">\(p(x) \propto q(x) L(x)\)</span> for a likelihood <span class="math inline">\(L\)</span>. If <span class="math inline">\(L\)</span> is bounded then <span class="math inline">\(M = \max L / Z\)</span> works, the ratio collapses, and the rule becomes</p>
+<p><span class="math display">\[
+\text{accept with probability } \frac{L(x)}{\max L} .
+\]</span></p>
+<p>No normalising constant, no evidence integral, no density estimate — just the likelihood evaluated at a point.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The envelope must actually exist
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is easy to write down a proposal for which no valid <span class="math inline">\(M\)</span> exists. Take target <span class="math inline">\(\mathcal{N}(-1,1)\)</span> and proposal <span class="math inline">\(\mathcal{N}(0,1)\)</span>: the ratio is</p>
+<p><span class="math display">\[
+\frac{p(x)}{q(x)} = e^{-x-\frac12} \;\xrightarrow[x\to-\infty]{}\; \infty ,
+\]</span></p>
+<p>so <span class="math inline">\(\sup_x p/q = \infty\)</span> and rejection sampling is simply unavailable. A proposal must have <strong>heavier tails than the target</strong> in every direction. Shifting a Gaussian is not enough; you have to widen it.</p>
+</div>
+</div>
+<p>And then the usual wall. Take target <span class="math inline">\(\mathcal{N}(0,I_d)\)</span> with a proposal <span class="math inline">\(\mathcal{N}(0,\sigma^2 I_d)\)</span>, <span class="math inline">\(\sigma &gt; 1\)</span>. The optimal constant is <span class="math inline">\(M = \sigma^{d}\)</span>, so the acceptance rate is <span class="math inline">\(\sigma^{-d}\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(d\)</span></th>
+<th>rate at <span class="math inline">\(\sigma = 1.1\)</span></th>
+<th>rate at <span class="math inline">\(\sigma = 1.5\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0.91</td>
+<td>0.67</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>0.39</td>
+<td>0.017</td>
+</tr>
+<tr class="odd">
+<td>100</td>
+<td><span class="math inline">\(7 \times 10^{-5}\)</span></td>
+<td><span class="math inline">\(2 \times 10^{-18}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>A proposal <em>ten percent</em> too wide is already useless at <span class="math inline">\(d = 100\)</span>. Rejection sampling is exact and, in high dimension, exactly worthless.</p>
+</section>
+<section id="mcmc-stop-proposing-from-scratch-and-walk" class="level3">
+<h3 class="anchored" data-anchor-id="mcmc-stop-proposing-from-scratch-and-walk">MCMC: stop proposing from scratch, and walk</h3>
+<p>The fix is to stop drawing independently and instead move from where you already are. Gibbs sampling draws each coordinate from its conditional given the others; Metropolis–Hastings proposes a local step and accepts with a ratio. Both need <span class="math inline">\(p\)</span> only through <strong>ratios</strong>, so the constant cancels again.</p>
+<p>What you buy is that the samples are no longer wasted. What you pay is that they are no longer independent — consecutive draws are correlated, and the chain must run a while before its distribution resembles the target at all.</p>
+<p>That last phrase deserves to be taken literally. For Gibbs on a standard bivariate normal with correlation <span class="math inline">\(\rho\)</span>, the <span class="math inline">\(x\)</span>-coordinate is exactly an AR(1) process with coefficient <span class="math inline">\(\rho^2\)</span>, and the law of the chain at step <span class="math inline">\(t\)</span> started from <span class="math inline">\(x_0\)</span> is available in closed form:</p>
+<p><span class="math display">\[
+\boxed{\;x_t \mid x_0 \;\sim\; \mathcal{N}\big(\rho^{2t} x_0,\; 1 - \rho^{4t}\big).\;}
+\]</span></p>
+<p>The mean decays geometrically toward <span class="math inline">\(0\)</span> and the variance climbs toward <span class="math inline">\(1\)</span>. So there is not one distribution here but a <strong>sequence</strong> of them, <span class="math inline">\(p_0, p_1, p_2,
+\dots\)</span>, flowing toward <span class="math inline">\(p_\infty\)</span>. Burn-in is the interval over which that flow is still visibly incomplete, and the lag-1 autocorrelation <span class="math inline">\(\rho^2\)</span> is why a strongly correlated target mixes slowly.</p>
+<p><strong>Interactive</strong> — <a href="../materials/sampling-lab.html" target="_blank">The Sampling Lab</a> runs both algorithms: darts under an envelope for rejection, and for Gibbs a staircase walk, a trace plot, and 4,000 parallel chains whose histogram at step <span class="math inline">\(t\)</span> is drawn against the exact <span class="math inline">\(p_t\)</span> above.</p>
+<iframe src="../materials/sampling-lab.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: rejection sampling and Gibbs sampling, with the chain's distribution evolving in time">
+</iframe>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+A chain is a time series, and its law obeys a PDE
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(p_t \to p_\infty\)</span> is the discrete-time shadow of the <strong>Fokker–Planck</strong> equation of Module 5, which describes exactly this: how a density evolves under stochastic dynamics. The continuous-time version of the walk is Langevin dynamics, and as §7 noted it needs only the score <span class="math inline">\(\nabla_x \log p\)</span>.</p>
+<p>A diffusion model is this picture used deliberately. Its <em>forward</em> process is a chain run in the easy direction — toward a known Gaussian, no learning required. Its <em>reverse</em> process is the same flow run backwards, which is the hard direction and the one worth a semester.</p>
+</div>
+</div>
+</section>
+<section id="the-proposal-is-a-generator-the-test-is-a-discriminator" class="level3">
+<h3 class="anchored" data-anchor-id="the-proposal-is-a-generator-the-test-is-a-discriminator">The proposal is a generator; the test is a discriminator</h3>
+<p>Look at rejection sampling structurally rather than procedurally. It has exactly two components: something that <strong>produces candidates</strong>, and something that <strong>judges them</strong>. That is the architecture of a generative adversarial network, with the proposal in the role of the generator and the acceptance test in the role of the discriminator.</p>
+<p>The parallel is not a loose analogy — both are <strong>density-ratio</strong> methods. The optimal discriminator for a GAN with generator distribution <span class="math inline">\(p_g\)</span> is</p>
+<p><span class="math display">\[
+D^{*}(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_g(x)} = \frac{r(x)}{1 + r(x)},
+\qquad r = \frac{p_{\text{data}}}{p_g},
+\]</span></p>
+<p>a strictly increasing function of the ratio <span class="math inline">\(r\)</span>. Rejection sampling accepts with probability <span class="math inline">\(p(x)/(M q(x))\)</span> — the same ratio, differently scaled. Both machines run on <span class="math inline">\(p/q\)</span>; they differ in what they know about it and what they do with it.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>rejection sampling</th>
+<th>GAN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Generator</td>
+<td>the proposal <span class="math inline">\(q\)</span></td>
+<td>a learned network</td>
+</tr>
+<tr class="even">
+<td>Discriminator</td>
+<td><span class="math inline">\(p(x)/Mq(x)\)</span>, computed exactly</td>
+<td>a learned network estimating <span class="math inline">\(r\)</span></td>
+</tr>
+<tr class="odd">
+<td>Density ratio</td>
+<td><strong>known</strong> — both densities can be evaluated</td>
+<td><strong>estimated</strong> from samples alone</td>
+</tr>
+<tr class="even">
+<td>Rejected mass</td>
+<td>discarded</td>
+<td>becomes gradient: it says where to move</td>
+</tr>
+<tr class="odd">
+<td>Output</td>
+<td>exact draws from <span class="math inline">\(p\)</span></td>
+<td>approximate draws, improving</td>
+</tr>
+</tbody>
+</table>
+<p>The decisive difference is in the row about rejected mass. Rejection sampling throws a dart away and learns nothing; a GAN turns every failure into a signal telling the generator which way to go. That is what makes one method collapse in high dimension and the other not.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The real limitation, in both classical methods
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In rejection sampling the proposal <span class="math inline">\(q\)</span> is chosen for convenience. In Metropolis–Hastings the proposal kernel is chosen for convenience. In Gibbs the “proposal” is whatever conditionals happen to be tractable. In every case a human picks a distribution because it is easy to sample, and then hopes it resembles the target — and in high dimension it does not, which is precisely the <span class="math inline">\(\sigma^{-d}\)</span> table above.</p>
+<p><strong>Modern generative models remove that choice: the proposal is learned.</strong> A GAN learns a generator, a flow learns an invertible map, and a diffusion model learns a reverse process. Each replaces a hand-picked proposal with one fitted to the data.</p>
+<p>A diffusion model goes one step further and dispenses with the judge entirely. Because the forward process is a sequence of small Gaussian steps, each reverse step is <em>nearly</em> Gaussian and can be matched directly — there is nothing to accept or reject. The convenience-chosen proposal, the wasted draws, and the adversarial referee all disappear at once. That is the destination of this course.</p>
+</div>
+</div>
+</section>
+</section>
 <section id="where-this-sits-in-the-landscape" class="level2">
-<h2 class="anchored" data-anchor-id="where-this-sits-in-the-landscape">8. Where this sits in the landscape</h2>
+<h2 class="anchored" data-anchor-id="where-this-sits-in-the-landscape">9. Where this sits in the landscape</h2>
 <p>Everything above is <strong>unsupervised</strong>: there are no labels, only <span class="math inline">\(x\)</span>’s, and the goal is the distribution itself. It is worth naming what else lives here and what lives next door, because the difficulty is not the same.</p>
 <p><strong>Other unsupervised problems.</strong> <em>Clustering</em> — partition the data, which is a Gaussian mixture with hard assignments (<span class="math inline">\(k\)</span>-means is EM with spherical components and responsibilities rounded to 0/1). <em>Dimension reduction</em> — PCA is the factor model of §4 read as an estimator; manifold learning is its nonlinear cousin. <em>Latent variable modelling</em> — factor analysis, topic models, and eventually VAEs. <em>Anomaly detection</em> — density estimation with a threshold on the output.</p>
 <p><strong>Supervised problems</strong>, by contrast, estimate a conditional: regression wants <span class="math inline">\(\mathbb{E}[y \mid x]\)</span>, classification wants <span class="math inline">\(\mathbb{P}(y \mid x)\)</span>. These are <em>easier</em>, and it is worth being precise about why: you need one number per input rather than a normalised function over the whole space, there is a label telling you when you are wrong, and you never have to compute a normalising constant. A classifier can be excellent while knowing nothing about <span class="math inline">\(p(x)\)</span>.</p>
 <p>This course stays in unsupervised density estimation, because generation demands the full distribution. You cannot sample from a conditional mean.</p>
 </section>
 <section id="why-this-was-hard-and-what-actually-solved-it" class="level2">
-<h2 class="anchored" data-anchor-id="why-this-was-hard-and-what-actually-solved-it">9. Why this was hard, and what actually solved it</h2>
+<h2 class="anchored" data-anchor-id="why-this-was-hard-and-what-actually-solved-it">10. Why this was hard, and what actually solved it</h2>
 <p>Roughly 2000–2010 was an extraordinarily active decade on precisely this problem. Sparsity, <span class="math inline">\(\ell_1\)</span> penalties, oracle inequalities, minimax rates over structured classes, the graphical lasso, compressed sensing. It produced beautiful and permanent mathematics, and it did not produce a model that can generate a photograph.</p>
 <p><strong>Why not.</strong> The classical programme’s answer to <span class="math inline">\(n \ll p\)</span> was: <em>impose structure you can write down and verify</em>. Sparse. Banded. Low-rank. Those are strong assumptions, deliberately simple so that theorems are provable and parameters interpretable. But the structure in a natural image is not sparsity in pixel covariance. It is edges composing into textures composing into objects — a deep, nonlinear, compositional structure that no one can write as a constraint on a matrix. Classical methods were limited not by their estimators but by the poverty of the structures they could express.</p>
 <p><strong>What deep learning changed</strong> — four moves, none of which is “more data” alone:</p>
@@ -815,7 +979,7 @@ What statistics still has that deep learning does not
 </div>
 </section>
 <section id="the-bridge-from-describing-to-comparing" class="level2">
-<h2 class="anchored" data-anchor-id="the-bridge-from-describing-to-comparing">10. The bridge: from describing to comparing</h2>
+<h2 class="anchored" data-anchor-id="the-bridge-from-describing-to-comparing">11. The bridge: from describing to comparing</h2>
 <p>Every method above tried to <strong>write down</strong> <span class="math inline">\(p_\text{data}\)</span> — as a Gaussian, a sparse graphical model, a mixture, a sum of kernels, a posterior. All of them hit the same wall from different sides.</p>
 <p>So change the question. And the surprise is that we have already been asking the new one without noticing.</p>
 <p><strong>Maximum likelihood was always a comparison.</strong> Take the average log-likelihood and let <span class="math inline">\(n\)</span> grow; by the law of large numbers it converges to an expectation under the true distribution:</p>
@@ -866,7 +1030,7 @@ What the next note does
 </div>
 </section>
 <section id="where-each-piece-returns" class="level2">
-<h2 class="anchored" data-anchor-id="where-each-piece-returns">11. Where each piece returns</h2>
+<h2 class="anchored" data-anchor-id="where-each-piece-returns">12. Where each piece returns</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -900,6 +1064,14 @@ What the next note does
 <td>Module 4: score matching, and Module 5’s SDEs</td>
 </tr>
 <tr class="even">
+<td><span class="math inline">\(p_t \to p_\infty\)</span> for a chain</td>
+<td>the Fokker–Planck equation of Module 5</td>
+</tr>
+<tr class="odd">
+<td>Proposal as generator, test as discriminator</td>
+<td>GANs, and why diffusion needs neither</td>
+</tr>
+<tr class="even">
 <td>Penalties are log-priors</td>
 <td>the ELBO’s prior term, read the same way</td>
 </tr>
@@ -913,7 +1085,7 @@ What the next note does
 </tr>
 </tbody>
 </table>
-<p>The segue is §10: if estimating <span class="math inline">\(p_\text{data}\)</span> directly is hopeless, stop describing distributions and start <strong>comparing</strong> them. That is note 07.</p>
+<p>The segue is §11: if estimating <span class="math inline">\(p_\text{data}\)</span> directly is hopeless, stop describing distributions and start <strong>comparing</strong> them. That is note 07.</p>
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
@@ -932,6 +1104,11 @@ What the next note does
 \mathrm{KL}(p_\text{data}\|p_\theta)\)</span>, and say exactly where you used that the entropy does not depend on <span class="math inline">\(\theta\)</span>.</li>
 <li>Let <span class="math inline">\(p = \delta_0\)</span> and <span class="math inline">\(q = \delta_\varepsilon\)</span> be point masses. Compute <span class="math inline">\(\mathrm{KL}(p\|q)\)</span> and the Wasserstein-1 distance as <span class="math inline">\(\varepsilon \to 0\)</span>. Which one is useful for gradient descent, and why?</li>
 <li>Write the Langevin update for <span class="math inline">\(p = \mathcal{N}(\mu,\sigma^2)\)</span> explicitly. Confirm the normalising constant never appears.</li>
+<li>Prove that accepted draws in rejection sampling have law exactly <span class="math inline">\(p\)</span>. <em>(Hint: <span class="math inline">\((x, uMq(x))\)</span> is uniform under the envelope.)</em></li>
+<li>Show that for target <span class="math inline">\(\mathcal{N}(0,I_d)\)</span> and proposal <span class="math inline">\(\mathcal{N}(0,\sigma^2 I_d)\)</span> with <span class="math inline">\(\sigma&gt;1\)</span>, the smallest valid constant is <span class="math inline">\(M = \sigma^{d}\)</span>. At what <span class="math inline">\(d\)</span> does <span class="math inline">\(\sigma = 1.2\)</span> become unusable?</li>
+<li>Explain why <span class="math inline">\(\mathcal{N}(0,1)\)</span> cannot be a rejection proposal for <span class="math inline">\(\mathcal{N}(-1,1)\)</span>, and give one that can.</li>
+<li>For Gibbs on the bivariate normal, derive <span class="math inline">\(x_t \mid x_0 \sim \mathcal{N}(\rho^{2t}x_0, 1-\rho^{4t})\)</span> and the lag-1 autocorrelation <span class="math inline">\(\rho^2\)</span>.</li>
+<li>Show the optimal GAN discriminator is <span class="math inline">\(r/(1+r)\)</span> with <span class="math inline">\(r = p_\text{data}/p_g\)</span>, and say what rejection sampling knows about <span class="math inline">\(r\)</span> that a GAN does not.</li>
 <li>A <span class="math inline">\(p=50\)</span> dataset has <span class="math inline">\(n=40\)</span> samples. Which estimator from §4 would you choose and why? What scientific claim does your choice commit you to?</li>
 </ol>
 

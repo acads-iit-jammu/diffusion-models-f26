@@ -407,10 +407,24 @@ window.Quarto = {
   <li><a href="#which-way-round-forward-and-reverse-kl-behave-differently" id="toc-which-way-round-forward-and-reverse-kl-behave-differently" class="nav-link" data-scroll-target="#which-way-round-forward-and-reverse-kl-behave-differently">Which way round? Forward and reverse KL behave differently</a></li>
   </ul></li>
   <li><a href="#kl-is-one-of-a-family-the-f-divergences" id="toc-kl-is-one-of-a-family-the-f-divergences" class="nav-link" data-scroll-target="#kl-is-one-of-a-family-the-f-divergences">4. KL is one of a family: the <span class="math inline">\(f\)</span>-divergences</a></li>
-  <li><a href="#wasserstein-is-not-an-f-divergence" id="toc-wasserstein-is-not-an-f-divergence" class="nav-link" data-scroll-target="#wasserstein-is-not-an-f-divergence">5. Wasserstein is <em>not</em> an <span class="math inline">\(f\)</span>-divergence</a></li>
-  <li><a href="#why-the-distinction-is-not-pedantry-disjoint-supports" id="toc-why-the-distinction-is-not-pedantry-disjoint-supports" class="nav-link" data-scroll-target="#why-the-distinction-is-not-pedantry-disjoint-supports">6. Why the distinction is not pedantry: disjoint supports</a></li>
-  <li><a href="#the-map-what-is-each-model-family-minimising" id="toc-the-map-what-is-each-model-family-minimising" class="nav-link" data-scroll-target="#the-map-what-is-each-model-family-minimising">7. The map: what is each model family minimising?</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  <li><a href="#wasserstein-and-what-changes-in-more-than-one-dimension" id="toc-wasserstein-and-what-changes-in-more-than-one-dimension" class="nav-link" data-scroll-target="#wasserstein-and-what-changes-in-more-than-one-dimension">5. Wasserstein, and what changes in more than one dimension</a>
+  <ul class="collapse">
+  <li><a href="#why-one-dimension-is-special" id="toc-why-one-dimension-is-special" class="nav-link" data-scroll-target="#why-one-dimension-is-special">Why one dimension is special</a></li>
+  <li><a href="#one-case-with-a-closed-form-gaussians" id="toc-one-case-with-a-closed-form-gaussians" class="nav-link" data-scroll-target="#one-case-with-a-closed-form-gaussians">One case with a closed form: Gaussians</a></li>
+  <li><a href="#the-two-costs-of-using-it-in-high-dimension" id="toc-the-two-costs-of-using-it-in-high-dimension" class="nav-link" data-scroll-target="#the-two-costs-of-using-it-in-high-dimension">The two costs of using it in high dimension</a></li>
+  </ul></li>
+  <li><a href="#integral-probability-metrics-in-general" id="toc-integral-probability-metrics-in-general" class="nav-link" data-scroll-target="#integral-probability-metrics-in-general">6. Integral probability metrics, in general</a></li>
+  <li><a href="#maximum-mean-discrepancy-the-ipm-you-can-actually-compute" id="toc-maximum-mean-discrepancy-the-ipm-you-can-actually-compute" class="nav-link" data-scroll-target="#maximum-mean-discrepancy-the-ipm-you-can-actually-compute">7. Maximum mean discrepancy: the IPM you can actually compute</a>
+  <ul class="collapse">
+  <li><a href="#the-headline-property-and-its-asterisk" id="toc-the-headline-property-and-its-asterisk" class="nav-link" data-scroll-target="#the-headline-property-and-its-asterisk">The headline property, and its asterisk</a></li>
+  <li><a href="#choosing-between-them" id="toc-choosing-between-them" class="nav-link" data-scroll-target="#choosing-between-them">Choosing between them</a></li>
+  </ul></li>
+  <li><a href="#why-the-distinction-is-not-pedantry-disjoint-supports" id="toc-why-the-distinction-is-not-pedantry-disjoint-supports" class="nav-link" data-scroll-target="#why-the-distinction-is-not-pedantry-disjoint-supports">8. Why the distinction is not pedantry: disjoint supports</a></li>
+  <li><a href="#the-map-what-is-each-model-family-minimising" id="toc-the-map-what-is-each-model-family-minimising" class="nav-link" data-scroll-target="#the-map-what-is-each-model-family-minimising">9. The map: what is each model family minimising?</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a>
+  <ul class="collapse">
+  <li><a href="#earlier-exercises" id="toc-earlier-exercises" class="nav-link" data-scroll-target="#earlier-exercises">Earlier exercises</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -588,6 +602,38 @@ The sentence to remember
 </tbody>
 </table>
 <p>The forward direction cannot afford <span class="math inline">\(p_\theta \approx 0\)</span> anywhere the data lives — the log ratio explodes — so it hedges and covers. The reverse direction is integrated under <span class="math inline">\(p_\theta\)</span>, so it simply avoids putting mass in the wrong place and is content to ignore parts of the target. This is exactly the single-Gaussian-fitted-to-a-mixture trap of tutorial 02, now with a name.</p>
+<p>The gap is not subtle. Fit a single Gaussian to an equal mixture of <span class="math inline">\(\mathcal{N}(-2, 0.7^2)\)</span> and <span class="math inline">\(\mathcal{N}(2, 0.7^2)\)</span> and the two criteria give completely different answers, each of which the <em>other</em> criterion scores as terrible:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Fit</th>
+<th><span class="math inline">\(\mu\)</span></th>
+<th><span class="math inline">\(\sigma\)</span></th>
+<th><span class="math inline">\(\mathrm{KL}(p\|q)\)</span></th>
+<th><span class="math inline">\(\mathrm{KL}(q\|p)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>forward optimum</td>
+<td><span class="math inline">\(0.00\)</span></td>
+<td><span class="math inline">\(2.12\)</span></td>
+<td><strong>0.42</strong></td>
+<td>0.81</td>
+</tr>
+<tr class="even">
+<td>reverse optimum</td>
+<td><span class="math inline">\(\pm1.98\)</span></td>
+<td><span class="math inline">\(0.73\)</span></td>
+<td>6.84</td>
+<td><strong>0.69</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The forward optimum is exactly <strong>moment matching</strong> — for a Gaussian family, minimising <span class="math inline">\(\mathrm{KL}(p\|q)\)</span> means matching the mean and variance of <span class="math inline">\(p\)</span>, which is why it lands between the modes where no data lives. The reverse optimum sits <em>on</em> a mode and is the same distance from either, so which one it finds depends entirely on where the optimiser starts.</p>
+<p><strong>Interactive</strong> — <a href="../materials/kl-lab.html" target="_blank">The KL Lab</a> draws both optima together, shades the two integrands so you can see <em>where</em> each direction pays its penalty, and plots both objectives against <span class="math inline">\(\mu\)</span>: forward KL has a single basin, reverse KL has one per mode with a barrier between them.</p>
+<iframe src="../materials/kl-lab.html" width="100%" height="640" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="Interactive demo: forward and reverse KL fitted to the same bimodal target">
+</iframe>
 </section>
 </section>
 <section id="kl-is-one-of-a-family-the-f-divergences" class="level2">
@@ -645,15 +691,38 @@ D_f(p \,\|\, q) \;=\; \int q(x)\, f\!\left(\frac{p(x)}{q(x)}\right) dx .
 </table>
 <p>All of these share one structural feature, and it is the one that matters: they depend on <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span> <strong>only through the pointwise ratio <span class="math inline">\(p/q\)</span></strong>. They never look at <em>where</em> the points are. Move a lump of <span class="math inline">\(q\)</span>’s mass from just beside <span class="math inline">\(p\)</span> to a mile away and no <span class="math inline">\(f\)</span>-divergence notices, because the ratio at every point is unchanged.</p>
 </section>
-<section id="wasserstein-is-not-an-f-divergence" class="level2">
-<h2 class="anchored" data-anchor-id="wasserstein-is-not-an-f-divergence">5. Wasserstein is <em>not</em> an <span class="math inline">\(f\)</span>-divergence</h2>
-<p>This is worth stating plainly, because it is a common and consequential slip.</p>
-<p><span class="math inline">\(W_1\)</span> cannot be written as <span class="math inline">\(\int q\,f(p/q)\)</span> for any <span class="math inline">\(f\)</span>. It is not in this family at all. It belongs to a <strong>second</strong> family, the <strong>integral probability metrics</strong>:</p>
+<section id="wasserstein-and-what-changes-in-more-than-one-dimension" class="level2">
+<h2 class="anchored" data-anchor-id="wasserstein-and-what-changes-in-more-than-one-dimension">5. Wasserstein, and what changes in more than one dimension</h2>
+<p>So far <span class="math inline">\(W_1\)</span> has appeared only through its one-dimensional formula <span class="math inline">\(\int |F - G|\)</span>. That formula is a happy accident of the line, and it is worth being precise about what the general object is before relying on it.</p>
+<p><strong>The Kantorovich definition.</strong> For <span class="math inline">\(p \ge 1\)</span> and distributions <span class="math inline">\(P, Q\)</span> on <span class="math inline">\(\mathbb{R}^d\)</span>,</p>
 <p><span class="math display">\[
-d_{\mathcal{F}}(p,q) \;=\; \sup_{f \in \mathcal{F}}
-\left| \mathbb{E}_{p}[f] - \mathbb{E}_{q}[f] \right| ,
+W_p(P,Q) \;=\; \left( \inf_{\gamma \in \Pi(P,Q)}
+\int \lVert x - y \rVert^{p} \, d\gamma(x,y) \right)^{1/p},
 \]</span></p>
-<p>defined by a class <span class="math inline">\(\mathcal{F}\)</span> of test functions rather than by a convex <span class="math inline">\(f\)</span> applied to a ratio.</p>
+<p>where <span class="math inline">\(\Pi(P,Q)\)</span> is the set of <strong>couplings</strong> — joint distributions on <span class="math inline">\(\mathbb{R}^d \times \mathbb{R}^d\)</span> whose marginals are <span class="math inline">\(P\)</span> and <span class="math inline">\(Q\)</span>. A coupling is a plan for moving mass; the integral is what the plan costs; <span class="math inline">\(W_p\)</span> is the cost of the cheapest one. Nothing here mentions densities, which is exactly why it survives when densities do not exist.</p>
+<section id="why-one-dimension-is-special" class="level3">
+<h3 class="anchored" data-anchor-id="why-one-dimension-is-special">Why one dimension is special</h3>
+<p>On the line there is a <strong>total order</strong>, and that changes everything. The optimal plan is forced to be monotone — cheapest transport never lets paths cross — and the monotone coupling is unique and explicit. It is the one matching quantile to quantile, which gives, <strong>for every <span class="math inline">\(p \ge 1\)</span></strong>,</p>
+<p><span class="math display">\[
+W_p(P,Q) = \left( \int_0^1 \big| F^{-1}(u) - G^{-1}(u) \big|^{p} du \right)^{1/p} .
+\]</span></p>
+<p>Sort both samples, subtract, average. <span class="math inline">\(O(n \log n)\)</span>, and no optimisation at all. <em>(Checked against an exact assignment solver on 3,000-point samples: the sorted matching reproduces the optimal cost to machine precision at <span class="math inline">\(p = 1, 2, 3\)</span>.)</em></p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The CDF formula is <span class="math inline">\(p = 1\)</span> only
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The quantile formula above holds for all <span class="math inline">\(p\)</span>. The <strong>other</strong> one-dimensional formula, the one in §1,</p>
+<p><span class="math display">\[
+W_1(P,Q) = \int_{-\infty}^{\infty} \big| F(x) - G(x) \big| \, dx ,
+\]</span></p>
+<p>does not generalise. At <span class="math inline">\(p=1\)</span> the area between the two <em>CDFs</em> happens to equal the area between the two <em>quantile functions</em> — the same region, measured along different axes — so the two expressions agree. For <span class="math inline">\(p &gt; 1\)</span> that coincidence breaks, and <span class="math inline">\(\big(\int |F-G|^p dx\big)^{1/p}\)</span> is <strong>not</strong> <span class="math inline">\(W_p\)</span> and is not any Wasserstein distance.</p>
+<p>Concretely, for <span class="math inline">\(\mathcal{N}(0,1)\)</span> against <span class="math inline">\(\mathcal{N}(1.5, 2^2)\)</span>:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -661,30 +730,260 @@ d_{\mathcal{F}}(p,q) \;=\; \sup_{f \in \mathcal{F}}
 </colgroup>
 <thead>
 <tr class="header">
-<th>Class <span class="math inline">\(\mathcal{F}\)</span></th>
-<th>Resulting IPM</th>
+<th>quantity</th>
+<th>value</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(\{f : \lVert f\rVert_{\mathrm{Lip}} \le 1\}\)</span></td>
-<td><strong>Wasserstein-1</strong> (Kantorovich–Rubinstein duality)</td>
+<td><span class="math inline">\(\int_0^1 \lvert F^{-1}-G^{-1}\rvert\,du\)</span></td>
+<td>1.5586</td>
 </tr>
 <tr class="even">
-<td>unit ball of an RKHS</td>
-<td><strong>maximum mean discrepancy</strong> (MMD)</td>
+<td><span class="math inline">\(\int \lvert F-G\rvert\,dx\)</span></td>
+<td>1.5586 &nbsp;&nbsp;<em>(agree, as they must at <span class="math inline">\(p=1\)</span>)</em></td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\{f : \lVert f \rVert_\infty \le \tfrac12\}\)</span></td>
-<td><strong>total variation</strong></td>
+<td><span class="math inline">\(W_2 = \big(\int_0^1 \lvert F^{-1}-G^{-1}\rvert^2 du\big)^{1/2}\)</span></td>
+<td><strong>1.8028</strong></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\big(\int \lvert F-G\rvert^2 dx\big)^{1/2}\)</span></td>
+<td><strong>0.6918</strong> &nbsp;&nbsp;<em>(not <span class="math inline">\(W_2\)</span>, not anything)</em></td>
 </tr>
 </tbody>
 </table>
-<p>The two families are genuinely different, and the reason is the one flagged above: <span class="math inline">\(f\)</span>-divergences see only ratios and are blind to geometry; IPMs test against functions defined on the space and therefore <em>do</em> see distance.</p>
-<p><strong>Total variation is the intersection.</strong> It is an <span class="math inline">\(f\)</span>-divergence (<span class="math inline">\(f(t) = \tfrac12|t-1|\)</span>) and an IPM (bounded test functions) and a metric. It is essentially the only member of both families — which is a good way to remember that the families are otherwise disjoint.</p>
+<p>When in doubt, work with quantiles: that form is the one that generalises in <span class="math inline">\(p\)</span>. Neither form generalises in <strong>dimension</strong>, which is the subject of the rest of this section.</p>
+</div>
+</div>
+<p>For one-dimensional Gaussians the quantile integral collapses to a formula worth remembering, and it is the <span class="math inline">\(d=1\)</span> case of Bures–Wasserstein below:</p>
+<p><span class="math display">\[
+W_2\big(\mathcal{N}(\mu_1,\sigma_1^2),\ \mathcal{N}(\mu_2,\sigma_2^2)\big)
+= \sqrt{(\mu_1-\mu_2)^2 + (\sigma_1-\sigma_2)^2} .
+\]</span></p>
+<p><em>(For the pair above: <span class="math inline">\(\sqrt{1.5^2 + 1^2} = 1.8028\)</span>, matching the numeric quantile integral.)</em></p>
+<p><strong>In <span class="math inline">\(\mathbb{R}^d\)</span> with <span class="math inline">\(d &gt; 1\)</span> there is no total order</strong>, so this construction simply has nothing to stand on. There is no quantile function, and no reason a cheapest plan should be expressible in closed form. What survives is weaker but still substantial:</p>
+<ul>
+<li><strong>It is still a linear program.</strong> For empirical measures on <span class="math inline">\(n\)</span> points each, the Kantorovich problem is an <span class="math inline">\(n \times n\)</span> assignment problem. Exact solvers cost about <span class="math inline">\(O(n^3 \log n)\)</span> — fine for thousands of points, hopeless for millions.</li>
+<li><strong>The dual still holds.</strong> Kantorovich–Rubinstein gives, for <span class="math inline">\(p = 1\)</span>, <span class="math inline">\(W_1 = \sup_{\lVert f \rVert_{\mathrm{Lip}} \le 1} \mathbb{E}_P[f] - \mathbb{E}_Q[f]\)</span>, which is what a WGAN critic estimates.</li>
+<li><strong>Brenier’s theorem replaces the quantile map.</strong> If <span class="math inline">\(P\)</span> is absolutely continuous, the optimal <span class="math inline">\(p=2\)</span> plan is <em>deterministic</em>: there is a map <span class="math inline">\(T\)</span> with <span class="math inline">\(T_\# P = Q\)</span> attaining the infimum, and it is the <strong>gradient of a convex function</strong>, <span class="math inline">\(T = \nabla \varphi\)</span>. In one dimension “<span class="math inline">\(\nabla\varphi\)</span> with <span class="math inline">\(\varphi\)</span> convex” means “increasing”, so this is precisely the monotone quantile map generalised. Convexity is what replaces the lost total order.</li>
+</ul>
+</section>
+<section id="one-case-with-a-closed-form-gaussians" class="level3">
+<h3 class="anchored" data-anchor-id="one-case-with-a-closed-form-gaussians">One case with a closed form: Gaussians</h3>
+<p>Between <span class="math inline">\(\mathcal{N}(m_1, C_1)\)</span> and <span class="math inline">\(\mathcal{N}(m_2, C_2)\)</span> in any dimension,</p>
+<p><span class="math display">\[
+\boxed{\;W_2^2 \;=\; \lVert m_1 - m_2 \rVert^2
+\;+\; \operatorname{tr}\!\Big( C_1 + C_2 - 2\big(C_2^{1/2} C_1 C_2^{1/2}\big)^{1/2} \Big).\;}
+\]</span></p>
+<p>This is the <strong>Bures–Wasserstein</strong> distance. When the covariances commute — in particular when both are diagonal — the trace term collapses to <span class="math inline">\(\lVert C_1^{1/2} - C_2^{1/2} \rVert_F^2\)</span>, so the means contribute Euclidean distance and the covariances contribute Frobenius distance between the <em>square roots</em>.</p>
+<p><em>(Checked numerically: for a 2-D pair the formula gives <span class="math inline">\(2.35331\)</span>, and exact optimal transport between <span class="math inline">\(4{,}000\)</span>-point empirical samples gives <span class="math inline">\(2.35356\)</span>.)</em></p>
+<p>This is the formula behind the Fréchet Inception Distance, which is simply <span class="math inline">\(W_2\)</span> between two Gaussians fitted to network features — accurate only to the extent that those features really are Gaussian.</p>
+</section>
+<section id="the-two-costs-of-using-it-in-high-dimension" class="level3">
+<h3 class="anchored" data-anchor-id="the-two-costs-of-using-it-in-high-dimension">The two costs of using it in high dimension</h3>
+<p><strong>Computation</strong> is the visible cost, and it is the one people usually try to fix. Entropic regularisation adds <span class="math inline">\(\varepsilon H(\gamma)\)</span> to the objective, which makes it strictly convex and solvable by <strong>Sinkhorn</strong> iterations costing <span class="math inline">\(O(n^2)\)</span> each — fast and differentiable, at the price of a blurred plan and a biased distance.</p>
+<p><strong>Statistics</strong> is the cost that actually bites. The empirical Wasserstein distance converges to the truth at rate</p>
+<p><span class="math display">\[
+\mathbb{E}\,W_p(P_n, P) \;\asymp\; n^{-1/d} \qquad (d &gt; 2p),
+\]</span></p>
+<p>which is the curse of dimensionality again, in a new costume. Measured on independent samples from <span class="math inline">\(\mathcal{N}(0, I_d)\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(d\)</span></th>
+<th>fitted slope of <span class="math inline">\(\log W_2\)</span> against <span class="math inline">\(\log n\)</span></th>
+<th><span class="math inline">\(-1/d\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>5</td>
+<td><span class="math inline">\(-0.193\)</span></td>
+<td><span class="math inline">\(-0.200\)</span></td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td><span class="math inline">\(-0.106\)</span></td>
+<td><span class="math inline">\(-0.100\)</span></td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td><span class="math inline">\(-0.065\)</span></td>
+<td><span class="math inline">\(-0.050\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>So a Wasserstein distance <em>estimated from samples</em> in high dimension is mostly noise, however exactly you solve the transport problem. Solving the wrong problem precisely does not help.</p>
+<p><strong>Sliced Wasserstein</strong> is the standard dodge: project both distributions onto a random direction <span class="math inline">\(\theta\)</span>, where the closed form applies, and average over directions,</p>
+<p><span class="math display">\[
+SW_p^p(P,Q) = \int_{\mathbb{S}^{d-1}} W_p^p\big(\theta_\# P,\ \theta_\# Q\big)\, d\theta .
+\]</span></p>
+<p>Each slice is a sort. It is a genuine metric, it is cheap, and it inherits the better one-dimensional rate — at the cost of being a weaker comparison that can be fooled by structure invisible to every projection.</p>
+</section>
+</section>
+<section id="integral-probability-metrics-in-general" class="level2">
+<h2 class="anchored" data-anchor-id="integral-probability-metrics-in-general">6. Integral probability metrics, in general</h2>
+<p>Wasserstein and MMD are both instances of one construction. Given a class <span class="math inline">\(\mathcal{F}\)</span> of real-valued <strong>test functions</strong>,</p>
+<p><span class="math display">\[
+d_{\mathcal{F}}(P,Q) \;=\; \sup_{f \in \mathcal{F}}
+\Big| \mathbb{E}_{P}[f] - \mathbb{E}_{Q}[f] \Big| .
+\]</span></p>
+<p>Read it as a search for a <strong>witness</strong>: a single function on which the two distributions disagree as loudly as possible. If no test function can tell them apart, they are the same as far as <span class="math inline">\(\mathcal{F}\)</span> can see.</p>
+<p>Everything depends on how rich <span class="math inline">\(\mathcal{F}\)</span> is, and the choice is a genuine trade-off in both directions:</p>
+<ul>
+<li><span class="math inline">\(\mathcal{F}\)</span> too <strong>small</strong> and the metric is blind — it will report zero for distributions that genuinely differ.</li>
+<li><span class="math inline">\(\mathcal{F}\)</span> too <strong>large</strong> and the supremum cannot be estimated from finitely many samples — the empirical witness overfits, and the estimate is biased upward no matter how much data you have.</li>
+</ul>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Class <span class="math inline">\(\mathcal{F}\)</span></th>
+<th>Resulting IPM</th>
+<th>Witness is</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\lVert f \rVert_{\mathrm{Lip}} \le 1\)</span></td>
+<td><strong>Wasserstein-1</strong></td>
+<td>a Lipschitz function — the WGAN critic</td>
+</tr>
+<tr class="even">
+<td>unit ball of an RKHS <span class="math inline">\(\mathcal{H}\)</span></td>
+<td><strong>MMD</strong></td>
+<td>available in closed form (§7)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\lVert f \rVert_\infty \le \tfrac12\)</span></td>
+<td><strong>total variation</strong></td>
+<td>an indicator of a set</td>
+</tr>
+<tr class="even">
+<td>bounded, with bounded derivatives</td>
+<td>Dudley metric</td>
+<td>a smooth bump</td>
+</tr>
+</tbody>
+</table>
+<p>Two structural remarks. First, <strong>IPMs are symmetric and satisfy the triangle inequality</strong> whenever <span class="math inline">\(\mathcal{F}\)</span> is symmetric (<span class="math inline">\(f \in \mathcal{F} \Rightarrow
+-f \in \mathcal{F}\)</span>), so they are honest metrics — unlike KL. Second, and this is the substantive contrast with §4, an IPM is defined through <strong>expectations of functions on the space</strong>, so it knows how far apart points are. An <span class="math inline">\(f\)</span>-divergence is defined through a <em>ratio of densities at the same point</em>, so it knows only how much the two disagree there, never how far anything had to move. That single difference is what §8 is about.</p>
+<p><strong>Total variation is the intersection.</strong> It is an <span class="math inline">\(f\)</span>-divergence (<span class="math inline">\(f(t) = \tfrac12|t-1|\)</span>) <em>and</em> an IPM (bounded test functions) <em>and</em> a metric — essentially the only member of both families, which is a good way to remember that they are otherwise disjoint.</p>
+</section>
+<section id="maximum-mean-discrepancy-the-ipm-you-can-actually-compute" class="level2">
+<h2 class="anchored" data-anchor-id="maximum-mean-discrepancy-the-ipm-you-can-actually-compute">7. Maximum mean discrepancy: the IPM you can actually compute</h2>
+<p>Wasserstein’s definition contains an infimum over couplings; the IPM form contains a supremum over functions. Both are optimisation problems. <strong>MMD is the choice of <span class="math inline">\(\mathcal{F}\)</span> for which the optimisation can be solved in closed form</strong>, and that is essentially the whole reason it exists.</p>
+<p>Take <span class="math inline">\(\mathcal{F}\)</span> to be the unit ball of a reproducing kernel Hilbert space <span class="math inline">\(\mathcal{H}\)</span> with kernel <span class="math inline">\(k\)</span>. Define the <strong>kernel mean embedding</strong> of a distribution,</p>
+<p><span class="math display">\[
+\mu_P \;=\; \mathbb{E}_{X \sim P}\big[\, k(X, \cdot)\,\big] \;\in\; \mathcal{H},
+\]</span></p>
+<p>a single point in <span class="math inline">\(\mathcal{H}\)</span> that summarises the whole distribution. The reproducing property gives <span class="math inline">\(\mathbb{E}_P[f] = \langle f, \mu_P\rangle\)</span> for every <span class="math inline">\(f \in \mathcal{H}\)</span>, so</p>
+<p><span class="math display">\[
+\mathrm{MMD}(P,Q) = \sup_{\lVert f \rVert_{\mathcal{H}} \le 1}
+\langle f, \mu_P - \mu_Q \rangle = \lVert \mu_P - \mu_Q \rVert_{\mathcal{H}} .
+\]</span></p>
+<p>The supremum is attained by the obvious witness, <span class="math inline">\(f \propto \mu_P - \mu_Q\)</span>, and the value is just a norm. Expanding it,</p>
+<p><span class="math display">\[
+\boxed{\;\mathrm{MMD}^2(P,Q) = \mathbb{E}\,k(X,X') - 2\,\mathbb{E}\,k(X,Y) + \mathbb{E}\,k(Y,Y')\;}
+\]</span></p>
+<p>with <span class="math inline">\(X, X' \sim P\)</span> and <span class="math inline">\(Y, Y' \sim Q\)</span> independent. <strong>Three expectations of a kernel — no densities, no couplings, no optimisation.</strong> Replacing them by sample averages (dropping diagonal terms) gives an unbiased estimator computable in <span class="math inline">\(O(n^2)\)</span>, or <span class="math inline">\(O(n)\)</span> with a linear-time variant.</p>
+<p><strong>Does it separate distributions?</strong> Only if the kernel is <strong>characteristic</strong>, meaning <span class="math inline">\(P \mapsto \mu_P\)</span> is injective. The Gaussian RBF and Laplace kernels are; a linear kernel is not — it embeds only the mean, so it cannot distinguish any two distributions with the same mean. With a characteristic kernel, <span class="math inline">\(\mathrm{MMD}(P,Q) = 0 \iff P = Q\)</span>.</p>
+<p><strong>A closed form to test against.</strong> For <span class="math inline">\(P = \mathcal{N}(a, I_d)\)</span>, <span class="math inline">\(Q = \mathcal{N}(b, I_d)\)</span> and Gaussian kernel of bandwidth <span class="math inline">\(s\)</span>,</p>
+<p><span class="math display">\[
+\mathrm{MMD}^2 = \frac{2\,s^d}{(2+s^2)^{d/2}}
+\left(1 - \exp\!\Big(-\frac{\lVert a-b\rVert^2}{2(2+s^2)}\Big)\right).
+\]</span></p>
+<p><em>(Checked: at <span class="math inline">\(\lVert a - b\rVert = 1\)</span> and <span class="math inline">\(s = \sqrt{d}\)</span>, the formula gives <span class="math inline">\(0.1175\)</span>, <span class="math inline">\(0.0328\)</span>, <span class="math inline">\(0.0072\)</span> for <span class="math inline">\(d = 2, 10, 50\)</span>, and the sample estimator returns <span class="math inline">\(0.1214\)</span>, <span class="math inline">\(0.0317\)</span>, <span class="math inline">\(0.0071\)</span>.)</em></p>
+<section id="the-headline-property-and-its-asterisk" class="level3">
+<h3 class="anchored" data-anchor-id="the-headline-property-and-its-asterisk">The headline property, and its asterisk</h3>
+<p>The MMD estimator converges at <span class="math inline">\(n^{-1/2}\)</span> <strong>independently of the dimension</strong> — there is no <span class="math inline">\(n^{-1/d}\)</span> anywhere. Measured slopes of <span class="math inline">\(\log|\hat{}-\text{truth}|\)</span> against <span class="math inline">\(\log n\)</span>: <span class="math inline">\(-0.55\)</span> at <span class="math inline">\(d=2\)</span>, <span class="math inline">\(-0.71\)</span> at <span class="math inline">\(d=10\)</span>, <span class="math inline">\(-0.48\)</span> at <span class="math inline">\(d=50\)</span>. Against Wasserstein’s <span class="math inline">\(n^{-1/d}\)</span> this looks like a free lunch.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It is not a free lunch
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Look again at the closed form above. For a <em>fixed</em> separation <span class="math inline">\(\lVert a-b\rVert = 1\)</span>, the population MMD itself falls with dimension — <span class="math inline">\(0.1175\)</span>, <span class="math inline">\(0.0328\)</span>, <span class="math inline">\(0.0072\)</span> at <span class="math inline">\(d = 2, 10, 50\)</span>. The <strong>error</strong> shrinks at <span class="math inline">\(n^{-1/2}\)</span> regardless of <span class="math inline">\(d\)</span>, but the <strong>signal</strong> you are trying to detect shrinks too. What matters for a test is the ratio, and that still degrades.</p>
+<p>So the honest statement is: MMD moves the curse from the <em>estimation rate</em> into the <em>effect size</em>. It does not abolish it. It also depends on a bandwidth <span class="math inline">\(s\)</span> that you must choose — the median heuristic (set <span class="math inline">\(s\)</span> to the median pairwise distance) is the usual default and is a heuristic, not a theorem.</p>
+</div>
+</div>
+<p>MMD’s real strengths are that it needs only samples, costs <span class="math inline">\(O(n^2)\)</span> with no inner optimisation, is differentiable in the samples — hence usable directly as a training loss, as in MMD-GAN — and comes with a clean two-sample test (Gretton et al.), which is how one asks “did my generative model actually match the data?” with a <span class="math inline">\(p\)</span>-value attached.</p>
+</section>
+<section id="choosing-between-them" class="level3">
+<h3 class="anchored" data-anchor-id="choosing-between-them">Choosing between them</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><span class="math inline">\(f\)</span>-divergence (KL, JS)</th>
+<th>Wasserstein</th>
+<th>MMD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Needs densities</td>
+<td>yes</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>Sees geometry</td>
+<td>no</td>
+<td>yes</td>
+<td>partly — through the kernel</td>
+</tr>
+<tr class="odd">
+<td>Disjoint supports</td>
+<td>saturates</td>
+<td>degrades gracefully</td>
+<td>degrades gracefully</td>
+</tr>
+<tr class="even">
+<td>Closed form in <span class="math inline">\(d\)</span> dims</td>
+<td>Gaussians only</td>
+<td>Gaussians only (Bures)</td>
+<td>any kernel, from samples</td>
+</tr>
+<tr class="odd">
+<td>Cost from <span class="math inline">\(n\)</span> samples</td>
+<td>needs a density model</td>
+<td><span class="math inline">\(O(n^3\log n)\)</span>, or <span class="math inline">\(O(n^2)\)</span> Sinkhorn</td>
+<td><span class="math inline">\(O(n^2)\)</span>, no optimisation</td>
+</tr>
+<tr class="even">
+<td>Estimation rate</td>
+<td>—</td>
+<td><span class="math inline">\(n^{-1/d}\)</span></td>
+<td><span class="math inline">\(n^{-1/2}\)</span>, but shrinking signal</td>
+</tr>
+<tr class="odd">
+<td>A metric</td>
+<td>no</td>
+<td>yes</td>
+<td>yes (characteristic kernel)</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="why-the-distinction-is-not-pedantry-disjoint-supports" class="level2">
-<h2 class="anchored" data-anchor-id="why-the-distinction-is-not-pedantry-disjoint-supports">6. Why the distinction is not pedantry: disjoint supports</h2>
+<h2 class="anchored" data-anchor-id="why-the-distinction-is-not-pedantry-disjoint-supports">8. Why the distinction is not pedantry: disjoint supports</h2>
 <p>Take <span class="math inline">\(P\)</span> uniform on <span class="math inline">\([0,1]\)</span> and <span class="math inline">\(Q\)</span> uniform on <span class="math inline">\([d, d+1]\)</span> — the same shape, shifted by <span class="math inline">\(d\)</span>. Watch what each measure reports as <span class="math inline">\(d\)</span> grows:</p>
 <table class="caption-top table">
 <thead>
@@ -750,7 +1049,7 @@ This is the WGAN argument
 </div>
 </section>
 <section id="the-map-what-is-each-model-family-minimising" class="level2">
-<h2 class="anchored" data-anchor-id="the-map-what-is-each-model-family-minimising">7. The map: what is each model family minimising?</h2>
+<h2 class="anchored" data-anchor-id="the-map-what-is-each-model-family-minimising">9. The map: what is each model family minimising?</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -811,6 +1110,21 @@ Key takeaway
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
 <ol type="1">
+<li>Show that in one dimension the monotone coupling is optimal for any convex cost, and deduce <span class="math inline">\(W_1 = \int|F-G|\)</span>.</li>
+<li>Verify the Bures–Wasserstein formula for two diagonal Gaussians directly, and confirm it reduces to <span class="math inline">\(\lVert C_1^{1/2}-C_2^{1/2}\rVert_F^2\)</span> plus the squared mean gap.</li>
+<li>Why does the quantile construction fail in <span class="math inline">\(\mathbb{R}^2\)</span>? Give two distributions for which several distinct plans have the same cost.</li>
+<li>Brenier’s map is <span class="math inline">\(\nabla\varphi\)</span> with <span class="math inline">\(\varphi\)</span> convex. What is <span class="math inline">\(\varphi\)</span> in one dimension, and why is convexity the right generalisation of monotonicity?</li>
+<li>Take <span class="math inline">\(P=\mathcal{N}(0,I_d)\)</span> and <span class="math inline">\(Q=\mathcal{N}(\delta e_1, I_d)\)</span>. Compute <span class="math inline">\(W_2\)</span> exactly. Now compute the sliced Wasserstein distance and compare.</li>
+<li>Show any IPM with a symmetric <span class="math inline">\(\mathcal{F}\)</span> obeys the triangle inequality.</li>
+<li>Show a linear kernel is not characteristic by exhibiting <span class="math inline">\(P \ne Q\)</span> with <span class="math inline">\(\mathrm{MMD}=0\)</span>.</li>
+<li>Derive the MMD expansion <span class="math inline">\(\mathbb{E}k(X,X') - 2\mathbb{E}k(X,Y) +
+\mathbb{E}k(Y,Y')\)</span> from <span class="math inline">\(\lVert \mu_P-\mu_Q\rVert^2_{\mathcal{H}}\)</span>.</li>
+<li>Using the Gaussian-kernel closed form, compute <span class="math inline">\(\mathrm{MMD}^2\)</span> at <span class="math inline">\(\lVert a-b\rVert=1\)</span>, <span class="math inline">\(s=\sqrt{d}\)</span>, for <span class="math inline">\(d=2,10,50\)</span>. Explain why the dimension-free <span class="math inline">\(n^{-1/2}\)</span> rate is nevertheless not a free lunch.</li>
+<li>Why is the diagonal dropped from the MMD estimator? What happens if you keep it?</li>
+</ol>
+<section id="earlier-exercises" class="level3">
+<h3 class="anchored" data-anchor-id="earlier-exercises">Earlier exercises</h3>
+<ol type="1">
 <li>For <span class="math inline">\(P = \mathcal{N}(0,1)\)</span> and <span class="math inline">\(Q = \mathcal{N}(\mu,1)\)</span>, show the KS statistic is <span class="math inline">\(2\Phi(\mu/2)-1\)</span> by finding where the CDF gap is maximised. Evaluate at <span class="math inline">\(\mu = 1\)</span> and <span class="math inline">\(\mu = 4\)</span> and comment on the saturation.</li>
 <li>Show <span class="math inline">\(\int|F-G|\,dx = W_1\)</span> for these two Gaussians equals exactly <span class="math inline">\(|\mu|\)</span>, and explain why it does not saturate.</li>
 <li>Derive <span class="math inline">\(\mathrm{KL}(\mathcal{N}(\mu_1,\sigma^2)\|\mathcal{N}(\mu_2,\sigma^2))
@@ -823,6 +1137,7 @@ Key takeaway
 </ol>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
