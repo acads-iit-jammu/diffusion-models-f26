@@ -12,7 +12,7 @@ on correctness**, with marks carried by the reasoning as much as the answer.
 
 | # | Topic | Released | Due | Problems | Solutions |
 |:---:|---|---|---|:---:|:---:|
-| HW 1 | Random variables, joints, conditionals, Bayes | Mon 10 Aug 2026 | Tue 18 Aug 2026, in class | [PDF](./homeworks/hw1.pdf) | after deadline |
+| HW 1 | Random variables, joints, conditionals, Bayes | Mon 10 Aug 2026 | Tue 18 Aug 2026, in class | [PDF](./homeworks/hw1.pdf) | [PDF](./homeworks/hw1-solutions.pdf) |
 | HW 2 | Distributions and maximum likelihood | Mon 10 Aug 2026 | Tue 25 Aug 2026, in class | [PDF](./homeworks/hw2.pdf) | after deadline |
 | HW 3 | — | TBA | TBA | — | — |
 | HW 4 | — | TBA | TBA | — | — |
@@ -20,15 +20,19 @@ on correctness**, with marks carried by the reasoning as much as the answer.
 
 : {tbl-colwidths="[8,34,14,14,15,15]"}
 
+Solution sets are worked derivations rather than answer keys: each problem states
+the concept it is testing and derives the answer in full.
+
 ## Practice sheets
 
-Not graded, and not submitted. Each sheet works a set of problems through in full,
-so it is a worked reference rather than an exercise set — read it with a pen and
-redo the derivations yourself before checking.
+Not graded, and not submitted. Each sheet derives a small set of results in full and
+ends with exercises — read it with a pen and redo the derivations yourself. These
+are the computations the lectures assume you can do, so they are worth the time even
+though no marks depend on them.
 
 | # | Topic | Posted | Sheet |
 |:---:|---|---|:---:|
-| Practice 1 | HW 1 worked in full; Gaussian algebra, conditional expectation, KL | Tue 18 Aug 2026 | [PDF](./homeworks/practice_01.pdf) |
+| Practice 1 | Gaussian algebra and $q(x_t \mid x_0)$; conditional expectation as the squared-error minimiser; KL between Gaussians | Tue 18 Aug 2026 | [PDF](./homeworks/practice_01.pdf) |
 
 : {tbl-colwidths="[12,52,18,18]"}
 
