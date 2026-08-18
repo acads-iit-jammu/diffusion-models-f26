@@ -118,15 +118,39 @@ Lectures meet **Monday, Tuesday and Friday, 1:00–1:50 pm** in 11AC4004.
 
 :::
 
-::: {.wk-card .wk-tbd}
-<span class="wk-top"><b>W04</b> · Aug 17, 18, 21<span>TBD</span></span>
+::: {.wk-card}
+<span class="wk-top"><b>W04</b> · Aug 17, 18, 21<span>M1</span></span>
 
-[To be decided]{.wk-title}
+[Sampling, and the First Deep Generative Model]{.wk-title}
+
+[Generation is sampling, and sampling is hard. Metropolis–Hastings solves it when the target can be written down up to a constant — and cannot be pointed at images, because there is no such target to write. So learn the proposal instead: the GAN, its min-max objective, the Jensen–Shannon theorem behind it, and why it is so hard to train.]{.wk-sum}
+
+::: {.wk-row}
+[Lecture notes]{.wk-lab}
+
+- [08 · Metropolis–Hastings](./tutorials/18-metropolis-hastings.qmd)
+- [09 · Generative Adversarial Networks](./tutorials/19-generative-adversarial-networks.qmd)
+:::
+
+::: {.wk-row}
+[Decks]{.wk-lab}
+
+- [08 · Sampling What You Cannot Normalise](./materials/w04-deck-01-metropolis-hastings.html)
+- [09 · Generative Adversarial Networks](./materials/w04-deck-02-gans.html)
+:::
+
+::: {.wk-row}
+[Materials]{.wk-lab}
+
+- [The Sampling Lab](./materials/sampling-lab.html)
+- [Practice 1](./homeworks/practice_01.pdf) — HW 1 worked in full, then Gaussian algebra, conditional expectation and KL
+:::
 
 ::: {.wk-row}
 [Deadline]{.wk-lab}
 
 - [**[HW 1](./homeworks/hw1.pdf) due Tue Aug 18, in class**]{.wk-due}
+- Class Test-1 window opens Wed Aug 19
 :::
 
 :::

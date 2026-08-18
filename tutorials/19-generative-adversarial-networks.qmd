@@ -1,0 +1,587 @@
+# 09 · Generative Adversarial Networks {.unnumbered}
+
+*The first deep generative model, and the one that changed what the field thought
+was possible. Its premise is a refusal: **do not estimate a density, do not
+evaluate a likelihood, do not even define one.** Learn a map from noise to data,
+and judge it by whether a second network can tell your samples from real ones.*
+
+*This note derives the whole thing. The min-max objective and the counterfeiter
+analogy it comes from; the optimal discriminator in three lines; the theorem that
+the game is secretly minimising a Jensen–Shannon divergence; and then the part
+that occupied the field for five years afterwards — why an objective this elegant
+is so hard to optimise, and what each failure mode teaches about what a generative
+model actually needs.*
+
+## 1. The change of question
+
+Every method so far has tried to **write down** $p_{\text{data}}$ — as a Gaussian
+(note 05), a sparse graphical model, a mixture, a kernel sum, a posterior
+(note 06) — and each hit the curse of dimensionality from a different side.
+[Note 08](./18-metropolis-hastings.qmd) then showed that even a *known* density is
+only the start of the difficulty, and that the machinery there cannot be pointed
+at images because there is no density to point it at.
+
+So change what the model *is*. A GAN never represents $p_g$ as a function. It
+represents a **sampling procedure**:
+
+$$
+z \sim p_z = \mathcal{N}(0, I_k), \qquad x = G_\theta(z) \in \mathbb{R}^d .
+$$
+
+Push a low-dimensional Gaussian through a neural network. The distribution of the
+output — call it $p_g$ — is a perfectly well-defined object, the pushforward
+$G_\theta \# p_z$, and it is what the model claims $p_{\text{data}}$ to be. You can
+draw from it in one forward pass. You cannot evaluate its density at a point,
+because that would require integrating over all $z$ mapping there, and in general
+$p_g$ has no density at all: its support is a $k$-dimensional set inside
+$\mathbb{R}^d$, of Lebesgue measure zero.
+
+This is called an **implicit** model — defined by how you sample it, not by a
+formula. Note 00's "sampling as a map" is exactly this idea; the GAN is its first
+deep instantiation.
+
+::: {.callout-important}
+## The problem this creates, immediately
+
+Maximum likelihood is unavailable. Note 06 §11 showed that maximising likelihood
+*is* minimising $\mathrm{KL}(p_{\text{data}}\|p_\theta)$ — but that requires
+evaluating $p_\theta(x_i)$, which an implicit model cannot do. Worse, note 07 §8
+showed that KL between two distributions on non-overlapping manifolds is
+identically $+\infty$, which is the generic situation here.
+
+So the loss must be built from **samples only** — a quantity computable from a
+batch of real $x$'s and a batch of fake $G(z)$'s, with no density anywhere. That
+constraint is what forces the entire GAN construction, adversary included.
+:::
+
+## 2. Police and thief
+
+Goodfellow's framing, and the reason the idea is memorable: two players with
+opposed interests.
+
+A **counterfeiter** (the generator) prints fake currency and wants it to pass. The
+**police** (the discriminator) inspect notes and want to catch every fake. Neither
+is competent at the start: the first forgeries are laughable, and the first
+inspections are guesswork. But each improvement forces the other to improve. Crude
+fakes teach the police to check the watermark; the police checking watermarks
+teach the counterfeiter to print one. The process ends only when the forgeries are
+indistinguishable from real currency — at which point the police can do no better
+than a coin flip, and that inability *is* the certificate of success.
+
+The analogy is worth pressing on, because two of its details are the mathematics.
+
+**The counterfeiter never sees real money.** $G$ has no access to the training set.
+Not one gradient in the generator's update touches a real image. Everything $G$
+learns about the data arrives *through* the discriminator — the police's verdicts
+are the only channel. That is why a broken $D$ is fatal: it is not a referee, it
+is the generator's sole teacher.
+
+**The police hand over their reasoning, not just their verdict.** A real
+counterfeiter learns only "caught" or "not caught". Here, $D$ is differentiable,
+so $G$ receives $\nabla_x D(x)$ — the *direction in image space* that would make
+the note more convincing. This is the trick that makes the whole thing work, and
+the point where the analogy stops being an analogy. Note 06's comparison table put
+it exactly: rejection sampling throws away a rejected dart and learns nothing; a
+GAN turns every rejection into a direction.
+
+## 3. The objective
+
+The discriminator $D_\phi: \mathbb{R}^d \to (0,1)$ outputs the probability that
+its input is real. Train it as a binary classifier on a balanced mixture of real
+and generated data — the cross-entropy loss, written out, is
+
+$$
+V(D, G) \;=\; \mathbb{E}_{x \sim p_{\text{data}}}\big[\log D(x)\big]
+\;+\; \mathbb{E}_{z \sim p_z}\big[\log\big(1 - D(G(z))\big)\big].
+$$
+
+$D$ wants this large: $\log D(x)$ near $0$ on real data (so $D \to 1$) and
+$\log(1-D)$ near $0$ on fakes (so $D \to 0$). $G$ wants the second term small,
+which means fooling $D$. One quantity, two opposed interests — a **zero-sum
+game**, and the solution is its saddle point:
+
+$$
+\boxed{\;\min_G \max_D \; V(D,G)
+= \min_G \max_D \;\mathbb{E}_{p_{\text{data}}}[\log D(x)] + \mathbb{E}_{p_g}[\log(1-D(x))].\;}
+$$
+
+Note the second expectation is over $p_g$, since $x = G(z)$ with $z \sim p_z$ is by
+definition a draw from $p_g$. Written that way the objective involves the two
+distributions and no latent variable, which is what makes the next section
+possible.
+
+The **order matters**: $\max_D$ is inside. The generator is judged against the
+*best available* critic, not a fixed one — otherwise $G$ would simply find the one
+blind spot of a mediocre $D$ and park there.
+
+## 4. Step one: the optimal discriminator
+
+**Proposition.** For a fixed generator $G$, the discriminator maximising $V$ is
+
+$$
+\boxed{\;D^{*}_G(x) \;=\; \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_g(x)}.\;}
+$$
+
+*Proof.* Write both expectations as integrals over the same variable:
+
+$$
+V(D,G) \;=\; \int \Big[\,p_{\text{data}}(x)\log D(x) \;+\; p_g(x)\log\big(1-D(x)\big)\Big]dx .
+$$
+
+The value $D(x)$ at one point appears in the integrand only at that point, so —
+allowing $D$ to be *any* function, which is the assumption to remember — the
+integral is maximised by maximising the bracket pointwise. With $a =
+p_{\text{data}}(x)$, $b = p_g(x)$ and $t = D(x) \in (0,1)$, maximise
+
+$$
+f(t) = a\log t + b\log(1-t), \qquad
+f'(t) = \frac{a}{t} - \frac{b}{1-t} = 0 \;\Longrightarrow\; t^{*} = \frac{a}{a+b},
+$$
+
+and $f''(t) = -a/t^2 - b/(1-t)^2 < 0$, so this is the unique maximum. $\square$
+
+Three consequences, each of which matters later.
+
+**The discriminator is a density-ratio estimator.** Let $r = p_{\text{data}}/p_g$.
+Then $D^{*} = r/(1+r)$, strictly increasing in $r$, and inverting,
+
+$$
+r(x) \;=\; \frac{D^{*}(x)}{1 - D^{*}(x)} .
+$$
+
+If $D = \sigma(h)$ for a logit $h$, this says $h^{*}(x) = \log
+\frac{p_{\text{data}}(x)}{p_g(x)}$: **the discriminator's logit is the log density
+ratio.** Two densities that cannot be written down individually, and a classifier
+recovers their ratio from samples alone. This is the *density-ratio trick*, and it
+is the single most reusable idea in the note.
+
+**At the solution $D^{*} = 1/2$ everywhere.** When $p_g = p_{\text{data}}$ the ratio
+is 1. The police are reduced to a coin flip, as promised.
+
+**"Allowing $D$ to be any function" is doing real work.** A neural network of
+finite capacity, trained on finite data for finitely many steps, is not $D^{*}$.
+Everything in §7 is downstream of that gap.
+
+## 5. Step two: the game is a Jensen–Shannon divergence
+
+Substitute $D^{*}$ back and see what the generator is actually minimising. Define
+the **mixture** — the "average of the data distribution and the generated one":
+
+$$
+m \;=\; \tfrac12\big(p_{\text{data}} + p_g\big).
+$$
+
+Then $D^{*} = p_{\text{data}}/(2m)$ and $1 - D^{*} = p_g/(2m)$, so
+
+$$
+\begin{aligned}
+C(G) \;=\; \max_D V(D,G)
+&= \mathbb{E}_{p_{\text{data}}}\!\left[\log \frac{p_{\text{data}}}{2m}\right]
+ + \mathbb{E}_{p_g}\!\left[\log \frac{p_g}{2m}\right] \\[4pt]
+&= \mathbb{E}_{p_{\text{data}}}\!\left[\log \frac{p_{\text{data}}}{m}\right] - \log 2
+ + \mathbb{E}_{p_g}\!\left[\log \frac{p_g}{m}\right] - \log 2 \\[4pt]
+&= -\log 4 \;+\; \mathrm{KL}\big(p_{\text{data}} \,\big\|\, m\big) + \mathrm{KL}\big(p_g \,\big\|\, m\big).
+\end{aligned}
+$$
+
+The two KL terms are, by definition, twice the **Jensen–Shannon divergence**:
+
+$$
+\mathrm{JS}(p\|q) \;=\; \tfrac12 \mathrm{KL}\!\left(p \,\Big\|\, \tfrac{p+q}{2}\right)
++ \tfrac12 \mathrm{KL}\!\left(q \,\Big\|\, \tfrac{p+q}{2}\right).
+$$
+
+Therefore
+
+$$
+\boxed{\;C(G) \;=\; -\log 4 \;+\; 2\,\mathrm{JS}\big(p_{\text{data}} \,\|\, p_g\big).\;}
+$$
+
+**Theorem (Goodfellow et al., 2014).** The global minimum of $C(G)$ is attained
+exactly when $p_g = p_{\text{data}}$, where its value is $-\log 4 \approx -1.386$.
+
+*Proof.* $\mathrm{JS} \ge 0$ always, with equality if and only if the two
+distributions coincide — it is an $f$-divergence, note 07 §4, and Jensen gives
+non-negativity with equality only at $p = q$. So $C(G) \ge -\log 4$ with equality
+precisely at $p_g = p_{\text{data}}$. $\square$
+
+This is the payoff of the derivation. A construction motivated entirely by a
+*story about counterfeiters* turns out to minimise a specific, principled,
+symmetric divergence. The adversary was never a heuristic: it is a **variational
+estimator of a divergence**, computing by optimisation what could not be computed
+in closed form. Note 07's map of "what is each model family minimising?" lists the
+original GAN under Jensen–Shannon for exactly this reason, and the $f$-GAN
+generalisation — swap the $\log$s for the Fenchel conjugate of any convex $f$ and
+get any $f$-divergence you like — follows the same template.
+
+::: {.callout-warning}
+## Read the small print
+
+The theorem is about **distributions**, not parameters. Three gaps between it and
+anything you can run:
+
+1. **$D$ is not optimal.** $D^{*}$ assumes an unconstrained function and exact
+   maximisation. In practice $D$ is a network updated a few steps per generator
+   step, so the quantity being descended is *some* estimate of JS, with error that
+   is not controlled.
+2. **$G$ moves in parameter space, not function space.** Goodfellow's convergence
+   argument (Prop. 2) treats $p_g$ itself as the variable, where $C$ is convex.
+   Gradient descent moves $\theta$, and $C$ as a function of $\theta$ is not
+   convex. The proof does not transfer, and the paper says so.
+3. **The expectations are estimated from minibatches.** The gradient is noisy in a
+   game where the two players' noise is coupled.
+
+Each gap is a real phenomenon in training, not a technicality. §7 is a catalogue
+of what comes through them.
+:::
+
+## 6. Training, as actually implemented
+
+Alternate stochastic gradient steps. For each iteration:
+
+1. **$k$ discriminator steps** ($k=1$ is standard). Draw a minibatch of $m$ real
+   samples and $m$ latents, and *ascend*
+
+   $$
+   \nabla_\phi \;\frac1m \sum_{i=1}^{m}\Big[\log D_\phi(x_i) + \log\big(1 - D_\phi(G_\theta(z_i))\big)\Big].
+   $$
+
+2. **One generator step.** Draw $m$ fresh latents and *descend* the generator's
+   loss — with a modification introduced in the next paragraph and used
+   universally since.
+
+The $k$ inner steps exist because the theory wants $D$ near-optimal. But $D$ is
+being asked to track a *moving* target: every generator step changes $p_g$ and
+therefore changes $D^{*}$. Chasing it too closely is as bad as not chasing it at
+all, for a reason that is the subject of §7.1.
+
+### The non-saturating loss
+
+The min-max objective assigns $G$ the loss $\mathbb{E}_z[\log(1 - D(G(z)))]$. It
+does not work early in training, and the reason is a two-line computation. Write
+$D = \sigma(h)$ with logit $h$; then $\log(1-D) = \log\sigma(-h)$ and
+
+$$
+\frac{\partial}{\partial h}\,\log\big(1 - D\big) \;=\; -\,\sigma(h) \;=\; -D .
+$$
+
+Early on, $G$'s samples are obvious fakes, so $D(G(z)) \approx 0$ — and the
+gradient reaching the generator is proportional to $D(G(z))$, hence **also
+$\approx 0$**. The generator learns most slowly exactly when it is worst. The loss
+*saturates*.
+
+The fix is to have $G$ maximise $\log D(G(z))$ instead of minimising $\log(1 -
+D(G(z)))$ — same fixed point, since both are optimised by $D(G(z)) \to 1$, but
+
+$$
+\frac{\partial}{\partial h}\,\big(-\log D\big) \;=\; -\big(1 - \sigma(h)\big) \;=\; -(1-D)
+\;\xrightarrow[D \to 0]{}\; -1 .
+$$
+
+Now the gradient is *largest* when the samples are worst. This is the
+**non-saturating** loss, and essentially every GAN ever trained uses it.
+
+::: {.callout-note}
+## What you give up by switching
+
+The heuristic fix breaks the theorem. Arjovsky and Bottou (2017) computed what the
+non-saturating generator gradient corresponds to at an optimal discriminator:
+
+$$
+\nabla_\theta\,\mathbb{E}_{p_g}\big[-\log D^{*}\big]
+\;=\; \nabla_\theta\Big[\mathrm{KL}\big(p_g \,\|\, p_{\text{data}}\big) - 2\,\mathrm{JS}\big(p_g\,\|\,p_{\text{data}}\big)\Big].
+$$
+
+Two things are wrong with the right-hand side. The first term is the **reverse**
+KL, which note 07 §3 identified as *mode-seeking*: it punishes putting mass where
+there is none, and is nearly indifferent to missing an entire mode. The second
+enters with a **minus sign**, actively pushing $p_g$ away from $p_{\text{data}}$.
+
+So the loss people actually train is not a divergence, is mode-seeking, and
+contains a repulsive term. Mode collapse and instability are not surprising in
+retrospect — they are visible in the objective.
+:::
+
+## 7. Why it is hard: four failure modes
+
+### 7.1 Vanishing gradients, and the tension at the heart of the method
+
+Note 07 §8 established the fact this rests on. If $p_{\text{data}}$ and $p_g$ have
+essentially disjoint supports — which is *generic*, since both live on
+low-dimensional manifolds in a high-dimensional space and two such manifolds
+generically miss each other — then
+
+$$
+\mathrm{JS}(p_{\text{data}} \| p_g) = \log 2 \quad\text{exactly, and}\quad
+\nabla_\theta \,\mathrm{JS} = 0 .
+$$
+
+Not small. *Zero*. The divergence reports "maximally different" and stops
+responding, so it cannot distinguish a near miss from a wild one, and the
+generator receives no signal about which way to move.
+
+The consequence is a genuine dilemma, and it is the deepest problem with the
+original formulation:
+
+> **The theory wants $D$ optimal. An optimal $D$ gives the generator no gradient.**
+
+A near-perfect discriminator separates the two manifolds cleanly, is confident
+everywhere, and is therefore flat everywhere $G$ can reach. A weak discriminator
+gives a usable gradient that points in the wrong direction. GAN training lives in
+a narrow band between the two, held there by hand-tuned learning rates,
+architectures and update ratios. This is what practitioners mean by "GANs are
+finicky", and it is a statement about the objective, not about anyone's code.
+
+The non-saturating loss patches the symptom. **WGAN removes the cause**: replace
+JS with $W_1$, which note 07 §8 showed reports the *actual distance* $d$ between
+separated supports and keeps a gradient pointing home. That is the entire
+motivation for Wasserstein GAN, and it is why note 07 came before this one.
+
+### 7.2 Mode collapse
+
+The most visible failure: $G$ maps every latent $z$ to the same output, or to a
+handful of outputs. Train on ten digit classes, generate only sevens — convincing
+sevens, and nothing else.
+
+Three complementary explanations, all correct.
+
+**The order of the min and max.** The objective is $\min_G \max_D$, but alternating
+optimisation drifts toward $\max_D \min_G$, and these are not equal. In the swapped
+game the generator moves first against a *fixed* $D$, and its optimal response is
+to put all mass on the single point $\arg\max_x D(x)$ — the one input this
+discriminator most believes. A perfect delta function is the exact solution to the
+inner problem. Then $D$ learns to reject that point, $G$ hops to the next best,
+and the pair cycles through modes forever without ever covering them.
+
+**The divergence is mode-seeking.** By §6's callout the practical loss carries a
+reverse-KL term, and reverse KL is minimised by covering *one* mode well rather
+than all modes poorly. The generator is doing what its objective asks.
+
+**Nothing penalises missing mass.** $D$ judges samples **one at a time**. It can
+answer "is this a plausible digit?" but never "is this batch's *diversity* right?"
+— that is a property of a set, invisible to a pointwise classifier. Diversity is
+simply not in the loss. This diagnosis suggests its own fix, and *minibatch
+discrimination* — letting $D$ see cross-sample statistics — is precisely that.
+
+::: {.callout-tip}
+## The same pathology as note 08, from the other side
+
+An MH chain trapped in one mode of a bimodal posterior looks perfectly healthy —
+good acceptance, stable trace — while sampling the wrong distribution. A
+mode-collapsed GAN looks perfectly healthy — sharp samples, low losses — while
+modelling the wrong distribution.
+
+Both are cases of a procedure that is locally correct everywhere and globally
+wrong, and in both cases the diagnostic that would reveal it (does the sample
+cover all the mass?) is exactly the one the algorithm does not compute.
+:::
+
+### 7.3 No convergence guarantee: it is a game, not a minimisation
+
+Ordinary training minimises one function, and "the loss went down" means progress.
+Here there are two losses that move in opposite directions, and the target is a
+**saddle point** — a Nash equilibrium — not a minimum. Descending a loss is not a
+correct algorithm for finding a saddle, and it can orbit one forever.
+
+The smallest possible instance makes it concrete. Take $\min_x \max_y \, xy$, whose
+unique equilibrium is $(0,0)$. Simultaneous gradient steps with rate $\eta$:
+
+$$
+x_{t+1} = x_t - \eta\,y_t, \qquad y_{t+1} = y_t + \eta\,x_t .
+$$
+
+Then
+
+$$
+x_{t+1}^2 + y_{t+1}^2 = (x_t - \eta y_t)^2 + (y_t + \eta x_t)^2 = (1+\eta^2)\,(x_t^2 + y_t^2),
+$$
+
+because the cross terms cancel exactly. The iterates **spiral outward** for any
+$\eta > 0$, moving further from the equilibrium at every step. In continuous time
+($\eta \to 0$) they orbit it forever on a circle and never converge. This is a
+convex-concave game — the friendliest case there is — and gradient descent-ascent
+still fails on it.
+
+Practical consequences:
+
+- **Losses are uninformative.** $D$'s loss hovering near $\log 2 \approx 0.69$ per
+  term is what you want, and also what you see when everything has collapsed.
+  Neither loss decreasing monotonically is a sign of health; there is no scalar
+  whose descent means progress. Evaluation moves outside the training loop
+  entirely — FID, Inception Score, human inspection — with all the arbitrariness
+  that implies.
+- **Oscillation.** Sample quality visibly cycles: sharp, then degraded, then sharp
+  again. There is no "the loss plateaued, we are done"; you checkpoint frequently
+  and pick by eye.
+- **Balance is a hyperparameter.** If $D$ outpaces $G$, §7.1 kills the gradient. If
+  $G$ outpaces $D$, it exploits a weak critic and collapses. The update ratio, the
+  two learning rates and the two architectures must be tuned *jointly*, and a
+  configuration that works on one dataset may not transfer.
+
+### 7.4 Slow and expensive convergence
+
+Beyond instability, the arithmetic of the game is unfavourable.
+
+- **Two networks, coupled.** Every generator step needs a discriminator that is
+  approximately optimal *for the current $p_g$* — and $p_g$ just changed. $D$ is
+  perpetually chasing a moving target, and much of the compute goes into tracking
+  rather than into progress.
+- **Indirect signal.** $G$ never touches a real sample. Its entire information
+  about the data arrives second-hand through $D$'s gradient, filtered through
+  whatever $D$ currently happens to have learned. Contrast a diffusion model, whose
+  training signal is a *supervised regression target* computed directly from a real
+  image plus known noise.
+- **No likelihood, so no model selection.** You cannot compute held-out
+  log-likelihood, so the ordinary machinery — early stopping, comparing
+  architectures, detecting overfitting — is unavailable. A GAN that has memorised
+  the training set and one that has generalised produce equally pretty samples.
+- **Sensitivity.** Results depend sharply on architecture, normalisation, and
+  optimiser settings. That an entire paper (DCGAN, 2015) was needed to publish *a
+  set of architectural choices that trains reliably* is itself the evidence.
+
+## 8. What was done about it
+
+For completeness, and because several of these ideas reappear later in more
+principled forms:
+
+| Problem | Fix | Idea |
+|---|---|---|
+| Vanishing gradient (7.1) | non-saturating loss | change $G$'s loss, keep the fixed point |
+| Vanishing gradient (7.1) | **WGAN** + weight clipping / gradient penalty | replace JS with $W_1$: an IPM, so it survives disjoint supports (note 07 §8) |
+| Vanishing gradient (7.1) | instance noise | convolve both distributions with Gaussian noise so the supports overlap |
+| Mode collapse (7.2) | minibatch discrimination | let $D$ see batch statistics, so diversity enters the loss |
+| Mode collapse (7.2) | unrolled GANs | let $G$ see $D$'s *future* response, undoing the min-max swap |
+| Instability (7.3) | spectral normalisation | constrain $D$'s Lipschitz constant, smoothing its gradient field |
+| Instability (7.3) | two time-scale updates (TTUR) | different learning rates for $D$ and $G$ |
+| Generality | **$f$-GAN** | the same variational template for any $f$-divergence |
+
+::: {.callout-tip}
+## Instance noise is the diffusion idea, in embryo
+
+Look at the third row. The fix for disjoint supports is: *add Gaussian noise to
+both real and fake samples*, so that both distributions acquire full support, the
+density ratio becomes finite, and JS regains a gradient. It works, and it was
+regarded as a trick.
+
+A diffusion model does this **at every noise level simultaneously and
+deliberately**. The forward process is a whole continuum of noised versions of
+$p_{\text{data}}$, and the model learns to reverse each level. The thing GANs had
+to smuggle in as a stabiliser is the diffusion model's organising principle.
+
+Note 07 makes the same observation from the divergence side: convolving with a
+Gaussian is what makes ratio-based quantities finite and informative again.
+:::
+
+## 9. The connection back to Metropolis–Hastings
+
+The two halves of this week look unrelated — a 1970 statistical algorithm and a
+2014 deep learning paper. They are the same machine.
+
+Note 08's acceptance rule turns on the ratio $\pi(y)/\pi(x)$, in which the
+normalising constant cancels. §4 above showed the discriminator's logit **is** the
+log density ratio $\log(p_{\text{data}}/p_g)$. Both methods run on a density ratio;
+they differ only in where it comes from.
+
+| | Metropolis–Hastings | GAN |
+|---|---|---|
+| Proposal | chosen by hand for convenience | **learned** |
+| Density ratio | computed exactly from $\tilde\pi$ | **estimated** by a classifier, from samples |
+| Requires | $\tilde\pi(x)$ evaluable | samples from $p_{\text{data}}$ only |
+| Rejected candidate | chain stays put; nothing learned | becomes a gradient: a direction to move |
+| Output | asymptotically exact, correlated draws | approximate, independent draws, one forward pass each |
+| Cost per sample | thousands of steps, every time | one forward pass, after training |
+
+The consequence is a fact worth stating plainly: **a trained discriminator gives
+you a density ratio for two distributions you cannot write down.** That is enough
+to run an MH accept/reject step on a GAN's own output, correcting its samples
+toward $p_{\text{data}}$ — which is exactly what MH-GAN (Turner et al., 2019) and
+discriminator rejection sampling (Azadi et al., 2019) do. The 1970 algorithm runs
+on the 2014 model's output, using the learned classifier as its density ratio.
+
+## 10. Key takeaway
+
+Three sentences worth remembering.
+
+**The construction.** Because an implicit model has no likelihood, its loss must be
+computable from samples alone; training a classifier to separate real from fake
+supplies exactly that, and its logit recovers the log density ratio that no
+formula could.
+
+**The theorem.** At an optimal discriminator the game minimises
+$-\log 4 + 2\,\mathrm{JS}(p_{\text{data}}\|p_g)$, uniquely minimised when
+$p_g = p_{\text{data}}$ — so the counterfeiter story was a principled divergence
+minimisation the whole time.
+
+**The trouble.** Every difficulty traces to one of two roots: JS saturates between
+distributions on disjoint manifolds, which kills the gradient exactly when the
+discriminator is good; and a saddle point is not a minimum, so gradient descent has
+no reason to converge to it. The field's response to the first was to change the
+divergence (WGAN), and to the second, to change the game.
+
+::: {.callout-important}
+## Where this leaves the course
+
+A GAN is a **learned proposal with a learned judge**. It fixed what was wrong with
+Metropolis–Hastings — the hand-picked proposal, the wasted rejections, the
+thousands of steps per sample — and inherited a new problem: the judge is an
+adversary, and training against an adversary is a game with no convergence
+guarantee.
+
+The rest of this course removes the judge. A diffusion model's forward process
+adds a *small* amount of Gaussian noise at each of many steps, which makes each
+reverse step nearly Gaussian and therefore matchable by direct regression against
+a target computed from real data. There is no adversary, no saddle point, no
+accept/reject, and the loss that goes down means progress.
+
+You have now seen both classical sampling and adversarial sampling fail, and in
+each case the diagnosis pointed the same way. Module 3 builds the thing they were
+pointing at.
+:::
+
+## 11. Where each piece returns
+
+| From this note | Where it reappears |
+|---|---|
+| Implicit model $x = G(z)$ | flows, decoders, and the diffusion sampler itself |
+| Discriminator logit $=\log(p_{\text{data}}/p_g)$ | the density-ratio trick; classifier guidance in Module 6 |
+| Saturating vs non-saturating loss | why a parametrisation can matter more than an objective |
+| JS pinned at $\log 2$ on disjoint supports | note 07 §8, and the motivation for WGAN |
+| Instance noise as a stabiliser | the forward diffusion process, Module 3 |
+| Reverse KL is mode-seeking | the ELBO's KL term, and mode-covering in diffusion |
+| Adversarial training as a game | why a direct regression objective is worth a great deal |
+
+## Exercises
+
+1. Show that for fixed $G$, $D^{*} = p_{\text{data}}/(p_{\text{data}}+p_g)$, and
+   verify the second-order condition.
+2. Derive $C(G) = -\log 4 + 2\,\mathrm{JS}(p_{\text{data}}\|p_g)$ in full, stating
+   where each $\log 2$ comes from.
+3. Show that the discriminator's logit at the optimum is $\log(p_{\text{data}}/p_g)$,
+   and explain why this is remarkable given that neither density is available.
+4. Confirm $\mathrm{JS} \le \log 2$ always, and characterise exactly when equality
+   holds.
+5. Let $p_{\text{data}} = \mathcal{N}(0,1)$ and $p_g = \mathcal{N}(\mu,1)$. Compute
+   $D^{*}(x)$ in closed form and sketch it for $\mu = 0.5$ and $\mu = 5$. Where is
+   its gradient largest, and what does that mean for the generator?
+6. Take $p_{\text{data}}$ uniform on $[0,1]$ and $p_g$ uniform on $[\mu, \mu+1]$
+   with $\mu > 1$. Compute $\mathrm{JS}$, its derivative in $\mu$, and $W_1$.
+   Which one can train a generator?
+7. Verify both gradient computations in §6: $\partial_h \log(1-\sigma(h)) =
+   -\sigma(h)$ and $\partial_h[-\log\sigma(h)] = -(1-\sigma(h))$. Explain in one
+   sentence why this justifies the non-saturating loss.
+8. For the game $\min_x\max_y xy$, show that simultaneous gradient steps of size
+   $\eta$ multiply $x^2+y^2$ by $1+\eta^2$. Now try *alternating* updates (use the
+   new $x_{t+1}$ when updating $y$) and show the behaviour differs. What does this
+   suggest about implementation details in GAN training?
+9. Show that $\max_D \min_G V \ne \min_G \max_D V$ for this game by computing the
+   generator's optimal response to a fixed $D$. Relate your answer to mode collapse.
+10. Explain why a discriminator that judges samples one at a time cannot penalise
+    a generator for ignoring half the data's modes. Design a loss term that could.
+11. Note 07 lists the original GAN under Jensen–Shannon and WGAN under $W_1$. Using
+    §6's callout, argue that the *non-saturating* GAN actually belongs in neither
+    row.
+12. Given a trained $D$ and generator $G$, write down a Metropolis–Hastings
+    accept/reject rule using $D$ that improves $G$'s samples. What must be assumed
+    about $D$ for the correction to be valid?
+13. In two sentences each, say what a GAN fixed about Metropolis–Hastings and what
+    a diffusion model fixes about a GAN.

@@ -22,6 +22,8 @@ project:
     - materials/kl-lab.html
     - materials/sampling-lab.html
     - materials/w03-deck-01-multivariate-gaussian.html
+    - materials/w04-deck-01-metropolis-hastings.html
+    - materials/w04-deck-02-gans.html
     - materials/img/**
     - materials/site_libs/**
     - homeworks/*.pdf
@@ -60,6 +62,8 @@ book:
         - tutorials/12-multivariate-gaussian.qmd
         - tutorials/17-density-estimation-many-dimensions.qmd
         - tutorials/15-comparing-distributions.qmd
+        - tutorials/18-metropolis-hastings.qmd
+        - tutorials/19-generative-adversarial-networks.qmd
     - part: "Decks"
       chapters:
         - href: materials/w01-deck-01-mechanics.html
@@ -76,6 +80,10 @@ book:
           text: "06 · Generative AI, in Its Simplest Form"
         - href: materials/w03-deck-01-multivariate-gaussian.html
           text: "07 · The Multivariate Gaussian"
+        - href: materials/w04-deck-01-metropolis-hastings.html
+          text: "08 · Sampling What You Cannot Normalise"
+        - href: materials/w04-deck-02-gans.html
+          text: "09 · Generative Adversarial Networks"
     - part: "Tutorials"
       chapters:
         - tutorials/13-inequalities.qmd

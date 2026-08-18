@@ -1,0 +1,363 @@
+---
+title: "Sampling What You Cannot Normalise"
+subtitle: "W04 · Part 1 — Metropolis–Hastings, and why it cannot generate an image"
+author: "Uma Satyaranjan · Soma S Dhavala"
+date: "ID-5-02 (TO) · Monsoon 2026 · IIT Jammu"
+date-format: "[ID-5-02 (TO) · Monsoon 2026 · IIT Jammu]"
+---
+
+## Where we are
+
+- W03 ended badly on purpose: estimating $p_{\text{data}}$ in high dimension is hopeless
+- But generation never needed the density — it needed **samples**
+- Today: the classical answer, and the exact point where it stops
+
+::: {.note}
+Everything this course does reduces to one request: **produce a draw from a
+distribution**. Today we solve that request in the case where you can write the
+target down — and find that the case we care about is not that one.
+:::
+
+## The setting
+
+You can evaluate the target, but only up to a constant:
+
+$$\pi(x) \;=\; \frac{\tilde\pi(x)}{Z}, \qquad Z = \int \tilde\pi(x)\,dx$$
+
+- $\tilde\pi$ — cheap, closed form, evaluable anywhere
+- $Z$ — an integral over the whole space that nobody can do
+
+This is not a special case. It is the **generic** case.
+
+## Three places it shows up
+
+**Bayesian posterior**
+
+$$p(\theta \mid \mathcal{D}) = \frac{p(\theta)\,L(\mathcal{D}\mid\theta)}{p(\mathcal{D})},
+\qquad p(\mathcal{D}) = \int p(\theta) L(\mathcal{D}\mid\theta)\, d\theta$$
+
+Numerator: prior × likelihood, both chosen by you. Denominator: intractable.
+
+**Energy-based model** — $\pi(x) \propto e^{-E(x)}$, and $Z$ is the partition function
+
+**Conditioning** — $\pi(x) \propto p(x)$ restricted to a region $A$; the mass $p(A)$ is unknown
+
+## Why not rejection sampling?
+
+Note 06: draw $x \sim q$, accept if $u < \pi(x)/Mq(x)$. Exact — and useless.
+
+Target $\mathcal{N}(0,I_d)$, proposal $\mathcal{N}(0,\sigma^2 I_d)$: acceptance rate $\sigma^{-d}$.
+
+| $d$ | $\sigma = 1.1$ | $\sigma = 1.5$ |
+|---|---|---|
+| 1 | 0.91 | 0.67 |
+| 10 | 0.39 | 0.017 |
+| 100 | $7 \times 10^{-5}$ | $2 \times 10^{-18}$ |
+
+::: {.note}
+A proposal **ten percent** too wide is already dead at $d = 100$. Every draw is a
+fresh, independent gamble against the same odds — nothing is ever learned.
+:::
+
+## The fix, in one sentence
+
+::: {style="text-align:center"}
+[Stop starting over. Move from where you already are.]{.big}
+:::
+
+A **Markov chain**: the next state depends on the past only through the present.
+
+$$\mathbb{P}(x_{t+1} \in A \mid x_t, \dots, x_0) \;=\; \int_A K(x_t,y)\,dy$$
+
+The kernel $K(x,y)$ is all the chain is.
+
+## A chain is a *sequence* of distributions
+
+Run the kernel forward from any starting law $p_0$:
+
+$$p_{t+1}(y) \;=\; \int p_t(x)\,K(x,y)\,dx$$
+
+There is not one distribution here — there are $p_0, p_1, p_2, \dots$ **flowing**.
+
+::: {.note}
+Note 06 computed this flow exactly for Gibbs on a bivariate normal:
+$x_t \mid x_0 \sim \mathcal{N}\big(\rho^{2t}x_0,\; 1-\rho^{4t}\big)$.
+Mean decays, variance climbs. **Burn-in** is the stretch where the flow is still
+visibly incomplete.
+:::
+
+## Stationarity
+
+$\pi$ is **stationary** for $K$ when one more step changes nothing:
+
+$$\boxed{\;\pi(y) \;=\; \int \pi(x)\,K(x,y)\,dx\;}$$
+
+Add **irreducibility** (can reach anywhere) and **aperiodicity** (no fixed cycle) and
+the chain is ergodic: $p_t \to \pi$ from any start, and
+
+$$\frac1T \sum_{t=1}^{T} f(x_t) \;\longrightarrow\; \mathbb{E}_\pi[f(X)]$$
+
+## The design problem, run backwards
+
+- Usual question: *here is a chain — what is its stationary distribution?*
+- Our question: **here is the distribution — build me a chain**
+
+::: {.note}
+Checking $\pi = \pi K$ directly means an integral over the whole space, which is
+the thing we are trying to avoid. We need a condition that is **local**, so it can
+be engineered pointwise.
+:::
+
+## Detailed balance
+
+A chain is **reversible** with respect to $\pi$ if for every pair of states
+
+$$\boxed{\;\pi(x)\,K(x,y) \;=\; \pi(y)\,K(y,x)\;}$$
+
+At equilibrium, mass flowing $x \to y$ equals mass flowing $y \to x$. Every
+pairwise exchange balances.
+
+::: {.fragment}
+**It implies stationarity, in one line:**
+
+$$\int \pi(x)K(x,y)\,dx = \int \pi(y)K(y,x)\,dx = \pi(y)\int K(y,x)\,dx = \pi(y)$$
+:::
+
+## The algorithm
+
+Pick **any** proposal $q(y \mid x)$ you can sample from. From state $x_t$:
+
+1. Propose $y \sim q(\cdot \mid x_t)$
+2. Compute
+
+$$\boxed{\;\alpha(x_t,y) \;=\; \min\!\left\{1,\;
+\frac{\pi(y)\,q(x_t \mid y)}{\pi(x_t)\,q(y \mid x_t)}\right\}\;}$$
+
+3. Draw $u \sim \mathrm{Uniform}(0,1)$: accept $x_{t+1} = y$ if $u < \alpha$,
+   otherwise $x_{t+1} = x_t$
+
+## The constant cancels
+
+$\pi$ enters **only** through a ratio:
+
+$$\frac{\pi(y)}{\pi(x)} \;=\; \frac{\tilde\pi(y)/Z}{\tilde\pi(x)/Z} \;=\; \frac{\tilde\pi(y)}{\tilde\pi(x)}$$
+
+For a Bayesian posterior with a symmetric proposal the rule is literally
+
+$$\alpha \;=\; \min\!\left\{1,\;\frac{p(\theta')\,L(\mathcal{D}\mid\theta')}{p(\theta)\,L(\mathcal{D}\mid\theta)}\right\}$$
+
+::: {.note}
+Prior × likelihood at two points. **The evidence integral — the entire reason the
+posterior was intractable — never appears.**
+:::
+
+## Rejection is not a discarded draw
+
+::: {style="text-align:center"}
+[A rejected proposal means the chain **emits the current state again**.]{.big}
+:::
+
+- Staying put is a legal move, and a genuine sample
+- It is how the chain gives extra weight to high-density regions
+- Recording only *accepted* states is the most common implementation bug — and it
+  silently biases every estimate
+
+## Why it works
+
+For $y \ne x$ the kernel is $K(x,y) = q(y\mid x)\,\alpha(x,y)$. Push the positive
+factor inside the $\min$:
+
+$$\pi(x)\,q(y\mid x)\min\!\left\{1, \frac{\pi(y)q(x\mid y)}{\pi(x)q(y\mid x)}\right\}
+= \min\big\{\pi(x)q(y\mid x),\; \pi(y)q(x\mid y)\big\}$$
+
+::: {.fragment}
+The right-hand side is **symmetric in $x \leftrightarrow y$** — swapping labels
+swaps the two arguments of a $\min$ and changes nothing.
+
+So $\pi(x)K(x,y) = \pi(y)K(y,x)$: detailed balance, hence stationarity. $\blacksquare$
+:::
+
+::: {.fragment}
+The acceptance rule was *reverse-engineered* to make that $\min$ appear.
+:::
+
+## Random-walk Metropolis
+
+Symmetric proposal $q(y\mid x) = \mathcal{N}(y; x, \tau^2 I)$, so the $q$-ratio is 1:
+
+$$\alpha \;=\; \min\!\left\{1, \frac{\pi(y)}{\pi(x)}\right\}$$
+
+- **Always** move uphill
+- Move **downhill** with probability equal to the density ratio
+
+::: {.note}
+The downhill move is not a defect — it is the difference between **sampling** and
+**optimisation**. A hill-climber reports the mode; a sampler must visit the tails
+in proportion to their mass.
+:::
+
+## Two more special cases
+
+**Independence sampler** — $q(y\mid x) = q(y)$, ignoring the current state.
+Then $\alpha = \min\{1, w(y)/w(x)\}$ with $w = \pi/q$: accept if the candidate's
+importance weight beats the incumbent's.
+
+**Gibbs is MH with $\alpha \equiv 1$** — propose one coordinate from its exact
+conditional $\pi(y_i \mid x_{-i})$; substitute into the ratio and everything
+cancels.
+
+::: {.note}
+Gibbs never rejects. The price is that you must be able to sample every
+conditional exactly.
+:::
+
+## MALA: the score walks in
+
+Nothing says the proposal has to be blind. Drift toward high density *first*:
+
+$$y \;=\; x + \tfrac{\tau^2}{2}\,\nabla_x \log \pi(x) + \tau\,z,
+\qquad z \sim \mathcal{N}(0,I)$$
+
+then accept/reject as usual.
+
+::: {.note}
+It needs only $\nabla_x \log \pi$ — the **score**. The normalising constant
+differentiates away. Drop the accept/reject step and this is Langevin dynamics.
+
+**This is the closest classical ancestor of a score-based generative model.**
+Module 4 learns that score from data instead of deriving it.
+:::
+
+## What it costs
+
+| | |
+|---|---|
+| **Burn-in** | early samples come from $p_t \ne \pi$ and are discarded |
+| **Autocorrelation** | consecutive states are dependent by construction |
+| **Effective sample size** | $\mathrm{ESS} = T \big/ \big(1 + 2\sum_k \rho_k\big)$ |
+
+::: {.note}
+Note 06's Gibbs example: lag-1 autocorrelation $\rho^2$. A target with $\rho =
+0.99$ gives ESS about a **fiftieth** of the chain length.
+:::
+
+## Step size is a real dilemma
+
+| $\tau$ | acceptance | what happens |
+|---|---|---|
+| too small | $\to 1$ | every move accepted, every move tiny — needs $\sim (L/\tau)^2$ steps to cross |
+| too large | $\to 0$ | proposals land in the tails; the chain sticks for hundreds of steps |
+| tuned | $\approx 0.234$ | the asymptotically optimal rate (Roberts, Gelman & Gilks, 1997) |
+
+::: {.note}
+The beginner's instinct — *"95% acceptance, it must be working"* — is exactly
+backwards. It almost always means the chain is crawling.
+:::
+
+## And the curse, once more
+
+Steps needed per **independent** sample, for product-form targets:
+
+| sampler | scaling |
+|---|---|
+| random-walk Metropolis | $O(d)$ |
+| MALA (adjusted Langevin) | $O(d^{1/3})$ |
+| Hamiltonian Monte Carlo | $O(d^{1/4})$ |
+
+::: {.note}
+Against rejection sampling's $\sigma^{-d}$ this is a triumph — polynomial, not
+exponential. Against $d \approx 10^5$ for a modest image, it is still nowhere
+near enough.
+:::
+
+## The failure that hides best
+
+A chain in one mode of a well-separated bimodal target must cross a low-density
+valley. The probability of proposing across it can be $e^{-100}$.
+
+The chain then looks **perfectly healthy**:
+
+- good acceptance rate
+- stable trace plot
+- tight autocorrelation
+
+::: {.note}
+It has converged — to a **mode**, not to $\pi$. Tempering, parallel chains and
+mode-hopping proposals help; none is a general solution. Remember this slide when
+we meet mode collapse in Part 2.
+:::
+
+## See it run
+
+Rejection sampling as darts under an envelope; Gibbs as a staircase walk, with
+4,000 parallel chains whose histogram at step $t$ is drawn against the exact $p_t$.
+
+```{=html}
+<iframe src="sampling-lab.html" style="width:100%;height:64%;border:1px solid #cfdcec;border-radius:8px" loading="lazy" title="The Sampling Lab"></iframe>
+```
+
+## Now suppose every difficulty were solved
+
+Perfect tuning. No multimodality. Dimension-free mixing.
+
+::: {.fragment}
+**It still cannot generate an image.** The obstruction is not efficiency — it is
+the *input*.
+:::
+
+::: {.fragment}
+MH answers:
+
+> *"I can write the target down up to a constant. Give me samples."*
+
+Generative modelling asks:
+
+> *"I cannot write it down at all. I have 60,000 samples. Give me more."*
+:::
+
+## There is no $\tilde\pi$ for images
+
+- Nobody can supply a function that takes a $256\times256\times3$ array and
+  returns a number proportional to how likely it is to be a photograph
+- That function is precisely what W03 proved we cannot estimate
+- **MH converts a density into samples — and we have no density to feed it**
+
+::: {.fragment}
+And MH never *learns*. A million steps, then a fresh start, and you pay the full
+burn-in again. Nothing is trained, nothing amortised.
+:::
+
+## The pivot
+
+In rejection sampling, in MH, in Gibbs — **a human picks the proposal for
+convenience and hopes it resembles the target.** In high dimension it does not.
+
+::: {style="text-align:center"}
+[So stop picking it. **Learn** it.]{.big}
+:::
+
+::: {.note}
+Which immediately raises the question that defines Part 2: if you never evaluate a
+density, **how do you know your generator is any good?** You cannot compute a
+likelihood, so you cannot maximise one.
+:::
+
+## Where this lands
+
+| Today | Where it returns |
+|---|---|
+| Detailed balance / reversibility | forward and reverse diffusion, Module 3 |
+| $p_t \to \pi$ as a flow of laws | the Fokker–Planck equation, Module 5 |
+| Langevin needing only $\nabla \log \pi$ | score matching, Module 4 |
+| Accept/reject patching a bad proposal | why diffusion needs no such step |
+| The ratio $\pi(y)/\pi(x)$, $Z$ cancelling | the discriminator's logit, Part 2 |
+| A chain trapped in one mode | mode collapse, Part 2 |
+
+## {.accent}
+
+::: {.quote}
+Metropolis–Hastings corrects a proposal chosen for convenience. A generative
+model learns one that was never wrong.
+
+<small>Reference: 08 · Metropolis–Hastings. Demo: The Sampling Lab. Next: 09 · Generative Adversarial Networks.</small>
+:::

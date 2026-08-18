@@ -602,6 +602,18 @@ divergence, and — because it is usually not computable directly — *how they 
 it*: a bound (VAE), a learned dual (GAN, WGAN), a closed form after adding noise
 (diffusion), or exactly (flows).
 
+::: {.callout-note}
+## What the next notes do with this
+
+Two rows of that table are now cashed in. [Note 08](./18-metropolis-hastings.qmd)
+takes the case where you *can* write the target down up to a constant and builds a
+Markov chain that samples it. [Note 09](./19-generative-adversarial-networks.qmd)
+takes the case where you cannot, and shows that training a classifier to separate
+real from generated samples estimates the density ratio $p_{\text{data}}/p_g$ — and
+that the resulting game minimises exactly the Jensen–Shannon divergence in the
+table above, with §8's saturation as its central difficulty.
+:::
+
 ::: {.callout-tip}
 ## Key takeaway
 

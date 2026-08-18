@@ -485,7 +485,7 @@ sampling is exact and, in high dimension, exactly worthless.
 
 The fix is to stop drawing independently and instead move from where you already
 are. Gibbs sampling draws each coordinate from its conditional given the others;
-Metropolis–Hastings proposes a local step and accepts with a ratio. Both need $p$
+[Metropolis–Hastings](./18-metropolis-hastings.qmd) proposes a local step and accepts with a ratio. Both need $p$
 only through **ratios**, so the constant cancels again.
 
 What you buy is that the samples are no longer wasted. What you pay is that they
@@ -532,7 +532,7 @@ and the one worth a semester.
 
 Look at rejection sampling structurally rather than procedurally. It has exactly
 two components: something that **produces candidates**, and something that
-**judges them**. That is the architecture of a generative adversarial network,
+**judges them**. That is the architecture of a [generative adversarial network](./19-generative-adversarial-networks.qmd),
 with the proposal in the role of the generator and the acceptance test in the
 role of the discriminator.
 

@@ -1,13 +1,25 @@
-# W04: Gaussian Calculus & Markov Chains {.unnumbered}
+# W04: Sampling, and the First Deep Generative Model {.unnumbered}
 
 **Dates:** Mon Aug 17, Tue Aug 18, Fri Aug 21, 2026
 
 **Slot/Venue:** Mon · Tue · Fri, 1:00–1:50 pm · 11AC4004
 
-**Syllabus module:** M2 — Conditioning and marginalization; linear transformations; discrete-time Markov chains
+**Syllabus module:** M1 — Foundations of generative modeling: sampling from an
+unnormalised target, and the first deep generative model
 
 ::: {.callout-important}
-Class Test-1 window opens Wed Aug 19 (through Aug 25).
+Class Test-1 window opens Wed Aug 19 (through Aug 25). HW 1 due Tue Aug 18, in class.
+:::
+
+::: {.callout-note}
+## Deviation from the original plan
+
+The planned title for this week was *Gaussian Calculus & Markov Chains* (M2:
+conditioning, marginalization, linear transformations, discrete-time Markov
+chains). Mon Aug 17 instead followed the thread note 06 opened — sampling — from
+Metropolis–Hastings through to GANs. Markov chains still appear, but as the
+machinery behind MCMC rather than as a topic in their own right; the M2 material
+on Gaussian calculus and noise accumulation moves forward.
 :::
 
 ## Pre-read
@@ -16,8 +28,53 @@ Class Test-1 window opens Wed Aug 19 (through Aug 25).
 
 ## In Class
 
-*Lecture notes/board scans will be posted here.*
+**Mon Aug 17 — Prof. Uma.** Generative AI needs sampling from a distribution, and
+that is a hard problem in general. When the target is known only up to its
+normalising constant, Metropolis–Hastings applies: propose, accept with a ratio,
+and the chain converges to a stationary distribution approximating the posterior.
+Then the switch to deep generative modelling, starting with GANs — the Goodfellow
+min-max formulation, the police-and-thief analogy, the derivation of the
+objective, its equivalence at an optimal discriminator to minimising the
+Jensen–Shannon divergence between the data distribution and the mixture of data
+and generated distributions, and then the difficulties: vanishing gradients, slow
+convergence, and instability.
+
+**Slides** (two parts; ← → arrows or click the edges to navigate):
+
+*Part 1 — Sampling What You Cannot Normalise* ([open fullscreen](../materials/w04-deck-01-metropolis-hastings.html){target="_blank"}):
+
+<iframe src="../materials/w04-deck-01-metropolis-hastings.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W04 deck 1: Metropolis-Hastings"></iframe>
+
+*Part 2 — Generative Adversarial Networks* ([open fullscreen](../materials/w04-deck-02-gans.html){target="_blank"}):
+
+<iframe src="../materials/w04-deck-02-gans.html" width="100%" height="480" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="W04 deck 2: generative adversarial networks"></iframe>
+
+**Lecture notes for this week:**
+
+- [08 · Metropolis–Hastings: Sampling What You Cannot Normalise](../tutorials/18-metropolis-hastings.qmd)
+  — the unnormalised-target problem, transition kernels and stationarity, detailed
+  balance, the MH algorithm and its correctness proof, random-walk/independence/
+  Gibbs/MALA as special cases, burn-in, ESS, step-size tuning and the $0.234$ rule,
+  dimension scaling, and the structural reason MH cannot generate an image.
+- [09 · Generative Adversarial Networks](../tutorials/19-generative-adversarial-networks.qmd)
+  — implicit models, the counterfeiter analogy, the min-max objective, the optimal
+  discriminator $D^{*} = p_{\text{data}}/(p_{\text{data}}+p_g)$, the
+  $-\log 4 + 2\,\mathrm{JS}$ theorem, the saturating/non-saturating gradient
+  computation, mode collapse, saddle-point non-convergence, and the MH ↔ GAN
+  density-ratio correspondence.
+
+*Board scans from the lecture will be added here.*
 
 ## After Class
 
-*Exercises and pointers will be posted here.*
+*Exercises and pointers will be posted here.* Note 08 has 12 exercises and note 09
+has 13; exercises 5–8 of note 09 are the ones that pay off most directly for
+Module 3.
+
+## Still owed from the original W04 plan
+
+Gaussian conditioning and marginalization, linear transformations of Gaussian
+vectors, discrete-time Markov chains as a topic, and noise accumulation through
+repeated Gaussian perturbation. Note 05 covers the first two as a reference; the
+last two are the direct on-ramp to the forward diffusion process and need a
+lecture of their own.
