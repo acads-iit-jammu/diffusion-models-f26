@@ -230,6 +230,18 @@ window.Quarto = {
  <span class="menu-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/19-generative-adversarial-networks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -281,6 +293,18 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../materials/w03-deck-01-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">07 · The Multivariate Gaussian</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-01-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-02-gans.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
   </div>
 </li>
       </ul>
@@ -849,7 +873,7 @@ The envelope must actually exist
 </section>
 <section id="mcmc-stop-proposing-from-scratch-and-walk" class="level3">
 <h3 class="anchored" data-anchor-id="mcmc-stop-proposing-from-scratch-and-walk">MCMC: stop proposing from scratch, and walk</h3>
-<p>The fix is to stop drawing independently and instead move from where you already are. Gibbs sampling draws each coordinate from its conditional given the others; Metropolis–Hastings proposes a local step and accepts with a ratio. Both need <span class="math inline">\(p\)</span> only through <strong>ratios</strong>, so the constant cancels again.</p>
+<p>The fix is to stop drawing independently and instead move from where you already are. Gibbs sampling draws each coordinate from its conditional given the others; <a href="../tutorials/18-metropolis-hastings.html">Metropolis–Hastings</a> proposes a local step and accepts with a ratio. Both need <span class="math inline">\(p\)</span> only through <strong>ratios</strong>, so the constant cancels again.</p>
 <p>What you buy is that the samples are no longer wasted. What you pay is that they are no longer independent — consecutive draws are correlated, and the chain must run a while before its distribution resembles the target at all.</p>
 <p>That last phrase deserves to be taken literally. For Gibbs on a standard bivariate normal with correlation <span class="math inline">\(\rho\)</span>, the <span class="math inline">\(x\)</span>-coordinate is exactly an AR(1) process with coefficient <span class="math inline">\(\rho^2\)</span>, and the law of the chain at step <span class="math inline">\(t\)</span> started from <span class="math inline">\(x_0\)</span> is available in closed form:</p>
 <p><span class="math display">\[
@@ -877,7 +901,7 @@ A chain is a time series, and its law obeys a PDE
 </section>
 <section id="the-proposal-is-a-generator-the-test-is-a-discriminator" class="level3">
 <h3 class="anchored" data-anchor-id="the-proposal-is-a-generator-the-test-is-a-discriminator">The proposal is a generator; the test is a discriminator</h3>
-<p>Look at rejection sampling structurally rather than procedurally. It has exactly two components: something that <strong>produces candidates</strong>, and something that <strong>judges them</strong>. That is the architecture of a generative adversarial network, with the proposal in the role of the generator and the acceptance test in the role of the discriminator.</p>
+<p>Look at rejection sampling structurally rather than procedurally. It has exactly two components: something that <strong>produces candidates</strong>, and something that <strong>judges them</strong>. That is the architecture of a <a href="../tutorials/19-generative-adversarial-networks.html">generative adversarial network</a>, with the proposal in the role of the generator and the acceptance test in the role of the discriminator.</p>
 <p>The parallel is not a loose analogy — both are <strong>density-ratio</strong> methods. The optimal discriminator for a GAN with generator distribution <span class="math inline">\(p_g\)</span> is</p>
 <p><span class="math display">\[
 D^{*}(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_g(x)} = \frac{r(x)}{1 + r(x)},

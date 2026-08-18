@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>03 · Joint, Conditional, Marginal — and Bayes – ID-5-02 (TO)</title>
+<title>08 · Metropolis–Hastings: Sampling What You Cannot Normalise – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/02-distributions-mle.html" rel="next">
-<link href="../tutorials/01-probability-101.html" rel="prev">
+<link href="../tutorials/19-generative-adversarial-networks.html" rel="next">
+<link href="../tutorials/15-comparing-distributions.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/16-joints-conditionals.html">03 · Joint, Conditional, Marginal — and Bayes</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/18-metropolis-hastings.html">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -202,7 +202,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
   </div>
 </li>
@@ -232,7 +232,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span></a>
   </div>
 </li>
@@ -418,11 +418,18 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#two-numbers-on-one-outcome" id="toc-two-numbers-on-one-outcome" class="nav-link active" data-scroll-target="#two-numbers-on-one-outcome">Two numbers on one outcome</a></li>
-  <li><a href="#joint-distributions" id="toc-joint-distributions" class="nav-link" data-scroll-target="#joint-distributions">Joint distributions</a></li>
-  <li><a href="#marginal-distributions" id="toc-marginal-distributions" class="nav-link" data-scroll-target="#marginal-distributions">Marginal distributions</a></li>
-  <li><a href="#conditional-distributions-and-bayes-rule" id="toc-conditional-distributions-and-bayes-rule" class="nav-link" data-scroll-target="#conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</a></li>
-  <li><a href="#bayes-rule-and-why-inference-is-the-inverse-problem" id="toc-bayes-rule-and-why-inference-is-the-inverse-problem" class="nav-link" data-scroll-target="#bayes-rule-and-why-inference-is-the-inverse-problem">Bayes’ rule, and why inference is the inverse problem</a></li>
+  <li><a href="#the-problem-stated-exactly" id="toc-the-problem-stated-exactly" class="nav-link active" data-scroll-target="#the-problem-stated-exactly">1. The problem, stated exactly</a></li>
+  <li><a href="#chains-kernels-and-what-converges-means" id="toc-chains-kernels-and-what-converges-means" class="nav-link" data-scroll-target="#chains-kernels-and-what-converges-means">2. Chains, kernels, and what “converges” means</a></li>
+  <li><a href="#detailed-balance-a-sufficient-condition-you-can-actually-check" id="toc-detailed-balance-a-sufficient-condition-you-can-actually-check" class="nav-link" data-scroll-target="#detailed-balance-a-sufficient-condition-you-can-actually-check">3. Detailed balance: a sufficient condition you can actually check</a></li>
+  <li><a href="#the-algorithm" id="toc-the-algorithm" class="nav-link" data-scroll-target="#the-algorithm">4. The algorithm</a>
+  <ul class="collapse">
+  <li><a href="#why-it-works" id="toc-why-it-works" class="nav-link" data-scroll-target="#why-it-works">Why it works</a></li>
+  </ul></li>
+  <li><a href="#the-three-special-cases-you-will-meet" id="toc-the-three-special-cases-you-will-meet" class="nav-link" data-scroll-target="#the-three-special-cases-you-will-meet">5. The three special cases you will meet</a></li>
+  <li><a href="#a-worked-example-two-lines-of-arithmetic" id="toc-a-worked-example-two-lines-of-arithmetic" class="nav-link" data-scroll-target="#a-worked-example-two-lines-of-arithmetic">6. A worked example: two lines of arithmetic</a></li>
+  <li><a href="#what-it-costs-burn-in-correlation-and-tuning" id="toc-what-it-costs-burn-in-correlation-and-tuning" class="nav-link" data-scroll-target="#what-it-costs-burn-in-correlation-and-tuning">7. What it costs: burn-in, correlation, and tuning</a></li>
+  <li><a href="#the-structural-reason-this-is-not-a-generative-model" id="toc-the-structural-reason-this-is-not-a-generative-model" class="nav-link" data-scroll-target="#the-structural-reason-this-is-not-a-generative-model">8. The structural reason this is not a generative model</a></li>
+  <li><a href="#where-this-returns" id="toc-where-this-returns" class="nav-link" data-scroll-target="#where-this-returns">9. Where this returns</a></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
@@ -430,9 +437,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/16-joints-conditionals.html">03 · Joint, Conditional, Marginal — and Bayes</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/18-metropolis-hastings.html">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">03 · Joint, Conditional, Marginal — and Bayes</h1>
+<h1 class="title">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</h1>
 </div>
 
 
@@ -449,356 +456,355 @@ window.Quarto = {
 </header>
 
 
-<p><em>The second concept in the spine, and the point at which probability starts being useful. One new move — put <strong>two</strong> numbers on the same outcome instead of one — produces the whole multivariate vocabulary: joints, marginals, conditionals, and Bayes’ rule. Everything here is elementary; the measure-theoretic version is <a href="../tutorials/11-joint-conditional-bayes.html">in Perspectives</a> and is not needed.</em></p>
+<p><em>Note 06 ended with a promise and half an algorithm: generation needs <strong>samples</strong>, not a density, and a Markov chain can produce them from a target known only up to its normalising constant. This note makes that precise. One condition — detailed balance — and one acceptance rule turn any proposal you can sample into a chain whose stationary distribution is exactly the one you wanted. Then the honest accounting: what it costs, where it breaks, and the single structural reason it cannot generate an image no matter how long you run it. That reason is the door into <a href="../tutorials/19-generative-adversarial-networks.html">note 09</a>.</em></p>
+<section id="the-problem-stated-exactly" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem-stated-exactly">1. The problem, stated exactly</h2>
+<p>Everything this course does is downstream of one request: <strong>produce a draw from a distribution</strong>. Note 00 argued that generation <em>is</em> sampling; note 06 showed that estimating the density first is hopeless in high dimension. So consider the situation where you are luckier than the image case — you can <em>write down</em> the target, but only up to a constant:</p>
+<p><span class="math display">\[
+\pi(x) \;=\; \frac{\tilde\pi(x)}{Z}, \qquad Z = \int \tilde\pi(x)\,dx ,
+\]</span></p>
+<p>with <span class="math inline">\(\tilde\pi\)</span> cheap to evaluate at any point and <span class="math inline">\(Z\)</span> an integral nobody can do.</p>
+<p>This is not a contrived setup; it is the <em>generic</em> one.</p>
+<p><strong>Bayesian inference.</strong> The posterior over parameters given data is</p>
+<p><span class="math display">\[
+\pi(\theta) \;=\; p(\theta \mid \mathcal{D}) \;=\; \frac{p(\theta)\,L(\mathcal{D}\mid\theta)}{p(\mathcal{D})},
+\qquad
+p(\mathcal{D}) = \int p(\theta)L(\mathcal{D}\mid\theta)\,d\theta .
+\]</span></p>
+<p>The numerator is prior times likelihood — two things you chose and can evaluate in closed form. The denominator, the <strong>evidence</strong>, is an integral over the whole parameter space, and outside conjugate families it has no closed form and no usable quadrature past a handful of dimensions. So <span class="math inline">\(\tilde\pi = p(\theta)L\)</span> is available and <span class="math inline">\(Z = p(\mathcal{D})\)</span> is not.</p>
+<p><strong>Energy-based models.</strong> <span class="math inline">\(\pi(x) \propto e^{-E(x)}\)</span> for an energy <span class="math inline">\(E\)</span> you specify or learn. <span class="math inline">\(Z = \int e^{-E}\)</span> is the partition function, and computing it is as hard as the original problem.</p>
+<p><strong>Conditioning of any kind.</strong> <span class="math inline">\(\pi(x) \propto p(x)\mathbf{1}\{x \in A\}\)</span> — a known distribution restricted to a region. The restricted density is trivial to evaluate and its mass <span class="math inline">\(p(A)\)</span> is not.</p>
 <div class="callout callout-style-simple callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Where this sits
+What note 06 already settled
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Follows <a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a>, which introduced a single random variable on a sample space. Here two random variables share an outcome, and that co-residence is the entire subject. The W02 primer deck <a href="../materials/w02-deck-00-probability-joints.html" target="_blank">Probability, Joints, Conditionals and Bayes</a> develops the same material from a 4 × 4 table of dice counts.</p>
+<p>Two facts carry over and are not re-derived here.</p>
+<p><strong>Rejection sampling is exact and unusable.</strong> It needs an envelope <span class="math inline">\(\pi \le M q\)</span>, and in <span class="math inline">\(d\)</span> dimensions with a proposal only ten percent too wide the acceptance rate is <span class="math inline">\(1.1^{-d}\)</span> — about <span class="math inline">\(7\times10^{-5}\)</span> at <span class="math inline">\(d=100\)</span>. Every independently drawn candidate is a fresh gamble against the same odds.</p>
+<p><strong>The cure is to stop starting over.</strong> Move from where you already are, so that work already done is not thrown away. That is what a Markov chain buys, and what this note builds.</p>
 </div>
 </div>
-<section id="two-numbers-on-one-outcome" class="level2">
-<h2 class="anchored" data-anchor-id="two-numbers-on-one-outcome">Two numbers on one outcome</h2>
-<p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables defined on the <strong>same</strong> sample space — two numerical features read off the same outcome <span class="math inline">\(\omega\)</span>. Height and weight of one person; today’s price and tomorrow’s price of one stock; the clean image and its noisy version from one generation run.</p>
-<p>That sharing is the whole idea. “<span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are jointly distributed” is not an extra assumption bolted on; it is the statement that a single <span class="math inline">\(\omega\)</span> determines both numbers at once, which is exactly why they can be correlated.</p>
 </section>
-<section id="joint-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="joint-distributions">Joint distributions</h2>
-<p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables defined on the same sample space — two numerical features of the same outcome. Their <strong>joint distribution</strong> specifies <span class="math inline">\(p(x, y) = \mathbb{P}(X = x \text{ and } Y = y)\)</span> in the discrete case, or a joint density <span class="math inline">\(f(x, y)\)</span> whose volumes are probabilities in the continuous case. The joint distribution is a complete description of the pair: every probabilistic statement about <span class="math inline">\((X, Y)\)</span> can be computed from it.</p>
-<p>The following discrete joint distribution serves as the running example (the state of a morning sky and the occurrence of rain):</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 34%">
-<col style="width: 22%">
-<col style="width: 22%">
-<col style="width: 22%">
-</colgroup>
-<thead>
-<tr class="header">
-<th><span class="math inline">\(p(x,y)\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> rain</th>
-<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> no rain</th>
-<th style="text-align: center;">row sum</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(X{=}\)</span> cloudy</td>
-<td style="text-align: center;">0.20</td>
-<td style="text-align: center;">0.25</td>
-<td style="text-align: center;"><strong>0.45</strong></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(X{=}\)</span> clear</td>
-<td style="text-align: center;">0.05</td>
-<td style="text-align: center;">0.50</td>
-<td style="text-align: center;"><strong>0.55</strong></td>
-</tr>
-<tr class="odd">
-<td>column sum</td>
-<td style="text-align: center;"><strong>0.25</strong></td>
-<td style="text-align: center;"><strong>0.75</strong></td>
-<td style="text-align: center;">1</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="marginal-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="marginal-distributions">Marginal distributions</h2>
-<p>The <strong>marginal</strong> distribution of <span class="math inline">\(X\)</span> describes <span class="math inline">\(X\)</span> alone, with <span class="math inline">\(Y\)</span> disregarded. It is obtained by summing (or, for densities, integrating) the joint distribution over the other variable:</p>
+<section id="chains-kernels-and-what-converges-means" class="level2">
+<h2 class="anchored" data-anchor-id="chains-kernels-and-what-converges-means">2. Chains, kernels, and what “converges” means</h2>
+<p>A <strong>Markov chain</strong> on a state space <span class="math inline">\(\mathcal{X}\)</span> is a sequence <span class="math inline">\(x_0, x_1, x_2,
+\dots\)</span> in which the next state depends on the past only through the present:</p>
 <p><span class="math display">\[
-p(x) = \sum_y p(x, y),
-\qquad\text{or}\qquad
-f(x) = \int f(x, y)\, dy .
+\mathbb{P}(x_{t+1} \in A \mid x_t, x_{t-1}, \dots, x_0) \;=\; \mathbb{P}(x_{t+1} \in A \mid x_t)
+\;=\; \int_A K(x_t, y)\,dy .
 \]</span></p>
-<p>In the table these are the row and column sums — the margins of the table, which is the origin of the term: <span class="math inline">\(\mathbb{P}(\text{cloudy}) = 0.45\)</span> and <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>. The operation is justified directly by the additivity axiom: the event “cloudy” is the disjoint union of “cloudy and rain” and “cloudy and no rain”. Marginalization recurs throughout the course; in the mixture model of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a>, the observed density <span class="math inline">\(p(x) = \sum_z p(z)\, p(x \mid z)\)</span> is precisely the joint distribution of <span class="math inline">\((x, z)\)</span> with the latent variable summed out.</p>
-</section>
-<section id="conditional-distributions-and-bayes-rule" class="level2">
-<h2 class="anchored" data-anchor-id="conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</h2>
-<p>The <strong>conditional</strong> distribution of <span class="math inline">\(Y\)</span> given <span class="math inline">\(X = x\)</span> is defined, whenever <span class="math inline">\(p(x) &gt; 0\)</span>, by</p>
+<p>The function <span class="math inline">\(K(x,y)\)</span> is the <strong>transition kernel</strong>: the density of where you go next, given where you are. It is all the chain is.</p>
+<p>Run the kernel forward from an initial law <span class="math inline">\(p_0\)</span> and you get a <em>sequence of distributions</em>, not one distribution:</p>
 <p><span class="math display">\[
-p(y \mid x) = \frac{p(x, y)}{p(x)} .
+p_{t+1}(y) \;=\; \int p_t(x)\,K(x,y)\,dx .
 \]</span></p>
-<p>The definition restricts attention to the outcomes consistent with <span class="math inline">\(X = x\)</span> and renormalizes their probabilities to total 1. In the running example, <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy}) = 0.20 / 0.45 \approx 0.44\)</span>, compared with the unconditional <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>.</p>
-<p>Applying the definition in both directions and eliminating the joint yields <strong>Bayes’ rule</strong>,</p>
+<p>This is the same <span class="math inline">\(p_0, p_1, p_2, \dots\)</span> that note 06 exhibited in closed form for Gibbs on a bivariate normal, where <span class="math inline">\(x_t \mid x_0 \sim \mathcal{N}(\rho^{2t}x_0,\,
+1-\rho^{4t})\)</span>. Watching that sequence flow is the whole subject.</p>
+<p>A distribution <span class="math inline">\(\pi\)</span> is <strong>stationary</strong> (or invariant) for <span class="math inline">\(K\)</span> when applying the kernel changes nothing:</p>
 <p><span class="math display">\[
-\boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
+\boxed{\;\pi(y) \;=\; \int \pi(x)\,K(x,y)\,dx.\;}
 \]</span></p>
-<p>which converts a conditional in one direction into the conditional in the other. The tanh denoiser of W01 is an application of this identity, with <span class="math inline">\(x\)</span> the clean data point and <span class="math inline">\(y\)</span> the noisy observation; it is derived in full in <a href="../tutorials/05-two-point-diffusion.html">The World’s Smallest Diffusion Model</a>.</p>
-<p><span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>independent</strong> if <span class="math inline">\(p(x, y) = p(x)\, p(y)\)</span> for all <span class="math inline">\(x, y\)</span> — equivalently, if <span class="math inline">\(p(y \mid x) = p(y)\)</span>, so that conditioning on <span class="math inline">\(X\)</span> conveys no information about <span class="math inline">\(Y\)</span>. In the table, <span class="math inline">\(0.20 \ne 0.45 \times 0.25\)</span>, so the two variables are dependent. The i.i.d. assumption underlying the likelihoods of <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> are an independence statement applied to repeated observations.</p>
-</section>
-<section id="bayes-rule-and-why-inference-is-the-inverse-problem" class="level2">
-<h2 class="anchored" data-anchor-id="bayes-rule-and-why-inference-is-the-inverse-problem">Bayes’ rule, and why inference is the inverse problem</h2>
-<section id="generation-runs-forward-inference-runs-backward" class="level4">
-<h4 class="anchored" data-anchor-id="generation-runs-forward-inference-runs-backward">Generation runs forward; inference runs backward</h4>
-<p>Almost every model in this course is written in the <strong>forward</strong> direction. You posit some unobserved state, and you write down a mechanism that turns it into data:</p>
-<p><span class="math display">\[
-\underbrace{z}_{\text{latent, what we care about}}
-\;\longrightarrow\;
-\underbrace{x}_{\text{observed, what we get}} ,
-\qquad \text{specified by } p(x \mid z).
-\]</span></p>
-<p>Writing <span class="math inline">\(p(x \mid z)\)</span> is usually the easy half. It is a <em>mechanism</em> — a simulator, a physical story, a noise model — and you can often just state it.</p>
-<p>But that is rarely what you want. You do not observe <span class="math inline">\(z\)</span>; you observe <span class="math inline">\(x\)</span>, and you want to reason back to the cause. That is the <strong>inverse problem</strong>:</p>
-<p><span class="math display">\[
-\underbrace{x}_{\text{observed}} \;\longrightarrow\; \underbrace{z}_{\text{inferred}},
-\qquad \text{wanted: } p(z \mid x).
-\]</span></p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th></th>
-<th>Forward</th>
-<th>Inverse</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Direction</td>
-<td>cause <span class="math inline">\(\to\)</span> effect</td>
-<td>effect <span class="math inline">\(\to\)</span> cause</td>
-</tr>
-<tr class="even">
-<td>Object</td>
-<td><span class="math inline">\(p(x \mid z)\)</span></td>
-<td><span class="math inline">\(p(z \mid x)\)</span></td>
-</tr>
-<tr class="odd">
-<td>Typical status</td>
-<td>given, by modelling</td>
-<td>wanted, must be computed</td>
-</tr>
-<tr class="even">
-<td>Names</td>
-<td>generative model, sampling distribution, simulator</td>
-<td>inference, inversion, the posterior</td>
-</tr>
-</tbody>
-</table>
-<p>You cannot simply invert the arrow, because the forward map is generally <strong>many-to-one</strong>: different latent states can produce the very same observation. Knowing <span class="math inline">\(x\)</span> therefore does not determine <span class="math inline">\(z\)</span> — it only makes some values of <span class="math inline">\(z\)</span> more plausible than others. Something extra is needed to break the tie, and that something is what you believed about <span class="math inline">\(z\)</span> before looking. Bayes’ rule is exactly the bookkeeping that combines the two:</p>
-<p><span class="math display">\[
-\underbrace{p(z \mid x)}_{\text{posterior}}
-\;=\;
-\frac{\overbrace{p(x \mid z)}^{\text{likelihood}}\;\overbrace{p(z)}^{\text{prior}}}
-     {\underbrace{p(x)}_{\text{evidence}}},
-\qquad
-p(x) = \sum_z p(x \mid z)\,p(z).
-\]</span></p>
-<p>This is the single most useful thing in the course’s toolkit: <strong>it is the bridge from the direction you can write down to the direction you want.</strong></p>
-</section>
-<section id="a-toy-example-did-the-student-understand-or" class="level4">
-<h4 class="anchored" data-anchor-id="a-toy-example-did-the-student-understand-or">A toy example: did the student understand “or”?</h4>
-<p>A student is set ten short questions on the logical connective <strong>or</strong>. We would like to know whether they have actually grasped it — but “understanding” is not something we can measure. We can only mark the answers.</p>
+<p>Stationarity says: <em>if</em> you are already distributed as <span class="math inline">\(\pi\)</span>, one more step leaves you distributed as <span class="math inline">\(\pi\)</span>. It says nothing on its own about getting there. Two more conditions supply that.</p>
 <ul>
-<li><strong>Latent</strong> <span class="math inline">\(z \in \{0, 1\}\)</span>: the student understands the concept, or does not. This is the <em>inferential goal</em>.</li>
-<li><strong>Observable</strong> <span class="math inline">\(x \in \{0, 1, \dots, 10\}\)</span>: the number of questions correct. This is all we ever see.</li>
+<li><strong>Irreducibility</strong>: from any starting point the chain can reach any region of positive <span class="math inline">\(\pi\)</span>-mass. No part of the space is walled off.</li>
+<li><strong>Aperiodicity</strong>: the chain does not cycle through regions on a fixed schedule.</li>
 </ul>
-<p>Now the forward model — the <strong>sampling distribution</strong> that says how marks are produced given the latent state. A student who understands still slips occasionally; one who does not can still get items right by guessing or by luck in which items came up. Take each item as independent with</p>
+<p>With those, the fundamental theorem of MCMC applies: the chain is <strong>ergodic</strong>, <span class="math inline">\(p_t \to \pi\)</span> regardless of <span class="math inline">\(p_0\)</span>, and time averages converge to space averages,</p>
 <p><span class="math display">\[
-x \mid z = 1 \;\sim\; \text{Binomial}(10,\ 0.9),
-\qquad
-x \mid z = 0 \;\sim\; \text{Binomial}(10,\ 0.4).
+\frac1T \sum_{t=1}^{T} f(x_t) \;\xrightarrow[T\to\infty]{}\; \mathbb{E}_{\pi}[f(X)] .
 \]</span></p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-The marks scale does not matter
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Nothing above depends on marks running <span class="math inline">\(0\)</span> to <span class="math inline">\(10\)</span>. The same structure works for a single right/wrong item (<span class="math inline">\(x \in \{0,1\}\)</span>, a Bernoulli), or a percentage score <span class="math inline">\(0\)</span>–<span class="math inline">\(100\)</span>, or a graded rubric. All that changes is the count distribution you put on the observable. What stays fixed is the shape of the problem: a latent you want, an observable you get, and a sampling distribution connecting them.</p>
-</div>
-</div>
-<p>Suppose the student scores <span class="math inline">\(x = 7\)</span>. Take a neutral prior <span class="math inline">\(p(z=1) = 0.5\)</span>. Then</p>
+<p>That last line is the working promise: <strong>run one chain long enough and average along it, and you get expectations under <span class="math inline">\(\pi\)</span></strong> — even though no single <span class="math inline">\(x_t\)</span> was drawn from <span class="math inline">\(\pi\)</span> and no two of them are independent.</p>
+<p>So the design problem is now sharp, and it runs backwards from the usual one. Ordinarily you are given a chain and asked for its stationary law. Here you are <strong>given the stationary law and asked to build a chain</strong>. Metropolis–Hastings is a universal answer.</p>
+</section>
+<section id="detailed-balance-a-sufficient-condition-you-can-actually-check" class="level2">
+<h2 class="anchored" data-anchor-id="detailed-balance-a-sufficient-condition-you-can-actually-check">3. Detailed balance: a sufficient condition you can actually check</h2>
+<p>Verifying <span class="math inline">\(\pi = \pi K\)</span> directly means doing an integral over the whole space, which is the sort of thing we are trying to avoid. There is a stronger, purely <strong>local</strong> condition that implies it. A chain satisfies <strong>detailed balance</strong> with respect to <span class="math inline">\(\pi\)</span> if for every pair of states,</p>
 <p><span class="math display">\[
-\frac{p(z=1 \mid x=7)}{p(z=0 \mid x=7)}
-= \underbrace{\frac{\binom{10}{7} 0.9^{7} 0.1^{3}}{\binom{10}{7} 0.4^{7} 0.6^{3}}}_{\text{likelihood ratio}}
-\times \underbrace{\frac{0.5}{0.5}}_{\text{prior odds}}
-= \Big(\tfrac{0.9}{0.4}\Big)^{7}\Big(\tfrac{0.1}{0.6}\Big)^{3}
-= 1.352 ,
+\boxed{\;\pi(x)\,K(x,y) \;=\; \pi(y)\,K(y,x).\;}
 \]</span></p>
-<p>so <span class="math inline">\(p(z = 1 \mid x = 7) = 1.352 / 2.352 = \mathbf{0.575}\)</span>.</p>
-<p>Two things are worth noticing. The binomial coefficient <span class="math inline">\(\binom{10}{7}\)</span> appears in both the numerator and the denominator and <strong>cancels</strong> — it describes how many ways the marks could have been arranged, which is the same under either hypothesis, so it carries no evidence. And <span class="math inline">\(7/10\)</span>, which sounds like a decent score, is barely informative here: it moves us from <span class="math inline">\(50\%\)</span> to <span class="math inline">\(58\%\)</span>.</p>
-<p>Across the range of possible scores:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Score <span class="math inline">\(x\)</span></th>
-<th>3</th>
-<th>5</th>
-<th>7</th>
-<th>9</th>
-<th>10</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(p(z = 1 \mid x)\)</span></td>
-<td>0.000</td>
-<td>0.007</td>
-<td>0.575</td>
-<td>0.996</td>
-<td>1.000</td>
-</tr>
-</tbody>
-</table>
-<p>The posterior is not a smooth reflection of the mark — it is nearly flat at the extremes and swings sharply in the middle, where the two hypotheses actually disagree.</p>
-<p>And the prior genuinely matters. At the same score <span class="math inline">\(x = 7\)</span>:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Prior <span class="math inline">\(p(z=1)\)</span></th>
-<th>0.2</th>
-<th>0.5</th>
-<th>0.8</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Posterior <span class="math inline">\(p(z=1 \mid x=7)\)</span></td>
-<td>0.253</td>
-<td>0.575</td>
-<td>0.844</td>
-</tr>
-</tbody>
-</table>
-<p>Same evidence, three different conclusions. This is not a defect. It is the honest statement that seven out of ten is weak evidence, and weak evidence does not overturn what you already knew.</p>
+<p>Read it as a flow statement: at equilibrium the probability mass moving from <span class="math inline">\(x\)</span> to <span class="math inline">\(y\)</span> exactly equals the mass moving from <span class="math inline">\(y\)</span> to <span class="math inline">\(x\)</span>. Every pairwise exchange balances — hence <em>reversible</em>: a film of the chain in equilibrium looks the same run backwards.</p>
+<p><strong>Detailed balance implies stationarity.</strong> One line:</p>
+<p><span class="math display">\[
+\int \pi(x)K(x,y)\,dx
+\;=\; \int \pi(y)K(y,x)\,dx
+\;=\; \pi(y)\int K(y,x)\,dx
+\;=\; \pi(y),
+\]</span></p>
+<p>using detailed balance in the first step and <span class="math inline">\(\int K(y,x)dx = 1\)</span> in the last. <span class="math inline">\(\square\)</span></p>
+<p>The converse is false — plenty of useful chains are stationary without being reversible, and some deliberately non-reversible chains mix faster. But detailed balance is a <em>pointwise</em> condition on two states at a time, which means it can be <strong>engineered</strong>, and that is exactly what the next section does.</p>
 </section>
-<section id="the-sampling-distribution-is-the-likelihood" class="level4">
-<h4 class="anchored" data-anchor-id="the-sampling-distribution-is-the-likelihood">The sampling distribution <em>is</em> the likelihood</h4>
-<p>The expression <span class="math inline">\(p(x \mid z)\)</span> has been doing two jobs above, and it is worth separating them, because this is the distinction <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> makes in the parametric setting.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Hold fixed</th>
-<th>Vary</th>
-<th>You get</th>
-<th>Sums to 1?</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>the latent <span class="math inline">\(z\)</span></td>
-<td>the data <span class="math inline">\(x\)</span></td>
-<td>the <strong>sampling distribution</strong> — how marks come out</td>
-<td>yes, over <span class="math inline">\(x\)</span></td>
-</tr>
-<tr class="even">
-<td>the observed data <span class="math inline">\(x\)</span></td>
-<td>the latent <span class="math inline">\(z\)</span></td>
-<td>the <strong>likelihood</strong> — how well each <span class="math inline">\(z\)</span> explains what we saw</td>
-<td>no</td>
-</tr>
-</tbody>
-</table>
-<p>It is one formula read in two directions. Forward, it generates. Backward, it scores. Bayes’ rule is what converts the backward reading into an actual probability distribution over <span class="math inline">\(z\)</span>, by weighting with the prior and renormalising.</p>
-</section>
-<section id="bayesian-knowledge-tracing" class="level4">
-<h4 class="anchored" data-anchor-id="bayesian-knowledge-tracing">Bayesian Knowledge Tracing</h4>
-<p>The toy example freezes the student in time. Real learners <em>learn</em>, so the latent state changes as they work — and the natural extension is exactly the model used in intelligent tutoring systems: <strong>Bayesian Knowledge Tracing</strong> (Corbett and Anderson, 1995, <em>User Modeling and User-Adapted Interaction</em>).</p>
-<p>BKT keeps the same two-layer structure and lets the latent evolve:</p>
-<ul>
-<li>a hidden binary skill state <span class="math inline">\(z_t \in \{\text{not known}, \text{known}\}\)</span>;</li>
-<li>an observed response <span class="math inline">\(x_t \in \{\text{incorrect}, \text{correct}\}\)</span> at each opportunity <span class="math inline">\(t\)</span>.</li>
-</ul>
-<p>Four parameters specify it, and each is a conditional probability:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Parameter</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(P(L_0)\)</span></td>
-<td>probability the skill is known before any practice — the <strong>prior</strong></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(P(T)\)</span></td>
-<td>probability of learning it at an opportunity, if not yet known — the <strong>transition</strong></td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(P(G)\)</span></td>
-<td>probability of answering correctly <em>without</em> knowing it — the <strong>guess</strong></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(P(S)\)</span></td>
-<td>probability of answering incorrectly <em>while</em> knowing it — the <strong>slip</strong></td>
-</tr>
-</tbody>
-</table>
-<p>So the emission model is <span class="math inline">\(P(\text{correct} \mid \text{known}) = 1 - P(S)\)</span> and <span class="math inline">\(P(\text{correct} \mid \text{not known}) = P(G)\)</span>. Standard BKT assumes no forgetting.</p>
-<p>Tracing a student is then a two-step recursion, repeated per question — and the first step is precisely Bayes’ rule:</p>
+<section id="the-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="the-algorithm">4. The algorithm</h2>
+<p>Choose a <strong>proposal</strong> <span class="math inline">\(q(y \mid x)\)</span>: any conditional distribution you can sample from. It need not resemble <span class="math inline">\(\pi\)</span>; it need not be symmetric; it carries no theoretical burden at all. From the current state <span class="math inline">\(x_t\)</span>:</p>
 <ol type="1">
-<li><strong>Update on the evidence.</strong> With <span class="math inline">\(L\)</span> the current probability the skill is known, a correct answer gives <span class="math display">\[
-L^{+} \;=\; \frac{L\,(1 - P(S))}{L\,(1 - P(S)) + (1-L)\,P(G)} ,
-\]</span> and an incorrect answer gives <span class="math inline">\(L^{-} = L\,P(S) \,/\, [\,L\,P(S) + (1-L)(1 - P(G))\,]\)</span>.</li>
-<li><strong>Predict forward through learning.</strong> <span class="math inline">\(L \leftarrow L^{\pm} + (1 - L^{\pm})\,P(T)\)</span>.</li>
+<li><strong>Propose</strong> <span class="math inline">\(y \sim q(\cdot \mid x_t)\)</span>.</li>
+<li><strong>Compute the acceptance probability</strong> <span class="math display">\[
+\boxed{\;\alpha(x_t, y) \;=\; \min\!\left\{1,\;
+\frac{\pi(y)\,q(x_t \mid y)}{\pi(x_t)\,q(y \mid x_t)}\right\}.\;}
+\]</span></li>
+<li><strong>Accept or reject</strong>: draw <span class="math inline">\(u \sim \mathrm{Uniform}(0,1)\)</span>; set <span class="math inline">\(x_{t+1} = y\)</span> if <span class="math inline">\(u &lt; \alpha\)</span>, and otherwise <span class="math inline">\(x_{t+1} = x_t\)</span> — <em>stay where you are</em>.</li>
 </ol>
-<p>For instance with <span class="math inline">\(L = 0.4\)</span>, <span class="math inline">\(P(S) = 0.10\)</span>, <span class="math inline">\(P(G) = 0.25\)</span>, <span class="math inline">\(P(T) = 0.20\)</span>, a correct answer raises the belief to <span class="math inline">\(0.36 / 0.51 = 0.706\)</span>, and the learning step then carries it to <span class="math inline">\(0.706 + 0.294 \times 0.20 = 0.765\)</span> before the next question. An incorrect answer instead drops it to <span class="math inline">\(0.04/0.49 = 0.082\)</span>.</p>
+<p>Three observations, in order of importance.</p>
+<p><strong>The normalising constant cancels.</strong> <span class="math inline">\(\pi\)</span> enters only as the ratio <span class="math inline">\(\pi(y)/\pi(x)\)</span>, and</p>
+<p><span class="math display">\[
+\frac{\pi(y)}{\pi(x)} \;=\; \frac{\tilde\pi(y)/Z}{\tilde\pi(x)/Z} \;=\; \frac{\tilde\pi(y)}{\tilde\pi(x)} .
+\]</span></p>
+<p><span class="math inline">\(Z\)</span> never appears. For a Bayesian posterior the rule is literally</p>
+<p><span class="math display">\[
+\alpha \;=\; \min\left\{1,\; \frac{p(\theta')\,L(\mathcal{D}\mid\theta')}{p(\theta)\,L(\mathcal{D}\mid\theta)}
+\cdot \frac{q(\theta \mid \theta')}{q(\theta' \mid \theta)}\right\},
+\]</span></p>
+<p>prior times likelihood at two points, and nothing else. The evidence integral — the reason the posterior was intractable — is gone.</p>
+<p><strong>Rejection is not a wasted draw.</strong> In rejection sampling a rejected candidate disappears and the sampler has nothing to show for it. Here a rejection <strong>emits the current state again</strong>, which is a genuine sample. Staying put is a legal move, and it is how the chain gives extra weight to high-probability regions. Omitting the repeat — recording only accepted states — is the single most common implementation bug, and it silently biases every estimate.</p>
+<p><strong>The correction term <span class="math inline">\(q(x\mid y)/q(y\mid x)\)</span> is Hastings’ contribution.</strong> It compensates for a proposal that is easier to enter a region than to leave it. Metropolis’ original 1953 algorithm assumed a symmetric proposal; Hastings generalised it in 1970 to arbitrary <span class="math inline">\(q\)</span>.</p>
+<section id="why-it-works" class="level3">
+<h3 class="anchored" data-anchor-id="why-it-works">Why it works</h3>
+<p>Take <span class="math inline">\(y \ne x\)</span>. The MH kernel is <span class="math inline">\(K(x,y) = q(y\mid x)\,\alpha(x,y)\)</span>, so</p>
+<p><span class="math display">\[
+\pi(x)K(x,y)
+= \pi(x)\,q(y\mid x)\,\min\!\left\{1, \frac{\pi(y)q(x\mid y)}{\pi(x)q(y\mid x)}\right\}
+= \min\big\{\pi(x)q(y\mid x),\; \pi(y)q(x\mid y)\big\},
+\]</span></p>
+<p>pushing the positive factor <span class="math inline">\(\pi(x)q(y\mid x)\)</span> inside the <span class="math inline">\(\min\)</span>. The right-hand side is <strong>symmetric under <span class="math inline">\(x \leftrightarrow y\)</span></strong> — swapping the labels swaps the two arguments of a <span class="math inline">\(\min\)</span> and changes nothing. Therefore <span class="math inline">\(\pi(x)K(x,y) =
+\pi(y)K(y,x)\)</span>: detailed balance holds, and by §3 so does stationarity. For <span class="math inline">\(x = y\)</span> the condition is trivial, and the rejection atom is exactly what makes <span class="math inline">\(K\)</span> integrate to one. <span class="math inline">\(\square\)</span></p>
+<p>That is the entire theory. The acceptance rule was <em>reverse-engineered</em> to make a <span class="math inline">\(\min\)</span> appear symmetrically — this is the rare algorithm whose correctness proof is shorter than its motivation.</p>
 <div class="callout callout-style-simple callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-The shape to remember
+Where the accept/reject step goes in this course
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>A latent state you care about, an observable you actually get, a forward model connecting them, and Bayes running the inference backwards — repeated over a sequence. That is BKT, and it is also a hidden Markov model, a Kalman filter, and, as the next few weeks will show, a diffusion model.</p>
+<p>Metropolis–Hastings needs the accept/reject correction because the proposal is picked for convenience and is therefore <em>wrong</em>. The step is a patch applied to a mismatch.</p>
+<p>A diffusion model has no such step. Its reverse process is built so that each small step is already almost exactly right — the forward process adds a tiny bit of Gaussian noise, so the reverse conditional is nearly Gaussian and can be matched directly. There is nothing left to accept or reject.</p>
+<p>Keep the contrast in view: <strong>MH corrects a bad proposal; a diffusion model learns a good one.</strong></p>
 </div>
 </div>
 </section>
-<section id="why-this-is-the-shape-of-the-whole-course" class="level4">
-<h4 class="anchored" data-anchor-id="why-this-is-the-shape-of-the-whole-course">Why this is the shape of the whole course</h4>
-<p>Diffusion models are an inverse problem, and it is worth being blunt about the terminology, because it inverts what you might expect.</p>
-<ul>
-<li>The <strong>forward process</strong> of a diffusion model is the <em>corruption</em>: <span class="math inline">\(x_0 \to x_\sigma = x_0 + \sigma z\)</span>. We write it down ourselves, in closed form, and it is trivial to sample. This is the easy direction.</li>
-<li><strong>Generating an image</strong> means going the other way — recovering a plausible clean <span class="math inline">\(x_0\)</span> from a noisy <span class="math inline">\(x_\sigma\)</span>. The clean signal is the latent; the noisy observation is the data.</li>
-</ul>
-<p>So in a diffusion model, <em>generation is the inference problem</em>. That is why the central object of the course is a posterior, and why the optimal denoiser is a posterior <strong>mean</strong>:</p>
+</section>
+<section id="the-three-special-cases-you-will-meet" class="level2">
+<h2 class="anchored" data-anchor-id="the-three-special-cases-you-will-meet">5. The three special cases you will meet</h2>
+<p><strong>Random-walk Metropolis.</strong> Take <span class="math inline">\(q(y\mid x) = \mathcal{N}(y; x, \tau^2 I)\)</span> — a symmetric jump. Then <span class="math inline">\(q(x\mid y) = q(y\mid x)\)</span>, the Hastings ratio is 1, and</p>
 <p><span class="math display">\[
-\mathbb{E}[x_0 \mid x_\sigma]
-= \tanh\!\Big(\frac{x_\sigma}{\sigma^2}\Big)
-\quad\text{for the two-point dataset of }
-\]</span> W01 — which, as <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional</a> shows, is nothing but Bayes’ rule applied to two Gaussian shelves and then averaged. Swap “understands the concept” for “was a <span class="math inline">\(+1\)</span>”, and “ten marks” for “one noisy measurement”, and it is the same calculation you did above.</p>
+\alpha \;=\; \min\left\{1, \frac{\pi(y)}{\pi(x)}\right\}.
+\]</span></p>
+<p><em>Always</em> move uphill; move downhill with probability equal to the density ratio. That downhill move is not a defect — it is precisely what separates sampling from optimisation. A hill-climber ends at the mode and reports one point; a sampler must visit the tails in proportion to their mass, so it has to be willing to go down.</p>
+<p><strong>The independence sampler.</strong> <span class="math inline">\(q(y \mid x) = q(y)\)</span>, ignoring the current state. Then <span class="math inline">\(\alpha = \min\{1, w(y)/w(x)\}\)</span> with importance weight <span class="math inline">\(w = \pi/q\)</span>: accept whenever the candidate has a better weight than the incumbent. This is rejection sampling’s cousin and inherits its fragility — a proposal with lighter tails than <span class="math inline">\(\pi\)</span> makes the chain stick for astronomically long stretches.</p>
+<p><strong>Gibbs sampling is MH with <span class="math inline">\(\alpha \equiv 1\)</span>.</strong> Propose by redrawing one coordinate from its exact conditional, <span class="math inline">\(q(y_i \mid x) = \pi(y_i \mid x_{-i})\)</span>, leaving the others fixed. Substituting into the acceptance ratio and using <span class="math inline">\(\pi(x) = \pi(x_i \mid x_{-i})\pi(x_{-i})\)</span>, everything cancels and <span class="math inline">\(\alpha = 1\)</span>. Gibbs never rejects — the price is that you must be able to sample each conditional exactly, which is a strong requirement.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+MALA: the score walks in
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nothing forces the proposal to be blind. <strong>Metropolis-adjusted Langevin</strong> proposes</p>
+<p><span class="math display">\[
+y \;=\; x + \tfrac{\tau^2}{2}\,\nabla_x \log \pi(x) + \tau\,z, \qquad z\sim\mathcal{N}(0,I),
+\]</span></p>
+<p>then applies the usual accept/reject step (the proposal is now asymmetric, so the Hastings ratio matters). The drift term pushes candidates toward high density <em>before</em> they are judged, so acceptance stays high with much larger steps.</p>
+<p>And notice what it needs: only <span class="math inline">\(\nabla_x \log \pi\)</span>, the <strong>score</strong>. The normalising constant differentiates away, exactly as in note 06. Drop the accept/reject step and you have unadjusted Langevin dynamics — biased by <span class="math inline">\(O(\tau)\)</span>, but needing nothing except the score.</p>
+<p><strong>This is the closest classical ancestor of a score-based generative model.</strong> Module 4 will learn <span class="math inline">\(\nabla_x\log p\)</span> from data instead of deriving it; the sampler on top is this one.</p>
+</div>
+</div>
 </section>
+<section id="a-worked-example-two-lines-of-arithmetic" class="level2">
+<h2 class="anchored" data-anchor-id="a-worked-example-two-lines-of-arithmetic">6. A worked example: two lines of arithmetic</h2>
+<p>Target: the posterior for a Gaussian mean with a Gaussian prior,</p>
+<p><span class="math display">\[
+\theta \sim \mathcal{N}(0, 10^2), \qquad
+x_1,\dots,x_n \mid \theta \sim \mathcal{N}(\theta, 1),
+\]</span></p>
+<p>so that <span class="math inline">\(\tilde\pi(\theta) = \exp\!\big(-\tfrac{\theta^2}{200}\big)\cdot
+\exp\!\big(-\tfrac12\sum_i (x_i-\theta)^2\big)\)</span>. Work on the log scale — always work on the log scale, or the products underflow to zero by <span class="math inline">\(n \approx 500\)</span>:</p>
+<p><span class="math display">\[
+\log\alpha \;=\; \min\Big\{0,\;\; \log\tilde\pi(\theta') - \log\tilde\pi(\theta)\Big\},
+\]</span></p>
+<p>with <span class="math inline">\(\log\tilde\pi(\theta) = -\tfrac{\theta^2}{200} - \tfrac12\sum_i(x_i-\theta)^2\)</span>. Propose <span class="math inline">\(\theta' = \theta + \tau z\)</span>, accept if <span class="math inline">\(\log u &lt; \log\alpha\)</span>.</p>
+<p>This example is conjugate, so the answer is known — <span class="math inline">\(\mathcal{N}\!\big(\frac{n\bar x}{n + 1/100},\, \frac{1}{n+1/100}\big)\)</span> — which is the point: run the sampler, overlay the histogram on the exact posterior, and confirm that a procedure using only <em>ratios of unnormalised densities</em> reproduces a distribution whose normalising constant it never computed. Then change the prior to a Student-<span class="math inline">\(t\)</span>, destroy conjugacy, and observe that the code does not change at all. That robustness is why MH dominated applied Bayesian statistics for thirty years.</p>
+</section>
+<section id="what-it-costs-burn-in-correlation-and-tuning" class="level2">
+<h2 class="anchored" data-anchor-id="what-it-costs-burn-in-correlation-and-tuning">7. What it costs: burn-in, correlation, and tuning</h2>
+<p>The theorem says <span class="math inline">\(p_t \to \pi\)</span>. It does not say when, and everything difficult about MCMC lives in that gap.</p>
+<p><strong>Burn-in.</strong> The chain starts at <span class="math inline">\(p_0\)</span>, which is wherever you put it, and needs time before <span class="math inline">\(p_t\)</span> resembles <span class="math inline">\(\pi\)</span>. Early samples are discarded. How many is a judgement call, informed by trace plots and by running several chains from dispersed starts and checking they agree (the Gelman–Rubin <span class="math inline">\(\hat R\)</span> statistic, which compares between-chain to within-chain variance and should approach 1).</p>
+<p><strong>Autocorrelation.</strong> Consecutive states are dependent by construction. <span class="math inline">\(T\)</span> MCMC draws are worth fewer than <span class="math inline">\(T\)</span> independent ones — the <strong>effective sample size</strong> is</p>
+<p><span class="math display">\[
+\mathrm{ESS} \;=\; \frac{T}{1 + 2\sum_{k\ge1}\rho_k},
+\]</span></p>
+<p>with <span class="math inline">\(\rho_k\)</span> the lag-<span class="math inline">\(k\)</span> autocorrelation. Note 06’s Gibbs example makes this concrete: lag-1 autocorrelation <span class="math inline">\(\rho^2\)</span>, so a target with correlation <span class="math inline">\(0.99\)</span> gives <span class="math inline">\(\rho^2 \approx 0.98\)</span> and an ESS a <em>fiftieth</em> of the chain length. Strongly dependent targets are expensive.</p>
+<p><strong>Step size is a genuine dilemma.</strong> For random-walk Metropolis with scale <span class="math inline">\(\tau\)</span>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(\tau\)</span></th>
+<th>acceptance</th>
+<th>behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>too small</td>
+<td><span class="math inline">\(\to 1\)</span></td>
+<td>almost every move accepted, but each is tiny — the chain diffuses, needing <span class="math inline">\(\sim(L/\tau)^2\)</span> steps to cross a region of width <span class="math inline">\(L\)</span></td>
+</tr>
+<tr class="even">
+<td>too large</td>
+<td><span class="math inline">\(\to 0\)</span></td>
+<td>proposals land in the tails and are rejected; the chain sticks at one point for hundreds of iterations</td>
+</tr>
+<tr class="odd">
+<td>tuned</td>
+<td><span class="math inline">\(\approx 0.234\)</span></td>
+<td>the asymptotically optimal rate for random-walk Metropolis on product targets (Roberts, Gelman &amp; Gilks, 1997)</td>
+</tr>
+</tbody>
+</table>
+<p>A first-time user’s instinct — “high acceptance means it is working” — is exactly backwards. An acceptance rate of <span class="math inline">\(0.95\)</span> almost always means the chain is crawling.</p>
+<p><strong>Multimodality is the failure MCMC hides best.</strong> A chain in one mode of a well-separated bimodal target must cross a low-density valley to reach the other, and the probability of proposing across it can be <span class="math inline">\(e^{-100}\)</span>. The chain then looks <em>perfectly healthy</em> — good acceptance, stable trace, tight autocorrelation — while sampling from the wrong distribution. It has converged to a mode, not to <span class="math inline">\(\pi\)</span>. Tempering, parallel chains and mode-hopping proposals exist; none is a general solution.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+And the curse, once more
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Even with none of the above going wrong, the number of steps needed to produce one effectively independent sample grows with dimension. For product-form targets the standard scaling results are</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>sampler</th>
+<th>steps per independent sample</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>random-walk Metropolis</td>
+<td><span class="math inline">\(O(d)\)</span></td>
+</tr>
+<tr class="even">
+<td>MALA (Langevin, adjusted)</td>
+<td><span class="math inline">\(O(d^{1/3})\)</span></td>
+</tr>
+<tr class="odd">
+<td>Hamiltonian Monte Carlo</td>
+<td><span class="math inline">\(O(d^{1/4})\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Each row is a real improvement, bought with more gradient information per step — and every row still grows. Compare rejection sampling’s <span class="math inline">\(\sigma^{-d}\)</span> and this is a triumph: polynomial instead of exponential. Compare it with the <span class="math inline">\(d \approx
+10^5\)</span> of a modest image and it is still nowhere near enough.</p>
+</div>
+</div>
+</section>
+<section id="the-structural-reason-this-is-not-a-generative-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-structural-reason-this-is-not-a-generative-model">8. The structural reason this is not a generative model</h2>
+<p>Suppose every difficulty in §7 were solved: a perfectly tuned sampler, no multimodality, dimension-free mixing. It would <strong>still</strong> not generate an image. The obstruction is not efficiency. It is the input.</p>
+<p>Metropolis–Hastings requires <span class="math inline">\(\tilde\pi\)</span>: a function you can <em>evaluate</em> at any proposed point. It answers</p>
+<blockquote class="blockquote">
+<p><em>“I can write down the target up to a constant. Give me samples.”</em></p>
+</blockquote>
+<p>Generative modelling asks the opposite question:</p>
+<blockquote class="blockquote">
+<p><em>“I cannot write down the target at all. I have 60,000 samples from it. Give me more.”</em></p>
+</blockquote>
+<p>There is no <span class="math inline">\(\tilde\pi(x)\)</span> for natural images. Nobody can supply a function that, given a <span class="math inline">\(256\times256\times3\)</span> array, returns a number proportional to how likely that array is to be a photograph. That function is precisely the thing note 06 proved we cannot estimate. <strong>MH is a machine for converting a density into samples, and we have no density to feed it.</strong></p>
+<p>Notice too that MH never <em>learns</em>. Run it for a million steps, then ask for a sample from a fresh start and you pay the full burn-in again. There is no trained object, nothing amortised, no reuse. A generative model, by contrast, pays a large training cost once and then produces a sample in a single forward pass.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The pivot the lecture turns on
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note 06 already named the shape of the fix. In rejection sampling, in MH, in Gibbs, <strong>a human picks the proposal for convenience and hopes it resembles the target</strong> — and in high dimension it does not.</p>
+<p>So stop picking it. <strong>Learn it.</strong> Learn a map <span class="math inline">\(G\)</span> from easy noise to data, fit it using only samples, and dispense with the density entirely.</p>
+<p>That immediately raises the question that defines the next note: if you never evaluate a density, <em>how do you know your generator is any good?</em> You cannot compute a likelihood, so you cannot maximise one. The answer — train a second network to tell your samples from real ones, and improve until it cannot — is the generative adversarial network, and it is the subject of <a href="../tutorials/19-generative-adversarial-networks.html">note 09</a>.</p>
+</div>
+</div>
+</section>
+<section id="where-this-returns" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-returns">9. Where this returns</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>From this note</th>
+<th>Where it reappears</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Detailed balance / reversibility</td>
+<td>the forward and reverse diffusion processes of Module 3</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(p_t \to \pi\)</span> as a flow of distributions</td>
+<td>the Fokker–Planck equation, Module 5</td>
+</tr>
+<tr class="odd">
+<td>Langevin proposal needing only <span class="math inline">\(\nabla\log\pi\)</span></td>
+<td>score matching, Module 4</td>
+</tr>
+<tr class="even">
+<td>Accept/reject as a patch for a bad proposal</td>
+<td>why diffusion needs no accept/reject step</td>
+</tr>
+<tr class="odd">
+<td>Ratio <span class="math inline">\(\pi(y)/\pi(x)\)</span> with <span class="math inline">\(Z\)</span> cancelling</td>
+<td>the discriminator’s logit as a log density ratio, note 09</td>
+</tr>
+<tr class="even">
+<td>Burn-in as an incomplete flow</td>
+<td>the reverse process run for too few steps</td>
+</tr>
+<tr class="odd">
+<td>Multimodality trapping a chain</td>
+<td>mode collapse in a GAN — the same pathology, different mechanism</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
 <ol type="1">
-<li>Two fair coin tosses. Let <span class="math inline">\(X\)</span> be the result of the first toss and <span class="math inline">\(Y\)</span> the total number of heads. Write the joint as a table, compute both marginals, and compute both families of conditionals. Verify Bayes’ rule on <span class="math inline">\(\mathbb{P}(X = H \mid Y = 1)\)</span>.</li>
-<li>For the sky-and-rain table above, compute <span class="math inline">\(\mathbb{P}(\text{cloudy} \mid \text{rain})\)</span> by Bayes’ rule from <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy})\)</span> and the marginals, then confirm it by reading the table directly.</li>
-<li>Construct two <em>different</em> joint distributions on <span class="math inline">\(\{0,1\}^2\)</span> that have the same pair of marginals. What does this show about whether marginals determine a joint?</li>
-<li>Show that if <span class="math inline">\(p(x,y) = p(x)p(y)\)</span> then every conditional <span class="math inline">\(p(y \mid x)\)</span> equals <span class="math inline">\(p(y)\)</span> — independence means the conditional does not move as you change what you condition on.</li>
-<li>In the mixture model <span class="math inline">\(z \sim \text{Bernoulli}(\pi)\)</span>, <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)\)</span>: identify the joint <span class="math inline">\(p(x,z)\)</span>, both marginals, and both conditionals. State which of these the <a href="../tutorials/05-two-point-diffusion.html">W01 denoiser</a> computes, and which the ancestral sampler of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> uses.</li>
-<li>A generative model produces a noisy observation <span class="math inline">\(x_t\)</span> from a clean signal <span class="math inline">\(x_0\)</span>. Which direction is easy to write down, <span class="math inline">\(p(x_t \mid x_0)\)</span> or <span class="math inline">\(p(x_0 \mid x_t)\)</span>? Which one does generation require? Name the rule that converts one into the other.</li>
+<li>Show that detailed balance implies stationarity, and give an example of a chain that is stationary for <span class="math inline">\(\pi\)</span> but not reversible.</li>
+<li>Verify the symmetry step <span class="math inline">\(\pi(x)q(y\mid x)\alpha(x,y) = \min\{\pi(x)q(y\mid x),
+\pi(y)q(x\mid y)\}\)</span> explicitly in both cases of the <span class="math inline">\(\min\)</span>.</li>
+<li>Show that Gibbs sampling is MH with acceptance probability exactly 1.</li>
+<li>A student records only accepted proposals, discarding the repeats. Show that the resulting sample is biased, and identify which regions are over-represented.</li>
+<li>For target <span class="math inline">\(\mathcal{N}(0,1)\)</span> and proposal <span class="math inline">\(\mathcal{N}(x,\tau^2)\)</span>, compute the expected acceptance probability as a function of <span class="math inline">\(\tau\)</span> and confirm it is monotonically decreasing.</li>
+<li>Implement random-walk Metropolis for the §6 posterior with <span class="math inline">\(n=50\)</span>. Plot the acceptance rate against <span class="math inline">\(\tau \in \{0.01, 0.1, 1, 10\}\)</span> and the ESS against the same grid. Where do the two curves disagree about which <span class="math inline">\(\tau\)</span> is best?</li>
+<li>Take <span class="math inline">\(\pi = \tfrac12\mathcal{N}(-5,1) + \tfrac12\mathcal{N}(5,1)\)</span> with a random-walk proposal of scale <span class="math inline">\(\tau=1\)</span>. Estimate the expected number of iterations before the chain first crosses between modes. Now run for 10,000 steps from <span class="math inline">\(x_0 = -5\)</span> and report the estimated mean of <span class="math inline">\(\pi\)</span>.</li>
+<li>Write the MALA proposal for <span class="math inline">\(\pi = \mathcal{N}(\mu,\sigma^2)\)</span> explicitly and confirm the Hastings ratio is not 1. What goes wrong if you forget it?</li>
+<li>Show that the independence sampler’s acceptance ratio is a ratio of importance weights, and explain why <span class="math inline">\(q\)</span> must have heavier tails than <span class="math inline">\(\pi\)</span>.</li>
+<li>For the Gibbs chain of note 06 with <span class="math inline">\(\rho = 0.9\)</span> and <span class="math inline">\(\rho = 0.99\)</span>, compute the ESS of a chain of length <span class="math inline">\(10^4\)</span>. How much longer must the second chain run to match the first?</li>
+<li>An energy-based model has <span class="math inline">\(\pi(x) \propto e^{-E(x)}\)</span>. Write the Metropolis acceptance rule in terms of <span class="math inline">\(\Delta E\)</span>, and interpret it physically.</li>
+<li>Explain, in three sentences and without using the word “slow”, why a perfectly mixing MH sampler still cannot generate photographs.</li>
 </ol>
 
 
@@ -1232,13 +1238,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/01-probability-101.html" class="pagination-link" aria-label="02 · Probability &amp; Random Variables">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">02 · Probability &amp; Random Variables</span>
+      <a href="../tutorials/15-comparing-distributions.html" class="pagination-link" aria-label="07 · Comparing Distributions: From CDFs to KL, and the Two Families">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/02-distributions-mle.html" class="pagination-link" aria-label="04 · Distributions and Maximum Likelihood">
-        <span class="nav-page-text">04 · Distributions and Maximum Likelihood</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/19-generative-adversarial-networks.html" class="pagination-link" aria-label="09 · Generative Adversarial Networks">
+        <span class="nav-page-text">09 · Generative Adversarial Networks</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

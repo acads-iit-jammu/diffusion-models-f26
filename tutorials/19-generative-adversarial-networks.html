@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>09 · Generative Adversarial Networks – ID-5-02 (TO)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../materials/w01-deck-01-mechanics.html" rel="next">
+<link href="../tutorials/18-metropolis-hastings.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/19-generative-adversarial-networks.html">09 · Generative Adversarial Networks</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">ID-5-02 (TO)</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Syllabus</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../curriculum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Curriculum</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assignments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lecture Notes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">00 · Introduction and Motivation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/17-density-estimation-many-dimensions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Estimating a Density in Many Dimensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/19-generative-adversarial-networks.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Decks</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Course Mechanics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-02-motivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Why Diffusion Models?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-03-toy-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-00-probability-joints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-01-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-02-genai-maps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w03-deck-01-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · The Multivariate Gaussian</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-01-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-02-gans.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inequalities Worth Knowing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Perspectives</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Deterministic Map, Proved</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/09-discrete-transport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-03-map-limit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deck · The Map, Proved</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Draft</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Probability-Flow ODE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resources</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-change-of-question" id="toc-the-change-of-question" class="nav-link active" data-scroll-target="#the-change-of-question">1. The change of question</a></li>
+  <li><a href="#police-and-thief" id="toc-police-and-thief" class="nav-link" data-scroll-target="#police-and-thief">2. Police and thief</a></li>
+  <li><a href="#the-objective" id="toc-the-objective" class="nav-link" data-scroll-target="#the-objective">3. The objective</a></li>
+  <li><a href="#step-one-the-optimal-discriminator" id="toc-step-one-the-optimal-discriminator" class="nav-link" data-scroll-target="#step-one-the-optimal-discriminator">4. Step one: the optimal discriminator</a></li>
+  <li><a href="#step-two-the-game-is-a-jensenshannon-divergence" id="toc-step-two-the-game-is-a-jensenshannon-divergence" class="nav-link" data-scroll-target="#step-two-the-game-is-a-jensenshannon-divergence">5. Step two: the game is a Jensen–Shannon divergence</a></li>
+  <li><a href="#training-as-actually-implemented" id="toc-training-as-actually-implemented" class="nav-link" data-scroll-target="#training-as-actually-implemented">6. Training, as actually implemented</a>
+  <ul class="collapse">
+  <li><a href="#the-non-saturating-loss" id="toc-the-non-saturating-loss" class="nav-link" data-scroll-target="#the-non-saturating-loss">The non-saturating loss</a></li>
+  </ul></li>
+  <li><a href="#why-it-is-hard-four-failure-modes" id="toc-why-it-is-hard-four-failure-modes" class="nav-link" data-scroll-target="#why-it-is-hard-four-failure-modes">7. Why it is hard: four failure modes</a>
+  <ul class="collapse">
+  <li><a href="#vanishing-gradients-and-the-tension-at-the-heart-of-the-method" id="toc-vanishing-gradients-and-the-tension-at-the-heart-of-the-method" class="nav-link" data-scroll-target="#vanishing-gradients-and-the-tension-at-the-heart-of-the-method">7.1 Vanishing gradients, and the tension at the heart of the method</a></li>
+  <li><a href="#mode-collapse" id="toc-mode-collapse" class="nav-link" data-scroll-target="#mode-collapse">7.2 Mode collapse</a></li>
+  <li><a href="#no-convergence-guarantee-it-is-a-game-not-a-minimisation" id="toc-no-convergence-guarantee-it-is-a-game-not-a-minimisation" class="nav-link" data-scroll-target="#no-convergence-guarantee-it-is-a-game-not-a-minimisation">7.3 No convergence guarantee: it is a game, not a minimisation</a></li>
+  <li><a href="#slow-and-expensive-convergence" id="toc-slow-and-expensive-convergence" class="nav-link" data-scroll-target="#slow-and-expensive-convergence">7.4 Slow and expensive convergence</a></li>
+  </ul></li>
+  <li><a href="#what-was-done-about-it" id="toc-what-was-done-about-it" class="nav-link" data-scroll-target="#what-was-done-about-it">8. What was done about it</a></li>
+  <li><a href="#the-connection-back-to-metropolishastings" id="toc-the-connection-back-to-metropolishastings" class="nav-link" data-scroll-target="#the-connection-back-to-metropolishastings">9. The connection back to Metropolis–Hastings</a></li>
+  <li><a href="#key-takeaway" id="toc-key-takeaway" class="nav-link" data-scroll-target="#key-takeaway">10. Key takeaway</a></li>
+  <li><a href="#where-each-piece-returns" id="toc-where-each-piece-returns" class="nav-link" data-scroll-target="#where-each-piece-returns">11. Where each piece returns</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/19-generative-adversarial-networks.html">09 · Generative Adversarial Networks</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">09 · Generative Adversarial Networks</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>The first deep generative model, and the one that changed what the field thought was possible. Its premise is a refusal: <strong>do not estimate a density, do not evaluate a likelihood, do not even define one.</strong> Learn a map from noise to data, and judge it by whether a second network can tell your samples from real ones.</em></p>
+<p><em>This note derives the whole thing. The min-max objective and the counterfeiter analogy it comes from; the optimal discriminator in three lines; the theorem that the game is secretly minimising a Jensen–Shannon divergence; and then the part that occupied the field for five years afterwards — why an objective this elegant is so hard to optimise, and what each failure mode teaches about what a generative model actually needs.</em></p>
+<section id="the-change-of-question" class="level2">
+<h2 class="anchored" data-anchor-id="the-change-of-question">1. The change of question</h2>
+<p>Every method so far has tried to <strong>write down</strong> <span class="math inline">\(p_{\text{data}}\)</span> — as a Gaussian (note 05), a sparse graphical model, a mixture, a kernel sum, a posterior (note 06) — and each hit the curse of dimensionality from a different side. <a href="../tutorials/18-metropolis-hastings.html">Note 08</a> then showed that even a <em>known</em> density is only the start of the difficulty, and that the machinery there cannot be pointed at images because there is no density to point it at.</p>
+<p>So change what the model <em>is</em>. A GAN never represents <span class="math inline">\(p_g\)</span> as a function. It represents a <strong>sampling procedure</strong>:</p>
+<p><span class="math display">\[
+z \sim p_z = \mathcal{N}(0, I_k), \qquad x = G_\theta(z) \in \mathbb{R}^d .
+\]</span></p>
+<p>Push a low-dimensional Gaussian through a neural network. The distribution of the output — call it <span class="math inline">\(p_g\)</span> — is a perfectly well-defined object, the pushforward <span class="math inline">\(G_\theta \# p_z\)</span>, and it is what the model claims <span class="math inline">\(p_{\text{data}}\)</span> to be. You can draw from it in one forward pass. You cannot evaluate its density at a point, because that would require integrating over all <span class="math inline">\(z\)</span> mapping there, and in general <span class="math inline">\(p_g\)</span> has no density at all: its support is a <span class="math inline">\(k\)</span>-dimensional set inside <span class="math inline">\(\mathbb{R}^d\)</span>, of Lebesgue measure zero.</p>
+<p>This is called an <strong>implicit</strong> model — defined by how you sample it, not by a formula. Note 00’s “sampling as a map” is exactly this idea; the GAN is its first deep instantiation.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The problem this creates, immediately
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Maximum likelihood is unavailable. Note 06 §11 showed that maximising likelihood <em>is</em> minimising <span class="math inline">\(\mathrm{KL}(p_{\text{data}}\|p_\theta)\)</span> — but that requires evaluating <span class="math inline">\(p_\theta(x_i)\)</span>, which an implicit model cannot do. Worse, note 07 §8 showed that KL between two distributions on non-overlapping manifolds is identically <span class="math inline">\(+\infty\)</span>, which is the generic situation here.</p>
+<p>So the loss must be built from <strong>samples only</strong> — a quantity computable from a batch of real <span class="math inline">\(x\)</span>’s and a batch of fake <span class="math inline">\(G(z)\)</span>’s, with no density anywhere. That constraint is what forces the entire GAN construction, adversary included.</p>
+</div>
+</div>
+</section>
+<section id="police-and-thief" class="level2">
+<h2 class="anchored" data-anchor-id="police-and-thief">2. Police and thief</h2>
+<p>Goodfellow’s framing, and the reason the idea is memorable: two players with opposed interests.</p>
+<p>A <strong>counterfeiter</strong> (the generator) prints fake currency and wants it to pass. The <strong>police</strong> (the discriminator) inspect notes and want to catch every fake. Neither is competent at the start: the first forgeries are laughable, and the first inspections are guesswork. But each improvement forces the other to improve. Crude fakes teach the police to check the watermark; the police checking watermarks teach the counterfeiter to print one. The process ends only when the forgeries are indistinguishable from real currency — at which point the police can do no better than a coin flip, and that inability <em>is</em> the certificate of success.</p>
+<p>The analogy is worth pressing on, because two of its details are the mathematics.</p>
+<p><strong>The counterfeiter never sees real money.</strong> <span class="math inline">\(G\)</span> has no access to the training set. Not one gradient in the generator’s update touches a real image. Everything <span class="math inline">\(G\)</span> learns about the data arrives <em>through</em> the discriminator — the police’s verdicts are the only channel. That is why a broken <span class="math inline">\(D\)</span> is fatal: it is not a referee, it is the generator’s sole teacher.</p>
+<p><strong>The police hand over their reasoning, not just their verdict.</strong> A real counterfeiter learns only “caught” or “not caught”. Here, <span class="math inline">\(D\)</span> is differentiable, so <span class="math inline">\(G\)</span> receives <span class="math inline">\(\nabla_x D(x)\)</span> — the <em>direction in image space</em> that would make the note more convincing. This is the trick that makes the whole thing work, and the point where the analogy stops being an analogy. Note 06’s comparison table put it exactly: rejection sampling throws away a rejected dart and learns nothing; a GAN turns every rejection into a direction.</p>
+</section>
+<section id="the-objective" class="level2">
+<h2 class="anchored" data-anchor-id="the-objective">3. The objective</h2>
+<p>The discriminator <span class="math inline">\(D_\phi: \mathbb{R}^d \to (0,1)\)</span> outputs the probability that its input is real. Train it as a binary classifier on a balanced mixture of real and generated data — the cross-entropy loss, written out, is</p>
+<p><span class="math display">\[
+V(D, G) \;=\; \mathbb{E}_{x \sim p_{\text{data}}}\big[\log D(x)\big]
+\;+\; \mathbb{E}_{z \sim p_z}\big[\log\big(1 - D(G(z))\big)\big].
+\]</span></p>
+<p><span class="math inline">\(D\)</span> wants this large: <span class="math inline">\(\log D(x)\)</span> near <span class="math inline">\(0\)</span> on real data (so <span class="math inline">\(D \to 1\)</span>) and <span class="math inline">\(\log(1-D)\)</span> near <span class="math inline">\(0\)</span> on fakes (so <span class="math inline">\(D \to 0\)</span>). <span class="math inline">\(G\)</span> wants the second term small, which means fooling <span class="math inline">\(D\)</span>. One quantity, two opposed interests — a <strong>zero-sum game</strong>, and the solution is its saddle point:</p>
+<p><span class="math display">\[
+\boxed{\;\min_G \max_D \; V(D,G)
+= \min_G \max_D \;\mathbb{E}_{p_{\text{data}}}[\log D(x)] + \mathbb{E}_{p_g}[\log(1-D(x))].\;}
+\]</span></p>
+<p>Note the second expectation is over <span class="math inline">\(p_g\)</span>, since <span class="math inline">\(x = G(z)\)</span> with <span class="math inline">\(z \sim p_z\)</span> is by definition a draw from <span class="math inline">\(p_g\)</span>. Written that way the objective involves the two distributions and no latent variable, which is what makes the next section possible.</p>
+<p>The <strong>order matters</strong>: <span class="math inline">\(\max_D\)</span> is inside. The generator is judged against the <em>best available</em> critic, not a fixed one — otherwise <span class="math inline">\(G\)</span> would simply find the one blind spot of a mediocre <span class="math inline">\(D\)</span> and park there.</p>
+</section>
+<section id="step-one-the-optimal-discriminator" class="level2">
+<h2 class="anchored" data-anchor-id="step-one-the-optimal-discriminator">4. Step one: the optimal discriminator</h2>
+<p><strong>Proposition.</strong> For a fixed generator <span class="math inline">\(G\)</span>, the discriminator maximising <span class="math inline">\(V\)</span> is</p>
+<p><span class="math display">\[
+\boxed{\;D^{*}_G(x) \;=\; \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_g(x)}.\;}
+\]</span></p>
+<p><em>Proof.</em> Write both expectations as integrals over the same variable:</p>
+<p><span class="math display">\[
+V(D,G) \;=\; \int \Big[\,p_{\text{data}}(x)\log D(x) \;+\; p_g(x)\log\big(1-D(x)\big)\Big]dx .
+\]</span></p>
+<p>The value <span class="math inline">\(D(x)\)</span> at one point appears in the integrand only at that point, so — allowing <span class="math inline">\(D\)</span> to be <em>any</em> function, which is the assumption to remember — the integral is maximised by maximising the bracket pointwise. With <span class="math inline">\(a =
+p_{\text{data}}(x)\)</span>, <span class="math inline">\(b = p_g(x)\)</span> and <span class="math inline">\(t = D(x) \in (0,1)\)</span>, maximise</p>
+<p><span class="math display">\[
+f(t) = a\log t + b\log(1-t), \qquad
+f'(t) = \frac{a}{t} - \frac{b}{1-t} = 0 \;\Longrightarrow\; t^{*} = \frac{a}{a+b},
+\]</span></p>
+<p>and <span class="math inline">\(f''(t) = -a/t^2 - b/(1-t)^2 &lt; 0\)</span>, so this is the unique maximum. <span class="math inline">\(\square\)</span></p>
+<p>Three consequences, each of which matters later.</p>
+<p><strong>The discriminator is a density-ratio estimator.</strong> Let <span class="math inline">\(r = p_{\text{data}}/p_g\)</span>. Then <span class="math inline">\(D^{*} = r/(1+r)\)</span>, strictly increasing in <span class="math inline">\(r\)</span>, and inverting,</p>
+<p><span class="math display">\[
+r(x) \;=\; \frac{D^{*}(x)}{1 - D^{*}(x)} .
+\]</span></p>
+<p>If <span class="math inline">\(D = \sigma(h)\)</span> for a logit <span class="math inline">\(h\)</span>, this says <span class="math inline">\(h^{*}(x) = \log
+\frac{p_{\text{data}}(x)}{p_g(x)}\)</span>: <strong>the discriminator’s logit is the log density ratio.</strong> Two densities that cannot be written down individually, and a classifier recovers their ratio from samples alone. This is the <em>density-ratio trick</em>, and it is the single most reusable idea in the note.</p>
+<p><strong>At the solution <span class="math inline">\(D^{*} = 1/2\)</span> everywhere.</strong> When <span class="math inline">\(p_g = p_{\text{data}}\)</span> the ratio is 1. The police are reduced to a coin flip, as promised.</p>
+<p><strong>“Allowing <span class="math inline">\(D\)</span> to be any function” is doing real work.</strong> A neural network of finite capacity, trained on finite data for finitely many steps, is not <span class="math inline">\(D^{*}\)</span>. Everything in §7 is downstream of that gap.</p>
+</section>
+<section id="step-two-the-game-is-a-jensenshannon-divergence" class="level2">
+<h2 class="anchored" data-anchor-id="step-two-the-game-is-a-jensenshannon-divergence">5. Step two: the game is a Jensen–Shannon divergence</h2>
+<p>Substitute <span class="math inline">\(D^{*}\)</span> back and see what the generator is actually minimising. Define the <strong>mixture</strong> — the “average of the data distribution and the generated one”:</p>
+<p><span class="math display">\[
+m \;=\; \tfrac12\big(p_{\text{data}} + p_g\big).
+\]</span></p>
+<p>Then <span class="math inline">\(D^{*} = p_{\text{data}}/(2m)\)</span> and <span class="math inline">\(1 - D^{*} = p_g/(2m)\)</span>, so</p>
+<p><span class="math display">\[
+\begin{aligned}
+C(G) \;=\; \max_D V(D,G)
+&amp;= \mathbb{E}_{p_{\text{data}}}\!\left[\log \frac{p_{\text{data}}}{2m}\right]
++ \mathbb{E}_{p_g}\!\left[\log \frac{p_g}{2m}\right] \\[4pt]
+&amp;= \mathbb{E}_{p_{\text{data}}}\!\left[\log \frac{p_{\text{data}}}{m}\right] - \log 2
++ \mathbb{E}_{p_g}\!\left[\log \frac{p_g}{m}\right] - \log 2 \\[4pt]
+&amp;= -\log 4 \;+\; \mathrm{KL}\big(p_{\text{data}} \,\big\|\, m\big) + \mathrm{KL}\big(p_g \,\big\|\, m\big).
+\end{aligned}
+\]</span></p>
+<p>The two KL terms are, by definition, twice the <strong>Jensen–Shannon divergence</strong>:</p>
+<p><span class="math display">\[
+\mathrm{JS}(p\|q) \;=\; \tfrac12 \mathrm{KL}\!\left(p \,\Big\|\, \tfrac{p+q}{2}\right)
++ \tfrac12 \mathrm{KL}\!\left(q \,\Big\|\, \tfrac{p+q}{2}\right).
+\]</span></p>
+<p>Therefore</p>
+<p><span class="math display">\[
+\boxed{\;C(G) \;=\; -\log 4 \;+\; 2\,\mathrm{JS}\big(p_{\text{data}} \,\|\, p_g\big).\;}
+\]</span></p>
+<p><strong>Theorem (Goodfellow et al., 2014).</strong> The global minimum of <span class="math inline">\(C(G)\)</span> is attained exactly when <span class="math inline">\(p_g = p_{\text{data}}\)</span>, where its value is <span class="math inline">\(-\log 4 \approx -1.386\)</span>.</p>
+<p><em>Proof.</em> <span class="math inline">\(\mathrm{JS} \ge 0\)</span> always, with equality if and only if the two distributions coincide — it is an <span class="math inline">\(f\)</span>-divergence, note 07 §4, and Jensen gives non-negativity with equality only at <span class="math inline">\(p = q\)</span>. So <span class="math inline">\(C(G) \ge -\log 4\)</span> with equality precisely at <span class="math inline">\(p_g = p_{\text{data}}\)</span>. <span class="math inline">\(\square\)</span></p>
+<p>This is the payoff of the derivation. A construction motivated entirely by a <em>story about counterfeiters</em> turns out to minimise a specific, principled, symmetric divergence. The adversary was never a heuristic: it is a <strong>variational estimator of a divergence</strong>, computing by optimisation what could not be computed in closed form. Note 07’s map of “what is each model family minimising?” lists the original GAN under Jensen–Shannon for exactly this reason, and the <span class="math inline">\(f\)</span>-GAN generalisation — swap the <span class="math inline">\(\log\)</span>s for the Fenchel conjugate of any convex <span class="math inline">\(f\)</span> and get any <span class="math inline">\(f\)</span>-divergence you like — follows the same template.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Read the small print
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The theorem is about <strong>distributions</strong>, not parameters. Three gaps between it and anything you can run:</p>
+<ol type="1">
+<li><strong><span class="math inline">\(D\)</span> is not optimal.</strong> <span class="math inline">\(D^{*}\)</span> assumes an unconstrained function and exact maximisation. In practice <span class="math inline">\(D\)</span> is a network updated a few steps per generator step, so the quantity being descended is <em>some</em> estimate of JS, with error that is not controlled.</li>
+<li><strong><span class="math inline">\(G\)</span> moves in parameter space, not function space.</strong> Goodfellow’s convergence argument (Prop. 2) treats <span class="math inline">\(p_g\)</span> itself as the variable, where <span class="math inline">\(C\)</span> is convex. Gradient descent moves <span class="math inline">\(\theta\)</span>, and <span class="math inline">\(C\)</span> as a function of <span class="math inline">\(\theta\)</span> is not convex. The proof does not transfer, and the paper says so.</li>
+<li><strong>The expectations are estimated from minibatches.</strong> The gradient is noisy in a game where the two players’ noise is coupled.</li>
+</ol>
+<p>Each gap is a real phenomenon in training, not a technicality. §7 is a catalogue of what comes through them.</p>
+</div>
+</div>
+</section>
+<section id="training-as-actually-implemented" class="level2">
+<h2 class="anchored" data-anchor-id="training-as-actually-implemented">6. Training, as actually implemented</h2>
+<p>Alternate stochastic gradient steps. For each iteration:</p>
+<ol type="1">
+<li><p><strong><span class="math inline">\(k\)</span> discriminator steps</strong> (<span class="math inline">\(k=1\)</span> is standard). Draw a minibatch of <span class="math inline">\(m\)</span> real samples and <span class="math inline">\(m\)</span> latents, and <em>ascend</em></p>
+<p><span class="math display">\[
+\nabla_\phi \;\frac1m \sum_{i=1}^{m}\Big[\log D_\phi(x_i) + \log\big(1 - D_\phi(G_\theta(z_i))\big)\Big].
+\]</span></p></li>
+<li><p><strong>One generator step.</strong> Draw <span class="math inline">\(m\)</span> fresh latents and <em>descend</em> the generator’s loss — with a modification introduced in the next paragraph and used universally since.</p></li>
+</ol>
+<p>The <span class="math inline">\(k\)</span> inner steps exist because the theory wants <span class="math inline">\(D\)</span> near-optimal. But <span class="math inline">\(D\)</span> is being asked to track a <em>moving</em> target: every generator step changes <span class="math inline">\(p_g\)</span> and therefore changes <span class="math inline">\(D^{*}\)</span>. Chasing it too closely is as bad as not chasing it at all, for a reason that is the subject of §7.1.</p>
+<section id="the-non-saturating-loss" class="level3">
+<h3 class="anchored" data-anchor-id="the-non-saturating-loss">The non-saturating loss</h3>
+<p>The min-max objective assigns <span class="math inline">\(G\)</span> the loss <span class="math inline">\(\mathbb{E}_z[\log(1 - D(G(z)))]\)</span>. It does not work early in training, and the reason is a two-line computation. Write <span class="math inline">\(D = \sigma(h)\)</span> with logit <span class="math inline">\(h\)</span>; then <span class="math inline">\(\log(1-D) = \log\sigma(-h)\)</span> and</p>
+<p><span class="math display">\[
+\frac{\partial}{\partial h}\,\log\big(1 - D\big) \;=\; -\,\sigma(h) \;=\; -D .
+\]</span></p>
+<p>Early on, <span class="math inline">\(G\)</span>’s samples are obvious fakes, so <span class="math inline">\(D(G(z)) \approx 0\)</span> — and the gradient reaching the generator is proportional to <span class="math inline">\(D(G(z))\)</span>, hence <strong>also <span class="math inline">\(\approx 0\)</span></strong>. The generator learns most slowly exactly when it is worst. The loss <em>saturates</em>.</p>
+<p>The fix is to have <span class="math inline">\(G\)</span> maximise <span class="math inline">\(\log D(G(z))\)</span> instead of minimising <span class="math inline">\(\log(1 -
+D(G(z)))\)</span> — same fixed point, since both are optimised by <span class="math inline">\(D(G(z)) \to 1\)</span>, but</p>
+<p><span class="math display">\[
+\frac{\partial}{\partial h}\,\big(-\log D\big) \;=\; -\big(1 - \sigma(h)\big) \;=\; -(1-D)
+\;\xrightarrow[D \to 0]{}\; -1 .
+\]</span></p>
+<p>Now the gradient is <em>largest</em> when the samples are worst. This is the <strong>non-saturating</strong> loss, and essentially every GAN ever trained uses it.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What you give up by switching
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The heuristic fix breaks the theorem. Arjovsky and Bottou (2017) computed what the non-saturating generator gradient corresponds to at an optimal discriminator:</p>
+<p><span class="math display">\[
+\nabla_\theta\,\mathbb{E}_{p_g}\big[-\log D^{*}\big]
+\;=\; \nabla_\theta\Big[\mathrm{KL}\big(p_g \,\|\, p_{\text{data}}\big) - 2\,\mathrm{JS}\big(p_g\,\|\,p_{\text{data}}\big)\Big].
+\]</span></p>
+<p>Two things are wrong with the right-hand side. The first term is the <strong>reverse</strong> KL, which note 07 §3 identified as <em>mode-seeking</em>: it punishes putting mass where there is none, and is nearly indifferent to missing an entire mode. The second enters with a <strong>minus sign</strong>, actively pushing <span class="math inline">\(p_g\)</span> away from <span class="math inline">\(p_{\text{data}}\)</span>.</p>
+<p>So the loss people actually train is not a divergence, is mode-seeking, and contains a repulsive term. Mode collapse and instability are not surprising in retrospect — they are visible in the objective.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="why-it-is-hard-four-failure-modes" class="level2">
+<h2 class="anchored" data-anchor-id="why-it-is-hard-four-failure-modes">7. Why it is hard: four failure modes</h2>
+<section id="vanishing-gradients-and-the-tension-at-the-heart-of-the-method" class="level3">
+<h3 class="anchored" data-anchor-id="vanishing-gradients-and-the-tension-at-the-heart-of-the-method">7.1 Vanishing gradients, and the tension at the heart of the method</h3>
+<p>Note 07 §8 established the fact this rests on. If <span class="math inline">\(p_{\text{data}}\)</span> and <span class="math inline">\(p_g\)</span> have essentially disjoint supports — which is <em>generic</em>, since both live on low-dimensional manifolds in a high-dimensional space and two such manifolds generically miss each other — then</p>
+<p><span class="math display">\[
+\mathrm{JS}(p_{\text{data}} \| p_g) = \log 2 \quad\text{exactly, and}\quad
+\nabla_\theta \,\mathrm{JS} = 0 .
+\]</span></p>
+<p>Not small. <em>Zero</em>. The divergence reports “maximally different” and stops responding, so it cannot distinguish a near miss from a wild one, and the generator receives no signal about which way to move.</p>
+<p>The consequence is a genuine dilemma, and it is the deepest problem with the original formulation:</p>
+<blockquote class="blockquote">
+<p><strong>The theory wants <span class="math inline">\(D\)</span> optimal. An optimal <span class="math inline">\(D\)</span> gives the generator no gradient.</strong></p>
+</blockquote>
+<p>A near-perfect discriminator separates the two manifolds cleanly, is confident everywhere, and is therefore flat everywhere <span class="math inline">\(G\)</span> can reach. A weak discriminator gives a usable gradient that points in the wrong direction. GAN training lives in a narrow band between the two, held there by hand-tuned learning rates, architectures and update ratios. This is what practitioners mean by “GANs are finicky”, and it is a statement about the objective, not about anyone’s code.</p>
+<p>The non-saturating loss patches the symptom. <strong>WGAN removes the cause</strong>: replace JS with <span class="math inline">\(W_1\)</span>, which note 07 §8 showed reports the <em>actual distance</em> <span class="math inline">\(d\)</span> between separated supports and keeps a gradient pointing home. That is the entire motivation for Wasserstein GAN, and it is why note 07 came before this one.</p>
+</section>
+<section id="mode-collapse" class="level3">
+<h3 class="anchored" data-anchor-id="mode-collapse">7.2 Mode collapse</h3>
+<p>The most visible failure: <span class="math inline">\(G\)</span> maps every latent <span class="math inline">\(z\)</span> to the same output, or to a handful of outputs. Train on ten digit classes, generate only sevens — convincing sevens, and nothing else.</p>
+<p>Three complementary explanations, all correct.</p>
+<p><strong>The order of the min and max.</strong> The objective is <span class="math inline">\(\min_G \max_D\)</span>, but alternating optimisation drifts toward <span class="math inline">\(\max_D \min_G\)</span>, and these are not equal. In the swapped game the generator moves first against a <em>fixed</em> <span class="math inline">\(D\)</span>, and its optimal response is to put all mass on the single point <span class="math inline">\(\arg\max_x D(x)\)</span> — the one input this discriminator most believes. A perfect delta function is the exact solution to the inner problem. Then <span class="math inline">\(D\)</span> learns to reject that point, <span class="math inline">\(G\)</span> hops to the next best, and the pair cycles through modes forever without ever covering them.</p>
+<p><strong>The divergence is mode-seeking.</strong> By §6’s callout the practical loss carries a reverse-KL term, and reverse KL is minimised by covering <em>one</em> mode well rather than all modes poorly. The generator is doing what its objective asks.</p>
+<p><strong>Nothing penalises missing mass.</strong> <span class="math inline">\(D\)</span> judges samples <strong>one at a time</strong>. It can answer “is this a plausible digit?” but never “is this batch’s <em>diversity</em> right?” — that is a property of a set, invisible to a pointwise classifier. Diversity is simply not in the loss. This diagnosis suggests its own fix, and <em>minibatch discrimination</em> — letting <span class="math inline">\(D\)</span> see cross-sample statistics — is precisely that.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The same pathology as note 08, from the other side
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An MH chain trapped in one mode of a bimodal posterior looks perfectly healthy — good acceptance, stable trace — while sampling the wrong distribution. A mode-collapsed GAN looks perfectly healthy — sharp samples, low losses — while modelling the wrong distribution.</p>
+<p>Both are cases of a procedure that is locally correct everywhere and globally wrong, and in both cases the diagnostic that would reveal it (does the sample cover all the mass?) is exactly the one the algorithm does not compute.</p>
+</div>
+</div>
+</section>
+<section id="no-convergence-guarantee-it-is-a-game-not-a-minimisation" class="level3">
+<h3 class="anchored" data-anchor-id="no-convergence-guarantee-it-is-a-game-not-a-minimisation">7.3 No convergence guarantee: it is a game, not a minimisation</h3>
+<p>Ordinary training minimises one function, and “the loss went down” means progress. Here there are two losses that move in opposite directions, and the target is a <strong>saddle point</strong> — a Nash equilibrium — not a minimum. Descending a loss is not a correct algorithm for finding a saddle, and it can orbit one forever.</p>
+<p>The smallest possible instance makes it concrete. Take <span class="math inline">\(\min_x \max_y \, xy\)</span>, whose unique equilibrium is <span class="math inline">\((0,0)\)</span>. Simultaneous gradient steps with rate <span class="math inline">\(\eta\)</span>:</p>
+<p><span class="math display">\[
+x_{t+1} = x_t - \eta\,y_t, \qquad y_{t+1} = y_t + \eta\,x_t .
+\]</span></p>
+<p>Then</p>
+<p><span class="math display">\[
+x_{t+1}^2 + y_{t+1}^2 = (x_t - \eta y_t)^2 + (y_t + \eta x_t)^2 = (1+\eta^2)\,(x_t^2 + y_t^2),
+\]</span></p>
+<p>because the cross terms cancel exactly. The iterates <strong>spiral outward</strong> for any <span class="math inline">\(\eta &gt; 0\)</span>, moving further from the equilibrium at every step. In continuous time (<span class="math inline">\(\eta \to 0\)</span>) they orbit it forever on a circle and never converge. This is a convex-concave game — the friendliest case there is — and gradient descent-ascent still fails on it.</p>
+<p>Practical consequences:</p>
+<ul>
+<li><strong>Losses are uninformative.</strong> <span class="math inline">\(D\)</span>’s loss hovering near <span class="math inline">\(\log 2 \approx 0.69\)</span> per term is what you want, and also what you see when everything has collapsed. Neither loss decreasing monotonically is a sign of health; there is no scalar whose descent means progress. Evaluation moves outside the training loop entirely — FID, Inception Score, human inspection — with all the arbitrariness that implies.</li>
+<li><strong>Oscillation.</strong> Sample quality visibly cycles: sharp, then degraded, then sharp again. There is no “the loss plateaued, we are done”; you checkpoint frequently and pick by eye.</li>
+<li><strong>Balance is a hyperparameter.</strong> If <span class="math inline">\(D\)</span> outpaces <span class="math inline">\(G\)</span>, §7.1 kills the gradient. If <span class="math inline">\(G\)</span> outpaces <span class="math inline">\(D\)</span>, it exploits a weak critic and collapses. The update ratio, the two learning rates and the two architectures must be tuned <em>jointly</em>, and a configuration that works on one dataset may not transfer.</li>
+</ul>
+</section>
+<section id="slow-and-expensive-convergence" class="level3">
+<h3 class="anchored" data-anchor-id="slow-and-expensive-convergence">7.4 Slow and expensive convergence</h3>
+<p>Beyond instability, the arithmetic of the game is unfavourable.</p>
+<ul>
+<li><strong>Two networks, coupled.</strong> Every generator step needs a discriminator that is approximately optimal <em>for the current <span class="math inline">\(p_g\)</span></em> — and <span class="math inline">\(p_g\)</span> just changed. <span class="math inline">\(D\)</span> is perpetually chasing a moving target, and much of the compute goes into tracking rather than into progress.</li>
+<li><strong>Indirect signal.</strong> <span class="math inline">\(G\)</span> never touches a real sample. Its entire information about the data arrives second-hand through <span class="math inline">\(D\)</span>’s gradient, filtered through whatever <span class="math inline">\(D\)</span> currently happens to have learned. Contrast a diffusion model, whose training signal is a <em>supervised regression target</em> computed directly from a real image plus known noise.</li>
+<li><strong>No likelihood, so no model selection.</strong> You cannot compute held-out log-likelihood, so the ordinary machinery — early stopping, comparing architectures, detecting overfitting — is unavailable. A GAN that has memorised the training set and one that has generalised produce equally pretty samples.</li>
+<li><strong>Sensitivity.</strong> Results depend sharply on architecture, normalisation, and optimiser settings. That an entire paper (DCGAN, 2015) was needed to publish <em>a set of architectural choices that trains reliably</em> is itself the evidence.</li>
+</ul>
+</section>
+</section>
+<section id="what-was-done-about-it" class="level2">
+<h2 class="anchored" data-anchor-id="what-was-done-about-it">8. What was done about it</h2>
+<p>For completeness, and because several of these ideas reappear later in more principled forms:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Fix</th>
+<th>Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Vanishing gradient (7.1)</td>
+<td>non-saturating loss</td>
+<td>change <span class="math inline">\(G\)</span>’s loss, keep the fixed point</td>
+</tr>
+<tr class="even">
+<td>Vanishing gradient (7.1)</td>
+<td><strong>WGAN</strong> + weight clipping / gradient penalty</td>
+<td>replace JS with <span class="math inline">\(W_1\)</span>: an IPM, so it survives disjoint supports (note 07 §8)</td>
+</tr>
+<tr class="odd">
+<td>Vanishing gradient (7.1)</td>
+<td>instance noise</td>
+<td>convolve both distributions with Gaussian noise so the supports overlap</td>
+</tr>
+<tr class="even">
+<td>Mode collapse (7.2)</td>
+<td>minibatch discrimination</td>
+<td>let <span class="math inline">\(D\)</span> see batch statistics, so diversity enters the loss</td>
+</tr>
+<tr class="odd">
+<td>Mode collapse (7.2)</td>
+<td>unrolled GANs</td>
+<td>let <span class="math inline">\(G\)</span> see <span class="math inline">\(D\)</span>’s <em>future</em> response, undoing the min-max swap</td>
+</tr>
+<tr class="even">
+<td>Instability (7.3)</td>
+<td>spectral normalisation</td>
+<td>constrain <span class="math inline">\(D\)</span>’s Lipschitz constant, smoothing its gradient field</td>
+</tr>
+<tr class="odd">
+<td>Instability (7.3)</td>
+<td>two time-scale updates (TTUR)</td>
+<td>different learning rates for <span class="math inline">\(D\)</span> and <span class="math inline">\(G\)</span></td>
+</tr>
+<tr class="even">
+<td>Generality</td>
+<td><strong><span class="math inline">\(f\)</span>-GAN</strong></td>
+<td>the same variational template for any <span class="math inline">\(f\)</span>-divergence</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Instance noise is the diffusion idea, in embryo
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Look at the third row. The fix for disjoint supports is: <em>add Gaussian noise to both real and fake samples</em>, so that both distributions acquire full support, the density ratio becomes finite, and JS regains a gradient. It works, and it was regarded as a trick.</p>
+<p>A diffusion model does this <strong>at every noise level simultaneously and deliberately</strong>. The forward process is a whole continuum of noised versions of <span class="math inline">\(p_{\text{data}}\)</span>, and the model learns to reverse each level. The thing GANs had to smuggle in as a stabiliser is the diffusion model’s organising principle.</p>
+<p>Note 07 makes the same observation from the divergence side: convolving with a Gaussian is what makes ratio-based quantities finite and informative again.</p>
+</div>
+</div>
+</section>
+<section id="the-connection-back-to-metropolishastings" class="level2">
+<h2 class="anchored" data-anchor-id="the-connection-back-to-metropolishastings">9. The connection back to Metropolis–Hastings</h2>
+<p>The two halves of this week look unrelated — a 1970 statistical algorithm and a 2014 deep learning paper. They are the same machine.</p>
+<p>Note 08’s acceptance rule turns on the ratio <span class="math inline">\(\pi(y)/\pi(x)\)</span>, in which the normalising constant cancels. §4 above showed the discriminator’s logit <strong>is</strong> the log density ratio <span class="math inline">\(\log(p_{\text{data}}/p_g)\)</span>. Both methods run on a density ratio; they differ only in where it comes from.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Metropolis–Hastings</th>
+<th>GAN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Proposal</td>
+<td>chosen by hand for convenience</td>
+<td><strong>learned</strong></td>
+</tr>
+<tr class="even">
+<td>Density ratio</td>
+<td>computed exactly from <span class="math inline">\(\tilde\pi\)</span></td>
+<td><strong>estimated</strong> by a classifier, from samples</td>
+</tr>
+<tr class="odd">
+<td>Requires</td>
+<td><span class="math inline">\(\tilde\pi(x)\)</span> evaluable</td>
+<td>samples from <span class="math inline">\(p_{\text{data}}\)</span> only</td>
+</tr>
+<tr class="even">
+<td>Rejected candidate</td>
+<td>chain stays put; nothing learned</td>
+<td>becomes a gradient: a direction to move</td>
+</tr>
+<tr class="odd">
+<td>Output</td>
+<td>asymptotically exact, correlated draws</td>
+<td>approximate, independent draws, one forward pass each</td>
+</tr>
+<tr class="even">
+<td>Cost per sample</td>
+<td>thousands of steps, every time</td>
+<td>one forward pass, after training</td>
+</tr>
+</tbody>
+</table>
+<p>The consequence is a fact worth stating plainly: <strong>a trained discriminator gives you a density ratio for two distributions you cannot write down.</strong> That is enough to run an MH accept/reject step on a GAN’s own output, correcting its samples toward <span class="math inline">\(p_{\text{data}}\)</span> — which is exactly what MH-GAN (Turner et al., 2019) and discriminator rejection sampling (Azadi et al., 2019) do. The 1970 algorithm runs on the 2014 model’s output, using the learned classifier as its density ratio.</p>
+</section>
+<section id="key-takeaway" class="level2">
+<h2 class="anchored" data-anchor-id="key-takeaway">10. Key takeaway</h2>
+<p>Three sentences worth remembering.</p>
+<p><strong>The construction.</strong> Because an implicit model has no likelihood, its loss must be computable from samples alone; training a classifier to separate real from fake supplies exactly that, and its logit recovers the log density ratio that no formula could.</p>
+<p><strong>The theorem.</strong> At an optimal discriminator the game minimises <span class="math inline">\(-\log 4 + 2\,\mathrm{JS}(p_{\text{data}}\|p_g)\)</span>, uniquely minimised when <span class="math inline">\(p_g = p_{\text{data}}\)</span> — so the counterfeiter story was a principled divergence minimisation the whole time.</p>
+<p><strong>The trouble.</strong> Every difficulty traces to one of two roots: JS saturates between distributions on disjoint manifolds, which kills the gradient exactly when the discriminator is good; and a saddle point is not a minimum, so gradient descent has no reason to converge to it. The field’s response to the first was to change the divergence (WGAN), and to the second, to change the game.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Where this leaves the course
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A GAN is a <strong>learned proposal with a learned judge</strong>. It fixed what was wrong with Metropolis–Hastings — the hand-picked proposal, the wasted rejections, the thousands of steps per sample — and inherited a new problem: the judge is an adversary, and training against an adversary is a game with no convergence guarantee.</p>
+<p>The rest of this course removes the judge. A diffusion model’s forward process adds a <em>small</em> amount of Gaussian noise at each of many steps, which makes each reverse step nearly Gaussian and therefore matchable by direct regression against a target computed from real data. There is no adversary, no saddle point, no accept/reject, and the loss that goes down means progress.</p>
+<p>You have now seen both classical sampling and adversarial sampling fail, and in each case the diagnosis pointed the same way. Module 3 builds the thing they were pointing at.</p>
+</div>
+</div>
+</section>
+<section id="where-each-piece-returns" class="level2">
+<h2 class="anchored" data-anchor-id="where-each-piece-returns">11. Where each piece returns</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>From this note</th>
+<th>Where it reappears</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Implicit model <span class="math inline">\(x = G(z)\)</span></td>
+<td>flows, decoders, and the diffusion sampler itself</td>
+</tr>
+<tr class="even">
+<td>Discriminator logit <span class="math inline">\(=\log(p_{\text{data}}/p_g)\)</span></td>
+<td>the density-ratio trick; classifier guidance in Module 6</td>
+</tr>
+<tr class="odd">
+<td>Saturating vs non-saturating loss</td>
+<td>why a parametrisation can matter more than an objective</td>
+</tr>
+<tr class="even">
+<td>JS pinned at <span class="math inline">\(\log 2\)</span> on disjoint supports</td>
+<td>note 07 §8, and the motivation for WGAN</td>
+</tr>
+<tr class="odd">
+<td>Instance noise as a stabiliser</td>
+<td>the forward diffusion process, Module 3</td>
+</tr>
+<tr class="even">
+<td>Reverse KL is mode-seeking</td>
+<td>the ELBO’s KL term, and mode-covering in diffusion</td>
+</tr>
+<tr class="odd">
+<td>Adversarial training as a game</td>
+<td>why a direct regression objective is worth a great deal</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Show that for fixed <span class="math inline">\(G\)</span>, <span class="math inline">\(D^{*} = p_{\text{data}}/(p_{\text{data}}+p_g)\)</span>, and verify the second-order condition.</li>
+<li>Derive <span class="math inline">\(C(G) = -\log 4 + 2\,\mathrm{JS}(p_{\text{data}}\|p_g)\)</span> in full, stating where each <span class="math inline">\(\log 2\)</span> comes from.</li>
+<li>Show that the discriminator’s logit at the optimum is <span class="math inline">\(\log(p_{\text{data}}/p_g)\)</span>, and explain why this is remarkable given that neither density is available.</li>
+<li>Confirm <span class="math inline">\(\mathrm{JS} \le \log 2\)</span> always, and characterise exactly when equality holds.</li>
+<li>Let <span class="math inline">\(p_{\text{data}} = \mathcal{N}(0,1)\)</span> and <span class="math inline">\(p_g = \mathcal{N}(\mu,1)\)</span>. Compute <span class="math inline">\(D^{*}(x)\)</span> in closed form and sketch it for <span class="math inline">\(\mu = 0.5\)</span> and <span class="math inline">\(\mu = 5\)</span>. Where is its gradient largest, and what does that mean for the generator?</li>
+<li>Take <span class="math inline">\(p_{\text{data}}\)</span> uniform on <span class="math inline">\([0,1]\)</span> and <span class="math inline">\(p_g\)</span> uniform on <span class="math inline">\([\mu, \mu+1]\)</span> with <span class="math inline">\(\mu &gt; 1\)</span>. Compute <span class="math inline">\(\mathrm{JS}\)</span>, its derivative in <span class="math inline">\(\mu\)</span>, and <span class="math inline">\(W_1\)</span>. Which one can train a generator?</li>
+<li>Verify both gradient computations in §6: <span class="math inline">\(\partial_h \log(1-\sigma(h)) =
+-\sigma(h)\)</span> and <span class="math inline">\(\partial_h[-\log\sigma(h)] = -(1-\sigma(h))\)</span>. Explain in one sentence why this justifies the non-saturating loss.</li>
+<li>For the game <span class="math inline">\(\min_x\max_y xy\)</span>, show that simultaneous gradient steps of size <span class="math inline">\(\eta\)</span> multiply <span class="math inline">\(x^2+y^2\)</span> by <span class="math inline">\(1+\eta^2\)</span>. Now try <em>alternating</em> updates (use the new <span class="math inline">\(x_{t+1}\)</span> when updating <span class="math inline">\(y\)</span>) and show the behaviour differs. What does this suggest about implementation details in GAN training?</li>
+<li>Show that <span class="math inline">\(\max_D \min_G V \ne \min_G \max_D V\)</span> for this game by computing the generator’s optimal response to a fixed <span class="math inline">\(D\)</span>. Relate your answer to mode collapse.</li>
+<li>Explain why a discriminator that judges samples one at a time cannot penalise a generator for ignoring half the data’s modes. Design a loss term that could.</li>
+<li>Note 07 lists the original GAN under Jensen–Shannon and WGAN under <span class="math inline">\(W_1\)</span>. Using §6’s callout, argue that the <em>non-saturating</em> GAN actually belongs in neither row.</li>
+<li>Given a trained <span class="math inline">\(D\)</span> and generator <span class="math inline">\(G\)</span>, write down a Metropolis–Hastings accept/reject rule using <span class="math inline">\(D\)</span> that improves <span class="math inline">\(G\)</span>’s samples. What must be assumed about <span class="math inline">\(D\)</span> for the correction to be valid?</li>
+<li>In two sentences each, say what a GAN fixed about Metropolis–Hastings and what a diffusion model fixes about a GAN.</li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/acads-iit-jammu\.github\.io\/diffusion-models-f26");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../tutorials/18-metropolis-hastings.html" class="pagination-link" aria-label="08 · Metropolis–Hastings: Sampling What You Cannot Normalise">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../materials/w01-deck-01-mechanics.html" class="pagination-link" aria-label="01 · Course Mechanics">
+        <span class="nav-page-text">01 · Course Mechanics</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

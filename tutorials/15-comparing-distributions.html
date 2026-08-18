@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../materials/w01-deck-01-mechanics.html" rel="next">
+<link href="../tutorials/18-metropolis-hastings.html" rel="next">
 <link href="../tutorials/17-density-estimation-many-dimensions.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -230,6 +230,18 @@ window.Quarto = {
  <span class="menu-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/19-generative-adversarial-networks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -281,6 +293,18 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../materials/w03-deck-01-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">07 · The Multivariate Gaussian</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-01-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-02-gans.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
   </div>
 </li>
       </ul>
@@ -1093,6 +1117,19 @@ This is the WGAN argument
 </tbody>
 </table>
 <p>Read down that column and the structure the whole field shares comes into view: <strong>every generative model is minimising some divergence between the data distribution and the model’s</strong>. What distinguishes the families is <em>which</em> divergence, and — because it is usually not computable directly — <em>how they get at it</em>: a bound (VAE), a learned dual (GAN, WGAN), a closed form after adding noise (diffusion), or exactly (flows).</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What the next notes do with this
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Two rows of that table are now cashed in. <a href="../tutorials/18-metropolis-hastings.html">Note 08</a> takes the case where you <em>can</em> write the target down up to a constant and builds a Markov chain that samples it. <a href="../tutorials/19-generative-adversarial-networks.html">Note 09</a> takes the case where you cannot, and shows that training a classifier to separate real from generated samples estimates the density ratio <span class="math inline">\(p_{\text{data}}/p_g\)</span> — and that the resulting game minimises exactly the Jensen–Shannon divergence in the table above, with §8’s saturation as its central difficulty.</p>
+</div>
+</div>
 <div class="callout callout-style-simple callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1573,8 +1610,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../materials/w01-deck-01-mechanics.html" class="pagination-link" aria-label="01 · Course Mechanics">
-        <span class="nav-page-text">01 · Course Mechanics</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/18-metropolis-hastings.html" class="pagination-link" aria-label="08 · Metropolis–Hastings: Sampling What You Cannot Normalise">
+        <span class="nav-page-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
