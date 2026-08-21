@@ -83,7 +83,10 @@
     color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
     gap: 1rem; flex-wrap: wrap; }
   .figwrap { overflow-x: auto; }
-  svg { display: block; max-width: 100%; height: auto; }
+  .figwrap > svg { display: block; max-width: 100%; height: auto; }
+  /* Path chips carry their own width/height attributes and must NOT be caught by
+     the rule above: max-width:100% + height:auto collapses them inside .paths. */
+  .pathchip svg { display: block; }
 
   .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
     margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
@@ -281,6 +284,11 @@
   const nEl = $("nSteps"), tEl = $("tNow");
 
   let n = 10, t = 10, kObs = null, playing = false, timer = null, highlightPath = null;
+
+  // Open with an endpoint already observed, so every act is populated on load.
+  // Act I is drawn unconditioned regardless, so the colourless -> colour contrast
+  // still reads: it is now between Act I and Act II rather than before/after a click.
+  const defaultK = () => 2 * Math.round(0.7 * n) - n;
 
   const C = (n, j) => { if (j < 0 || j > n) return 0; let r = 1; for (let i = 0; i < j; i++) r = r * (n - i) / (i + 1); return Math.round(r); };
   const N = (t, k) => (Math.abs(k) > t || ((t + k) & 1)) ? 0 : C(t, (t + k) / 2);
@@ -483,7 +491,7 @@
     if (kObs === null) {
       $("f3right").textContent = ""; $("f4right").textContent = "";
       s3.innerHTML = ""; r3.innerHTML = `<span class="empty">Observe an endpoint in Act II first — with nothing known, the last step is a coin toss like any other.</span>`;
-      list.innerHTML = `<span class="empty">No observation yet, so all ${fmt(total)} paths remain in play.</span>`;
+      list.innerHTML = `<p class="empty" style="margin:0">No endpoint observed, so all ${fmt(total)} paths remain in play — far too many to draw. Pick one in Act II.</p>`;
       take3.innerHTML = `<strong>Nothing to reverse yet.</strong> Pick an endpoint above.`;
       $("sampleNote").textContent = "";
     } else {
@@ -509,7 +517,7 @@
     }
   }
 
-  nEl.addEventListener("input", () => { n = +nEl.value; t = n; kObs = null; highlightPath = null;
+  nEl.addEventListener("input", () => { n = +nEl.value; t = n; kObs = defaultK(); highlightPath = null;
     tEl.max = n; tEl.value = n; render(); });
   tEl.addEventListener("input", () => { t = +tEl.value; render(); });
 
@@ -542,6 +550,7 @@
     highlightPath = rev.reverse(); render();
   });
 
+  kObs = defaultK();
   render();
 })();
 </script>
