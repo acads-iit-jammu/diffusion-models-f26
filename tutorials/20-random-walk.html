@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>00 · Introduction and Motivation – ID-5-02 (TO)</title>
+<title>The Random Walk: Forward, and Backward – ID-5-02 (TO)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/05-two-point-diffusion.html" rel="next">
-<link href="../assignments.html" rel="prev">
+<link href="../tutorials/03-transport-story.html" rel="next">
+<link href="../tutorials/13-inequalities.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/13-inequalities.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/20-random-walk.html">The Random Walk: Forward, and Backward</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -175,16 +175,16 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Lecture Notes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">00 · Introduction and Motivation</span></a>
   </div>
 </li>
@@ -311,13 +311,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
@@ -326,7 +326,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/20-random-walk.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/20-random-walk.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">The Random Walk: Forward, and Backward</span></a>
   </div>
 </li>
@@ -424,18 +424,15 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#what-this-course-is-about" id="toc-what-this-course-is-about" class="nav-link active" data-scroll-target="#what-this-course-is-about">What this course is about</a>
-  <ul class="collapse">
-  <li><a href="#the-route-in-one-paragraph" id="toc-the-route-in-one-paragraph" class="nav-link" data-scroll-target="#the-route-in-one-paragraph">The route, in one paragraph</a></li>
-  <li><a href="#how-the-material-is-organised" id="toc-how-the-material-is-organised" class="nav-link" data-scroll-target="#how-the-material-is-organised">How the material is organised</a></li>
-  <li><a href="#where-to-start" id="toc-where-to-start" class="nav-link" data-scroll-target="#where-to-start">Where to start</a></li>
-  </ul></li>
-  <li><a href="#the-simplest-generative-model-there-is" id="toc-the-simplest-generative-model-there-is" class="nav-link" data-scroll-target="#the-simplest-generative-model-there-is">The simplest generative model there is</a></li>
-  <li><a href="#view-1-conditional-generation-a-hierarchical-model" id="toc-view-1-conditional-generation-a-hierarchical-model" class="nav-link" data-scroll-target="#view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</a></li>
-  <li><a href="#view-2-the-coin-disappears-into-a-map" id="toc-view-2-the-coin-disappears-into-a-map" class="nav-link" data-scroll-target="#view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</a></li>
-  <li><a href="#the-two-point-limit" id="toc-the-two-point-limit" class="nav-link" data-scroll-target="#the-two-point-limit">The two-point limit</a></li>
-  <li><a href="#maps-are-not-unique" id="toc-maps-are-not-unique" class="nav-link" data-scroll-target="#maps-are-not-unique">Maps are not unique</a></li>
-  <li><a href="#the-claim-that-organizes-everything" id="toc-the-claim-that-organizes-everything" class="nav-link" data-scroll-target="#the-claim-that-organizes-everything">The claim that organizes everything</a></li>
+  <li><a href="#the-object" id="toc-the-object" class="nav-link active" data-scroll-target="#the-object">1. The object</a></li>
+  <li><a href="#variances-add-so-the-walk-spreads-like-sqrtn" id="toc-variances-add-so-the-walk-spreads-like-sqrtn" class="nav-link" data-scroll-target="#variances-add-so-the-walk-spreads-like-sqrtn">2. Variances add, so the walk spreads like <span class="math inline">\(\sqrt{n}\)</span></a></li>
+  <li><a href="#the-exact-law-and-where-the-binomial-comes-from" id="toc-the-exact-law-and-where-the-binomial-comes-from" class="nav-link" data-scroll-target="#the-exact-law-and-where-the-binomial-comes-from">3. The exact law, and where the binomial comes from</a></li>
+  <li><a href="#the-equation-the-density-obeys" id="toc-the-equation-the-density-obeys" class="nav-link" data-scroll-target="#the-equation-the-density-obeys">4. The equation the density obeys</a></li>
+  <li><a href="#the-gaussian-is-a-limit-not-an-assumption" id="toc-the-gaussian-is-a-limit-not-an-assumption" class="nav-link" data-scroll-target="#the-gaussian-is-a-limit-not-an-assumption">5. The Gaussian is a limit, not an assumption</a></li>
+  <li><a href="#backward-the-reverse-step-is-exactly-solvable" id="toc-backward-the-reverse-step-is-exactly-solvable" class="nav-link" data-scroll-target="#backward-the-reverse-step-is-exactly-solvable">6. Backward: the reverse step is exactly solvable</a></li>
+  <li><a href="#what-the-observation-actually-did" id="toc-what-the-observation-actually-did" class="nav-link" data-scroll-target="#what-the-observation-actually-did">7. What the observation actually did</a></li>
+  <li><a href="#where-learning-has-to-enter" id="toc-where-learning-has-to-enter" class="nav-link" data-scroll-target="#where-learning-has-to-enter">8. Where learning has to enter</a></li>
+  <li><a href="#where-each-piece-returns" id="toc-where-each-piece-returns" class="nav-link" data-scroll-target="#where-each-piece-returns">Where each piece returns</a></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 </nav>
@@ -443,9 +440,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/13-inequalities.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/20-random-walk.html">The Random Walk: Forward, and Backward</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">00 · Introduction and Motivation</h1>
+<h1 class="title">The Random Walk: Forward, and Backward</h1>
 </div>
 
 
@@ -462,147 +459,274 @@ window.Quarto = {
 </header>
 
 
-<p><em>The first note of the course. It says what the subject is, what the rest of the material is for, and then earns the claim that organises everything with the smallest possible example. Interactive version: <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>.</em></p>
-<section id="what-this-course-is-about" class="level2">
-<h2 class="anchored" data-anchor-id="what-this-course-is-about">What this course is about</h2>
-<p>A <strong>generative model</strong> is a thing that produces samples. Show it a pile of handwritten digits and it should produce new handwritten digits — not ones from the pile, and not noise, but plausible new members of the same population.</p>
-<p>The difficulty is that nobody hands you the population. You get a finite pile of examples, and from that pile you must build something that can generate more. Put formally: given samples <span class="math inline">\(x_1,\dots,x_n\)</span> drawn from an unknown <span class="math inline">\(p_{\text{data}}\)</span>, construct a procedure that draws fresh samples from something close to <span class="math inline">\(p_{\text{data}}\)</span>.</p>
-<p>Two observations shape everything that follows.</p>
-<p><strong>Sampling is not the same as knowing the density.</strong> You do not need a formula for <span class="math inline">\(p_{\text{data}}(x)\)</span> in order to draw from it, and — as the course will show — for images you could not write one down anyway. What you need is a <em>procedure</em>.</p>
-<p><strong>Every such procedure turns simple randomness into structured output.</strong> Somewhere in the machine there is a coin flip, a uniform draw, or a burst of Gaussian noise, and everything downstream of it is arithmetic. That is the picture this note builds, and the rest of the course is about how to <em>learn</em> the arithmetic when the target is complicated.</p>
-<section id="the-route-in-one-paragraph" class="level3">
-<h3 class="anchored" data-anchor-id="the-route-in-one-paragraph">The route, in one paragraph</h3>
-<p>We start with probability itself — random variables, joints, conditionals, Bayes — because generation runs forward from a latent cause to an observation while inference runs backward, and Bayes is the bridge. Then distributions and maximum likelihood in one dimension, where fitting has closed forms. Then the multivariate Gaussian, the one family closed under everything linear, which is why every tractable calculation in this subject goes through it. Then the wall: in high dimension, estimating a density directly stops working, even with structure. That failure is what forces the modern approach — stop describing distributions and start <strong>comparing</strong> them, which is why distances and divergences become central. Diffusion models are then one particular, very effective answer.</p>
+<p><em>A standalone tutorial, and the most economical object in the course. Toss a coin, add <span class="math inline">\(+1\)</span> for heads and <span class="math inline">\(-1\)</span> for tails, and keep a running total. That is the forward process of a diffusion model with the noise made as simple as noise can possibly be — and because it is that simple, every single thing we will later have to learn or approximate can here be done exactly, by counting.</em></p>
+<p><em>The companion sheet <a href="../homeworks/practice_01.pdf">Practice 1</a> built the machinery. This one spends it. The full derivations, with the small cases written out and the induction in full, are in <a href="../homeworks/practice_02.pdf">Practice 2</a>; the <a href="../materials/walk-lab.html">Walk Lab</a> below is the same object to play with.</em></p>
+<section id="the-object" class="level2">
+<h2 class="anchored" data-anchor-id="the-object">1. The object</h2>
+<p>Let <span class="math inline">\(X_1, X_2, \dots\)</span> be independent with <span class="math inline">\(\mathbb{P}(X_i = +1) = \mathbb{P}(X_i = -1) = \tfrac12\)</span>, and set</p>
+<p><span class="math display">\[S_n = \sum_{i=1}^{n} X_i .\]</span></p>
+<p>This is the <strong>simple symmetric random walk</strong>. Put its update rule beside the one from note 01 and the resemblance is the entire point:</p>
+<p><span class="math display">\[\underbrace{S_n = S_{n-1} + X_n}_{\text{here}}
+\qquad\qquad
+\underbrace{x_t = \sqrt{\alpha_t}\,x_{t-1} + \sqrt{1-\alpha_t}\,\varepsilon_t}_{\text{a diffusion model}}\]</span></p>
+<p>Both are discrete-time Markov chains in which noise accumulates and nothing removes it; both run forward with no training required; and both end somewhere structureless. The difference is one multiplicative factor. The walk has no shrinkage, so its variance grows without bound — <em>variance exploding</em>; the DDPM update shrinks the old state just enough to hold the total variance at 1 — <em>variance preserving</em>. Both are used in practice, and the choice is a design decision rather than a mathematical necessity.</p>
 </section>
-<section id="how-the-material-is-organised" class="level3">
-<h3 class="anchored" data-anchor-id="how-the-material-is-organised">How the material is organised</h3>
-<p><strong>Lecture Notes</strong> are the numbered spine, in reading order, and follow the lectures. <strong>Tutorials</strong> sit alongside and go deeper on one thing. <strong>Perspectives</strong> are optional reinterpretations — a transport reading of the whole subject, and the measure-theoretic foundations — and nothing in the lectures depends on them. The <a href="../curriculum.html">Curriculum</a> page lists the sequence and maps it to weeks.</p>
+<section id="variances-add-so-the-walk-spreads-like-sqrtn" class="level2">
+<h2 class="anchored" data-anchor-id="variances-add-so-the-walk-spreads-like-sqrtn">2. Variances add, so the walk spreads like <span class="math inline">\(\sqrt{n}\)</span></h2>
+<p>Each increment has mean <span class="math inline">\(0\)</span>, and since <span class="math inline">\(X_i^2 = 1\)</span> always, variance <span class="math inline">\(1\)</span>. The increments are independent, so variances add:</p>
+<p><span class="math display">\[\mathbb{E}[S_n] = 0, \qquad \operatorname{Var}(S_n) = n, \qquad \operatorname{sd}(S_n) = \sqrt{n}.\]</span></p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+This is the <span class="math inline">\(\sqrt{t}\)</span> envelope
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The W01 demo <em>Progressively Adding Noise</em> draws a cloud of walkers spreading with a <span class="math inline">\(\sqrt{t}\)</span> curve over it. That curve is the line above. A walk does not travel a distance proportional to the number of steps — it travels proportional to the <strong>square root</strong> of it, because the steps cancel in a way that lets variances rather than distances accumulate.</p>
+<p>Everything in this course that spreads like <span class="math inline">\(\sqrt{t}\)</span> spreads for this reason.</p>
+</div>
+</div>
 </section>
-<section id="where-to-start" class="level3">
-<h3 class="anchored" data-anchor-id="where-to-start">Where to start</h3>
-<p>Read this note, then <a href="../tutorials/05-two-point-diffusion.html">01 · The World’s Smallest Diffusion Model</a>, which builds a complete working diffusion model on a dataset of two points, with every step in closed form. Nothing in it is approximated and nothing is learned — which makes it the clearest possible statement of <em>what we are trying to do in high dimensions</em>, and of exactly which step stops being computable once the data is images rather than two numbers.</p>
+<section id="the-exact-law-and-where-the-binomial-comes-from" class="level2">
+<h2 class="anchored" data-anchor-id="the-exact-law-and-where-the-binomial-comes-from">3. The exact law, and where the binomial comes from</h2>
+<p>Here it matters what the underlying sample space actually is, because the answer is a counting argument and counting needs something to count.</p>
+<p>An <strong>outcome is a whole path</strong>, not a position:</p>
+<p><span class="math display">\[\Omega_n = \{-1,+1\}^n, \qquad \omega = (\omega_1,\dots,\omega_n), \qquad |\Omega_n| = 2^n,\]</span></p>
+<p>with every path equally likely, <span class="math inline">\(\mathbb{P}(\{\omega\}) = 2^{-n}\)</span>. On this space <span class="math inline">\(S_n(\omega) = \sum_i \omega_i\)</span> is a random variable in the sense of note 02 — an honest function — and the interesting thing about it is that it is <strong>massively many-to-one</strong>: it crushes <span class="math inline">\(2^n\)</span> paths onto at most <span class="math inline">\(n+1\)</span> positions.</p>
+<p>The event <span class="math inline">\(\{S_n = k\}\)</span> is therefore a <em>set of paths</em>, the preimage <span class="math inline">\(S_n^{-1}(\{k\})\)</span>, and because the measure is uniform,</p>
+<p><span class="math display">\[\mathbb{P}(S_n = k) \;=\; \frac{\big|S_n^{-1}(\{k\})\big|}{2^n}
+\;=\; \frac{\text{paths ending at } k}{\text{all paths}} .\]</span></p>
+<p><strong>Probability has become combinatorics</strong>, not by choice but because the coin is fair.</p>
+<p>Now count. A path with <span class="math inline">\(j\)</span> up-steps and <span class="math inline">\(n-j\)</span> down-steps ends at <span class="math inline">\(j - (n-j) = 2j-n\)</span>, so <em>ending at <span class="math inline">\(k\)</span></em> is the same condition as <em>having exactly <span class="math inline">\(j = (n+k)/2\)</span> up-steps</em>. The paths ending at <span class="math inline">\(k\)</span> are in bijection with the ways of choosing <strong>which</strong> <span class="math inline">\(j\)</span> of the <span class="math inline">\(n\)</span> steps went up, and there are <span class="math inline">\(\binom{n}{j}\)</span> of those:</p>
+<p><span class="math display">\[\boxed{\;\mathbb{P}(S_n = k) = \binom{n}{\tfrac{n+k}{2}}\,2^{-n},
+\qquad k \in \{-n, -n+2, \dots, n-2, n\}.\;}\]</span></p>
+<p>Note the <strong>parity constraint</strong>: each step changes <span class="math inline">\(S\)</span> by an odd amount, so after <span class="math inline">\(n\)</span> steps only positions of the same parity as <span class="math inline">\(n\)</span> are reachable. <span class="math inline">\(\mathbb{P}(S_4 = 1)\)</span> is not small — it is exactly zero.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+This is the discrete <span class="math inline">\(q(x_t \mid x_0)\)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note 05’s closed-form marginal is what lets a diffusion model jump to any noise level in one step rather than simulating the chain. The boxed formula is that same property, with a binomial coefficient where the Gaussian would be. Without it, sampling <span class="math inline">\(S_{1000}\)</span> would mean tossing a thousand coins.</p>
+</div>
+</div>
+<p><strong>Interactive</strong> — <a href="../materials/walk-lab.html" target="_blank">The Walk Lab</a> runs all of this. <strong>Act I</strong> stacks the counts up column by column and draws the distribution on the same <span class="math inline">\(k\)</span> axis, so it reads as the column of counts turned on its side. <strong>Act II</strong> is §7 below — observe an endpoint and watch path space collapse. <strong>Act III</strong> is §6, the reverse step.</p>
+<iframe src="../materials/walk-lab.html" width="100%" height="680" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="The Walk Lab: the random walk lattice, path counts, and the reverse step">
+</iframe>
 </section>
-</section>
-<section id="the-simplest-generative-model-there-is" class="level2">
-<h2 class="anchored" data-anchor-id="the-simplest-generative-model-there-is">The simplest generative model there is</h2>
-<p>The rest of this note presents one tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative sampler, diffusion included, is the second picture, once all of its random inputs are exposed, with a learned ingredient in place of the formula.</p>
-</section>
-<section id="view-1-conditional-generation-a-hierarchical-model" class="level2">
-<h2 class="anchored" data-anchor-id="view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</h2>
-<p>The simplest latent-variable model:</p>
-<p><span class="math display">\[
-\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
-x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
-\]</span></p>
-<p><strong>Ancestral sampling</strong> generates by following the arrows: draw the latent coin <span class="math inline">\(z\)</span>, then draw <span class="math inline">\(x\)</span> from the selected component. The observed marginal is obtained by summing out the latent:</p>
-<p><span class="math display">\[
-p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
-\;=\; \pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)
-\]</span></p>
-<p>— exactly the two-component mixture from the playground. A mixture is not just a formula; it is a <em>generative story</em>: population <span class="math inline">\(\to\)</span> subpopulation <span class="math inline">\(\to\)</span> individual.</p>
-<p><strong>Inference is the same hierarchy, run backwards.</strong> Given an observed <span class="math inline">\(x\)</span>, Bayes’ rule gives the posterior over the hidden coin:</p>
-<p><span class="math display">\[
-\mathbb{P}(z = 1 \mid x)
-= \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
-       {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
-\]</span></p>
-<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this equals <span class="math inline">\(\operatorname{sigmoid}(-2x/\sigma^2)\)</span>; its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is exactly the posterior W01 computed for the <span class="math inline">\(+1\)</span> component, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
-</section>
-<section id="view-2-the-coin-disappears-into-a-map" class="level2">
-<h2 class="anchored" data-anchor-id="view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</h2>
-<p><strong>Theorem (inverse-CDF / probability integral transform).</strong> Let <span class="math inline">\(F\)</span> be a CDF with generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
-<p><em>Proof.</em> <span class="math inline">\(\mathbb{P}(F^{-1}(U) \le x) = \mathbb{P}(U \le F(x)) = F(x)\)</span>, since <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span> by monotonicity. <span class="math inline">\(\square\)</span></p>
-<p>For our mixture, <span class="math inline">\(F(x) = \pi\,\Phi\!\big(\tfrac{x-\mu_1}{\sigma}\big) +
-(1-\pi)\,\Phi\!\big(\tfrac{x-\mu_2}{\sigma}\big)\)</span> is continuous and strictly increasing, so <span class="math inline">\(F^{-1}\)</span> is an honest function, and</p>
-<p><span class="math display">\[
-u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
-\]</span></p>
-<p>generates the mixture <strong>with no coin anywhere</strong> — the explicit coin has been marginalized out. One caution about where it went: under this map, the event <span class="math inline">\(u &lt; \pi\)</span> selects the lowest <span class="math inline">\(\pi\)</span>-fraction of the <em>mixture</em> distribution, which is <strong>not</strong> the same as the ancestral label <span class="math inline">\(z = 1\)</span> when the components overlap — both Gaussians have full support, so each contributes on both sides of any quantile. (In the well-separated limit <span class="math inline">\(\sigma \to 0\)</span> the two events do coincide, and the <em>packed</em> map below is the construction in which <span class="math inline">\(u &lt; \pi\)</span> genuinely encodes the coin.) Randomness in, structure out, everything in between deterministic.</p>
-</section>
-<section id="the-two-point-limit" class="level2">
-<h2 class="anchored" data-anchor-id="the-two-point-limit">The two-point limit</h2>
-<p>Send <span class="math inline">\(\sigma \to 0\)</span> with <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>. The CDF collapses to a staircase: a jump of height <span class="math inline">\(\pi\)</span> at <span class="math inline">\(-1\)</span>, a flat <strong>plateau</strong> at height <span class="math inline">\(\pi\)</span> across the empty middle, a jump to <span class="math inline">\(1\)</span> at <span class="math inline">\(+1\)</span>. The map becomes</p>
-<p><span class="math display">\[
-x = \begin{cases} -1, &amp; u &lt; \pi \\ +1, &amp; u &gt; \pi \end{cases}
-\qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
-\]</span></p>
-<p>W01’s dataset, generated by thresholding a uniform (almost surely: the single point <span class="math inline">\(u = \pi\)</span> has probability zero). The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a> proves this limit. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
-</section>
-<section id="maps-are-not-unique" class="level2">
-<h2 class="anchored" data-anchor-id="maps-are-not-unique">Maps are not unique</h2>
-<p><span class="math inline">\(F^{-1}\)</span> is the <em>monotone</em> map pushing <span class="math inline">\(\text{Uniform}(0,1)\)</span> to <span class="math inline">\(p\)</span>, but not the only map. The “packed” two-stage construction</p>
-<p><span class="math display">\[
-x = \begin{cases}
-\mu_1 + \sigma\, \Phi^{-1}\!\big(u/\pi\big), &amp; u &lt; \pi,\\[2pt]
-\mu_2 + \sigma\, \Phi^{-1}\!\big(\tfrac{u-\pi}{1-\pi}\big), &amp; u \ge \pi,
-\end{cases}
-\]</span></p>
-<p>also pushes uniform to the mixture (each branch rescales its segment of <span class="math inline">\([0,1]\)</span> back to a full uniform — Exercise 3), and it is <em>literally</em> ancestral sampling written as one formula. Different map, same distribution: what is canonical is the <em>distribution</em>, not the transport. (In higher dimensions, choosing among the many maps is its own subject — optimal transport — which we will brush against later.)</p>
-</section>
-<section id="the-claim-that-organizes-everything" class="level2">
-<h2 class="anchored" data-anchor-id="the-claim-that-organizes-everything">The claim that organizes everything</h2>
-<blockquote class="blockquote">
-<p><strong>Once all of its random draws are exposed, a generative sampler is a deterministic map from base randomness to a sample.</strong></p>
-</blockquote>
+<section id="the-equation-the-density-obeys" class="level2">
+<h2 class="anchored" data-anchor-id="the-equation-the-density-obeys">4. The equation the density obeys</h2>
+<p>Stop watching the walker and watch the distribution. Write <span class="math inline">\(p_n(k) = \mathbb{P}(S_n = k)\)</span>. There are exactly two ways to be at <span class="math inline">\(k\)</span> at time <span class="math inline">\(n+1\)</span>, so</p>
+<p><span class="math display">\[p_{n+1}(k) = \tfrac12\,p_n(k-1) + \tfrac12\,p_n(k+1).\]</span></p>
+<p>Subtract <span class="math inline">\(p_n(k)\)</span> from both sides and regroup:</p>
+<p><span class="math display">\[\underbrace{p_{n+1}(k) - p_n(k)}_{\text{difference in time}}
+\;=\; \tfrac12 \underbrace{\big[\,p_n(k+1) - 2p_n(k) + p_n(k-1)\,\big]}_{\text{second difference in space}}\]</span></p>
+<p>The left side is a discrete time derivative; the right is the three-point second difference, the discrete <span class="math inline">\(\partial_x^2\)</span>. In the continuum,</p>
+<p><span class="math display">\[\boxed{\;\frac{\partial p}{\partial t} = \frac12\,\frac{\partial^2 p}{\partial x^2}\;}\]</span></p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+That is the heat equation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is the Fokker–Planck equation for Brownian motion — Module 5’s centrepiece — derived from a coin toss with nothing but addition and subtraction.</p>
+<p>Read it rather than merely verifying it: where <span class="math inline">\(p\)</span> is concave (a peak) the second difference is negative and the density falls; where it is convex (a trough) it rises. Peaks flatten, troughs fill, the whole thing spreads. That is what “adding noise” does to a <em>distribution</em>, as opposed to what it does to a sample.</p>
+</div>
+</div>
+<p><strong>Where <span class="math inline">\(\sqrt{\Delta t}\)</span> comes from.</strong> Take lattice spacing <span class="math inline">\(h\)</span> and time step <span class="math inline">\(\Delta t\)</span>, so after time <span class="math inline">\(t\)</span> the walker has taken <span class="math inline">\(n = t/\Delta t\)</span> steps and, by §2, has variance <span class="math inline">\(n h^2 = t h^2/\Delta t\)</span>. Only one choice of <span class="math inline">\(h\)</span> survives the limit:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 18%">
-<col style="width: 24%">
-<col style="width: 32%">
-<col style="width: 26%">
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Model</th>
-<th>Random input(s)</th>
-<th>Sampling mechanism</th>
-<th>Typical fitting</th>
+<th>choice</th>
+<th>variance at time <span class="math inline">\(t\)</span></th>
+<th>limit</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>This note</td>
-<td><span class="math inline">\(u \sim \text{U}(0,1)\)</span></td>
-<td>quantile <span class="math inline">\(F^{-1}(u)\)</span> (numerical in the demo)</td>
-<td>the CDF is known</td>
+<td><span class="math inline">\(h = \Delta t\)</span></td>
+<td><span class="math inline">\(t\,\Delta t \to 0\)</span></td>
+<td>the walk <strong>dies</strong></td>
 </tr>
 <tr class="even">
-<td>GAN</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td><span class="math inline">\(G_\theta(z)\)</span>, a network</td>
-<td>adversarial objective</td>
+<td><span class="math inline">\(h = \sqrt{\Delta t}\)</span></td>
+<td><span class="math inline">\(t\)</span></td>
+<td><strong>Brownian motion</strong></td>
 </tr>
 <tr class="odd">
-<td>VAE</td>
-<td><span class="math inline">\(z\)</span>, plus decoder noise <span class="math inline">\(\varepsilon\)</span></td>
-<td>sample <span class="math inline">\(p_\theta(x \mid z)\)</span>, i.e.&nbsp;<span class="math inline">\(T_\theta(z, \varepsilon)\)</span></td>
-<td>ELBO / variational learning</td>
-</tr>
-<tr class="even">
-<td>Normalizing flow</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td>invertible <span class="math inline">\(f_\theta(z)\)</span></td>
-<td>exact likelihood (change of variables)</td>
-</tr>
-<tr class="odd">
-<td><strong>Diffusion</strong></td>
-<td><span class="math inline">\(x_T \sim \mathcal{N}\)</span>; step noise if stochastic</td>
-<td><strong>probability-flow ODE</strong> (deterministic) or reverse SDE</td>
-<td><strong>score/denoising objectives, ELBO</strong></td>
+<td><span class="math inline">\(h = (\Delta t)^{1/4}\)</span></td>
+<td><span class="math inline">\(t/\sqrt{\Delta t} \to \infty\)</span></td>
+<td>the walk <strong>explodes</strong></td>
 </tr>
 </tbody>
 </table>
-<p>The outer skeleton is shared — simple randomness, a sampling mechanism, data — while the learned object, the structural constraints, and the sampler differ. For diffusion in particular, determinism is a <em>sampler choice</em>: the probability-flow ODE is a deterministic map from <span class="math inline">\(x_T\)</span>; the reverse SDE consumes fresh noise at every step and is a deterministic function only of <span class="math inline">\((x_T, \text{all step noises})\)</span>.</p>
-<p>In one dimension with a known CDF, the map is a formula. For images, the population law is unknown and no tractable multivariate inverse-CDF construction exists — so deep generative models learn a <em>transport, density, score, or other ingredient</em> of a sampler rather than writing the map down. And you have already run one: W01’s probability-flow ODE numerically transported a moment-matched Gaussian to within <span class="math inline">\(\approx \sigma_{\min}\)</span> of the two-point data (W01 lists the approximations involved); with the exact terminal law, score, and integration, it is an exact deterministic transport — an inverse-CDF-like map built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
+<p>This is why an SDE is written <span class="math inline">\(dX = b\,dt + \sigma\,dW\)</span> with <span class="math inline">\(dW\)</span> of size <span class="math inline">\(\sqrt{dt}\)</span> and not <span class="math inline">\(dt\)</span> — and it is the same fact that puts a square root on the noise coefficient <span class="math inline">\(\sqrt{1-\alpha_t}\)</span>, since that coefficient multiplies the <em>variable</em> while variances scale by its <em>square</em>.</p>
+</section>
+<section id="the-gaussian-is-a-limit-not-an-assumption" class="level2">
+<h2 class="anchored" data-anchor-id="the-gaussian-is-a-limit-not-an-assumption">5. The Gaussian is a limit, not an assumption</h2>
+<p><span class="math inline">\(S_n\)</span> is a sum of <span class="math inline">\(n\)</span> i.i.d. terms with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(1\)</span>, so <span class="math inline">\(S_n/\sqrt{n} \Rightarrow \mathcal{N}(0,1)\)</span> — equivalently, the binomial of §3, once centred and scaled, approaches a Gaussian density.</p>
+<p>The increments here are as un-Gaussian as a random variable can be: two atoms, no density at all. After enough steps the marginal is Gaussian anyway. <strong>So the Gaussian noise in a diffusion model is not a modelling restriction being smuggled in</strong> — after many small steps you would arrive at a Gaussian whatever the increments looked like. Choosing Gaussians only buys closed forms at <em>every</em> <span class="math inline">\(t\)</span> rather than asymptotically.</p>
+<p>Run <span class="math inline">\(d\)</span> independent walks and a second fact appears: <span class="math inline">\(\mathbb{E}\lVert S_n\rVert^2 = nd\)</span>, and the relative spread of <span class="math inline">\(\lVert S_n \rVert\)</span> shrinks like <span class="math inline">\(1/\sqrt{2d}\)</span>. In high dimension essentially every sample sits in a <strong>thin shell</strong> at radius <span class="math inline">\(\sqrt{nd}\)</span>, even though the origin is the single most likely point. That is the Gaussian annulus of note 06, and it is why <span class="math inline">\(x_T \sim \mathcal{N}(0,I_d)\)</span> is a sphere rather than a blob — the reverse process starts on a shell.</p>
+</section>
+<section id="backward-the-reverse-step-is-exactly-solvable" class="level2">
+<h2 class="anchored" data-anchor-id="backward-the-reverse-step-is-exactly-solvable">6. Backward: the reverse step is exactly solvable</h2>
+<p>Now the diffusion question, asked of a coin: <strong>you are told where the walk ended; what was the last step?</strong></p>
+<p><strong>By Bayes.</strong> To have <span class="math inline">\(S_n = k\)</span> with <span class="math inline">\(X_n = +1\)</span> the walk must have been at <span class="math inline">\(k-1\)</span> after <span class="math inline">\(n-1\)</span> steps. With <span class="math inline">\(j = (n+k)/2\)</span>,</p>
+<p><span class="math display">\[\mathbb{P}(X_n = +1 \mid S_n = k)
+= \frac{\mathbb{P}(S_{n-1}=k-1)\cdot\tfrac12}{\mathbb{P}(S_n = k)}
+= \frac{\binom{n-1}{j-1}}{\binom{n}{j}} = \frac{j}{n} = \frac{n+k}{2n},\]</span></p>
+<p>the powers of two cancelling and the last step being <span class="math inline">\(\binom{n}{j} = \tfrac{n}{j}\binom{n-1}{j-1}\)</span>.</p>
+<p><strong>By symmetry, in one line.</strong> Given <span class="math inline">\(S_n = k\)</span>, every path with <span class="math inline">\(j\)</span> up-steps has the same probability — a path’s probability depends on <em>how many</em> up-steps it has, not where they fall. So the increments are conditionally <strong>exchangeable</strong>, <span class="math inline">\(\mathbb{E}[X_i \mid S_n = k]\)</span> is the same number <span class="math inline">\(c\)</span> for every <span class="math inline">\(i\)</span>, and they must sum to <span class="math inline">\(k\)</span>. Hence <span class="math inline">\(nc = k\)</span> and</p>
+<p><span class="math display">\[\boxed{\;\mathbb{E}\big[X_i \mid S_n = k\big] = \frac{k}{n} \quad\text{for every } i.\;}\]</span></p>
+<p>The expected step is the average step. Same theorem; one derivation takes a blackboard and the other takes a sentence.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+This is a denoiser
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A hidden quantity, a noisy observation, a posterior, and its mean — and note 07’s best-predictor theorem says the conditional mean is exactly what squared-error training converges to. So <span class="math inline">\(k/n\)</span> is what a network trained to predict the increment from the endpoint would learn. Here we have it in closed form, so we can check the answer a network would otherwise have to discover.</p>
+<p>A question worth sitting with: <strong>does the answer change if the coin is biased?</strong> It does not. Conditioning on the endpoint fixes the number of up-steps, all arrangements stay equally likely whatever <span class="math inline">\(p\)</span> is, and exchangeability is untouched. The forward process depends on the bias; the reverse step given the endpoint does not.</p>
+</div>
+</div>
+<p><strong>Reverse sampling.</strong> The reverse step is all you need to run the process backwards. From <span class="math inline">\(S_n = k\)</span>: set <span class="math inline">\(j = (n+k)/2\)</span>, declare the last step <span class="math inline">\(+1\)</span> with probability <span class="math inline">\(j/n\)</span> (else <span class="math inline">\(-1\)</span>), update <span class="math inline">\(k\)</span> and <span class="math inline">\(n\)</span>, repeat. This produces a trajectory distributed exactly as a forward walk conditioned to end at <span class="math inline">\(k\)</span> — a <strong>complete diffusion model, in nine lines of code, with nothing trained</strong>. Act III of the lab runs it.</p>
+</section>
+<section id="what-the-observation-actually-did" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-observation-actually-did">7. What the observation actually did</h2>
+<p>This is the part the lab is built to make visible, and it is worth stating carefully because it is the idea the whole course rests on.</p>
+<p>Before you observe anything, all <span class="math inline">\(2^n\)</span> paths are <strong>equally likely</strong>. Ranking paths by probability gives one enormous tie. The distribution of <span class="math inline">\(S_n\)</span> is peaked in the middle not because those paths are likelier, but because <strong>more paths land there</strong>.</p>
+<p>Observing <span class="math inline">\(S_n = k\)</span> then <strong>reweights nothing</strong>. It rules paths out. The <span class="math inline">\(\binom{n}{j}\)</span> survivors remain exactly as likely as one another — a perfect tie, just a smaller one. And the size of what survives measures how much you learned:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>observation</th>
+<th>paths surviving (<span class="math inline">\(n = 20\)</span>)</th>
+<th>bits still unknown</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(S_n = n\)</span></td>
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(0\)</span> — the path is pinned</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(S_n = n-2\)</span></td>
+<td><span class="math inline">\(20\)</span></td>
+<td><span class="math inline">\(4.3\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(S_n = 0\)</span></td>
+<td><span class="math inline">\(184{,}756\)</span></td>
+<td><span class="math inline">\(17.5\)</span> of <span class="math inline">\(20\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>The extreme case is the clearest. <span class="math inline">\(S_n = n\)</span> can be reached by exactly one path, all <span class="math inline">\(+1\)</span>s, so the observation determines the entire history and the reverse process is deterministic. At the other end, the <em>most likely</em> endpoint is also the <em>least informative</em>: more paths survive there than anywhere else.</p>
+</section>
+<section id="where-learning-has-to-enter" class="level2">
+<h2 class="anchored" data-anchor-id="where-learning-has-to-enter">8. Where learning has to enter</h2>
+<p>Everything above was exact. It is worth being precise about which step stops being exact when the data stops being a coin, because that step is the rest of the course.</p>
+<p>The reverse process needs <span class="math inline">\(\mathbb{P}(x_0 \mid x_t)\)</span>. Here we could write it down because the possibilities could be enumerated. Replace the coin with images and three things break at once: there is no formula for <span class="math inline">\(p(x_0)\)</span> — note 06 is a catalogue of failed attempts to get one; the sum over possible <span class="math inline">\(x_0\)</span> becomes an intractable integral over <span class="math inline">\(\mathbb{R}^d\)</span>; and by §5 the relevant region is a thin shell in a huge space, so no amount of sampling covers it.</p>
+<p>So the posterior mean is not computable. But note 07 §1 says it is exactly what squared-error regression converges to — and a regression target <em>is</em> available, because the forward process is known and we can noise a real image ourselves.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The whole idea, assembled
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A forward process that is free to run and has a closed-form marginal (§3); a reverse process that is a posterior over what was added (§6); and a training objective that reaches that posterior without ever writing it down (note 07).</p>
+<p>Modules 3 to 6 replace the coin with a Gaussian and the enumeration with a network. Nothing else changes.</p>
+</div>
+</div>
+</section>
+<section id="where-each-piece-returns" class="level2">
+<h2 class="anchored" data-anchor-id="where-each-piece-returns">Where each piece returns</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>From this tutorial</th>
+<th>Where it reappears</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\operatorname{Var}(S_n) = n\)</span>, spread <span class="math inline">\(\sqrt n\)</span></td>
+<td>the <span class="math inline">\(\sqrt t\)</span> envelope of the forward process</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbb{P}(S_n = k) = \binom{n}{(n+k)/2}2^{-n}\)</span></td>
+<td>closed-form <span class="math inline">\(q(x_t \mid x_0)\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(p_{n+1} = \tfrac12 p_n(k-1) + \tfrac12 p_n(k+1)\)</span></td>
+<td>the master equation of any chain</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\partial_t p = \tfrac12 \partial_x^2 p\)</span></td>
+<td>Fokker–Planck, Module 5</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(h = \sqrt{\Delta t}\)</span></td>
+<td>why <span class="math inline">\(dW\)</span> has size <span class="math inline">\(\sqrt{dt}\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(S_n/\sqrt n \Rightarrow \mathcal{N}(0,1)\)</span></td>
+<td>why the forward endpoint is Gaussian</td>
+</tr>
+<tr class="odd">
+<td>Thin shell at radius <span class="math inline">\(\sqrt{nd}\)</span></td>
+<td>why <span class="math inline">\(\mathcal{N}(0,I_d)\)</span> is a sphere</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbb{E}[X_i \mid S_n = k] = k/n\)</span></td>
+<td>the reverse process; the denoiser</td>
+</tr>
+<tr class="odd">
+<td>Observing rules out, never reweights</td>
+<td>why the reverse step is an inference problem</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<p>The full set, with the small cases enumerated and the induction written out, is in <a href="../homeworks/practice_02.pdf">Practice 2</a>. A representative few:</p>
 <ol type="1">
-<li>Complete the inverse-CDF proof for a general (possibly non-strictly-increasing) <span class="math inline">\(F\)</span> using the generalized inverse.</li>
-<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above, and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x)\)</span> equals W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span> posterior (mind which component carries the <span class="math inline">\(+\)</span> sign); compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
-<li>Verify the packed map: show that conditional on <span class="math inline">\(u &lt; \pi\)</span>, the rescaled variable <span class="math inline">\(u/\pi\)</span> is <span class="math inline">\(\text{Uniform}(0,1)\)</span>, and conclude that the branch produces <span class="math inline">\(\mathcal{N}(\mu_1, \sigma^2)\)</span> with the correct probability.</li>
-<li>Construct the inverse-CDF map for a <strong>three</strong>-component mixture and describe its staircase limit as <span class="math inline">\(\sigma \to 0\)</span>. How many plateaus, at what heights?</li>
-<li>The map <span class="math inline">\(x = F^{-1}(u)\)</span> is monotone increasing. Exhibit a <em>decreasing</em> map with the same pushforward, and a map that is neither monotone nor continuous. (Hint: <span class="math inline">\(1 - u\)</span> is also uniform.)</li>
+<li>Compute <span class="math inline">\(\mathbb{P}(S_6 = k)\)</span> for every <span class="math inline">\(k\)</span> and check the values sum to 1. Which <span class="math inline">\(k\)</span> are unreachable, and why?</li>
+<li>Prove the recursion <span class="math inline">\(N_{n+1}(k) = N_n(k-1) + N_n(k+1)\)</span> by deleting the last step, and show it is Pascal’s rule in disguise.</li>
+<li>A walker starts at 0. Estimate how many steps until it is typically 100 away, then 1000 away, and comment on the ratio.</li>
+<li>Show <span class="math inline">\(\mathbb{E}[X_i \mid S_n = k] = k/n\)</span> for <em>every</em> <span class="math inline">\(i\)</span>, not just <span class="math inline">\(i = n\)</span>. Why does this not contradict the increments being unconditionally independent?</li>
+<li>Let <span class="math inline">\(\mathbb{P}(X_i = +1) = p\)</span>. Show <span class="math inline">\(\mathbb{E}[S_n] = n(2p-1)\)</span> and <span class="math inline">\(\operatorname{Var}(S_n) = 4np(1-p)\)</span>, and then that <span class="math inline">\(\mathbb{P}(X_n = +1 \mid S_n = k)\)</span> is still <span class="math inline">\((n+k)/2n\)</span>, independent of <span class="math inline">\(p\)</span>.</li>
+<li>Which choice of <span class="math inline">\(\alpha_t\)</span> turns the DDPM update of §1 into this walk? What does that say about variance-preserving versus variance-exploding processes?</li>
 </ol>
 
 
@@ -1036,13 +1160,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../assignments.html" class="pagination-link" aria-label="Assignments">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Assignments</span>
+      <a href="../tutorials/13-inequalities.html" class="pagination-link" aria-label="Inequalities Worth Knowing">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Inequalities Worth Knowing</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/05-two-point-diffusion.html" class="pagination-link" aria-label="01 · The World's Smallest Diffusion Model">
-        <span class="nav-page-text">01 · The World’s Smallest Diffusion Model</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/03-transport-story.html" class="pagination-link" aria-label="Moving Distributions: The Transport Story">
+        <span class="nav-page-text">Moving Distributions: The Transport Story</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

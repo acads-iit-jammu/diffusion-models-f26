@@ -164,7 +164,7 @@
     "href": "curriculum.html#week-by-week",
     "title": "Curriculum",
     "section": "",
-    "text": "W01 · Jul 29M1\nCourse Overview\nWhat the course is, how it is assessed, and why diffusion models are worth a semester. A first look at the object of study: a model that produces samples rather than one that scores them.\n\nDecks\n\n01 · Course Mechanics\n02 · Why Diffusion Models?\n03 · The World’s Smallest Diffusion Model\n\n\n\nMaterials\n\nTwo-point diffusion demo\nOne-point noise demo\n\n\n\n\nW02 · Aug 3–5M1\nIntroduction, Motivation and Foundations\nWhat a generative model is, and the smallest complete example — a diffusion model on two data points, exact at every step. Then probability from the ground up, ending at maximum likelihood in one dimension.\n\nLecture notes\n\n00 · Introduction and Motivation\n01 · The World’s Smallest Diffusion Model\n02 · Probability & Random Variables\n03 · Joint, Conditional, Marginal — and Bayes\n04 · Distributions and Maximum Likelihood\n\n\n\nDecks\n\n04 · Probability, Joints, Conditionals and Bayes\n05 · Distributions and Maximum Likelihood\n06 · Generative AI, in Its Simplest Form\n\n\n\nMaterials\n\nJoint slicer\nDistributions playground\nLikelihood lens\nSampling as a map\n\n\n\n\nW03 · Aug 10, 11, 14M1–2\nMultivariate Extensions, and Comparing Distributions\nMaximum likelihood in many dimensions — supervised, where closed forms mostly vanish, and unsupervised, which is density estimation. Where that runs out, and the segue it forces: stop describing distributions, start comparing them.\n\nLecture notes\n\n05 · The Multivariate Gaussian\n06 · Estimating a Density in Many Dimensions\n07 · Comparing Distributions\n\n\n\nDecks\n\n07 · The Multivariate Gaussian\n\n\n\nMaterials\n\nGaussian Lab\nThe KDE Lab\nThe KL Lab\nThe Sampling Lab\nTutorial: Inequalities Worth Knowing\nHW 1 & HW 2 released Mon Aug 10\n\n\n\n\nW04 · Aug 17, 18, 21M1\nSampling, and the First Deep Generative Model\nGeneration is sampling, and sampling is hard. Metropolis–Hastings solves it when the target can be written down up to a constant — and cannot be pointed at images, because there is no such target to write. So learn the proposal instead: the GAN, its min-max objective, the Jensen–Shannon theorem behind it, and why it is so hard to train.\n\nLecture notes\n\n08 · Metropolis–Hastings\n09 · Generative Adversarial Networks\n\n\n\nDecks\n\n08 · Sampling What You Cannot Normalise\n09 · Generative Adversarial Networks\n\n\n\nMaterials\n\nThe Sampling Lab\nPractice 1 — HW 1 worked in full, then Gaussian algebra, conditional expectation and KL\n\n\n\nDeadline\n\nHW 1 due Tue Aug 18, in class\nClass Test-1 window opens Wed Aug 19\n\n\n\n\nW05 · Aug 24, 25, 28TBD\nTo be decided\n\nDeadline\n\nHW 2 due Tue Aug 25, in class\n\n\n\n\nW06 · Aug 31, Sep 1, 4TBD\nTo be decided\n\n\nW07 · Sep 7, 8, 11TBD\nTo be decided\n\n\nW08 · Sep 14, 15, 18TBD\nTo be decided\n\n\nW09 · Sep 21–25—\nBreak\n\nExaminations\n\nMid-semester examination window Sep 18 – 23\nNo classes Monday or Tuesday; Friday Sep 25 to be confirmed\n\n\n\n\nW10 · Sep 28, 29, Oct 2TBD\nTo be decided\n\n\nW11 · Oct 5, 6, 9TBD\nTo be decided\n\n\nW12 · Oct 12, 13, 16TBD\nTo be decided\n\n\nW13 · Oct 23TBD\nTo be decided\n\nHolidays\n\nMonday and Tuesday are Dussehra holidays\nSingle lecture this week\n\n\n\n\nW14 · Oct 26, 27, 30TBD\nTo be decided\n\n\nW15 · Nov 2, 3, 6TBD\nTo be decided\n\n\nW16 · Nov 9–13—\nBreak\n\nHolidays\n\nNo classes — the Diwali cluster runs Nov 9 – 11\nFriday Nov 13 to be confirmed\n\n\n\n\nW17 · Nov 16, 17, 20TBD\nTo be decided\n\nExaminations\n\nLast teaching week\nEnd-semester examination window Nov 23 – 30",
+    "text": "W01 · Jul 29M1\nCourse Overview\nWhat the course is, how it is assessed, and why diffusion models are worth a semester. A first look at the object of study: a model that produces samples rather than one that scores them.\n\nDecks\n\n01 · Course Mechanics\n02 · Why Diffusion Models?\n03 · The World’s Smallest Diffusion Model\n\n\n\nMaterials\n\nTwo-point diffusion demo\nOne-point noise demo\n\n\n\n\nW02 · Aug 3–5M1\nIntroduction, Motivation and Foundations\nWhat a generative model is, and the smallest complete example — a diffusion model on two data points, exact at every step. Then probability from the ground up, ending at maximum likelihood in one dimension.\n\nLecture notes\n\n00 · Introduction and Motivation\n01 · The World’s Smallest Diffusion Model\n02 · Probability & Random Variables\n03 · Joint, Conditional, Marginal — and Bayes\n04 · Distributions and Maximum Likelihood\n\n\n\nDecks\n\n04 · Probability, Joints, Conditionals and Bayes\n05 · Distributions and Maximum Likelihood\n06 · Generative AI, in Its Simplest Form\n\n\n\nMaterials\n\nJoint slicer\nDistributions playground\nLikelihood lens\nSampling as a map\n\n\n\n\nW03 · Aug 10, 11, 14M1–2\nMultivariate Extensions, and Comparing Distributions\nMaximum likelihood in many dimensions — supervised, where closed forms mostly vanish, and unsupervised, which is density estimation. Where that runs out, and the segue it forces: stop describing distributions, start comparing them.\n\nLecture notes\n\n05 · The Multivariate Gaussian\n06 · Estimating a Density in Many Dimensions\n07 · Comparing Distributions\n\n\n\nDecks\n\n07 · The Multivariate Gaussian\n\n\n\nMaterials\n\nGaussian Lab\nThe KDE Lab\nThe KL Lab\nThe Sampling Lab\nTutorial: Inequalities Worth Knowing\nHW 1 & HW 2 released Mon Aug 10\n\n\n\n\nW04 · Aug 17, 18, 21M1\nSampling, and the First Deep Generative Model\nGeneration is sampling, and sampling is hard. Metropolis–Hastings solves it when the target can be written down up to a constant — and cannot be pointed at images, because there is no such target to write. So learn the proposal instead: the GAN, its min-max objective, the Jensen–Shannon theorem behind it, and why it is so hard to train.\n\nLecture notes\n\n08 · Metropolis–Hastings\n09 · Generative Adversarial Networks\n\n\n\nDecks\n\n08 · Sampling What You Cannot Normalise\n09 · Generative Adversarial Networks\n\n\n\nMaterials\n\nThe Sampling Lab\nPractice 1 — Gaussian algebra, conditional expectation, and KL\nHW 1 solutions — released Tue Aug 18\n\n\n\nDeadline\n\nHW 1 due Tue Aug 18, in class\nClass Test-1 window opens Wed Aug 19\n\n\n\n\nW05 · Aug 24, 25, 28TBD\nTo be decided\n\nDeadline\n\nHW 2 due Tue Aug 25, in class\n\n\n\n\nW06 · Aug 31, Sep 1, 4TBD\nTo be decided\n\n\nW07 · Sep 7, 8, 11TBD\nTo be decided\n\n\nW08 · Sep 14, 15, 18TBD\nTo be decided\n\n\nW09 · Sep 21–25—\nBreak\n\nExaminations\n\nMid-semester examination window Sep 18 – 23\nNo classes Monday or Tuesday; Friday Sep 25 to be confirmed\n\n\n\n\nW10 · Sep 28, 29, Oct 2TBD\nTo be decided\n\n\nW11 · Oct 5, 6, 9TBD\nTo be decided\n\n\nW12 · Oct 12, 13, 16TBD\nTo be decided\n\n\nW13 · Oct 23TBD\nTo be decided\n\nHolidays\n\nMonday and Tuesday are Dussehra holidays\nSingle lecture this week\n\n\n\n\nW14 · Oct 26, 27, 30TBD\nTo be decided\n\n\nW15 · Nov 2, 3, 6TBD\nTo be decided\n\n\nW16 · Nov 9–13—\nBreak\n\nHolidays\n\nNo classes — the Diwali cluster runs Nov 9 – 11\nFriday Nov 13 to be confirmed\n\n\n\n\nW17 · Nov 16, 17, 20TBD\nTo be decided\n\nExaminations\n\nLast teaching week\nEnd-semester examination window Nov 23 – 30",
     "crumbs": [
       "Curriculum"
     ]
@@ -194,7 +194,7 @@
     "href": "assignments.html",
     "title": "Assignments",
     "section": "",
-    "text": "Homeworks\nFive homeworks, together worth 20%. Each carries 50 points, in five problems. Problem sets are distributed as PDF; solution sets are posted after the submission deadline. HW 1 is graded for completion — credit is for a genuine attempt at every part rather than for correct answers. HW 2 onwards are graded on correctness, with marks carried by the reasoning as much as the answer.",
+    "text": "Homeworks\nFive homeworks, together worth 20%. Each carries 50 points, in five problems. Problem sets are distributed as PDF; solution sets are posted after the submission deadline. HW 1 is graded for completion — credit is for a genuine attempt at every part rather than for correct answers. HW 2 onwards are graded on correctness, with marks carried by the reasoning as much as the answer.\nSolution sets are worked derivations rather than answer keys: each problem states the concept it is testing and derives the answer in full.",
     "crumbs": [
       "Assignments"
     ]
@@ -204,7 +204,7 @@
     "href": "assignments.html#homeworks",
     "title": "Assignments",
     "section": "",
-    "text": "#\nTopic\nReleased\nDue\nProblems\nSolutions\n\n\n\n\nHW 1\nRandom variables, joints, conditionals, Bayes\nMon 10 Aug 2026\nTue 18 Aug 2026, in class\nPDF\nafter deadline\n\n\nHW 2\nDistributions and maximum likelihood\nMon 10 Aug 2026\nTue 25 Aug 2026, in class\nPDF\nafter deadline\n\n\nHW 3\n—\nTBA\nTBA\n—\n—\n\n\nHW 4\n—\nTBA\nTBA\n—\n—\n\n\nHW 5\n—\nTBA\nTBA\n—\n—",
+    "text": "#\nTopic\nReleased\nDue\nProblems\nSolutions\n\n\n\n\nHW 1\nRandom variables, joints, conditionals, Bayes\nMon 10 Aug 2026\nTue 18 Aug 2026, in class\nPDF\nPDF\n\n\nHW 2\nDistributions and maximum likelihood\nMon 10 Aug 2026\nTue 25 Aug 2026, in class\nPDF\nafter deadline\n\n\nHW 3\n—\nTBA\nTBA\n—\n—\n\n\nHW 4\n—\nTBA\nTBA\n—\n—\n\n\nHW 5\n—\nTBA\nTBA\n—\n—",
     "crumbs": [
       "Assignments"
     ]
@@ -214,7 +214,7 @@
     "href": "assignments.html#practice-sheets",
     "title": "Assignments",
     "section": "Practice sheets",
-    "text": "Practice sheets\nNot graded, and not submitted. Each sheet works a set of problems through in full, so it is a worked reference rather than an exercise set — read it with a pen and redo the derivations yourself before checking.\n\n\n\n\n\n\n\n\n\n#\nTopic\nPosted\nSheet\n\n\n\n\nPractice 1\nHW 1 worked in full; Gaussian algebra, conditional expectation, KL\nTue 18 Aug 2026\nPDF",
+    "text": "Practice sheets\nNot graded, and not submitted. Each sheet derives a small set of results in full and ends with exercises — read it with a pen and redo the derivations yourself. These are the computations the lectures assume you can do, so they are worth the time even though no marks depend on them.\nPractice 2 has a companion you can play with: The Walk Lab, also embedded in the tutorial The Random Walk.\n\n\n\n\n\n\n\n\n\n#\nTopic\nPosted\nSheet\n\n\n\n\nPractice 1\nGaussian algebra and \\(q(x_t \\mid x_0)\\); conditional expectation as the squared-error minimiser; KL between Gaussians\nTue 18 Aug 2026\nPDF\n\n\nPractice 2\nThe random walk: its exact law by counting, the heat equation, and a reverse step you can solve in closed form\nFri 21 Aug 2026\nPDF",
     "crumbs": [
       "Assignments"
     ]
@@ -1381,6 +1381,116 @@
     "crumbs": [
       "Tutorials",
       "Inequalities Worth Knowing"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html",
+    "href": "tutorials/20-random-walk.html",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "",
+    "text": "1. The object\nLet \\(X_1, X_2, \\dots\\) be independent with \\(\\mathbb{P}(X_i = +1) = \\mathbb{P}(X_i = -1) = \\tfrac12\\), and set\n\\[S_n = \\sum_{i=1}^{n} X_i .\\]\nThis is the simple symmetric random walk. Put its update rule beside the one from note 01 and the resemblance is the entire point:\n\\[\\underbrace{S_n = S_{n-1} + X_n}_{\\text{here}}\n\\qquad\\qquad\n\\underbrace{x_t = \\sqrt{\\alpha_t}\\,x_{t-1} + \\sqrt{1-\\alpha_t}\\,\\varepsilon_t}_{\\text{a diffusion model}}\\]\nBoth are discrete-time Markov chains in which noise accumulates and nothing removes it; both run forward with no training required; and both end somewhere structureless. The difference is one multiplicative factor. The walk has no shrinkage, so its variance grows without bound — variance exploding; the DDPM update shrinks the old state just enough to hold the total variance at 1 — variance preserving. Both are used in practice, and the choice is a design decision rather than a mathematical necessity.",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html#variances-add-so-the-walk-spreads-like-sqrtn",
+    "href": "tutorials/20-random-walk.html#variances-add-so-the-walk-spreads-like-sqrtn",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "2. Variances add, so the walk spreads like \\(\\sqrt{n}\\)",
+    "text": "2. Variances add, so the walk spreads like \\(\\sqrt{n}\\)\nEach increment has mean \\(0\\), and since \\(X_i^2 = 1\\) always, variance \\(1\\). The increments are independent, so variances add:\n\\[\\mathbb{E}[S_n] = 0, \\qquad \\operatorname{Var}(S_n) = n, \\qquad \\operatorname{sd}(S_n) = \\sqrt{n}.\\]\n\n\n\n\n\n\nThis is the \\(\\sqrt{t}\\) envelope\n\n\n\nThe W01 demo Progressively Adding Noise draws a cloud of walkers spreading with a \\(\\sqrt{t}\\) curve over it. That curve is the line above. A walk does not travel a distance proportional to the number of steps — it travels proportional to the square root of it, because the steps cancel in a way that lets variances rather than distances accumulate.\nEverything in this course that spreads like \\(\\sqrt{t}\\) spreads for this reason.",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html#the-exact-law-and-where-the-binomial-comes-from",
+    "href": "tutorials/20-random-walk.html#the-exact-law-and-where-the-binomial-comes-from",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "3. The exact law, and where the binomial comes from",
+    "text": "3. The exact law, and where the binomial comes from\nHere it matters what the underlying sample space actually is, because the answer is a counting argument and counting needs something to count.\nAn outcome is a whole path, not a position:\n\\[\\Omega_n = \\{-1,+1\\}^n, \\qquad \\omega = (\\omega_1,\\dots,\\omega_n), \\qquad |\\Omega_n| = 2^n,\\]\nwith every path equally likely, \\(\\mathbb{P}(\\{\\omega\\}) = 2^{-n}\\). On this space \\(S_n(\\omega) = \\sum_i \\omega_i\\) is a random variable in the sense of note 02 — an honest function — and the interesting thing about it is that it is massively many-to-one: it crushes \\(2^n\\) paths onto at most \\(n+1\\) positions.\nThe event \\(\\{S_n = k\\}\\) is therefore a set of paths, the preimage \\(S_n^{-1}(\\{k\\})\\), and because the measure is uniform,\n\\[\\mathbb{P}(S_n = k) \\;=\\; \\frac{\\big|S_n^{-1}(\\{k\\})\\big|}{2^n}\n\\;=\\; \\frac{\\text{paths ending at } k}{\\text{all paths}} .\\]\nProbability has become combinatorics, not by choice but because the coin is fair.\nNow count. A path with \\(j\\) up-steps and \\(n-j\\) down-steps ends at \\(j - (n-j) = 2j-n\\), so ending at \\(k\\) is the same condition as having exactly \\(j = (n+k)/2\\) up-steps. The paths ending at \\(k\\) are in bijection with the ways of choosing which \\(j\\) of the \\(n\\) steps went up, and there are \\(\\binom{n}{j}\\) of those:\n\\[\\boxed{\\;\\mathbb{P}(S_n = k) = \\binom{n}{\\tfrac{n+k}{2}}\\,2^{-n},\n\\qquad k \\in \\{-n, -n+2, \\dots, n-2, n\\}.\\;}\\]\nNote the parity constraint: each step changes \\(S\\) by an odd amount, so after \\(n\\) steps only positions of the same parity as \\(n\\) are reachable. \\(\\mathbb{P}(S_4 = 1)\\) is not small — it is exactly zero.\n\n\n\n\n\n\nThis is the discrete \\(q(x_t \\mid x_0)\\)\n\n\n\nNote 05’s closed-form marginal is what lets a diffusion model jump to any noise level in one step rather than simulating the chain. The boxed formula is that same property, with a binomial coefficient where the Gaussian would be. Without it, sampling \\(S_{1000}\\) would mean tossing a thousand coins.\n\n\nInteractive — The Walk Lab runs all of this. Act I stacks the counts up column by column and draws the distribution on the same \\(k\\) axis, so it reads as the column of counts turned on its side. Act II is §7 below — observe an endpoint and watch path space collapse. Act III is §6, the reverse step.",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html#the-equation-the-density-obeys",
+    "href": "tutorials/20-random-walk.html#the-equation-the-density-obeys",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "4. The equation the density obeys",
+    "text": "4. The equation the density obeys\nStop watching the walker and watch the distribution. Write \\(p_n(k) = \\mathbb{P}(S_n = k)\\). There are exactly two ways to be at \\(k\\) at time \\(n+1\\), so\n\\[p_{n+1}(k) = \\tfrac12\\,p_n(k-1) + \\tfrac12\\,p_n(k+1).\\]\nSubtract \\(p_n(k)\\) from both sides and regroup:\n\\[\\underbrace{p_{n+1}(k) - p_n(k)}_{\\text{difference in time}}\n\\;=\\; \\tfrac12 \\underbrace{\\big[\\,p_n(k+1) - 2p_n(k) + p_n(k-1)\\,\\big]}_{\\text{second difference in space}}\\]\nThe left side is a discrete time derivative; the right is the three-point second difference, the discrete \\(\\partial_x^2\\). In the continuum,\n\\[\\boxed{\\;\\frac{\\partial p}{\\partial t} = \\frac12\\,\\frac{\\partial^2 p}{\\partial x^2}\\;}\\]\n\n\n\n\n\n\nThat is the heat equation\n\n\n\nIt is the Fokker–Planck equation for Brownian motion — Module 5’s centrepiece — derived from a coin toss with nothing but addition and subtraction.\nRead it rather than merely verifying it: where \\(p\\) is concave (a peak) the second difference is negative and the density falls; where it is convex (a trough) it rises. Peaks flatten, troughs fill, the whole thing spreads. That is what “adding noise” does to a distribution, as opposed to what it does to a sample.\n\n\nWhere \\(\\sqrt{\\Delta t}\\) comes from. Take lattice spacing \\(h\\) and time step \\(\\Delta t\\), so after time \\(t\\) the walker has taken \\(n = t/\\Delta t\\) steps and, by §2, has variance \\(n h^2 = t h^2/\\Delta t\\). Only one choice of \\(h\\) survives the limit:\n\n\n\n\n\n\n\n\nchoice\nvariance at time \\(t\\)\nlimit\n\n\n\n\n\\(h = \\Delta t\\)\n\\(t\\,\\Delta t \\to 0\\)\nthe walk dies\n\n\n\\(h = \\sqrt{\\Delta t}\\)\n\\(t\\)\nBrownian motion\n\n\n\\(h = (\\Delta t)^{1/4}\\)\n\\(t/\\sqrt{\\Delta t} \\to \\infty\\)\nthe walk explodes\n\n\n\nThis is why an SDE is written \\(dX = b\\,dt + \\sigma\\,dW\\) with \\(dW\\) of size \\(\\sqrt{dt}\\) and not \\(dt\\) — and it is the same fact that puts a square root on the noise coefficient \\(\\sqrt{1-\\alpha_t}\\), since that coefficient multiplies the variable while variances scale by its square.",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html#the-gaussian-is-a-limit-not-an-assumption",
+    "href": "tutorials/20-random-walk.html#the-gaussian-is-a-limit-not-an-assumption",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "5. The Gaussian is a limit, not an assumption",
+    "text": "5. The Gaussian is a limit, not an assumption\n\\(S_n\\) is a sum of \\(n\\) i.i.d. terms with mean \\(0\\) and variance \\(1\\), so \\(S_n/\\sqrt{n} \\Rightarrow \\mathcal{N}(0,1)\\) — equivalently, the binomial of §3, once centred and scaled, approaches a Gaussian density.\nThe increments here are as un-Gaussian as a random variable can be: two atoms, no density at all. After enough steps the marginal is Gaussian anyway. So the Gaussian noise in a diffusion model is not a modelling restriction being smuggled in — after many small steps you would arrive at a Gaussian whatever the increments looked like. Choosing Gaussians only buys closed forms at every \\(t\\) rather than asymptotically.\nRun \\(d\\) independent walks and a second fact appears: \\(\\mathbb{E}\\lVert S_n\\rVert^2 = nd\\), and the relative spread of \\(\\lVert S_n \\rVert\\) shrinks like \\(1/\\sqrt{2d}\\). In high dimension essentially every sample sits in a thin shell at radius \\(\\sqrt{nd}\\), even though the origin is the single most likely point. That is the Gaussian annulus of note 06, and it is why \\(x_T \\sim \\mathcal{N}(0,I_d)\\) is a sphere rather than a blob — the reverse process starts on a shell.",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html#backward-the-reverse-step-is-exactly-solvable",
+    "href": "tutorials/20-random-walk.html#backward-the-reverse-step-is-exactly-solvable",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "6. Backward: the reverse step is exactly solvable",
+    "text": "6. Backward: the reverse step is exactly solvable\nNow the diffusion question, asked of a coin: you are told where the walk ended; what was the last step?\nBy Bayes. To have \\(S_n = k\\) with \\(X_n = +1\\) the walk must have been at \\(k-1\\) after \\(n-1\\) steps. With \\(j = (n+k)/2\\),\n\\[\\mathbb{P}(X_n = +1 \\mid S_n = k)\n= \\frac{\\mathbb{P}(S_{n-1}=k-1)\\cdot\\tfrac12}{\\mathbb{P}(S_n = k)}\n= \\frac{\\binom{n-1}{j-1}}{\\binom{n}{j}} = \\frac{j}{n} = \\frac{n+k}{2n},\\]\nthe powers of two cancelling and the last step being \\(\\binom{n}{j} = \\tfrac{n}{j}\\binom{n-1}{j-1}\\).\nBy symmetry, in one line. Given \\(S_n = k\\), every path with \\(j\\) up-steps has the same probability — a path’s probability depends on how many up-steps it has, not where they fall. So the increments are conditionally exchangeable, \\(\\mathbb{E}[X_i \\mid S_n = k]\\) is the same number \\(c\\) for every \\(i\\), and they must sum to \\(k\\). Hence \\(nc = k\\) and\n\\[\\boxed{\\;\\mathbb{E}\\big[X_i \\mid S_n = k\\big] = \\frac{k}{n} \\quad\\text{for every } i.\\;}\\]\nThe expected step is the average step. Same theorem; one derivation takes a blackboard and the other takes a sentence.\n\n\n\n\n\n\nThis is a denoiser\n\n\n\nA hidden quantity, a noisy observation, a posterior, and its mean — and note 07’s best-predictor theorem says the conditional mean is exactly what squared-error training converges to. So \\(k/n\\) is what a network trained to predict the increment from the endpoint would learn. Here we have it in closed form, so we can check the answer a network would otherwise have to discover.\nA question worth sitting with: does the answer change if the coin is biased? It does not. Conditioning on the endpoint fixes the number of up-steps, all arrangements stay equally likely whatever \\(p\\) is, and exchangeability is untouched. The forward process depends on the bias; the reverse step given the endpoint does not.\n\n\nReverse sampling. The reverse step is all you need to run the process backwards. From \\(S_n = k\\): set \\(j = (n+k)/2\\), declare the last step \\(+1\\) with probability \\(j/n\\) (else \\(-1\\)), update \\(k\\) and \\(n\\), repeat. This produces a trajectory distributed exactly as a forward walk conditioned to end at \\(k\\) — a complete diffusion model, in nine lines of code, with nothing trained. Act III of the lab runs it.",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html#what-the-observation-actually-did",
+    "href": "tutorials/20-random-walk.html#what-the-observation-actually-did",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "7. What the observation actually did",
+    "text": "7. What the observation actually did\nThis is the part the lab is built to make visible, and it is worth stating carefully because it is the idea the whole course rests on.\nBefore you observe anything, all \\(2^n\\) paths are equally likely. Ranking paths by probability gives one enormous tie. The distribution of \\(S_n\\) is peaked in the middle not because those paths are likelier, but because more paths land there.\nObserving \\(S_n = k\\) then reweights nothing. It rules paths out. The \\(\\binom{n}{j}\\) survivors remain exactly as likely as one another — a perfect tie, just a smaller one. And the size of what survives measures how much you learned:\n\n\n\nobservation\npaths surviving (\\(n = 20\\))\nbits still unknown\n\n\n\n\n\\(S_n = n\\)\n\\(1\\)\n\\(0\\) — the path is pinned\n\n\n\\(S_n = n-2\\)\n\\(20\\)\n\\(4.3\\)\n\n\n\\(S_n = 0\\)\n\\(184{,}756\\)\n\\(17.5\\) of \\(20\\)\n\n\n\nThe extreme case is the clearest. \\(S_n = n\\) can be reached by exactly one path, all \\(+1\\)s, so the observation determines the entire history and the reverse process is deterministic. At the other end, the most likely endpoint is also the least informative: more paths survive there than anywhere else.",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html#where-learning-has-to-enter",
+    "href": "tutorials/20-random-walk.html#where-learning-has-to-enter",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "8. Where learning has to enter",
+    "text": "8. Where learning has to enter\nEverything above was exact. It is worth being precise about which step stops being exact when the data stops being a coin, because that step is the rest of the course.\nThe reverse process needs \\(\\mathbb{P}(x_0 \\mid x_t)\\). Here we could write it down because the possibilities could be enumerated. Replace the coin with images and three things break at once: there is no formula for \\(p(x_0)\\) — note 06 is a catalogue of failed attempts to get one; the sum over possible \\(x_0\\) becomes an intractable integral over \\(\\mathbb{R}^d\\); and by §5 the relevant region is a thin shell in a huge space, so no amount of sampling covers it.\nSo the posterior mean is not computable. But note 07 §1 says it is exactly what squared-error regression converges to — and a regression target is available, because the forward process is known and we can noise a real image ourselves.\n\n\n\n\n\n\nThe whole idea, assembled\n\n\n\nA forward process that is free to run and has a closed-form marginal (§3); a reverse process that is a posterior over what was added (§6); and a training objective that reaches that posterior without ever writing it down (note 07).\nModules 3 to 6 replace the coin with a Gaussian and the enumeration with a network. Nothing else changes.",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html#where-each-piece-returns",
+    "href": "tutorials/20-random-walk.html#where-each-piece-returns",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "Where each piece returns",
+    "text": "Where each piece returns\n\n\n\n\n\n\n\nFrom this tutorial\nWhere it reappears\n\n\n\n\n\\(\\operatorname{Var}(S_n) = n\\), spread \\(\\sqrt n\\)\nthe \\(\\sqrt t\\) envelope of the forward process\n\n\n\\(\\mathbb{P}(S_n = k) = \\binom{n}{(n+k)/2}2^{-n}\\)\nclosed-form \\(q(x_t \\mid x_0)\\)\n\n\n\\(p_{n+1} = \\tfrac12 p_n(k-1) + \\tfrac12 p_n(k+1)\\)\nthe master equation of any chain\n\n\n\\(\\partial_t p = \\tfrac12 \\partial_x^2 p\\)\nFokker–Planck, Module 5\n\n\n\\(h = \\sqrt{\\Delta t}\\)\nwhy \\(dW\\) has size \\(\\sqrt{dt}\\)\n\n\n\\(S_n/\\sqrt n \\Rightarrow \\mathcal{N}(0,1)\\)\nwhy the forward endpoint is Gaussian\n\n\nThin shell at radius \\(\\sqrt{nd}\\)\nwhy \\(\\mathcal{N}(0,I_d)\\) is a sphere\n\n\n\\(\\mathbb{E}[X_i \\mid S_n = k] = k/n\\)\nthe reverse process; the denoiser\n\n\nObserving rules out, never reweights\nwhy the reverse step is an inference problem",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
+    ]
+  },
+  {
+    "objectID": "tutorials/20-random-walk.html#exercises",
+    "href": "tutorials/20-random-walk.html#exercises",
+    "title": "The Random Walk: Forward, and Backward",
+    "section": "Exercises",
+    "text": "Exercises\nThe full set, with the small cases enumerated and the induction written out, is in Practice 2. A representative few:\n\nCompute \\(\\mathbb{P}(S_6 = k)\\) for every \\(k\\) and check the values sum to 1. Which \\(k\\) are unreachable, and why?\nProve the recursion \\(N_{n+1}(k) = N_n(k-1) + N_n(k+1)\\) by deleting the last step, and show it is Pascal’s rule in disguise.\nA walker starts at 0. Estimate how many steps until it is typically 100 away, then 1000 away, and comment on the ratio.\nShow \\(\\mathbb{E}[X_i \\mid S_n = k] = k/n\\) for every \\(i\\), not just \\(i = n\\). Why does this not contradict the increments being unconditionally independent?\nLet \\(\\mathbb{P}(X_i = +1) = p\\). Show \\(\\mathbb{E}[S_n] = n(2p-1)\\) and \\(\\operatorname{Var}(S_n) = 4np(1-p)\\), and then that \\(\\mathbb{P}(X_n = +1 \\mid S_n = k)\\) is still \\((n+k)/2n\\), independent of \\(p\\).\nWhich choice of \\(\\alpha_t\\) turns the DDPM update of §1 into this walk? What does that say about variance-preserving versus variance-exploding processes?",
+    "crumbs": [
+      "Tutorials",
+      "The Random Walk: Forward, and Backward"
     ]
   },
   {
