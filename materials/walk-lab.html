@@ -1,0 +1,547 @@
+<title>The Walk Lab</title>
+<style>
+  /* Tokens and type stack are the course lab system, shared with
+     sampling-lab / gaussian-lab / kde-lab / kl-lab. Do not fork them. */
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --ring: rgba(11,11,11,0.10);
+    --data: #2a78d6;
+    --data-soft: rgba(42,120,214,0.16);
+    --lik: #eb6834;
+    --lik-soft: rgba(235,104,52,0.16);
+    --true: #7a7a72;
+    --node: 11, 11, 11;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --ring: rgba(255,255,255,0.10);
+      --data: #3987e5;
+      --data-soft: rgba(57,135,229,0.20);
+      --lik: #d95926;
+      --lik-soft: rgba(217,89,38,0.20);
+      --true: #9b9b92;
+      --node: 255, 255, 255;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --ring: rgba(255,255,255,0.10);
+    --data: #3987e5;
+    --data-soft: rgba(57,135,229,0.20);
+    --lik: #d95926;
+    --lik-soft: rgba(217,89,38,0.20);
+    --true: #9b9b92;
+    --node: 255, 255, 255;
+  }
+
+  * { box-sizing: border-box; }
+
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 17px; line-height: 1.6; }
+
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+    display: flex; flex-direction: column; gap: 2.5rem; }
+
+  h1 { font-size: clamp(1.9rem, 5.5vw, 2.7rem); line-height: 1.12; margin: 0 0 0.6rem;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .dek { color: var(--ink-2); margin: 0; font-size: 1.06rem; max-width: 38rem; }
+  .dek b { color: var(--ink); font-weight: 600; }
+
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  h2 .act { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--data); margin-bottom: 0.35rem; }
+  section > p { margin: 0 0 1rem; max-width: 38rem; color: var(--ink-2); }
+  section > p b { color: var(--ink); font-weight: 600; }
+
+  .fig { background: var(--surface); border: 1px solid var(--grid); border-radius: 4px;
+    padding: 0.9rem 1rem 1rem; }
+  .figlabel { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.6rem; display: flex; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; }
+  .figwrap { overflow-x: auto; }
+  svg { display: block; max-width: 100%; height: auto; }
+
+  .controls { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--grid);
+    font-size: 0.82rem; color: var(--ink-2); }
+  .controls label { display: inline-flex; align-items: center; gap: 0.35rem; }
+  input[type=range] { width: 9rem; accent-color: var(--data); }
+  input[type=range]:focus-visible { outline: 2px solid var(--data); outline-offset: 3px; }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.2em; display: inline-block; }
+
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+  button { font: inherit; font-size: 0.82rem; cursor: pointer; padding: 0.3rem 0.7rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--axis); border-radius: 3px; }
+  button:hover { border-color: var(--ink-2); }
+  button:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
+  .seg button[aria-pressed="true"] { background: var(--data); border-color: var(--data); color: #fff; }
+
+  .readout { font-size: 0.85rem; margin-top: 0.6rem; color: var(--ink-2); }
+  .readout b { color: var(--ink); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem;
+    font-variant-numeric: tabular-nums; }
+
+  .takeaway { border-left: 3px solid var(--data); padding: 0.15rem 0 0.15rem 1.1rem;
+    color: var(--ink-2); font-size: 1.02rem; max-width: 38rem; }
+  .takeaway strong { color: var(--ink); }
+  .takeaway.warm { border-left-color: var(--lik); }
+
+  .legend { font-size: 0.78rem; color: var(--muted); display: flex; gap: 1.1rem;
+    flex-wrap: wrap; margin-top: 0.5rem; }
+  .legend i { display: inline-block; width: 1.5rem; height: 0; border-top-width: 3px;
+    border-top-style: solid; vertical-align: middle; margin-right: 0.35rem; }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 1.4rem; margin-top: 0.7rem;
+    padding-top: 0.7rem; border-top: 1px solid var(--grid); }
+  .stat { min-width: 7rem; }
+  .stat .n { display: block; font-size: 1.5rem; font-weight: 600; line-height: 1.1;
+    font-variant-numeric: tabular-nums; }
+  .stat .l { display: block; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    margin-top: 0.15rem; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+  th, td { text-align: right; padding: 0.28rem 0.5rem; border-bottom: 1px solid var(--grid);
+    font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.64rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted);
+    font-weight: 600; border-bottom-color: var(--axis); }
+  tbody tr.sel td { background: var(--data-soft); }
+  .tie { color: var(--muted); font-size: 0.68rem; letter-spacing: 0.04em; }
+
+  .paths { display: flex; flex-wrap: wrap; gap: 0.3rem; max-height: 15rem; overflow-y: auto;
+    margin-top: 0.6rem; padding: 2px; }
+  .pathchip { border: 1px solid var(--grid); border-radius: 3px; padding: 2px;
+    background: var(--surface); line-height: 0; }
+  .pathchip.hi { border-color: var(--ink); }
+  .empty { color: var(--muted); font-style: italic; font-size: 0.9rem; }
+
+  footer { color: var(--muted); font-size: 0.8rem; max-width: 38rem;
+    border-top: 1px solid var(--grid); padding-top: 1rem; }
+
+  /* SVG marks styled here, not via presentation attributes: var() inside an SVG
+     attribute is not reliably supported, and this makes the theme swap free. */
+  .shade { fill: var(--grid); }
+  .axis-l { stroke: var(--axis); stroke-width: 1; }
+  .lbl { fill: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .edge { stroke: var(--axis); fill: none; stroke-linecap: round; }
+  .edge.up { stroke: var(--data); }
+  .edge.down { stroke: var(--lik); }
+  .node { fill: rgb(var(--node)); stroke: var(--axis); stroke-width: .8; }
+  .node.off { stroke: none; }
+  .ring-sel { fill: none; stroke: var(--ink); stroke-width: 2; }
+  .trace { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linejoin: round;
+    stroke-linecap: round; opacity: .9; }
+  .bar { fill: rgb(var(--node)); fill-opacity: .45; }
+  .bar.sel { fill: var(--data); fill-opacity: 1; }
+  .bar.dim { fill-opacity: .12; }
+  .pc-up { stroke: var(--data); stroke-width: 1.7; stroke-linecap: round; }
+  .pc-down { stroke: var(--lik); stroke-width: 1.7; stroke-linecap: round; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <h1>The Walk Lab</h1>
+    <p class="dek">
+      Toss a coin <span class="mono">n</span> times, adding <span class="mono">+1</span> for heads and
+      <span class="mono">−1</span> for tails. Forward, the distribution takes shape — not because the
+      middle paths are likelier, but because <b>there are more of them</b>. Backward, name where the walk
+      ended and watch path space collapse to the paths still consistent with it.
+    </p>
+    <p class="dek" style="margin-top:.6rem">
+      Companion to <b>Practice 2</b>: the lattice is §3, the reverse step is §7.
+    </p>
+  </header>
+
+  <!-- ACT I ------------------------------------------------------------ -->
+  <section>
+    <h2><span class="act">Act I · the forward process</span>Counts pile up, and that is the distribution</h2>
+    <p>
+      Every node is a position after <span class="mono">t</span> steps; its label is the number of
+      distinct paths that reach it. Node size is that count as a share of its own column. The bars on the
+      right share the same <span class="mono">k</span> axis — so the distribution is literally the column
+      of counts, turned on its side.
+    </p>
+    <div class="fig">
+      <p class="figlabel"><span>Lattice · path counts N(t,k)</span><span id="f1right">P(S_t = k)</span></p>
+      <div class="figwrap"><svg id="fig1" role="img" aria-labelledby="fig1t"><title id="fig1t">Random walk lattice with path counts, and the distribution it produces</title></svg></div>
+      <div class="controls">
+        <label>steps <input type="range" id="nSteps" min="2" max="18" value="10" step="1"><span class="val mono" id="nOut">10</span></label>
+        <label>run to <input type="range" id="tNow" min="0" max="10" value="10" step="1"><span class="val mono" id="tOut">10</span></label>
+        <span class="seg"><button id="play" aria-pressed="false">Run forward</button></span>
+      </div>
+      <p class="readout" id="r1"></p>
+    </div>
+    <p class="takeaway">
+      <strong>Every path is equally likely.</strong> All <span class="mono" id="tot1"></span> of them have
+      probability <span class="mono">1/2ⁿ</span>, so ranking paths by probability gives one enormous tie.
+      What differs between endpoints is only <em>how many</em> paths land there.
+    </p>
+  </section>
+
+  <!-- ACT II ----------------------------------------------------------- -->
+  <section>
+    <h2><span class="act">Act II · the observation</span>Naming the endpoint rules paths out</h2>
+    <p>
+      Now observe where the walk finished. The paths that survive are shown in colour, by the direction of
+      each step; everything ruled out fades. Node labels switch to <b>paths through here that still reach
+      your endpoint</b>.
+    </p>
+    <div class="fig">
+      <p class="figlabel"><span>Consistent paths, given the endpoint</span><span id="f2right">nothing observed</span></p>
+      <div class="figwrap"><svg id="fig2" role="img" aria-labelledby="fig2t"><title id="fig2t">The same lattice with paths inconsistent with the observed endpoint faded out</title></svg></div>
+      <p class="legend">
+        <span><i style="border-top-color:var(--data)"></i>step +1</span>
+        <span><i style="border-top-color:var(--lik)"></i>step −1</span>
+        <span>click an endpoint on the right edge, or use the buttons</span>
+      </p>
+      <div class="controls">
+        <label>observed endpoint <span class="val mono" id="kOut">none</span></label>
+        <span class="seg">
+          <button id="kDown">−2</button>
+          <button id="kUp">+2</button>
+          <button id="kExtreme">k = n</button>
+          <button id="kClear">forget it</button>
+        </span>
+      </div>
+      <div class="stats" id="stats2"></div>
+    </div>
+    <p class="takeaway" id="take2"></p>
+    <div class="fig" style="margin-top:1rem">
+      <p class="figlabel"><span>Endpoints ranked by how many paths reach them</span><span>ties are exact</span></p>
+      <div class="figwrap"><table id="rankTable"><thead><tr><th>Rank</th><th>End at k</th><th>Paths</th><th>Probability</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- ACT III ---------------------------------------------------------- -->
+  <section>
+    <h2><span class="act">Act III · the reverse process</span>Running it backwards is counting</h2>
+    <p>
+      Of the paths that end where you said, what fraction took <span class="mono">+1</span> last? Nothing
+      has to be learned or approximated — count them. Apply the answer repeatedly and you have sampled a
+      path backwards out of a single number.
+    </p>
+    <div class="fig">
+      <p class="figlabel"><span>The reverse step</span><span id="f3right"></span></p>
+      <div class="stats" id="stats3" style="border-top:0; padding-top:0; margin-top:0"></div>
+      <p class="readout" id="r3"></p>
+      <div class="controls">
+        <span class="seg"><button id="sample">Sample a path backwards</button></span>
+        <span id="sampleNote"></span>
+      </div>
+    </div>
+    <div class="fig" style="margin-top:1rem">
+      <p class="figlabel"><span>The consistent paths</span><span id="f4right"></span></p>
+      <div class="paths" id="pathList"></div>
+    </div>
+    <p class="takeaway warm" id="take3"></p>
+  </section>
+
+  <footer>
+    Counts are exact binomial coefficients; probabilities are <span class="mono">N(n,k)/2ⁿ</span>. The
+    backwards sampler uses <span class="mono">P(last = +1 | S_m = k) = j/m</span> with
+    <span class="mono">j = (m+k)/2</span>, which draws uniformly from the consistent paths — the same
+    reverse step a diffusion model has to learn when the counting is no longer possible.
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const nEl = $("nSteps"), tEl = $("tNow");
+
+  let n = 10, t = 10, kObs = null, playing = false, timer = null, highlightPath = null;
+
+  const C = (n, j) => { if (j < 0 || j > n) return 0; let r = 1; for (let i = 0; i < j; i++) r = r * (n - i) / (i + 1); return Math.round(r); };
+  const N = (t, k) => (Math.abs(k) > t || ((t + k) & 1)) ? 0 : C(t, (t + k) / 2);
+  const through = (t, k, kEnd) => N(t, k) * N(n - t, kEnd - k);
+  const fmt = (x) => x.toLocaleString("en-US");
+  const fmtP = (p) => p >= 1e-4 ? p.toFixed(4) : p.toExponential(1);
+
+  const PAD = { l: 34, r: 14, t: 22, b: 30 }, GAP = 20, BARW = 108, BARMAX = 74;
+
+  function drawLattice(svg, conditioned) {
+    const colW = Math.max(24, Math.min(46, 470 / n));
+    const rowH = Math.max(11, Math.min(20, 290 / n));
+    const latW = colW * n;
+    const W = PAD.l + latW + GAP + BARW + PAD.r;
+    const H = PAD.t + rowH * 2 * n + PAD.b;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", W); svg.setAttribute("height", H);
+    while (svg.childNodes.length > 1) svg.removeChild(svg.lastChild);
+
+    const X = (tt) => PAD.l + tt * colW, Y = (k) => PAD.t + (n - k) * rowH;
+    const add = (tag, at, txt) => { const e = document.createElementNS(SVGNS, tag);
+      for (const a in at) if (at[a] !== null && at[a] !== undefined) e.setAttribute(a, at[a]);
+      if (txt != null) e.textContent = txt; svg.appendChild(e); return e; };
+
+    const tt_ = conditioned ? n : t;
+    if (!conditioned && t < n)
+      add("rect", { x: X(t) + 1, y: PAD.t - 10, width: latW - t * colW + 1,
+        height: H - PAD.t - PAD.b + 20, class: "shade", opacity: ".3" });
+
+    add("line", { x1: PAD.l - 6, y1: Y(0), x2: X(n) + 6, y2: Y(0), class: "axis-l" });
+
+    for (let s = 0; s <= n; s++) {
+      if (n > 12 && s % 2 === 1 && s !== n) continue;
+      add("text", { x: X(s), y: H - PAD.b + 17, "text-anchor": "middle", class: "lbl", "font-size": 9.5 }, s);
+    }
+    add("text", { x: PAD.l + latW / 2, y: H - PAD.b + 28, "text-anchor": "middle", class: "lbl",
+      "font-size": 8.5, "letter-spacing": ".12em" }, "STEPS  t");
+    for (let k = -n; k <= n; k++) {
+      if ((k + n) % (n > 10 ? 4 : 2) !== 0) continue;
+      add("text", { x: PAD.l - 10, y: Y(k) + 3, "text-anchor": "end", class: "lbl", "font-size": 9.5 }, k);
+    }
+
+    for (let s = 0; s < tt_; s++) {
+      for (let k = -s; k <= s; k += 2) {
+        if (N(s, k) === 0) continue;
+        for (const d of [1, -1]) {
+          const k2 = k + d;
+          const on = conditioned && kObs !== null && through(s, k, kObs) > 0 && through(s + 1, k2, kObs) > 0;
+          let cls = "edge", op = 0.32, w = 1;
+          if (conditioned && kObs !== null) { if (on) { cls += d === 1 ? " up" : " down"; op = 0.55; w = 1.4; } else op = 0.06; }
+          add("line", { x1: X(s), y1: Y(k), x2: X(s + 1), y2: Y(k2), class: cls, "stroke-width": w, opacity: op });
+        }
+      }
+    }
+
+    if (conditioned && highlightPath) {
+      let pos = 0, d = `M ${X(0)} ${Y(0)}`;
+      highlightPath.forEach((s, i) => { pos += s; d += ` L ${X(i + 1)} ${Y(pos)}`; });
+      add("path", { d, class: "trace" });
+    }
+
+    const maxAt = (s) => { let m = 0; for (let k = -s; k <= s; k += 2) m = Math.max(m, N(s, k)); return m; };
+    const rMax = Math.min(rowH * 0.9, colW * 0.34);
+    for (let s = 0; s <= tt_; s++) {
+      const mx = maxAt(s);
+      for (let k = -s; k <= s; k += 2) {
+        const c = N(s, k); if (!c) continue;
+        const share = c / mx, r = Math.max(2, rMax * Math.sqrt(share));
+        const live = !(conditioned && kObs !== null) || through(s, k, kObs) > 0;
+        const alpha = live ? 0.14 + 0.5 * share : 0.05;
+        add("circle", { cx: X(s), cy: Y(k), r, class: live ? "node" : "node off",
+          "fill-opacity": alpha.toFixed(3), opacity: live ? 1 : .5 });
+        if (n <= 10 && live)
+          add("text", { x: X(s), y: Y(k) - r - 3, "text-anchor": "middle", class: "lbl", "font-size": 8.5 },
+            (conditioned && kObs !== null) ? through(s, k, kObs) : c);
+      }
+    }
+
+    if (conditioned) {
+      for (let k = -n; k <= n; k += 2) {
+        const g = add("g", { style: "cursor:pointer" });
+        const hit = document.createElementNS(SVGNS, "rect");
+        hit.setAttribute("x", X(n) - 9); hit.setAttribute("y", Y(k) - rowH);
+        hit.setAttribute("width", 22); hit.setAttribute("height", rowH * 2);
+        hit.setAttribute("fill", "transparent"); hit.setAttribute("tabindex", "0");
+        hit.setAttribute("role", "button");
+        hit.setAttribute("aria-label", `Observe the walk ending at ${k}`);
+        const pick = () => { kObs = (kObs === k ? null : k); highlightPath = null; render(); };
+        hit.addEventListener("click", pick);
+        hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+        g.appendChild(hit);
+        if (kObs === k) { const c = document.createElementNS(SVGNS, "circle");
+          c.setAttribute("cx", X(n)); c.setAttribute("cy", Y(k)); c.setAttribute("r", rMax + 4);
+          c.setAttribute("class", "ring-sel"); g.appendChild(c); }
+      }
+    }
+
+    const bx = X(n) + GAP;
+    const pmax = N(tt_, tt_ % 2 === 0 ? 0 : 1) / Math.pow(2, tt_);
+    add("line", { x1: bx, y1: PAD.t - 4, x2: bx, y2: H - PAD.b + 2, class: "axis-l" });
+    for (let k = -tt_; k <= tt_; k += 2) {
+      const p = N(tt_, k) / Math.pow(2, tt_); if (p <= 0) continue;
+      const w = Math.max(1.5, (p / pmax) * BARMAX);
+      let cls = "bar";
+      if (conditioned && kObs !== null) cls += (k === kObs ? " sel" : " dim");
+      add("rect", { x: bx + 1, y: Y(k) - Math.max(3, rowH * 1.3) / 2, width: w,
+        height: Math.max(3, rowH * 1.3), rx: 1.5, class: cls });
+      if (n <= 12)
+        add("text", { x: bx + w + 5, y: Y(k) + 3, class: "lbl", "font-size": 8.5 }, p.toFixed(3).slice(1));
+    }
+  }
+
+  const CAP = 120;
+  function enumeratePaths(kEnd) {
+    const j = (n + kEnd) / 2, out = [];
+    const rec = (i, ups, acc) => { if (out.length >= CAP) return;
+      if (i === n) { if (ups === j) out.push(acc.slice()); return; }
+      if (ups < j) { acc.push(1); rec(i + 1, ups + 1, acc); acc.pop(); }
+      if (i - ups < n - j) { acc.push(-1); rec(i + 1, ups, acc); acc.pop(); } };
+    rec(0, 0, []); return out;
+  }
+
+  function pathChip(path, hi) {
+    const w = Math.max(44, path.length * 5.5), h = 22, mid = h / 2, amp = (h - 5) / (2 * n);
+    const el = document.createElementNS(SVGNS, "svg");
+    el.setAttribute("width", w); el.setAttribute("height", h); el.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    let pos = 0, x = 2; const step = (w - 4) / path.length;
+    path.forEach((s) => { const y1 = mid - pos * amp; pos += s; const y2 = mid - pos * amp;
+      const ln = document.createElementNS(SVGNS, "line");
+      ln.setAttribute("x1", x); ln.setAttribute("y1", y1);
+      ln.setAttribute("x2", x + step); ln.setAttribute("y2", y2);
+      ln.setAttribute("class", s === 1 ? "pc-up" : "pc-down");
+      el.appendChild(ln); x += step; });
+    const d = document.createElement("div");
+    d.className = "pathchip" + (hi ? " hi" : ""); d.appendChild(el); return d;
+  }
+
+  const stat = (v, l) => `<span class="stat"><span class="n">${v}</span><span class="l">${l}</span></span>`;
+
+  function render() {
+    const total = Math.pow(2, n);
+    $("nOut").textContent = n; $("tOut").textContent = t;
+    $("kOut").textContent = kObs === null ? "none" : (kObs > 0 ? "+" + kObs : "" + kObs);
+    $("tot1").textContent = fmt(total);
+    $("f1right").textContent = `P(S_${t} = k)`;
+
+    drawLattice($("fig1"), false);
+    drawLattice($("fig2"), true);
+
+    $("r1").innerHTML = `After <b>${t}</b> ${t === 1 ? "step" : "steps"} the walk can be in <b>${t + 1}</b> ` +
+      `${t === 1 ? "place" : "places"}, reached by <b>${fmt(Math.pow(2, t))}</b> distinct paths. ` +
+      `Standard deviation <b>√${t} = ${Math.sqrt(t).toFixed(2)}</b>.`;
+
+    // ---- Act II ----
+    const s2 = $("stats2"), take2 = $("take2");
+    if (kObs === null) {
+      $("f2right").textContent = "nothing observed";
+      s2.innerHTML = stat(fmt(total), "paths in play") + stat(`${n}`, "bits unknown") + stat("0", "bits learned");
+      take2.innerHTML = `<strong>Before you observe anything, the lattice is colourless</strong> — every path is
+        the same as every other. Colour appears only when an observation makes some of them impossible.`;
+    } else {
+      const cnt = N(n, kObs), j = (n + kObs) / 2, bits = Math.log2(cnt);
+      $("f2right").textContent = `S_${n} = ${kObs > 0 ? "+" + kObs : kObs}`;
+      s2.innerHTML = stat(fmt(cnt), "paths still consistent") +
+        stat(`${j} / ${n}`, "up-steps forced") +
+        stat(bits.toFixed(2), "bits still unknown") +
+        stat((n - bits).toFixed(2), "bits learned");
+      if (cnt === 1) {
+        take2.className = "takeaway warm";
+        take2.innerHTML = `<strong>The extreme case.</strong> Only one path reaches k = ${kObs} — ` +
+          `${kObs > 0 ? "all +1s" : "all −1s"} — so the observation pins the entire path and there is
+           nothing left to infer. The reverse process is deterministic.`;
+      } else {
+        take2.className = "takeaway";
+        take2.innerHTML = `<strong>The observation reweights nothing; it only rules paths out.</strong> ` +
+          `${fmt(total - cnt)} paths are now impossible, and the ${fmt(cnt)} that survive remain exactly ` +
+          `as likely as one another — a perfect ${fmt(cnt)}-way tie.`;
+      }
+    }
+
+    // rank table
+    const body = document.querySelector("#rankTable tbody"); body.innerHTML = "";
+    const rows = []; for (let k = -n; k <= n; k += 2) rows.push({ k, c: N(n, k) });
+    rows.sort((a, b) => b.c - a.c || a.k - b.k);
+    let rank = 0, prev = null;
+    rows.forEach((r, i) => {
+      if (r.c !== prev) { rank = i + 1; prev = r.c; }
+      const tied = rows.filter((x) => x.c === r.c).length > 1;
+      const tr = document.createElement("tr");
+      if (kObs === r.k) tr.className = "sel";
+      tr.innerHTML = `<td class="mono">${rank}${tied ? ' <span class="tie">tie</span>' : ""}</td>` +
+        `<td class="mono">${r.k > 0 ? "+" : ""}${r.k}</td><td class="mono">${fmt(r.c)}</td>` +
+        `<td class="mono">${fmtP(r.c / total)}</td>`;
+      body.appendChild(tr);
+    });
+
+    // ---- Act III ----
+    const s3 = $("stats3"), r3 = $("r3"), list = $("pathList"), take3 = $("take3");
+    list.innerHTML = "";
+    if (kObs === null) {
+      $("f3right").textContent = ""; $("f4right").textContent = "";
+      s3.innerHTML = ""; r3.innerHTML = `<span class="empty">Observe an endpoint in Act II first — with nothing known, the last step is a coin toss like any other.</span>`;
+      list.innerHTML = `<span class="empty">No observation yet, so all ${fmt(total)} paths remain in play.</span>`;
+      take3.innerHTML = `<strong>Nothing to reverse yet.</strong> Pick an endpoint above.`;
+      $("sampleNote").textContent = "";
+    } else {
+      const cnt = N(n, kObs), j = (n + kObs) / 2, up = N(n - 1, kObs - 1), down = N(n - 1, kObs + 1);
+      $("f3right").textContent = `S_${n} = ${kObs > 0 ? "+" + kObs : kObs}`;
+      s3.innerHTML = stat((j / n).toFixed(4), "P(last step = +1)") +
+        stat((kObs / n).toFixed(4), "E[last step]") +
+        stat(fmt(up), "consistent, ending +1") + stat(fmt(down), "consistent, ending −1");
+      r3.innerHTML = `<b>${fmt(up)}</b> of the <b>${fmt(cnt)}</b> consistent paths take +1 last, so the ` +
+        `reverse step is <b>${fmt(up)}/${fmt(cnt)} = j/n = ${j}/${n}</b>. No algebra — just counting. ` +
+        `Equivalently <span class="mono">E[X_${n} | S_${n} = ${kObs}] = k/n = ${(kObs / n).toFixed(4)}</span>.`;
+      const shown = enumeratePaths(kObs);
+      $("f4right").textContent = cnt > CAP ? `showing ${CAP} of ${fmt(cnt)}` : `all ${fmt(cnt)}`;
+      const hp = highlightPath ? highlightPath.join(",") : null;
+      shown.forEach((p) => list.appendChild(pathChip(p, hp !== null && p.join(",") === hp)));
+      take3.innerHTML = `<strong>This is a diffusion model with nothing learned.</strong> A forward process
+        that is free to run, a reverse step that is a posterior over what was added, and no network
+        anywhere. Replace the coin with a Gaussian and the enumeration with a regression, and the rest of
+        the course is what remains.`;
+      $("sampleNote").innerHTML = highlightPath
+        ? `<span class="mono">${highlightPath.map((s) => s === 1 ? "+" : "−").join("")}</span> — traced above, and outlined in the ledger.`
+        : "";
+    }
+  }
+
+  nEl.addEventListener("input", () => { n = +nEl.value; t = n; kObs = null; highlightPath = null;
+    tEl.max = n; tEl.value = n; render(); });
+  tEl.addEventListener("input", () => { t = +tEl.value; render(); });
+
+  $("play").addEventListener("click", (e) => {
+    const b = e.currentTarget;
+    if (playing) { clearInterval(timer); playing = false; b.setAttribute("aria-pressed", "false"); b.textContent = "Run forward"; return; }
+    playing = true; b.setAttribute("aria-pressed", "true"); b.textContent = "Pause";
+    t = 0; tEl.value = 0; render();
+    const slow = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    timer = setInterval(() => {
+      if (t >= n) { clearInterval(timer); playing = false; b.setAttribute("aria-pressed", "false"); b.textContent = "Run forward"; return; }
+      t++; tEl.value = t; render();
+    }, slow ? 520 : 260);
+  });
+
+  const opts = () => { const o = []; for (let k = -n; k <= n; k += 2) o.push(k); return o; };
+  const nudge = (d) => { const o = opts();
+    kObs = kObs === null ? o[Math.floor(o.length / 2)] : o[Math.min(o.length - 1, Math.max(0, o.indexOf(kObs) + d))];
+    highlightPath = null; render(); };
+  $("kUp").addEventListener("click", () => nudge(1));
+  $("kDown").addEventListener("click", () => nudge(-1));
+  $("kExtreme").addEventListener("click", () => { kObs = n; highlightPath = null; render(); });
+  $("kClear").addEventListener("click", () => { kObs = null; highlightPath = null; render(); });
+
+  $("sample").addEventListener("click", () => {
+    if (kObs === null) nudge(0);
+    let m = n, k = kObs; const rev = [];
+    while (m > 0) { const j = (m + k) / 2;
+      if (Math.random() < j / m) { rev.push(1); k -= 1; } else { rev.push(-1); k += 1; } m--; }
+    highlightPath = rev.reverse(); render();
+  });
+
+  render();
+})();
+</script>

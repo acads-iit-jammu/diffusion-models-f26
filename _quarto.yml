@@ -24,6 +24,7 @@ project:
     - materials/w03-deck-01-multivariate-gaussian.html
     - materials/w04-deck-01-metropolis-hastings.html
     - materials/w04-deck-02-gans.html
+    - materials/walk-lab.html
     - materials/img/**
     - materials/site_libs/**
     - homeworks/*.pdf
@@ -87,6 +88,7 @@ book:
     - part: "Tutorials"
       chapters:
         - tutorials/13-inequalities.qmd
+        - tutorials/20-random-walk.qmd
     - part: "Perspectives"
       chapters:
         - tutorials/03-transport-story.qmd

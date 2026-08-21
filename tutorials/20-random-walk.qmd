@@ -1,0 +1,299 @@
+# The Random Walk: Forward, and Backward {.unnumbered}
+
+*A standalone tutorial, and the most economical object in the course. Toss a coin,
+add $+1$ for heads and $-1$ for tails, and keep a running total. That is the forward
+process of a diffusion model with the noise made as simple as noise can possibly be
+— and because it is that simple, every single thing we will later have to learn or
+approximate can here be done exactly, by counting.*
+
+*The companion sheet [Practice 1](../homeworks/practice_01.pdf) built the machinery.
+This one spends it. The full derivations, with the small cases written out and the
+induction in full, are in [Practice 2](../homeworks/practice_02.pdf); the
+[Walk Lab](../materials/walk-lab.html) below is the same object to play with.*
+
+## 1. The object
+
+Let $X_1, X_2, \dots$ be independent with
+$\mathbb{P}(X_i = +1) = \mathbb{P}(X_i = -1) = \tfrac12$, and set
+
+$$S_n = \sum_{i=1}^{n} X_i .$$
+
+This is the **simple symmetric random walk**. Put its update rule beside the one from
+note 01 and the resemblance is the entire point:
+
+$$\underbrace{S_n = S_{n-1} + X_n}_{\text{here}}
+\qquad\qquad
+\underbrace{x_t = \sqrt{\alpha_t}\,x_{t-1} + \sqrt{1-\alpha_t}\,\varepsilon_t}_{\text{a diffusion model}}$$
+
+Both are discrete-time Markov chains in which noise accumulates and nothing removes
+it; both run forward with no training required; and both end somewhere
+structureless. The difference is one multiplicative factor. The walk has no
+shrinkage, so its variance grows without bound — *variance exploding*; the DDPM
+update shrinks the old state just enough to hold the total variance at 1 —
+*variance preserving*. Both are used in practice, and the choice is a design
+decision rather than a mathematical necessity.
+
+## 2. Variances add, so the walk spreads like $\sqrt{n}$
+
+Each increment has mean $0$, and since $X_i^2 = 1$ always, variance $1$. The
+increments are independent, so variances add:
+
+$$\mathbb{E}[S_n] = 0, \qquad \operatorname{Var}(S_n) = n, \qquad \operatorname{sd}(S_n) = \sqrt{n}.$$
+
+::: {.callout-note}
+## This is the $\sqrt{t}$ envelope
+
+The W01 demo *Progressively Adding Noise* draws a cloud of walkers spreading with a
+$\sqrt{t}$ curve over it. That curve is the line above. A walk does not travel a
+distance proportional to the number of steps — it travels proportional to the
+**square root** of it, because the steps cancel in a way that lets variances rather
+than distances accumulate.
+
+Everything in this course that spreads like $\sqrt{t}$ spreads for this reason.
+:::
+
+## 3. The exact law, and where the binomial comes from
+
+Here it matters what the underlying sample space actually is, because the answer is
+a counting argument and counting needs something to count.
+
+An **outcome is a whole path**, not a position:
+
+$$\Omega_n = \{-1,+1\}^n, \qquad \omega = (\omega_1,\dots,\omega_n), \qquad |\Omega_n| = 2^n,$$
+
+with every path equally likely, $\mathbb{P}(\{\omega\}) = 2^{-n}$. On this space
+$S_n(\omega) = \sum_i \omega_i$ is a random variable in the sense of note 02 — an
+honest function — and the interesting thing about it is that it is **massively
+many-to-one**: it crushes $2^n$ paths onto at most $n+1$ positions.
+
+The event $\{S_n = k\}$ is therefore a *set of paths*, the preimage
+$S_n^{-1}(\{k\})$, and because the measure is uniform,
+
+$$\mathbb{P}(S_n = k) \;=\; \frac{\big|S_n^{-1}(\{k\})\big|}{2^n}
+\;=\; \frac{\text{paths ending at } k}{\text{all paths}} .$$
+
+**Probability has become combinatorics**, not by choice but because the coin is fair.
+
+Now count. A path with $j$ up-steps and $n-j$ down-steps ends at $j - (n-j) = 2j-n$,
+so *ending at $k$* is the same condition as *having exactly $j = (n+k)/2$ up-steps*.
+The paths ending at $k$ are in bijection with the ways of choosing **which** $j$ of
+the $n$ steps went up, and there are $\binom{n}{j}$ of those:
+
+$$\boxed{\;\mathbb{P}(S_n = k) = \binom{n}{\tfrac{n+k}{2}}\,2^{-n},
+\qquad k \in \{-n, -n+2, \dots, n-2, n\}.\;}$$
+
+Note the **parity constraint**: each step changes $S$ by an odd amount, so after $n$
+steps only positions of the same parity as $n$ are reachable. $\mathbb{P}(S_4 = 1)$
+is not small — it is exactly zero.
+
+::: {.callout-tip}
+## This is the discrete $q(x_t \mid x_0)$
+
+Note 05's closed-form marginal is what lets a diffusion model jump to any noise level
+in one step rather than simulating the chain. The boxed formula is that same
+property, with a binomial coefficient where the Gaussian would be. Without it,
+sampling $S_{1000}$ would mean tossing a thousand coins.
+:::
+
+**Interactive** — [The Walk Lab](../materials/walk-lab.html){target="_blank"} runs
+all of this. **Act I** stacks the counts up column by column and draws the
+distribution on the same $k$ axis, so it reads as the column of counts turned on its
+side. **Act II** is §7 below — observe an endpoint and watch path space collapse.
+**Act III** is §6, the reverse step.
+
+<iframe src="../materials/walk-lab.html" width="100%" height="680" style="border: 1px solid #ddd; border-radius: 8px;" loading="lazy" title="The Walk Lab: the random walk lattice, path counts, and the reverse step"></iframe>
+
+## 4. The equation the density obeys
+
+Stop watching the walker and watch the distribution. Write $p_n(k) = \mathbb{P}(S_n = k)$.
+There are exactly two ways to be at $k$ at time $n+1$, so
+
+$$p_{n+1}(k) = \tfrac12\,p_n(k-1) + \tfrac12\,p_n(k+1).$$
+
+Subtract $p_n(k)$ from both sides and regroup:
+
+$$\underbrace{p_{n+1}(k) - p_n(k)}_{\text{difference in time}}
+\;=\; \tfrac12 \underbrace{\big[\,p_n(k+1) - 2p_n(k) + p_n(k-1)\,\big]}_{\text{second difference in space}}$$
+
+The left side is a discrete time derivative; the right is the three-point second
+difference, the discrete $\partial_x^2$. In the continuum,
+
+$$\boxed{\;\frac{\partial p}{\partial t} = \frac12\,\frac{\partial^2 p}{\partial x^2}\;}$$
+
+::: {.callout-important}
+## That is the heat equation
+
+It is the Fokker–Planck equation for Brownian motion — Module 5's centrepiece —
+derived from a coin toss with nothing but addition and subtraction.
+
+Read it rather than merely verifying it: where $p$ is concave (a peak) the second
+difference is negative and the density falls; where it is convex (a trough) it rises.
+Peaks flatten, troughs fill, the whole thing spreads. That is what "adding noise"
+does to a *distribution*, as opposed to what it does to a sample.
+:::
+
+**Where $\sqrt{\Delta t}$ comes from.** Take lattice spacing $h$ and time step
+$\Delta t$, so after time $t$ the walker has taken $n = t/\Delta t$ steps and, by §2,
+has variance $n h^2 = t h^2/\Delta t$. Only one choice of $h$ survives the limit:
+
+| choice | variance at time $t$ | limit |
+|---|---|---|
+| $h = \Delta t$ | $t\,\Delta t \to 0$ | the walk **dies** |
+| $h = \sqrt{\Delta t}$ | $t$ | **Brownian motion** |
+| $h = (\Delta t)^{1/4}$ | $t/\sqrt{\Delta t} \to \infty$ | the walk **explodes** |
+
+This is why an SDE is written $dX = b\,dt + \sigma\,dW$ with $dW$ of size $\sqrt{dt}$
+and not $dt$ — and it is the same fact that puts a square root on the noise
+coefficient $\sqrt{1-\alpha_t}$, since that coefficient multiplies the *variable*
+while variances scale by its *square*.
+
+## 5. The Gaussian is a limit, not an assumption
+
+$S_n$ is a sum of $n$ i.i.d. terms with mean $0$ and variance $1$, so
+$S_n/\sqrt{n} \Rightarrow \mathcal{N}(0,1)$ — equivalently, the binomial of §3, once
+centred and scaled, approaches a Gaussian density.
+
+The increments here are as un-Gaussian as a random variable can be: two atoms, no
+density at all. After enough steps the marginal is Gaussian anyway. **So the Gaussian
+noise in a diffusion model is not a modelling restriction being smuggled in** —
+after many small steps you would arrive at a Gaussian whatever the increments looked
+like. Choosing Gaussians only buys closed forms at *every* $t$ rather than
+asymptotically.
+
+Run $d$ independent walks and a second fact appears: $\mathbb{E}\lVert S_n\rVert^2 = nd$,
+and the relative spread of $\lVert S_n \rVert$ shrinks like $1/\sqrt{2d}$. In high
+dimension essentially every sample sits in a **thin shell** at radius $\sqrt{nd}$,
+even though the origin is the single most likely point. That is the Gaussian annulus
+of note 06, and it is why $x_T \sim \mathcal{N}(0,I_d)$ is a sphere rather than a blob
+— the reverse process starts on a shell.
+
+## 6. Backward: the reverse step is exactly solvable
+
+Now the diffusion question, asked of a coin: **you are told where the walk ended;
+what was the last step?**
+
+**By Bayes.** To have $S_n = k$ with $X_n = +1$ the walk must have been at $k-1$ after
+$n-1$ steps. With $j = (n+k)/2$,
+
+$$\mathbb{P}(X_n = +1 \mid S_n = k)
+= \frac{\mathbb{P}(S_{n-1}=k-1)\cdot\tfrac12}{\mathbb{P}(S_n = k)}
+= \frac{\binom{n-1}{j-1}}{\binom{n}{j}} = \frac{j}{n} = \frac{n+k}{2n},$$
+
+the powers of two cancelling and the last step being
+$\binom{n}{j} = \tfrac{n}{j}\binom{n-1}{j-1}$.
+
+**By symmetry, in one line.** Given $S_n = k$, every path with $j$ up-steps has the
+same probability — a path's probability depends on *how many* up-steps it has, not
+where they fall. So the increments are conditionally **exchangeable**,
+$\mathbb{E}[X_i \mid S_n = k]$ is the same number $c$ for every $i$, and they must sum
+to $k$. Hence $nc = k$ and
+
+$$\boxed{\;\mathbb{E}\big[X_i \mid S_n = k\big] = \frac{k}{n} \quad\text{for every } i.\;}$$
+
+The expected step is the average step. Same theorem; one derivation takes a
+blackboard and the other takes a sentence.
+
+::: {.callout-note}
+## This is a denoiser
+
+A hidden quantity, a noisy observation, a posterior, and its mean — and note 07's
+best-predictor theorem says the conditional mean is exactly what squared-error
+training converges to. So $k/n$ is what a network trained to predict the increment
+from the endpoint would learn. Here we have it in closed form, so we can check the
+answer a network would otherwise have to discover.
+
+A question worth sitting with: **does the answer change if the coin is biased?** It
+does not. Conditioning on the endpoint fixes the number of up-steps, all arrangements
+stay equally likely whatever $p$ is, and exchangeability is untouched. The forward
+process depends on the bias; the reverse step given the endpoint does not.
+:::
+
+**Reverse sampling.** The reverse step is all you need to run the process backwards.
+From $S_n = k$: set $j = (n+k)/2$, declare the last step $+1$ with probability $j/n$
+(else $-1$), update $k$ and $n$, repeat. This produces a trajectory distributed
+exactly as a forward walk conditioned to end at $k$ — a **complete diffusion model,
+in nine lines of code, with nothing trained**. Act III of the lab runs it.
+
+## 7. What the observation actually did
+
+This is the part the lab is built to make visible, and it is worth stating carefully
+because it is the idea the whole course rests on.
+
+Before you observe anything, all $2^n$ paths are **equally likely**. Ranking paths by
+probability gives one enormous tie. The distribution of $S_n$ is peaked in the middle
+not because those paths are likelier, but because **more paths land there**.
+
+Observing $S_n = k$ then **reweights nothing**. It rules paths out. The
+$\binom{n}{j}$ survivors remain exactly as likely as one another — a perfect tie,
+just a smaller one. And the size of what survives measures how much you learned:
+
+| observation | paths surviving ($n = 20$) | bits still unknown |
+|---|---|---|
+| $S_n = n$ | $1$ | $0$ — the path is pinned |
+| $S_n = n-2$ | $20$ | $4.3$ |
+| $S_n = 0$ | $184{,}756$ | $17.5$ of $20$ |
+
+The extreme case is the clearest. $S_n = n$ can be reached by exactly one path, all
+$+1$s, so the observation determines the entire history and the reverse process is
+deterministic. At the other end, the *most likely* endpoint is also the *least
+informative*: more paths survive there than anywhere else.
+
+## 8. Where learning has to enter
+
+Everything above was exact. It is worth being precise about which step stops being
+exact when the data stops being a coin, because that step is the rest of the course.
+
+The reverse process needs $\mathbb{P}(x_0 \mid x_t)$. Here we could write it down
+because the possibilities could be enumerated. Replace the coin with images and three
+things break at once: there is no formula for $p(x_0)$ — note 06 is a catalogue of
+failed attempts to get one; the sum over possible $x_0$ becomes an intractable
+integral over $\mathbb{R}^d$; and by §5 the relevant region is a thin shell in a huge
+space, so no amount of sampling covers it.
+
+So the posterior mean is not computable. But note 07 §1 says it is exactly what
+squared-error regression converges to — and a regression target *is* available,
+because the forward process is known and we can noise a real image ourselves.
+
+::: {.callout-tip}
+## The whole idea, assembled
+
+A forward process that is free to run and has a closed-form marginal (§3); a reverse
+process that is a posterior over what was added (§6); and a training objective that
+reaches that posterior without ever writing it down (note 07).
+
+Modules 3 to 6 replace the coin with a Gaussian and the enumeration with a network.
+Nothing else changes.
+:::
+
+## Where each piece returns
+
+| From this tutorial | Where it reappears |
+|---|---|
+| $\operatorname{Var}(S_n) = n$, spread $\sqrt n$ | the $\sqrt t$ envelope of the forward process |
+| $\mathbb{P}(S_n = k) = \binom{n}{(n+k)/2}2^{-n}$ | closed-form $q(x_t \mid x_0)$ |
+| $p_{n+1} = \tfrac12 p_n(k-1) + \tfrac12 p_n(k+1)$ | the master equation of any chain |
+| $\partial_t p = \tfrac12 \partial_x^2 p$ | Fokker–Planck, Module 5 |
+| $h = \sqrt{\Delta t}$ | why $dW$ has size $\sqrt{dt}$ |
+| $S_n/\sqrt n \Rightarrow \mathcal{N}(0,1)$ | why the forward endpoint is Gaussian |
+| Thin shell at radius $\sqrt{nd}$ | why $\mathcal{N}(0,I_d)$ is a sphere |
+| $\mathbb{E}[X_i \mid S_n = k] = k/n$ | the reverse process; the denoiser |
+| Observing rules out, never reweights | why the reverse step is an inference problem |
+
+## Exercises
+
+The full set, with the small cases enumerated and the induction written out, is in
+[Practice 2](../homeworks/practice_02.pdf). A representative few:
+
+1. Compute $\mathbb{P}(S_6 = k)$ for every $k$ and check the values sum to 1. Which
+   $k$ are unreachable, and why?
+2. Prove the recursion $N_{n+1}(k) = N_n(k-1) + N_n(k+1)$ by deleting the last step,
+   and show it is Pascal's rule in disguise.
+3. A walker starts at 0. Estimate how many steps until it is typically 100 away, then
+   1000 away, and comment on the ratio.
+4. Show $\mathbb{E}[X_i \mid S_n = k] = k/n$ for *every* $i$, not just $i = n$. Why
+   does this not contradict the increments being unconditionally independent?
+5. Let $\mathbb{P}(X_i = +1) = p$. Show $\mathbb{E}[S_n] = n(2p-1)$ and
+   $\operatorname{Var}(S_n) = 4np(1-p)$, and then that
+   $\mathbb{P}(X_n = +1 \mid S_n = k)$ is still $(n+k)/2n$, independent of $p$.
+6. Which choice of $\alpha_t$ turns the DDPM update of §1 into this walk? What does
+   that say about variance-preserving versus variance-exploding processes?
