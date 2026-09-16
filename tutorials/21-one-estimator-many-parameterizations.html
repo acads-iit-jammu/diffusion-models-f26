@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>03 · Joint, Conditional, Marginal — and Bayes – ID-5-02 (TO)</title>
+<title>One Estimator, Many Parameterizations – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/02-distributions-mle.html" rel="next">
-<link href="../tutorials/01-probability-101.html" rel="prev">
+<link href="../resources.html" rel="next">
+<link href="../tutorials/07-probability-flow-ode.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/16-joints-conditionals.html">03 · Joint, Conditional, Marginal — and Bayes</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/07-probability-flow-ode.html">Draft</a></li><li class="breadcrumb-item"><a href="../tutorials/21-one-estimator-many-parameterizations.html">One Estimator, Many Parameterizations</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -182,13 +182,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Lecture Notes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
@@ -209,7 +209,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
   </div>
 </li>
@@ -400,13 +400,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
  <span class="menu-text">Draft</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
@@ -415,7 +415,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/21-one-estimator-many-parameterizations.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/21-one-estimator-many-parameterizations.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">One Estimator, Many Parameterizations</span></a>
   </div>
 </li>
@@ -437,21 +437,30 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#two-numbers-on-one-outcome" id="toc-two-numbers-on-one-outcome" class="nav-link active" data-scroll-target="#two-numbers-on-one-outcome">Two numbers on one outcome</a></li>
-  <li><a href="#joint-distributions" id="toc-joint-distributions" class="nav-link" data-scroll-target="#joint-distributions">Joint distributions</a></li>
-  <li><a href="#marginal-distributions" id="toc-marginal-distributions" class="nav-link" data-scroll-target="#marginal-distributions">Marginal distributions</a></li>
-  <li><a href="#conditional-distributions-and-bayes-rule" id="toc-conditional-distributions-and-bayes-rule" class="nav-link" data-scroll-target="#conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</a></li>
-  <li><a href="#bayes-rule-and-why-inference-is-the-inverse-problem" id="toc-bayes-rule-and-why-inference-is-the-inverse-problem" class="nav-link" data-scroll-target="#bayes-rule-and-why-inference-is-the-inverse-problem">Bayes’ rule, and why inference is the inverse problem</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  <li><a href="#the-claim" id="toc-the-claim" class="nav-link active" data-scroll-target="#the-claim">The claim</a></li>
+  <li><a href="#scope-of-the-identity" id="toc-scope-of-the-identity" class="nav-link" data-scroll-target="#scope-of-the-identity">Scope of the identity</a></li>
+  <li><a href="#why-squared-loss-learns-a-mean" id="toc-why-squared-loss-learns-a-mean" class="nav-link" data-scroll-target="#why-squared-loss-learns-a-mean">Why squared loss learns a mean</a></li>
+  <li><a href="#gaussian-corruption-the-score-is-the-same-field-again" id="toc-gaussian-corruption-the-score-is-the-same-field-again" class="nav-link" data-scroll-target="#gaussian-corruption-the-score-is-the-same-field-again">Gaussian corruption: the score is the same field again</a></li>
+  <li><a href="#the-v-parameterization" id="toc-the-v-parameterization" class="nav-link" data-scroll-target="#the-v-parameterization">The <span class="math inline">\(v\)</span> parameterization</a></li>
+  <li><a href="#equivalent-estimands-different-training-problems" id="toc-equivalent-estimands-different-training-problems" class="nav-link" data-scroll-target="#equivalent-estimands-different-training-problems">Equivalent estimands, different training problems</a></li>
+  <li><a href="#why-did-varepsilon-prediction-become-the-default" id="toc-why-did-varepsilon-prediction-become-the-default" class="nav-link" data-scroll-target="#why-did-varepsilon-prediction-become-the-default">Why did <span class="math inline">\(\varepsilon\)</span>-prediction become the default?</a>
+  <ul class="collapse">
+  <li><a href="#a-normalized-supervised-target" id="toc-a-normalized-supervised-target" class="nav-link" data-scroll-target="#a-normalized-supervised-target">A normalized supervised target</a></li>
+  <li><a href="#a-useful-implicit-weighting-over-noise-levels" id="toc-a-useful-implicit-weighting-over-noise-levels" class="nav-link" data-scroll-target="#a-useful-implicit-weighting-over-noise-levels">A useful implicit weighting over noise levels</a></li>
+  <li><a href="#direct-use-in-the-ddpm-reverse-mean" id="toc-direct-use-in-the-ddpm-reverse-mean" class="nav-link" data-scroll-target="#direct-use-in-the-ddpm-reverse-mean">Direct use in the DDPM reverse mean</a></li>
+  <li><a href="#empirical-success-became-convention" id="toc-empirical-success-became-convention" class="nav-link" data-scroll-target="#empirical-success-became-convention">Empirical success became convention</a></li>
+  <li><a href="#it-is-not-uniformly-well-conditioned" id="toc-it-is-not-uniformly-well-conditioned" class="nav-link" data-scroll-target="#it-is-not-uniformly-well-conditioned">It is not uniformly well-conditioned</a></li>
+  </ul></li>
+  <li><a href="#what-the-phrase-gets-wrong" id="toc-what-the-phrase-gets-wrong" class="nav-link" data-scroll-target="#what-the-phrase-gets-wrong">What the phrase gets wrong</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/16-joints-conditionals.html">03 · Joint, Conditional, Marginal — and Bayes</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/07-probability-flow-ode.html">Draft</a></li><li class="breadcrumb-item"><a href="../tutorials/21-one-estimator-many-parameterizations.html">One Estimator, Many Parameterizations</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">03 · Joint, Conditional, Marginal — and Bayes</h1>
+<h1 class="title">One Estimator, Many Parameterizations</h1>
 </div>
 
 
@@ -468,279 +477,124 @@ window.Quarto = {
 </header>
 
 
-<p><em>The second concept in the spine, and the point at which probability starts being useful. One new move — put <strong>two</strong> numbers on the same outcome instead of one — produces the whole multivariate vocabulary: joints, marginals, conditionals, and Bayes’ rule. Everything here is elementary; the measure-theoretic version is <a href="../tutorials/11-joint-conditional-bayes.html">in Perspectives</a> and is not needed.</em></p>
-<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout callout-style-simple callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Where this sits
+<span class="screen-reader-only">Important</span>Draft
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Follows <a href="../tutorials/01-probability-101.html">Probability &amp; Random Variables</a>, which introduced a single random variable on a sample space. Here two random variables share an outcome, and that co-residence is the entire subject. The W02 primer deck <a href="../materials/w02-deck-00-probability-joints.html" target="_blank">Probability, Joints, Conditionals and Bayes</a> develops the same material from a 4 × 4 table of dice counts.</p>
+<p>This note isolates one claim that is easily blurred in standard introductions to diffusion models: a network trained to “predict noise” does not predict an unrevealed realization of randomness. Under squared loss it estimates a conditional mean, expressed in a particular coordinate system.</p>
 </div>
 </div>
-<section id="two-numbers-on-one-outcome" class="level2">
-<h2 class="anchored" data-anchor-id="two-numbers-on-one-outcome">Two numbers on one outcome</h2>
-<p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables defined on the <strong>same</strong> sample space — two numerical features read off the same outcome <span class="math inline">\(\omega\)</span>. Height and weight of one person; today’s price and tomorrow’s price of one stock; the clean image and its noisy version from one generation run.</p>
-<p>That sharing is the whole idea. “<span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are jointly distributed” is not an extra assumption bolted on; it is the statement that a single <span class="math inline">\(\omega\)</span> determines both numbers at once, which is exactly why they can be correlated.</p>
-</section>
-<section id="joint-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="joint-distributions">Joint distributions</h2>
-<p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables defined on the same sample space — two numerical features of the same outcome. Their <strong>joint distribution</strong> specifies <span class="math inline">\(p(x, y) = \mathbb{P}(X = x \text{ and } Y = y)\)</span> in the discrete case, or a joint density <span class="math inline">\(f(x, y)\)</span> whose volumes are probabilities in the continuous case. The joint distribution is a complete description of the pair: every probabilistic statement about <span class="math inline">\((X, Y)\)</span> can be computed from it.</p>
-<p>The following discrete joint distribution serves as the running example (the state of a morning sky and the occurrence of rain):</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 34%">
-<col style="width: 22%">
-<col style="width: 22%">
-<col style="width: 22%">
-</colgroup>
-<thead>
-<tr class="header">
-<th><span class="math inline">\(p(x,y)\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> rain</th>
-<th style="text-align: center;"><span class="math inline">\(Y{=}\)</span> no rain</th>
-<th style="text-align: center;">row sum</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(X{=}\)</span> cloudy</td>
-<td style="text-align: center;">0.20</td>
-<td style="text-align: center;">0.25</td>
-<td style="text-align: center;"><strong>0.45</strong></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(X{=}\)</span> clear</td>
-<td style="text-align: center;">0.05</td>
-<td style="text-align: center;">0.50</td>
-<td style="text-align: center;"><strong>0.55</strong></td>
-</tr>
-<tr class="odd">
-<td>column sum</td>
-<td style="text-align: center;"><strong>0.25</strong></td>
-<td style="text-align: center;"><strong>0.75</strong></td>
-<td style="text-align: center;">1</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="marginal-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="marginal-distributions">Marginal distributions</h2>
-<p>The <strong>marginal</strong> distribution of <span class="math inline">\(X\)</span> describes <span class="math inline">\(X\)</span> alone, with <span class="math inline">\(Y\)</span> disregarded. It is obtained by summing (or, for densities, integrating) the joint distribution over the other variable:</p>
+<p><em>Standalone companion to <a href="../tutorials/07-probability-flow-ode.html">The Probability-Flow ODE</a>. That note uses the score to construct a sampler; this one studies what the different training heads estimate. The two arguments are logically separate.</em></p>
+<section id="the-claim" class="level2">
+<h2 class="anchored" data-anchor-id="the-claim">The claim</h2>
+<p>Fix a noise level <span class="math inline">\(t\)</span> and begin with the minimal linear observation model</p>
 <p><span class="math display">\[
-p(x) = \sum_y p(x, y),
-\qquad\text{or}\qquad
-f(x) = \int f(x, y)\, dy .
+\boxed{\;X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
+\alpha_t,\sigma_t\ \text{known}.\;}
 \]</span></p>
-<p>In the table these are the row and column sums — the margins of the table, which is the origin of the term: <span class="math inline">\(\mathbb{P}(\text{cloudy}) = 0.45\)</span> and <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>. The operation is justified directly by the additivity axiom: the event “cloudy” is the disjoint union of “cloudy and rain” and “cloudy and no rain”. Marginalization recurs throughout the course; in the mixture model of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a>, the observed density <span class="math inline">\(p(x) = \sum_z p(z)\, p(x \mid z)\)</span> is precisely the joint distribution of <span class="math inline">\((x, z)\)</span> with the latent variable summed out.</p>
-</section>
-<section id="conditional-distributions-and-bayes-rule" class="level2">
-<h2 class="anchored" data-anchor-id="conditional-distributions-and-bayes-rule">Conditional distributions and Bayes’ rule</h2>
-<p>The <strong>conditional</strong> distribution of <span class="math inline">\(Y\)</span> given <span class="math inline">\(X = x\)</span> is defined, whenever <span class="math inline">\(p(x) &gt; 0\)</span>, by</p>
+<p>Assume the conditional means below exist and <span class="math inline">\(\sigma_t&gt;0\)</span>; require also <span class="math inline">\(\alpha_t&gt;0\)</span> when inverting the relation. The standard diffusion instance adds <span class="math inline">\(\varepsilon\sim\mathcal N(0,I)\)</span> independent of <span class="math inline">\(X_0\)</span>, but the first identity does not need either Gaussianity or independence.</p>
+<p>The phrase <em>predict the injected noise</em> suggests that a network recovers the particular random draw <span class="math inline">\(\varepsilon\)</span>. It does not. If the network is trained by squared error, its unrestricted population optimum is</p>
 <p><span class="math display">\[
-p(y \mid x) = \frac{p(x, y)}{p(x)} .
+\varepsilon_t^\star(x)
+=\mathbb E[\varepsilon\mid X_t=x,t].
 \]</span></p>
-<p>The definition restricts attention to the outcomes consistent with <span class="math inline">\(X = x\)</span> and renormalizes their probabilities to total 1. In the running example, <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy}) = 0.20 / 0.45 \approx 0.44\)</span>, compared with the unconditional <span class="math inline">\(\mathbb{P}(\text{rain}) = 0.25\)</span>.</p>
-<p>Applying the definition in both directions and eliminating the joint yields <strong>Bayes’ rule</strong>,</p>
+<p>This is a deterministic function of the network input. More strongly, it is an affine transformation of the familiar posterior-mean denoiser</p>
 <p><span class="math display">\[
-\boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
+m_t(x)=\mathbb E[X_0\mid X_t=x,t].
 \]</span></p>
-<p>which converts a conditional in one direction into the conditional in the other. The tanh denoiser of W01 is an application of this identity, with <span class="math inline">\(x\)</span> the clean data point and <span class="math inline">\(y\)</span> the noisy observation; it is derived in full in <a href="../tutorials/05-two-point-diffusion.html">The World’s Smallest Diffusion Model</a>.</p>
-<p><span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>independent</strong> if <span class="math inline">\(p(x, y) = p(x)\, p(y)\)</span> for all <span class="math inline">\(x, y\)</span> — equivalently, if <span class="math inline">\(p(y \mid x) = p(y)\)</span>, so that conditioning on <span class="math inline">\(X\)</span> conveys no information about <span class="math inline">\(Y\)</span>. In the table, <span class="math inline">\(0.20 \ne 0.45 \times 0.25\)</span>, so the two variables are dependent. The i.i.d. assumption underlying the likelihoods of <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> are an independence statement applied to repeated observations.</p>
-</section>
-<section id="bayes-rule-and-why-inference-is-the-inverse-problem" class="level2">
-<h2 class="anchored" data-anchor-id="bayes-rule-and-why-inference-is-the-inverse-problem">Bayes’ rule, and why inference is the inverse problem</h2>
-<section id="generation-runs-forward-inference-runs-backward" class="level4">
-<h4 class="anchored" data-anchor-id="generation-runs-forward-inference-runs-backward">Generation runs forward; inference runs backward</h4>
-<p>Almost every model in this course is written in the <strong>forward</strong> direction. You posit some unobserved state, and you write down a mechanism that turns it into data:</p>
+<p>Taking the conditional expectation of the corruption equation gives</p>
 <p><span class="math display">\[
-\underbrace{z}_{\text{latent, what we care about}}
-\;\longrightarrow\;
-\underbrace{x}_{\text{observed, what we get}} ,
-\qquad \text{specified by } p(x \mid z).
+x=\alpha_t m_t(x)+\sigma_t\varepsilon_t^\star(x),
 \]</span></p>
-<p>Writing <span class="math inline">\(p(x \mid z)\)</span> is usually the easy half. It is a <em>mechanism</em> — a simulator, a physical story, a noise model — and you can often just state it.</p>
-<p>But that is rarely what you want. You do not observe <span class="math inline">\(z\)</span>; you observe <span class="math inline">\(x\)</span>, and you want to reason back to the cause. That is the <strong>inverse problem</strong>:</p>
+<p>and hence, whenever <span class="math inline">\(\alpha_t,\sigma_t&gt;0\)</span>,</p>
 <p><span class="math display">\[
-\underbrace{x}_{\text{observed}} \;\longrightarrow\; \underbrace{z}_{\text{inferred}},
-\qquad \text{wanted: } p(z \mid x).
-\]</span></p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th></th>
-<th>Forward</th>
-<th>Inverse</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Direction</td>
-<td>cause <span class="math inline">\(\to\)</span> effect</td>
-<td>effect <span class="math inline">\(\to\)</span> cause</td>
-</tr>
-<tr class="even">
-<td>Object</td>
-<td><span class="math inline">\(p(x \mid z)\)</span></td>
-<td><span class="math inline">\(p(z \mid x)\)</span></td>
-</tr>
-<tr class="odd">
-<td>Typical status</td>
-<td>given, by modelling</td>
-<td>wanted, must be computed</td>
-</tr>
-<tr class="even">
-<td>Names</td>
-<td>generative model, sampling distribution, simulator</td>
-<td>inference, inversion, the posterior</td>
-</tr>
-</tbody>
-</table>
-<p>You cannot simply invert the arrow, because the forward map is generally <strong>many-to-one</strong>: different latent states can produce the very same observation. Knowing <span class="math inline">\(x\)</span> therefore does not determine <span class="math inline">\(z\)</span> — it only makes some values of <span class="math inline">\(z\)</span> more plausible than others. Something extra is needed to break the tie, and that something is what you believed about <span class="math inline">\(z\)</span> before looking. Bayes’ rule is exactly the bookkeeping that combines the two:</p>
-<p><span class="math display">\[
-\underbrace{p(z \mid x)}_{\text{posterior}}
-\;=\;
-\frac{\overbrace{p(x \mid z)}^{\text{likelihood}}\;\overbrace{p(z)}^{\text{prior}}}
-     {\underbrace{p(x)}_{\text{evidence}}},
+\boxed{
+\varepsilon_t^\star(x)
+=\frac{x-\alpha_t m_t(x)}{\sigma_t},
 \qquad
-p(x) = \sum_z p(x \mid z)\,p(z).
+m_t(x)=\frac{x-\sigma_t\varepsilon_t^\star(x)}{\alpha_t}.
+}
 \]</span></p>
-<p>This is the single most useful thing in the course’s toolkit: <strong>it is the bridge from the direction you can write down to the direction you want.</strong></p>
+<p>The two estimators contain exactly the same information. “Noise prediction” and posterior-mean denoising are not rival explanations of what the population regressor learns; they are two coordinate systems for the same conditional expectation.</p>
 </section>
-<section id="a-toy-example-did-the-student-understand-or" class="level4">
-<h4 class="anchored" data-anchor-id="a-toy-example-did-the-student-understand-or">A toy example: did the student understand “or”?</h4>
-<p>A student is set ten short questions on the logical connective <strong>or</strong>. We would like to know whether they have actually grasped it — but “understanding” is not something we can measure. We can only mark the answers.</p>
-<ul>
-<li><strong>Latent</strong> <span class="math inline">\(z \in \{0, 1\}\)</span>: the student understands the concept, or does not. This is the <em>inferential goal</em>.</li>
-<li><strong>Observable</strong> <span class="math inline">\(x \in \{0, 1, \dots, 10\}\)</span>: the number of questions correct. This is all we ever see.</li>
-</ul>
-<p>Now the forward model — the <strong>sampling distribution</strong> that says how marks are produced given the latent state. A student who understands still slips occasionally; one who does not can still get items right by guessing or by luck in which items came up. Take each item as independent with</p>
+<section id="scope-of-the-identity" class="level2">
+<h2 class="anchored" data-anchor-id="scope-of-the-identity">Scope of the identity</h2>
+<p>The affine identity above uses only:</p>
+<ol type="1">
+<li>the linear observation equation;</li>
+<li>known coefficients <span class="math inline">\(\alpha_t\)</span> and <span class="math inline">\(\sigma_t\)</span>;</li>
+<li>existence of the relevant conditional expectations.</li>
+</ol>
+<p>Squared-error training is a separate assumption: it is what makes these conditional means the population targets of trained regression heads, not what makes the affine identity true.</p>
+<p>It does not require a density for <span class="math inline">\(X_0\)</span>, Gaussian data, a two-point support, a closed-form posterior, or even independence of <span class="math inline">\(X_0\)</span> and <span class="math inline">\(\varepsilon\)</span>. It applies in any dimension and to discrete, continuous, singular, or mixed data laws. The squared-loss decomposition below additionally assumes finite second moments. Gaussianity and independence of the corruption noise become important when connecting the estimator to the marginal score; neither is needed for the affine equivalence between the two conditional means.</p>
+<p>The identity is therefore not special to the two-point example. That example is special only because the posterior mean is explicit. For independent Gaussian corruption and <span class="math inline">\(X_0\)</span> uniform on <span class="math inline">\(\{-1,+1\}\)</span>, For <span class="math inline">\(X_0\)</span> uniform on <span class="math inline">\(\{-1,+1\}\)</span>,</p>
 <p><span class="math display">\[
-x \mid z = 1 \;\sim\; \text{Binomial}(10,\ 0.9),
+m_t(x)=\tanh\!\left(\frac{\alpha_t x}{\sigma_t^2}\right),
+\]</span></p>
+<p>so</p>
+<p><span class="math display">\[
+\varepsilon_t^\star(x)
+=\frac{x-\alpha_t\tanh(\alpha_t x/\sigma_t^2)}{\sigma_t}.
+\]</span></p>
+<p>The closed form makes the general fact visible: the fitted output is a field, not a fresh noise draw.</p>
+</section>
+<section id="why-squared-loss-learns-a-mean" class="level2">
+<h2 class="anchored" data-anchor-id="why-squared-loss-learns-a-mean">Why squared loss learns a mean</h2>
+<p>Let <span class="math inline">\(h(X_t,t)\)</span> be any predictor. Conditional expectation gives the orthogonal decomposition</p>
+<p><span class="math display">\[
+\varepsilon
+=\underbrace{\mathbb E[\varepsilon\mid X_t,t]}_{\varepsilon_t^\star(X_t)}
++\underbrace{\left(\varepsilon-
+\mathbb E[\varepsilon\mid X_t,t]\right)}_{R_t},
+\qquad \mathbb E[R_t\mid X_t,t]=0.
+\]</span></p>
+<p>Consequently,</p>
+<p><span class="math display">\[
+\boxed{
+\mathbb E\|h(X_t,t)-\varepsilon\|^2
+=\mathbb E\|h(X_t,t)-\varepsilon_t^\star(X_t)\|^2
++\mathbb E\|R_t\|^2.
+}
+\]</span></p>
+<p>Only the first term can be reduced by learning. The second is irreducible. Thus the random sample <span class="math inline">\(\varepsilon\)</span> is the <strong>training label</strong>, while <span class="math inline">\(\varepsilon_t^\star\)</span> is the <strong>function being estimated</strong> — the population optimum that a fitted <span class="math inline">\(\varepsilon_\theta\)</span> approximates. Calling all three “the noise” is the source of the confusion.</p>
+<p>The residual uncertainty is also an affine image of uncertainty about the clean sample. Rearranging the observation equation gives the pathwise identity</p>
+<p><span class="math display">\[
+\varepsilon-\varepsilon_t^\star(X_t)
+=-\frac{\alpha_t}{\sigma_t}\bigl(X_0-m_t(X_t)\bigr),
+\]</span></p>
+<p>and therefore, after conditioning on <span class="math inline">\((X_t,t)\)</span>,</p>
+<p><span class="math display">\[
+\boxed{
+\operatorname{Cov}(\varepsilon\mid X_t,t)
+=\frac{\alpha_t^2}{\sigma_t^2}
+\operatorname{Cov}(X_0\mid X_t,t).
+}
+\]</span></p>
+<p>What remains unpredictable about the noise is precisely what remains uncertain about the clean sample, expressed in different units. Neither this covariance identity nor the affine mean identity needs Gaussianity or independence.</p>
+</section>
+<section id="gaussian-corruption-the-score-is-the-same-field-again" class="level2">
+<h2 class="anchored" data-anchor-id="gaussian-corruption-the-score-is-the-same-field-again">Gaussian corruption: the score is the same field again</h2>
+<p>For Gaussian corruption,</p>
+<p><span class="math display">\[
+p_t(x\mid x_0)=
+\mathcal N(x;\alpha_t x_0,\sigma_t^2I),
 \qquad
-x \mid z = 0 \;\sim\; \text{Binomial}(10,\ 0.4).
+\nabla_x\log p_t(x\mid x_0)
+=-\frac{x-\alpha_t x_0}{\sigma_t^2}.
 \]</span></p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>The marks scale does not matter
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Nothing above depends on marks running <span class="math inline">\(0\)</span> to <span class="math inline">\(10\)</span>. The same structure works for a single right/wrong item (<span class="math inline">\(x \in \{0,1\}\)</span>, a Bernoulli), or a percentage score <span class="math inline">\(0\)</span>–<span class="math inline">\(100\)</span>, or a graded rubric. All that changes is the count distribution you put on the observable. What stays fixed is the shape of the problem: a latent you want, an observable you get, and a sampling distribution connecting them.</p>
-</div>
-</div>
-<p>Suppose the student scores <span class="math inline">\(x = 7\)</span>. Take a neutral prior <span class="math inline">\(p(z=1) = 0.5\)</span>. Then</p>
+<p>Averaging the conditional score over the posterior of <span class="math inline">\(X_0\)</span> gives the marginal score — the denoising-score identity derived in <a href="../tutorials/07-probability-flow-ode.html#learning-the-score">the companion note</a><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>:</p>
 <p><span class="math display">\[
-\frac{p(z=1 \mid x=7)}{p(z=0 \mid x=7)}
-= \underbrace{\frac{\binom{10}{7} 0.9^{7} 0.1^{3}}{\binom{10}{7} 0.4^{7} 0.6^{3}}}_{\text{likelihood ratio}}
-\times \underbrace{\frac{0.5}{0.5}}_{\text{prior odds}}
-= \Big(\tfrac{0.9}{0.4}\Big)^{7}\Big(\tfrac{0.1}{0.6}\Big)^{3}
-= 1.352 ,
+s_t(x)=\nabla_x\log p_t(x)
+=\frac{\alpha_t m_t(x)-x}{\sigma_t^2}
+=-\frac{\varepsilon_t^\star(x)}{\sigma_t}.
 \]</span></p>
-<p>so <span class="math inline">\(p(z = 1 \mid x = 7) = 1.352 / 2.352 = \mathbf{0.575}\)</span>.</p>
-<p>Two things are worth noticing. The binomial coefficient <span class="math inline">\(\binom{10}{7}\)</span> appears in both the numerator and the denominator and <strong>cancels</strong> — it describes how many ways the marks could have been arranged, which is the same under either hypothesis, so it carries no evidence. And <span class="math inline">\(7/10\)</span>, which sounds like a decent score, is barely informative here: it moves us from <span class="math inline">\(50\%\)</span> to <span class="math inline">\(58\%\)</span>.</p>
-<p>Across the range of possible scores:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Score <span class="math inline">\(x\)</span></th>
-<th>3</th>
-<th>5</th>
-<th>7</th>
-<th>9</th>
-<th>10</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(p(z = 1 \mid x)\)</span></td>
-<td>0.000</td>
-<td>0.007</td>
-<td>0.575</td>
-<td>0.996</td>
-<td>1.000</td>
-</tr>
-</tbody>
-</table>
-<p>The posterior is not a smooth reflection of the mark — it is nearly flat at the extremes and swings sharply in the middle, where the two hypotheses actually disagree.</p>
-<p>And the prior genuinely matters. At the same score <span class="math inline">\(x = 7\)</span>:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Prior <span class="math inline">\(p(z=1)\)</span></th>
-<th>0.2</th>
-<th>0.5</th>
-<th>0.8</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Posterior <span class="math inline">\(p(z=1 \mid x=7)\)</span></td>
-<td>0.253</td>
-<td>0.575</td>
-<td>0.844</td>
-</tr>
-</tbody>
-</table>
-<p>Same evidence, three different conclusions. This is not a defect. It is the honest statement that seven out of ten is weak evidence, and weak evidence does not overturn what you already knew.</p>
-</section>
-<section id="the-sampling-distribution-is-the-likelihood" class="level4">
-<h4 class="anchored" data-anchor-id="the-sampling-distribution-is-the-likelihood">The sampling distribution <em>is</em> the likelihood</h4>
-<p>The expression <span class="math inline">\(p(x \mid z)\)</span> has been doing two jobs above, and it is worth separating them, because this is the distinction <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> makes in the parametric setting.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Hold fixed</th>
-<th>Vary</th>
-<th>You get</th>
-<th>Sums to 1?</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>the latent <span class="math inline">\(z\)</span></td>
-<td>the data <span class="math inline">\(x\)</span></td>
-<td>the <strong>sampling distribution</strong> — how marks come out</td>
-<td>yes, over <span class="math inline">\(x\)</span></td>
-</tr>
-<tr class="even">
-<td>the observed data <span class="math inline">\(x\)</span></td>
-<td>the latent <span class="math inline">\(z\)</span></td>
-<td>the <strong>likelihood</strong> — how well each <span class="math inline">\(z\)</span> explains what we saw</td>
-<td>no</td>
-</tr>
-</tbody>
-</table>
-<p>It is one formula read in two directions. Forward, it generates. Backward, it scores. Bayes’ rule is what converts the backward reading into an actual probability distribution over <span class="math inline">\(z\)</span>, by weighting with the prior and renormalising.</p>
-</section>
-<section id="bayesian-knowledge-tracing" class="level4">
-<h4 class="anchored" data-anchor-id="bayesian-knowledge-tracing">Bayesian Knowledge Tracing</h4>
-<p>The toy example freezes the student in time. Real learners <em>learn</em>, so the latent state changes as they work — and the natural extension is exactly the model used in intelligent tutoring systems: <strong>Bayesian Knowledge Tracing</strong> (Corbett and Anderson, 1995, <em>User Modeling and User-Adapted Interaction</em>).</p>
-<p>BKT keeps the same two-layer structure and lets the latent evolve:</p>
-<ul>
-<li>a hidden binary skill state <span class="math inline">\(z_t \in \{\text{not known}, \text{known}\}\)</span>;</li>
-<li>an observed response <span class="math inline">\(x_t \in \{\text{incorrect}, \text{correct}\}\)</span> at each opportunity <span class="math inline">\(t\)</span>.</li>
-</ul>
-<p>Four parameters specify it, and each is a conditional probability:</p>
+<p>Thus the common population estimands are connected by invertible affine maps:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -748,79 +602,153 @@ x \mid z = 0 \;\sim\; \text{Binomial}(10,\ 0.4).
 </colgroup>
 <thead>
 <tr class="header">
-<th>Parameter</th>
-<th>Meaning</th>
+<th>Name of head</th>
+<th>Population-optimal output</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(P(L_0)\)</span></td>
-<td>probability the skill is known before any practice — the <strong>prior</strong></td>
+<td>clean-sample prediction</td>
+<td><span class="math inline">\(m_t(x)=\mathbb E[X_0\mid X_t=x,t]\)</span></td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(P(T)\)</span></td>
-<td>probability of learning it at an opportunity, if not yet known — the <strong>transition</strong></td>
+<td>noise prediction</td>
+<td><span class="math inline">\(\varepsilon_t^\star(x)=(x-\alpha_t m_t(x))/\sigma_t\)</span></td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(P(G)\)</span></td>
-<td>probability of answering correctly <em>without</em> knowing it — the <strong>guess</strong></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(P(S)\)</span></td>
-<td>probability of answering incorrectly <em>while</em> knowing it — the <strong>slip</strong></td>
+<td>score prediction</td>
+<td><span class="math inline">\(s_t(x)=(\alpha_t m_t(x)-x)/\sigma_t^2\)</span></td>
 </tr>
 </tbody>
 </table>
-<p>So the emission model is <span class="math inline">\(P(\text{correct} \mid \text{known}) = 1 - P(S)\)</span> and <span class="math inline">\(P(\text{correct} \mid \text{not known}) = P(G)\)</span>. Standard BKT assumes no forgetting.</p>
-<p>Tracing a student is then a two-step recursion, repeated per question — and the first step is precisely Bayes’ rule:</p>
-<ol type="1">
-<li><strong>Update on the evidence.</strong> With <span class="math inline">\(L\)</span> the current probability the skill is known, a correct answer gives <span class="math display">\[
-L^{+} \;=\; \frac{L\,(1 - P(S))}{L\,(1 - P(S)) + (1-L)\,P(G)} ,
-\]</span> and an incorrect answer gives <span class="math inline">\(L^{-} = L\,P(S) \,/\, [\,L\,P(S) + (1-L)(1 - P(G))\,]\)</span>.</li>
-<li><strong>Predict forward through learning.</strong> <span class="math inline">\(L \leftarrow L^{\pm} + (1 - L^{\pm})\,P(T)\)</span>.</li>
-</ol>
-<p>For instance with <span class="math inline">\(L = 0.4\)</span>, <span class="math inline">\(P(S) = 0.10\)</span>, <span class="math inline">\(P(G) = 0.25\)</span>, <span class="math inline">\(P(T) = 0.20\)</span>, a correct answer raises the belief to <span class="math inline">\(0.36 / 0.51 = 0.706\)</span>, and the learning step then carries it to <span class="math inline">\(0.706 + 0.294 \times 0.20 = 0.765\)</span> before the next question. An incorrect answer instead drops it to <span class="math inline">\(0.04/0.49 = 0.082\)</span>.</p>
-<div class="callout callout-style-simple callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>The shape to remember
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>A latent state you care about, an observable you actually get, a forward model connecting them, and Bayes running the inference backwards — repeated over a sequence. That is BKT, and it is also a hidden Markov model, a Kalman filter, and, as the next few weeks will show, a diffusion model.</p>
-</div>
-</div>
+<p>The score identity is specifically Gaussian. The mean-to-noise identity is not.</p>
 </section>
-<section id="why-this-is-the-shape-of-the-whole-course" class="level4">
-<h4 class="anchored" data-anchor-id="why-this-is-the-shape-of-the-whole-course">Why this is the shape of the whole course</h4>
-<p>Diffusion models are an inverse problem, and it is worth being blunt about the terminology, because it inverts what you might expect.</p>
-<ul>
-<li>The <strong>forward process</strong> of a diffusion model is the <em>corruption</em>: <span class="math inline">\(x_0 \to x_\sigma = x_0 + \sigma z\)</span>. We write it down ourselves, in closed form, and it is trivial to sample. This is the easy direction.</li>
-<li><strong>Generating an image</strong> means going the other way — recovering a plausible clean <span class="math inline">\(x_0\)</span> from a noisy <span class="math inline">\(x_\sigma\)</span>. The clean signal is the latent; the noisy observation is the data.</li>
-</ul>
-<p>So in a diffusion model, <em>generation is the inference problem</em>. That is why the central object of the course is a posterior, and why the optimal denoiser is a posterior <strong>mean</strong>:</p>
+<section id="the-v-parameterization" class="level2">
+<h2 class="anchored" data-anchor-id="the-v-parameterization">The <span class="math inline">\(v\)</span> parameterization</h2>
+<p>For any linear corruption, define the <span class="math inline">\(v\)</span> target introduced for diffusion-model parameterization by Salimans and Ho<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>:</p>
 <p><span class="math display">\[
-\mathbb{E}[x_0 \mid x_\sigma]
-= \tanh\!\Big(\frac{x_\sigma}{\sigma^2}\Big)
-\quad\text{for the two-point dataset of }
-\]</span> W01 — which, as <a href="../tutorials/11-joint-conditional-bayes.html">Joint, Marginal, Conditional</a> shows, is nothing but Bayes’ rule applied to two Gaussian shelves and then averaged. Swap “understands the concept” for “was a <span class="math inline">\(+1\)</span>”, and “ten marks” for “one noisy measurement”, and it is the same calculation you did above.</p>
+v_t=\alpha_t\varepsilon-\sigma_tX_0.
+\]</span></p>
+<p>Then</p>
+<p><span class="math display">\[
+\begin{bmatrix}X_t\\v_t\end{bmatrix}
+=
+\begin{bmatrix}
+\alpha_t&amp;\sigma_t\\
+-\sigma_t&amp;\alpha_t
+\end{bmatrix}
+\begin{bmatrix}X_0\\\varepsilon\end{bmatrix}.
+\]</span></p>
+<p>When <span class="math inline">\(\alpha_t^2+\sigma_t^2=1\)</span>, as in a variance-preserving schedule, the matrix is a rotation. Its population-optimal regression target is</p>
+<p><span class="math display">\[
+v_t^\star(x)
+=\mathbb E[v_t\mid X_t=x,t]
+=\alpha_t\varepsilon_t^\star(x)-\sigma_t m_t(x).
+\]</span></p>
+<p>So <span class="math inline">\(v\)</span>-prediction is a fourth representation of the same conditional-mean information. Under the VP normalization the inverse rotation gives</p>
+<p><span class="math display">\[
+\boxed{
+m_t(x)=\alpha_t x-\sigma_t v_t^\star(x),
+\qquad
+\varepsilon_t^\star(x)=\sigma_t x+\alpha_t v_t^\star(x).
+}
+\]</span></p>
+<p>If <span class="math inline">\(\alpha_t=\cos\phi_t\)</span> and <span class="math inline">\(\sigma_t=\sin\phi_t\)</span>, <span class="math inline">\(v_t\)</span> is also the derivative of the interpolation with respect to the angle <span class="math inline">\(\phi_t\)</span>. The companion note uses <span class="math inline">\(v\)</span> for the probability-flow ODE velocity; here <span class="math inline">\(v\)</span> is reserved for the prediction target, so call the ODE velocity <span class="math inline">\(u_t\)</span>. From the ODE derived <a href="../tutorials/07-probability-flow-ode.html#from-sde-to-ode-the-derivation">there</a>, for the VP SDE,</p>
+<p><span class="math display">\[
+u_t(x)=-\tfrac12\beta(t)\bigl(x+s_t(x)\bigr)
+=\dot\phi_t\,v_t^\star(x),
+\qquad
+\dot\phi_t=\frac{\beta(t)\alpha_t}{2\sigma_t}.
+\]</span></p>
+<p>Thus, at interior times with <span class="math inline">\(\sigma_t&gt;0\)</span>, the conditional mean of the <span class="math inline">\(v\)</span> target is the probability-flow velocity after the deterministic time change <span class="math inline">\(t\mapsto\phi_t\)</span>. The derivative <span class="math inline">\(\dot\phi_t\)</span> generally diverges as <span class="math inline">\(\sigma_t\downarrow0\)</span>, so this is not a regular reparameterization at the clean endpoint.</p>
+</section>
+<section id="equivalent-estimands-different-training-problems" class="level2">
+<h2 class="anchored" data-anchor-id="equivalent-estimands-different-training-problems">Equivalent estimands, different training problems</h2>
+<p>The affine equivalence is a population statement. It does <strong>not</strong> imply that all parameterizations train equally well with a finite network, finite data, and a particular optimizer.</p>
+<p>Coordinate conversion makes the endpoint conditioning visible. An error <span class="math inline">\(\delta_\varepsilon\)</span> in a noise head produces</p>
+<p><span class="math display">\[
+\delta_{x_0}=-\frac{\sigma_t}{\alpha_t}\delta_\varepsilon,
+\]</span></p>
+<p>which is amplified near the high-noise endpoint. In the other direction,</p>
+<p><span class="math display">\[
+\delta_\varepsilon=-\frac{\alpha_t}{\sigma_t}\delta_{x_0},
+\]</span></p>
+<p>which is amplified near the clean endpoint.</p>
+<p>These factors alone do <strong>not</strong> prove that one head is easier to learn: the same affine map rescales signal, approximation error, and the irreducible conditional variance together. A comparison becomes meaningful only after specifying the error consumed downstream — score, denoised sample, reverse mean, or velocity — and the approximation error achieved by a fixed finite model in each coordinate system. Parameterization matters because architectures, loss weights, numerical precision, and optimizers are not invariant to these time-dependent rescalings, not because the Bayes estimands contain different information.</p>
+</section>
+<section id="why-did-varepsilon-prediction-become-the-default" class="level2">
+<h2 class="anchored" data-anchor-id="why-did-varepsilon-prediction-become-the-default">Why did <span class="math inline">\(\varepsilon\)</span>-prediction become the default?</h2>
+<p>If the heads contain the same population information, a preference among them can come only from approximation, optimization, loss weighting, downstream numerics, or historical convention — not from one head containing additional population information. The reasons below mix documented design history with a retrospective conditioning analysis; they should not be mistaken for a single causal story.</p>
+<section id="a-normalized-supervised-target" class="level3">
+<h3 class="anchored" data-anchor-id="a-normalized-supervised-target">A normalized supervised target</h3>
+<p>At every noise level the sampled label has the same known marginal law,</p>
+<p><span class="math display">\[
+\varepsilon\sim\mathcal N(0,I).
+\]</span></p>
+<p>Its coordinate scale does not inherit image brightness, dataset covariance, or the changing signal-to-noise ratio. Direct <span class="math inline">\(x_0\)</span> targets retain the structure and scale of the data, while conditional-score targets <span class="math inline">\(-\varepsilon/\sigma_t\)</span> diverge in magnitude as <span class="math inline">\(\sigma_t\downarrow0\)</span>. Predicting <span class="math inline">\(\varepsilon\)</span> avoids that small-noise target explosion. Earlier noise-conditional score models used an explicitly noise-scaled output for the same normalization reason.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<p>This statement concerns the <strong>sampled labels</strong>, not the fitted function. The population-optimal output remains <span class="math inline">\(\mathbb E[\varepsilon\mid X_t=x,t]\)</span>, whose distribution and difficulty do vary with <span class="math inline">\(t\)</span> and with the data law.</p>
+</section>
+<section id="a-useful-implicit-weighting-over-noise-levels" class="level3">
+<h3 class="anchored" data-anchor-id="a-useful-implicit-weighting-over-noise-levels">A useful implicit weighting over noise levels</h3>
+<p>Because <span class="math inline">\(\varepsilon_\theta=-\sigma_t s_\theta\)</span> and <span class="math inline">\(\varepsilon^\star=-\sigma_t s_t\)</span>,</p>
+<p><span class="math display">\[
+\|\varepsilon_\theta-\varepsilon^\star\|^2
+=\sigma_t^2\|s_\theta-s_t\|^2.
+\]</span></p>
+<p>An unweighted <span class="math inline">\(\varepsilon\)</span> objective is therefore a score objective weighted by <span class="math inline">\(\sigma_t^2\)</span>. Relative to an unweighted score objective, it gives less weight to the small-<span class="math inline">\(\sigma_t\)</span> region in which conditional score labels have scale <span class="math inline">\(1/\sigma_t\)</span>. Equivalently, a score loss with weight <span class="math inline">\(\lambda(t)\)</span> becomes a noise loss with weight <span class="math inline">\(\lambda(t)/\sigma_t^2\)</span>. The familiar “simple” DDPM objective is consequently not just a relabeling: it chooses a consequential weighting across noise levels. This is best read as an analysis of the objective, not by itself as a historical account of why it was adopted.</p>
+</section>
+<section id="direct-use-in-the-ddpm-reverse-mean" class="level3">
+<h3 class="anchored" data-anchor-id="direct-use-in-the-ddpm-reverse-mean">Direct use in the DDPM reverse mean</h3>
+<p>For a discrete DDPM, write the one-step retention as <span class="math inline">\(a_k\)</span>, its cumulative product as <span class="math inline">\(\bar a_k=\prod_{j=1}^k a_j\)</span>, and <span class="math inline">\(X_k=\sqrt{\bar a_k}X_0+\sqrt{1-\bar a_k}\,\varepsilon\)</span>. The exact posterior <span class="math inline">\(q(x_{k-1}\mid x_k,x_0)\)</span> has a mean affine in <span class="math inline">\(x_0\)</span>. Averaging over <span class="math inline">\(X_0\mid X_k=x\)</span> therefore makes the exact conditional reverse mean a fifth coordinate of the same estimator:</p>
+<p><span class="math display">\[
+\mathbb E[X_{k-1}\mid X_k=x]
+=\frac{1}{\sqrt{a_k}}
+\left(x-\frac{1-a_k}{\sqrt{1-\bar a_k}}\,
+\varepsilon_k^\star(x)\right).
+\]</span></p>
+<p>The full reverse conditional need not be Gaussian, but this conditional-mean identity is exact. The DDPM Gaussian model uses the same expression with <span class="math inline">\(\varepsilon_k^\star\)</span> replaced by <span class="math inline">\(\varepsilon_\theta\)</span>.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> This made the training target and reverse update compact: generate a known standard-normal label, fit it by MSE, and insert the output into the reverse mean. Unlike the probability-flow velocity <span class="math inline">\(u_t\)</span>, this is a discrete-time conditional expectation of the previous state, not a continuous-time derivative.</p>
+</section>
+<section id="empirical-success-became-convention" class="level3">
+<h3 class="anchored" data-anchor-id="empirical-success-became-convention">Empirical success became convention</h3>
+<p>The original DDPM work arrived at <span class="math inline">\(\varepsilon\)</span>-prediction by reparameterizing the variational reverse mean and reported its effectiveness empirically; its ablations also tie the result to the simplified objective rather than to output coordinates alone.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> Subsequent architectures, schedulers, software interfaces, and explanations standardized around it. Part of its status as the “preferred” parameterization is therefore path dependence: a successful baseline became the default language of the field. That history is evidence for usefulness, not proof of universal optimality.</p>
+</section>
+<section id="it-is-not-uniformly-well-conditioned" class="level3">
+<h3 class="anchored" data-anchor-id="it-is-not-uniformly-well-conditioned">It is not uniformly well-conditioned</h3>
+<p>The endpoint factors do identify where a coordinate conversion is ill-conditioned, provided we say which downstream quantity must be accurate. Near the high-noise endpoint, an apparently small <span class="math inline">\(\varepsilon\)</span> error can become a large <span class="math inline">\(x_0\)</span> error after multiplication by <span class="math inline">\(\sigma_t/\alpha_t\)</span>; the observation is nearly the noise, and the small difference that carries clean-signal information is difficult to resolve. Near the clean endpoint, an <span class="math inline">\(x_0\)</span> error becomes a large <span class="math inline">\(\varepsilon\)</span> or score error after multiplication by <span class="math inline">\(\alpha_t/\sigma_t\)</span>. Accordingly, <span class="math inline">\(\varepsilon\)</span> coordinates resolve the small residual naturally near clean data, while <span class="math inline">\(x_0\)</span> coordinates avoid the singular recovery of clean signal near zero SNR. The VP rotation motivates <span class="math inline">\(v\)</span>-prediction as a more balanced coordinate system.<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a> EDM-style formulations go further by explicitly preconditioning the input, output, and loss rather than treating any raw head as intrinsically correct.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a></p>
+<p>The preference can therefore be summarized precisely:</p>
+<blockquote class="blockquote">
+<p><span class="math inline">\(\varepsilon\)</span>-prediction became standard not because noise is the fundamental object being learned, but because noise coordinates give normalized sampled labels, a useful implicit timestep weighting, and a convenient reverse-step formula. These properties, empirical results, and subsequent convention made it a practical default, not a uniquely privileged statistical target.</p>
+</blockquote>
+<p>The defensible conclusion is:</p>
+<blockquote class="blockquote">
+<p>The standard prediction heads are information-equivalent at the unrestricted population optimum, but they are not necessarily optimization-equivalent in practice.</p>
+</blockquote>
 </section>
 </section>
-<section id="exercises" class="level2">
-<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
-<ol type="1">
-<li>Two fair coin tosses. Let <span class="math inline">\(X\)</span> be the result of the first toss and <span class="math inline">\(Y\)</span> the total number of heads. Write the joint as a table, compute both marginals, and compute both families of conditionals. Verify Bayes’ rule on <span class="math inline">\(\mathbb{P}(X = H \mid Y = 1)\)</span>.</li>
-<li>For the sky-and-rain table above, compute <span class="math inline">\(\mathbb{P}(\text{cloudy} \mid \text{rain})\)</span> by Bayes’ rule from <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy})\)</span> and the marginals, then confirm it by reading the table directly.</li>
-<li>Construct two <em>different</em> joint distributions on <span class="math inline">\(\{0,1\}^2\)</span> that have the same pair of marginals. What does this show about whether marginals determine a joint?</li>
-<li>Show that if <span class="math inline">\(p(x,y) = p(x)p(y)\)</span> then every conditional <span class="math inline">\(p(y \mid x)\)</span> equals <span class="math inline">\(p(y)\)</span> — independence means the conditional does not move as you change what you condition on.</li>
-<li>In the mixture model <span class="math inline">\(z \sim \text{Bernoulli}(\pi)\)</span>, <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)\)</span>: identify the joint <span class="math inline">\(p(x,z)\)</span>, both marginals, and both conditionals. State which of these the <a href="../tutorials/05-two-point-diffusion.html">W01 denoiser</a> computes, and which the ancestral sampler of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> uses.</li>
-<li>A generative model produces a noisy observation <span class="math inline">\(x_t\)</span> from a clean signal <span class="math inline">\(x_0\)</span>. Which direction is easy to write down, <span class="math inline">\(p(x_t \mid x_0)\)</span> or <span class="math inline">\(p(x_0 \mid x_t)\)</span>? Which one does generation require? Name the rule that converts one into the other.</li>
+<section id="what-the-phrase-gets-wrong" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-phrase-gets-wrong">What the phrase gets wrong</h2>
+<p>“Noise prediction” is defensible as shorthand for the target used in a regression problem. It becomes misleading when read as a description of the fitted function.</p>
+<ul>
+<li>The network does not reproduce a hidden random draw exactly; an irreducible conditional variance generally remains.</li>
+<li>Its output is a deterministic function of <span class="math inline">\((x,t)\)</span>, not newly generated static.</li>
+<li>The predictable component is the posterior-mean displacement from the noisy observation to the attenuated clean signal.</li>
+<li>Under Gaussian corruption, that component is precisely the score in different units.</li>
+</ul>
+<p>A more faithful phrase would be <strong>conditional-noise mean estimation</strong>. Better still, present <span class="math inline">\(x_0\)</span>-, <span class="math inline">\(\varepsilon\)</span>-, score-, and <span class="math inline">\(v\)</span>-prediction together as alternative parameterizations of one learned conditional-mean field.</p>
+
+
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Pascal Vincent, “A Connection Between Score Matching and Denoising Autoencoders,” <em>Neural Computation</em> 23(7), 2011, <a href="https://doi.org/10.1162/NECO_a_00142">doi:10.1162/NECO_a_00142</a>. The conditional-to-marginal score averaging used here is often called Vincent’s identity in the diffusion-model literature.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Tim Salimans and Jonathan Ho, “Progressive Distillation for Fast Sampling of Diffusion Models,” ICLR 2022, <a href="https://arxiv.org/abs/2202.00512">arXiv:2202.00512</a>, §4. The paper introduces the angular/velocity parameterization used here.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Yang Song and Stefano Ermon, “Generative Modeling by Estimating Gradients of the Data Distribution,” NeurIPS 2019, <a href="https://arxiv.org/abs/1907.05600">arXiv:1907.05600</a>. Noise-conditional score networks normalize the output and objective across noise scales, anticipating the conditioning role later played by <span class="math inline">\(\varepsilon\)</span> parameterization.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Jonathan Ho, Ajay Jain, and Pieter Abbeel, “Denoising Diffusion Probabilistic Models,” NeurIPS 2020, <a href="https://arxiv.org/abs/2006.11239">arXiv:2006.11239</a>, especially §3.2 and Table 2. The paper derives the <span class="math inline">\(\varepsilon\)</span> parameterization from the reverse-process mean and studies it together with the simplified objective.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Jonathan Ho, Ajay Jain, and Pieter Abbeel, “Denoising Diffusion Probabilistic Models,” NeurIPS 2020, <a href="https://arxiv.org/abs/2006.11239">arXiv:2006.11239</a>, especially §3.2 and Table 2. The paper derives the <span class="math inline">\(\varepsilon\)</span> parameterization from the reverse-process mean and studies it together with the simplified objective.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>Tim Salimans and Jonathan Ho, “Progressive Distillation for Fast Sampling of Diffusion Models,” ICLR 2022, <a href="https://arxiv.org/abs/2202.00512">arXiv:2202.00512</a>, §4. The paper introduces the angular/velocity parameterization used here.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>Tero Karras, Miika Aittala, Timo Aila, and Samuli Laine, “Elucidating the Design Space of Diffusion-Based Generative Models,” NeurIPS 2022, <a href="https://arxiv.org/abs/2206.00364">arXiv:2206.00364</a>, especially §5 and Table 1 on input, output, skip, and loss preconditioning.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-
-
 </section>
 
 </main> <!-- /main -->
@@ -1231,13 +1159,13 @@ L^{+} \;=\; \frac{L\,(1 - P(S))}{L\,(1 - P(S)) + (1-L)\,P(G)} ,
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/01-probability-101.html" class="pagination-link" aria-label="02 · Probability &amp; Random Variables">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">02 · Probability &amp; Random Variables</span>
+      <a href="../tutorials/07-probability-flow-ode.html" class="pagination-link" aria-label="The Probability-Flow ODE">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The Probability-Flow ODE</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/02-distributions-mle.html" class="pagination-link" aria-label="04 · Distributions and Maximum Likelihood">
-        <span class="nav-page-text">04 · Distributions and Maximum Likelihood</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../resources.html" class="pagination-link" aria-label="Resources">
+        <span class="nav-page-text">Resources</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
