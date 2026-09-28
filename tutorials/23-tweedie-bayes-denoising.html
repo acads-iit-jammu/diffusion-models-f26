@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>04 · Distributions and Maximum Likelihood – ID-5-02 (TO)</title>
+<title>Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/12-multivariate-gaussian.html" rel="next">
-<link href="../tutorials/16-joints-conditionals.html" rel="prev">
+<link href="../materials/w01-deck-01-mechanics.html" rel="next">
+<link href="../tutorials/24-sampling-with-scores.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/02-distributions-mle.html">04 · Distributions and Maximum Likelihood</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/23-tweedie-bayes-denoising.html">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -215,7 +215,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
   </div>
 </li>
@@ -263,7 +263,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</span></a>
   </div>
 </li>
@@ -455,24 +455,31 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-cast-of-distributions" id="toc-the-cast-of-distributions" class="nav-link active" data-scroll-target="#the-cast-of-distributions">The cast of distributions</a></li>
-  <li><a href="#how-sampling-actually-works" id="toc-how-sampling-actually-works" class="nav-link" data-scroll-target="#how-sampling-actually-works">How sampling actually works</a></li>
-  <li><a href="#likelihood" id="toc-likelihood" class="nav-link" data-scroll-target="#likelihood">Likelihood</a></li>
-  <li><a href="#pdf-vs-likelihood-the-same-function-two-readings" id="toc-pdf-vs-likelihood-the-same-function-two-readings" class="nav-link" data-scroll-target="#pdf-vs-likelihood-the-same-function-two-readings">PDF vs likelihood: the same function, two readings</a></li>
-  <li><a href="#the-gaussian-mle-in-full" id="toc-the-gaussian-mle-in-full" class="nav-link" data-scroll-target="#the-gaussian-mle-in-full">The Gaussian MLE, in full</a></li>
-  <li><a href="#aside-binary-cross-entropy-is-a-likelihood" id="toc-aside-binary-cross-entropy-is-a-likelihood" class="nav-link" data-scroll-target="#aside-binary-cross-entropy-is-a-likelihood">Aside: binary cross-entropy is a likelihood</a></li>
-  <li><a href="#fitting-the-other-families-honestly" id="toc-fitting-the-other-families-honestly" class="nav-link" data-scroll-target="#fitting-the-other-families-honestly">Fitting the other families — honestly</a></li>
-  <li><a href="#the-trap-right-method-wrong-family" id="toc-the-trap-right-method-wrong-family" class="nav-link" data-scroll-target="#the-trap-right-method-wrong-family">The trap: right method, wrong family</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  <li><a href="#what-does-bayes-optimal-denoiser-mean" id="toc-what-does-bayes-optimal-denoiser-mean" class="nav-link active" data-scroll-target="#what-does-bayes-optimal-denoiser-mean">1. What does “Bayes-optimal denoiser” mean?</a></li>
+  <li><a href="#the-density-we-differentiate-is-the-noisy-marginal" id="toc-the-density-we-differentiate-is-the-noisy-marginal" class="nav-link" data-scroll-target="#the-density-we-differentiate-is-the-noisy-marginal">2. The density we differentiate is the noisy marginal</a></li>
+  <li><a href="#differentiate-the-gaussian-then-use-bayes-rule" id="toc-differentiate-the-gaussian-then-use-bayes-rule" class="nav-link" data-scroll-target="#differentiate-the-gaussian-then-use-bayes-rule">3. Differentiate the Gaussian, then use Bayes’ rule</a></li>
+  <li><a href="#what-the-formula-tells-us-geometrically" id="toc-what-the-formula-tells-us-geometrically" class="nav-link" data-scroll-target="#what-the-formula-tells-us-geometrically">4. What the formula tells us geometrically</a></li>
+  <li><a href="#check-it-on-a-gaussian-prior" id="toc-check-it-on-a-gaussian-prior" class="nav-link" data-scroll-target="#check-it-on-a-gaussian-prior">5. Check it on a Gaussian prior</a></li>
+  <li><a href="#the-vp-diffusion-form" id="toc-the-vp-diffusion-form" class="nav-link" data-scroll-target="#the-vp-diffusion-form">6. The VP diffusion form</a></li>
+  <li><a href="#noise-prediction-is-another-expression-of-the-same-conditional-mean" id="toc-noise-prediction-is-another-expression-of-the-same-conditional-mean" class="nav-link" data-scroll-target="#noise-prediction-is-another-expression-of-the-same-conditional-mean">7. Noise prediction is another expression of the same conditional mean</a></li>
+  <li><a href="#two-possible-clean-values-derive-the-tanh-denoiser" id="toc-two-possible-clean-values-derive-the-tanh-denoiser" class="nav-link" data-scroll-target="#two-possible-clean-values-derive-the-tanh-denoiser">8. Two possible clean values: derive the tanh denoiser</a>
+  <ul class="collapse">
+  <li><a href="#posterior-mean-posterior-mode-and-posterior-sample-differ" id="toc-posterior-mean-posterior-mode-and-posterior-sample-differ" class="nav-link" data-scroll-target="#posterior-mean-posterior-mode-and-posterior-sample-differ">Posterior mean, posterior mode, and posterior sample differ</a></li>
+  <li><a href="#the-small-noise-limit-needs-a-qualification" id="toc-the-small-noise-limit-needs-a-qualification" class="nav-link" data-scroll-target="#the-small-noise-limit-needs-a-qualification">The small-noise limit needs a qualification</a></li>
+  </ul></li>
+  <li><a href="#a-useful-extension-correlated-gaussian-noise" id="toc-a-useful-extension-correlated-gaussian-noise" class="nav-link" data-scroll-target="#a-useful-extension-correlated-gaussian-noise">9. A useful extension: correlated Gaussian noise</a></li>
+  <li><a href="#how-this-fits-into-diffusion-sampling" id="toc-how-this-fits-into-diffusion-sampling" class="nav-link" data-scroll-target="#how-this-fits-into-diffusion-sampling">10. How this fits into diffusion sampling</a></li>
+  <li><a href="#exercises-with-checks" id="toc-exercises-with-checks" class="nav-link" data-scroll-target="#exercises-with-checks">Exercises with checks</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/02-distributions-mle.html">04 · Distributions and Maximum Likelihood</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/23-tweedie-bayes-denoising.html">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">04 · Distributions and Maximum Likelihood</h1>
+<h1 class="title">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</h1>
 </div>
 
 
@@ -489,206 +496,244 @@ window.Quarto = {
 </header>
 
 
-<p><em>Standalone tutorial accompanying W02. Interactive versions: <a href="../materials/distributions-playground.html">the Distribution Playground</a> and <a href="../materials/likelihood-lens.html">the Likelihood Lens</a>.</em></p>
-<p>This note walks one loop twice: <strong>distribution → samples → fitted distribution → new samples</strong>. First visually (the playground), then analytically (maximum likelihood for the Gaussian, derived in full). It doubles as a compact reference for the distribution families used throughout the course.</p>
-<section id="the-cast-of-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="the-cast-of-distributions">The cast of distributions</h2>
+<p><em>A standalone derivation. Prerequisites: Gaussian densities, Bayes’ rule, conditional expectation, and differentiation. No ODE or SDE theory is needed.</em></p>
+<p><strong>Place in the teaching sequence.</strong> This is the statistical derivation in the three-note sequence: <a href="../tutorials/22-vector-fields-to-score-diffusion.html">geometric introduction</a> → <a href="../tutorials/24-sampling-with-scores.html">worked sampling tutorial</a> → this proof. It can also be read independently. We reserve <span class="math inline">\(\varrho\)</span> for a Gaussian prior’s standard deviation, keeping <span class="math inline">\(\tau\)</span> available for the reverse clock in the companion notes.</p>
+<p>We observe a corrupted signal</p>
+<p><span class="math display">\[\boxed{Y=X+\sigma\varepsilon,\qquad
+\varepsilon\sim\mathcal N(0,I_d),\quad\varepsilon\perp X,\quad\sigma&gt;0.}\]</span></p>
+<p>The clean signal <span class="math inline">\(X\)</span> is random because it represents the population of possible data. Its law <span class="math inline">\(P_X\)</span> is our prior. We observe <span class="math inline">\(Y=y\)</span>, but do not know either <span class="math inline">\(X\)</span> or the particular noise realization. What should we return as a denoised estimate?</p>
+<p>The answer depends on the loss. Under squared Euclidean error, the best answer is the <strong>posterior mean</strong>. Tweedie’s formula expresses that mean using only the score of the noisy marginal density:</p>
+<p><span class="math display">\[\boxed{\mathbb E[X\mid Y=y]=y+\sigma^2\nabla_y\log p_Y(y).}\]</span></p>
+<p>We will prove both statements: why this is Bayes-optimal, and why the score gives exactly that estimate. Open <a href="../materials/score-flow-lab.html#tweedie">Lab 4: Tweedie’s denoiser</a> to explore the two-point example as you read.</p>
+<section id="what-does-bayes-optimal-denoiser-mean" class="level2">
+<h2 class="anchored" data-anchor-id="what-does-bayes-optimal-denoiser-mean">1. What does “Bayes-optimal denoiser” mean?</h2>
+<p>A denoiser is a function <span class="math inline">\(D\)</span> that turns an observation into an estimate <span class="math inline">\(D(Y)\)</span>. Its mean squared error, or Bayes risk, is</p>
+<p><span class="math display">\[R(D)=\mathbb E\|X-D(Y)\|^2.\]</span></p>
+<p>Assume <span class="math inline">\(\mathbb E\|X\|^2&lt;\infty\)</span> and consider denoisers with finite risk. Then <span class="math inline">\(D(Y)\)</span> is square-integrable too, so the cross term below is well defined. Let <span class="math inline">\(m(Y)=\mathbb E[X\mid Y]\)</span>. Add and subtract <span class="math inline">\(m(Y)\)</span> inside the error:</p>
+<p><span class="math display">\[X-D(Y)=[X-m(Y)]+[m(Y)-D(Y)].\]</span></p>
+<p>Expanding the squared norm produces two squared terms and a cross term. Given <span class="math inline">\(Y\)</span>, the second bracket is known and <span class="math inline">\(\mathbb E[X-m(Y)\mid Y]=0\)</span>. Therefore the cross term has expectation zero:</p>
+<p><span class="math display">\[
+\mathbb E\big[(X-m(Y))^\top(m(Y)-D(Y))\big]=0.
+\]</span></p>
+<p>It follows that</p>
+<p><span class="math display">\[\boxed{
+R(D)=\underbrace{\mathbb E\|X-m(Y)\|^2}_{\text{irreducible posterior uncertainty}}
++\underbrace{\mathbb E\|m(Y)-D(Y)\|^2}_{\text{avoidable estimation error}}.
+}\]</span></p>
+<p>The first term does not depend on <span class="math inline">\(D\)</span>. The second is nonnegative and is zero exactly when <span class="math inline">\(D(Y)=m(Y)\)</span> almost surely. Thus</p>
+<p><span class="math display">\[\boxed{D^*(y)=\mathbb E[X\mid Y=y].}\]</span></p>
+<p>At a particular observation, the same argument reads</p>
+<p><span class="math display">\[\mathbb E[\|X-a\|^2\mid Y=y]
+=\operatorname{tr}\operatorname{Cov}(X\mid Y=y)+\|m(y)-a\|^2.\]</span></p>
+<p>“Optimal” means optimal for this loss and this joint model, not guaranteed to recover the actual hidden signal. The remaining risk is the average posterior variance. With other losses, the optimal estimate can change: absolute error in one dimension gives a posterior median, for example.</p>
+</section>
+<section id="the-density-we-differentiate-is-the-noisy-marginal" class="level2">
+<h2 class="anchored" data-anchor-id="the-density-we-differentiate-is-the-noisy-marginal">2. The density we differentiate is the noisy marginal</h2>
+<p>Conditional on <span class="math inline">\(X=x\)</span>, the observation is Gaussian:</p>
+<p><span class="math display">\[p(y\mid x)=\frac{1}{(2\pi\sigma^2)^{d/2}}
+\exp\left[-\frac{\|y-x\|^2}{2\sigma^2}\right].\]</span></p>
+<p>Averaging over possible clean signals gives</p>
+<p><span class="math display">\[\boxed{p_Y(y)=\int p(y\mid x)\,P_X(dx).}\]</span></p>
+<p>If <span class="math inline">\(X\)</span> has a density, <span class="math inline">\(P_X(dx)=p_X(x)dx\)</span>. If <span class="math inline">\(X\)</span> takes finitely many values, the integral is a sum. This notation lets the same proof apply to continuous data, discrete data, and data supported on a lower-dimensional set. Gaussian noise with <span class="math inline">\(\sigma&gt;0\)</span> makes <span class="math inline">\(p_Y\)</span> smooth and strictly positive everywhere.</p>
+<p>The score in this tutorial is</p>
+<p><span class="math display">\[s_Y(y)=\nabla_y\log p_Y(y).\]</span></p>
+<p>It is a gradient with respect to the observed data coordinates. It is not a parameter gradient, not the clean-data score, and not the score of one fixed conditional likelihood <span class="math inline">\(p(y\mid x)\)</span>.</p>
+</section>
+<section id="differentiate-the-gaussian-then-use-bayes-rule" class="level2">
+<h2 class="anchored" data-anchor-id="differentiate-the-gaussian-then-use-bayes-rule">3. Differentiate the Gaussian, then use Bayes’ rule</h2>
+<p>The Gaussian kernel has derivative</p>
+<p><span class="math display">\[\nabla_y p(y\mid x)=\frac{x-y}{\sigma^2}p(y\mid x).\]</span></p>
+<p>Differentiate under the integral:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\nabla_y p_Y(y)
+&amp;=\int\nabla_y p(y\mid x)\,P_X(dx)\\
+&amp;=\frac{1}{\sigma^2}\int(x-y)p(y\mid x)\,P_X(dx).
+\end{aligned}
+\]</span></p>
+<p>For fixed positive <span class="math inline">\(\sigma\)</span>, Gaussian kernels and their first derivatives are locally uniformly bounded as functions of <span class="math inline">\(x\)</span> for <span class="math inline">\(y\)</span> in a compact set. This provides a dominating integrable bound against the probability measure <span class="math inline">\(P_X\)</span> and justifies the interchange. The finite-second-moment assumption above also makes the squared-error decision problem well defined.</p>
+<p>Now divide by the positive marginal density:</p>
+<p><span class="math display">\[\frac{\nabla_y p_Y(y)}{p_Y(y)}
+=\frac{1}{\sigma^2}\int(x-y)
+\frac{p(y\mid x)P_X(dx)}{p_Y(y)}.\]</span></p>
+<p>Bayes’ rule identifies the fraction as the posterior measure:</p>
+<p><span class="math display">\[P_{X\mid Y=y}(dx)=\frac{p(y\mid x)P_X(dx)}{p_Y(y)}.\]</span></p>
+<p>Hence</p>
+<p><span class="math display">\[
+\begin{aligned}
+\nabla_y\log p_Y(y)
+&amp;=\frac{1}{\sigma^2}\int(x-y)\,P_{X\mid Y=y}(dx)\\
+&amp;=\frac{\mathbb E[X\mid Y=y]-y}{\sigma^2}.
+\end{aligned}
+\]</span></p>
+<p>Rearranging proves Tweedie’s formula:</p>
+<p><span class="math display">\[\boxed{m(y)=y+\sigma^2s_Y(y).}\]</span></p>
+<p>The whole proof is a Gaussian derivative followed by Bayes’ rule. Bayes optimality comes from the squared-error decomposition in Section 1, not from differentiating the density alone.</p>
+</section>
+<section id="what-the-formula-tells-us-geometrically" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-formula-tells-us-geometrically">4. What the formula tells us geometrically</h2>
+<p>The vector</p>
+<p><span class="math display">\[\boxed{\sigma^2s_Y(y)=m(y)-y}\]</span></p>
+<p>is the displacement from the observed noisy point to its posterior-mean clean estimate. Thus a score is not merely an abstract derivative: it encodes a denoising displacement, measured in units of noise variance.</p>
+<p>This is an exact identity for this Gaussian observation model. It is not an instruction to keep applying a fixed denoiser as a sampling algorithm. A posterior mean averages uncertainty and can lie between plausible clean signals. Likewise, repeated score ascent can concentrate particles at modes instead of reproducing a distribution.</p>
+<p>For additive noise, <span class="math inline">\(s_Y(y)\)</span> points toward <span class="math inline">\(m(y)\)</span>. For scaled corruption, the correct endpoint of that arrow is the <strong>scaled</strong> posterior mean; we will make that distinction explicit below.</p>
+</section>
+<section id="check-it-on-a-gaussian-prior" class="level2">
+<h2 class="anchored" data-anchor-id="check-it-on-a-gaussian-prior">5. Check it on a Gaussian prior</h2>
+<p>Let <span class="math inline">\(X\sim\mathcal N(\mu,\varrho^2)\)</span> in one dimension, with <span class="math inline">\(\varrho&gt;0\)</span>. Then</p>
+<p><span class="math display">\[Y\sim\mathcal N(\mu,\varrho^2+\sigma^2),\qquad
+s_Y(y)=-\frac{y-\mu}{\varrho^2+\sigma^2}.\]</span></p>
+<p>Tweedie gives</p>
+<p><span class="math display">\[
+\begin{aligned}
+m(y)&amp;=y-\frac{\sigma^2}{\varrho^2+\sigma^2}(y-\mu)\\
+&amp;=\boxed{\frac{\varrho^2}{\varrho^2+\sigma^2}y
++\frac{\sigma^2}{\varrho^2+\sigma^2}\mu}.
+\end{aligned}
+\]</span></p>
+<p>The denoiser balances observation and prior mean. If observation noise is small, it trusts <span class="math inline">\(y\)</span>. If noise is large, it trusts <span class="math inline">\(\mu\)</span>. The posterior variance is <span class="math inline">\(\varrho^2\sigma^2/(\varrho^2+\sigma^2)\)</span>, so even the optimal estimate usually has nonzero error.</p>
+<p>Notice why the marginal matters. The clean score would be <span class="math inline">\(-(y-\mu)/\varrho^2\)</span> and would give the wrong shrinkage. Tweedie requires the score of the <strong>noise-smoothed</strong> density <span class="math inline">\(p_Y\)</span>.</p>
+</section>
+<section id="the-vp-diffusion-form" class="level2">
+<h2 class="anchored" data-anchor-id="the-vp-diffusion-form">6. The VP diffusion form</h2>
+<p>At a fixed time, consider</p>
+<p><span class="math display">\[\boxed{X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
+\varepsilon\perp X_0,\quad\sigma_t&gt;0.}\]</span></p>
+<p>In the usual VP convention, <span class="math inline">\(\alpha_t^2+\sigma_t^2=1\)</span>, but the derivation needs only the linear Gaussian observation model. Set <span class="math inline">\(Z=\alpha_tX_0\)</span> and apply the additive formula to <span class="math inline">\(X_t=Z+\sigma_t\varepsilon\)</span>:</p>
+<p><span class="math display">\[\mathbb E[Z\mid X_t=x]=x+\sigma_t^2s_t(x),\qquad
+s_t(x)=\nabla_x\log p_t(x).\]</span></p>
+<p>Because <span class="math inline">\(\alpha_t\)</span> is known at the fixed time,</p>
+<p><span class="math display">\[\boxed{\alpha_t\mathbb E[X_0\mid X_t=x]
+=x+\sigma_t^2s_t(x).}\]</span></p>
+<p>When <span class="math inline">\(\alpha_t\ne0\)</span> (usually <span class="math inline">\(\alpha_t&gt;0\)</span>), this gives</p>
+<p><span class="math display">\[\boxed{m_t(x)=\mathbb E[X_0\mid X_t=x]
+=\frac{x+\sigma_t^2s_t(x)}{\alpha_t}.}\]</span></p>
+<p>The companion tutorials write this same posterior mean as <span class="math inline">\(\widehat X_0(x,t)=m_t(x)\)</span>. The shorter <span class="math inline">\(m_t\)</span> notation here emphasizes that it is a conditional mean, and is also used in the denoising lab.</p>
+<p>Equivalently,</p>
+<p><span class="math display">\[\boxed{s_t(x)=\frac{\alpha_t m_t(x)-x}{\sigma_t^2}.}\]</span></p>
+<p>The score points from <span class="math inline">\(x\)</span> toward <span class="math inline">\(\alpha_t m_t(x)\)</span>, not generally toward <span class="math inline">\(m_t(x)\)</span> itself. The distinction matters when the clean signal has been attenuated. At <span class="math inline">\(\alpha_t=0\)</span>, the observation contains no information about <span class="math inline">\(X_0\)</span>, so its posterior mean is the prior mean. Dividing by <span class="math inline">\(\alpha_t\)</span> is then invalid. At <span class="math inline">\(\sigma_t=0\)</span>, the smoothed-score formula cannot be used as written.</p>
+</section>
+<section id="noise-prediction-is-another-expression-of-the-same-conditional-mean" class="level2">
+<h2 class="anchored" data-anchor-id="noise-prediction-is-another-expression-of-the-same-conditional-mean">7. Noise prediction is another expression of the same conditional mean</h2>
+<p>Rearrange the corruption equation and take conditional expectations:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\varepsilon&amp;=\frac{X_t-\alpha_tX_0}{\sigma_t},\\
+\mathbb E[\varepsilon\mid X_t=x]
+&amp;=\frac{x-\alpha_t m_t(x)}{\sigma_t}
+=-\sigma_t s_t(x).
+\end{aligned}
+\]</span></p>
+<p>Write <span class="math inline">\(e_t(x)=\mathbb E[\varepsilon\mid X_t=x]\)</span>. This is <span class="math inline">\(\varepsilon^\star(x,t)\)</span> in the companion tutorials; a fitted predictor <span class="math inline">\(e_\theta(x,t)\)</span> here corresponds to their <span class="math inline">\(\varepsilon_\theta(x,t)\)</span>. Then</p>
+<p><span class="math display">\[\boxed{
+s_t=-e_t/\sigma_t,\qquad
+m_t=(x-\sigma_te_t)/\alpha_t,\qquad
+e_t=(x-\alpha_tm_t)/\sigma_t.
+}\]</span></p>
+<p>These are identities between optimal fitted functions, not claims that the particular random noise realization can be recovered. Under squared loss, a noise predictor estimates <span class="math inline">\(e_t\)</span>, a clean-data predictor estimates <span class="math inline">\(m_t\)</span>, and denoising score matching estimates <span class="math inline">\(s_t\)</span>.</p>
+<p>Indeed, the conditional-score target is <span class="math inline">\(-\varepsilon/\sigma_t\)</span>, and</p>
+<p><span class="math display">\[\mathbb E[-\varepsilon/\sigma_t\mid X_t=x]=s_t(x).\]</span></p>
+<p>That is why regression against a known corruption target can recover the unknown marginal score.</p>
+<p>The parameterizations encode the same information at the population optimum when <span class="math inline">\(\alpha_t,\sigma_t\ne0\)</span>. Their training losses are not automatically equivalent under arbitrary time weighting. For example, with <span class="math inline">\(s_\theta=-e_\theta/\sigma_t\)</span>,</p>
+<p><span class="math display">\[\lambda(t)\|s_\theta+\varepsilon/\sigma_t\|^2
+=\frac{\lambda(t)}{\sigma_t^2}\|e_\theta-\varepsilon\|^2.\]</span></p>
+<p>With <span class="math inline">\(s_\theta=(\alpha_tD_\theta-x_t)/\sigma_t^2\)</span>, the same score-target loss equals <span class="math inline">\(\lambda(t)\alpha_t^2\|D_\theta-X_0\|^2/\sigma_t^4\)</span>. Finite networks, optimization, and time weights can therefore make the practical training problems behave differently.</p>
+</section>
+<section id="two-possible-clean-values-derive-the-tanh-denoiser" class="level2">
+<h2 class="anchored" data-anchor-id="two-possible-clean-values-derive-the-tanh-denoiser">8. Two possible clean values: derive the tanh denoiser</h2>
+<p>Suppose <span class="math inline">\(X_0\)</span> takes values <span class="math inline">\(-1\)</span> and <span class="math inline">\(+1\)</span> with <strong>equal probabilities</strong>. Observe</p>
+<p><span class="math display">\[X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad \alpha_t&gt;0,\ \sigma_t&gt;0.\]</span></p>
+<p>The two likelihoods are Gaussians centered at <span class="math inline">\(-\alpha_t\)</span> and <span class="math inline">\(+\alpha_t\)</span>. By Bayes’ rule, the posterior odds are</p>
+<p><span class="math display">\[\frac{P(X_0=+1\mid x)}{P(X_0=-1\mid x)}
+=\exp\left[\frac{(x+\alpha_t)^2-(x-\alpha_t)^2}{2\sigma_t^2}\right]
+=\exp\left(\frac{2\alpha_t x}{\sigma_t^2}\right).\]</span></p>
+<p>Writing <span class="math inline">\(\kappa=\alpha_t x/\sigma_t^2\)</span> gives</p>
+<p><span class="math display">\[w_+(x)=\frac{1}{1+e^{-2\kappa}},\qquad w_-(x)=1-w_+(x).\]</span></p>
+<p>The posterior mean is their signed difference:</p>
+<p><span class="math display">\[\boxed{m_t(x)=w_+(x)-w_-(x)=\tanh\left(\frac{\alpha_t x}{\sigma_t^2}\right).}\]</span></p>
+<p>Substitution into Tweedie yields</p>
+<p><span class="math display">\[\boxed{s_t(x)=\frac{
+\alpha_t\tanh(\alpha_t x/\sigma_t^2)-x}{\sigma_t^2}.}\]</span></p>
+<p>The tanh denoiser and the mixture score are two expressions of the same posterior calculation. An unequal prior would add half the log prior odds inside the tanh; the symmetric formula relies on the equal weights.</p>
+<section id="posterior-mean-posterior-mode-and-posterior-sample-differ" class="level3">
+<h3 class="anchored" data-anchor-id="posterior-mean-posterior-mode-and-posterior-sample-differ">Posterior mean, posterior mode, and posterior sample differ</h3>
+<p>At <span class="math inline">\(x=0\)</span>, the posterior gives probability <span class="math inline">\(1/2\)</span> to each clean value. Consequently:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 22%">
-<col style="width: 30%">
-<col style="width: 14%">
-<col style="width: 14%">
-<col style="width: 20%">
+<col style="width: 50%">
+<col style="width: 50%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Family</th>
-<th>pdf <span class="math inline">\(f(x)\)</span></th>
-<th>Support</th>
-<th>Mean</th>
-<th>Variance</th>
+<th>Decision or draw</th>
+<th>Result at <span class="math inline">\(x=0\)</span></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Uniform<span class="math inline">\((a,b)\)</span></td>
-<td><span class="math inline">\(\frac{1}{b-a}\)</span></td>
-<td><span class="math inline">\([a,b]\)</span></td>
-<td><span class="math inline">\(\frac{a+b}{2}\)</span></td>
-<td><span class="math inline">\(\frac{(b-a)^2}{12}\)</span></td>
+<td>Posterior mean, optimal under squared error</td>
+<td><span class="math inline">\(0\)</span></td>
 </tr>
 <tr class="even">
-<td>Normal<span class="math inline">\((\mu,\sigma^2)\)</span></td>
-<td><span class="math inline">\(\frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}\)</span></td>
-<td><span class="math inline">\(\mathbb{R}\)</span></td>
-<td><span class="math inline">\(\mu\)</span></td>
-<td><span class="math inline">\(\sigma^2\)</span></td>
+<td>Posterior mode (MAP)</td>
+<td>A tie between <span class="math inline">\(-1\)</span> and <span class="math inline">\(+1\)</span></td>
 </tr>
 <tr class="odd">
-<td>Gamma<span class="math inline">\((k,\theta)\)</span></td>
-<td><span class="math inline">\(\frac{x^{k-1} e^{-x/\theta}}{\Gamma(k)\,\theta^{k}}\)</span></td>
-<td><span class="math inline">\((0,\infty)\)</span></td>
-<td><span class="math inline">\(k\theta\)</span></td>
-<td><span class="math inline">\(k\theta^2\)</span></td>
-</tr>
-<tr class="even">
-<td>Beta<span class="math inline">\((\alpha,\beta)\)</span></td>
-<td><span class="math inline">\(\frac{x^{\alpha-1}(1-x)^{\beta-1}}{B(\alpha,\beta)}\)</span></td>
-<td><span class="math inline">\((0,1)\)</span></td>
-<td><span class="math inline">\(\frac{\alpha}{\alpha+\beta}\)</span></td>
-<td><span class="math inline">\(\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}\)</span></td>
-</tr>
-<tr class="odd">
-<td>Mixture</td>
-<td><span class="math inline">\(\sum_i \pi_i\, f_i(x)\)</span></td>
-<td>union</td>
-<td><span class="math inline">\(\sum_i \pi_i \mu_i\)</span></td>
-<td>see Exercise 5</td>
+<td>Posterior sample</td>
+<td>Randomly <span class="math inline">\(-1\)</span> or <span class="math inline">\(+1\)</span>, each with probability <span class="math inline">\(1/2\)</span></td>
 </tr>
 </tbody>
 </table>
-<p>A sentence of habitat for each: the <strong>Uniform</strong> encodes total ignorance on an interval; the <strong>Normal</strong> is what sums of many small independent effects look like (W01’s warm-up demo <em>is</em> this statement); the <strong>Gamma</strong> models positive, right-skewed quantities such as waiting times; the <strong>Beta</strong> lives on <span class="math inline">\((0,1)\)</span> and models proportions and probabilities; a <strong>mixture</strong> models data with subpopulations — clusters — and is the recurring character of this course.</p>
+<p>Zero is not an allowed clean value, but it is the best squared-error estimate. Its conditional risk is <span class="math inline">\(1\)</span>. Always choosing either endpoint has risk <span class="math inline">\(2\)</span>. An independent draw from the posterior also has conditional risk <span class="math inline">\(2\)</span> here. Plausibility as a clean sample and optimality as a point estimate are different criteria.</p>
+<p>For a general observation in this two-point example,</p>
+<p><span class="math display">\[\operatorname{Var}(X_0\mid x)=1-m_t(x)^2,\]</span></p>
+<p>and an estimate <span class="math inline">\(a\)</span> has conditional risk</p>
+<p><span class="math display">\[\boxed{R_x(a)=1-m_t(x)^2+(a-m_t(x))^2.}\]</span></p>
+<p><strong>Lab 4.</strong> Move the observed value, signal scale, and noise level. Read the posterior weights, posterior mean, and the score displacement. Move the candidate estimate away from the mean and watch its squared-error risk increase. At <span class="math inline">\(x=0\)</span>, compare the posterior mean with both possible clean values.</p>
 </section>
-<section id="how-sampling-actually-works" class="level2">
-<h2 class="anchored" data-anchor-id="how-sampling-actually-works">How sampling actually works</h2>
-<p>Every sampler in the playground reduces to uniform random numbers:</p>
-<ul>
-<li><strong>Inverse CDF.</strong> If <span class="math inline">\(F\)</span> is a CDF and <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>, then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span> (proved in the companion note <a href="../tutorials/04-genai-simplest-form.html"><em>Generative AI, in Its Simplest Form</em></a>). This handles Uniform (<span class="math inline">\(x = a + (b-a)u\)</span>) and anything with a computable <span class="math inline">\(F^{-1}\)</span>.</li>
-<li><strong>Box–Muller</strong> for the Normal: with <span class="math inline">\(U_1, U_2\)</span> independent uniforms, <span class="math inline">\(\sqrt{-2\log U_1}\,\cos(2\pi U_2)\)</span> is exactly <span class="math inline">\(\mathcal{N}(0,1)\)</span>. This is the sampler inside every demo of this course.</li>
-<li><strong>Pick-then-sample</strong> for mixtures: draw the component index with probabilities <span class="math inline">\(\pi_i\)</span>, then sample that component — ancestral sampling, the subject of the companion note.</li>
-<li>Gamma and Beta use clever rejection samplers (the playground uses Marsaglia–Tsang); we treat them as black boxes.</li>
-</ul>
+<section id="the-small-noise-limit-needs-a-qualification" class="level3">
+<h3 class="anchored" data-anchor-id="the-small-noise-limit-needs-a-qualification">The small-noise limit needs a qualification</h3>
+<p>If <span class="math inline">\(\alpha_t\to1\)</span> and <span class="math inline">\(\sigma_t\to0\)</span>, then for each fixed <span class="math inline">\(x\ne0\)</span>,</p>
+<p><span class="math display">\[m_t(x)=\tanh(\alpha_t x/\sigma_t^2)\longrightarrow\operatorname{sign}(x).\]</span></p>
+<p>At <span class="math inline">\(x=0\)</span>, the posterior mean remains zero by symmetry. This is a pointwise statement away from the decision boundary; it is not uniform near zero. At exactly zero noise the data law is atomic, with no ordinary density score on <span class="math inline">\(\mathbb R\)</span>. The positive-noise score has a different limiting behavior from the posterior mean. For every fixed <span class="math inline">\(x\notin\{-1,0,1\}\)</span>,</p>
+<p><span class="math display">\[\sigma_t^2s_t(x)\longrightarrow\operatorname{sign}(x)-x\ne0,\]</span></p>
+<p>so its magnitude diverges as the noise vanishes. At <span class="math inline">\(x=0\)</span>, the score remains exactly zero by symmetry. At the clean points <span class="math inline">\(x=\pm1\)</span>, the behavior depends on how the signal scale approaches one: with additive corruption (<span class="math inline">\(\alpha_t\equiv1\)</span>) the score tends to zero, whereas with VP corruption (<span class="math inline">\(\alpha_t=\sqrt{1-\sigma_t^2}\)</span>) it tends to <span class="math inline">\(\mp\tfrac12\)</span>. These are limits of smoothed-density scores, not scores of the atomic law itself.</p>
 </section>
-<section id="likelihood" class="level2">
-<h2 class="anchored" data-anchor-id="likelihood">Likelihood</h2>
-<p>Fix a family <span class="math inline">\(f(x;\theta)\)</span> and observe an i.i.d. dataset <span class="math inline">\(x_1, \dots, x_n\)</span>. The <strong>likelihood</strong> and <strong>log-likelihood</strong> are</p>
-<p><span class="math display">\[
-L(\theta) = \prod_{i=1}^n f(x_i; \theta),
-\qquad
-\ell(\theta) = \sum_{i=1}^n \log f(x_i; \theta),
-\]</span></p>
-<p>and the <strong>maximum likelihood estimator (MLE)</strong> is <span class="math inline">\(\hat\theta = \arg\max_\theta \ell(\theta)\)</span>. The log changes nothing about the argmax (monotonicity) and everything about the algebra and the numerics: a product of 3000 numbers of size <span class="math inline">\(10^{-2}\)</span> underflows; a sum of their logs is a perfectly pleasant <span class="math inline">\(\approx -13{,}800\)</span>.</p>
 </section>
-<section id="pdf-vs-likelihood-the-same-function-two-readings" class="level2">
-<h2 class="anchored" data-anchor-id="pdf-vs-likelihood-the-same-function-two-readings">PDF vs likelihood: the same function, two readings</h2>
-<p>The chronic confusion, settled: <span class="math inline">\(f(x;\theta)\)</span> is <strong>one formula with two arguments</strong>.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 22%">
-<col style="width: 22%">
-<col style="width: 36%">
-<col style="width: 20%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Fix</th>
-<th>Vary</th>
-<th>You get</th>
-<th>Area under the curve</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>parameters <span class="math inline">\(\theta\)</span></td>
-<td>data <span class="math inline">\(x\)</span></td>
-<td>the <strong>pdf</strong> — a distribution over data</td>
-<td><span class="math inline">\(= 1\)</span>, always</td>
-</tr>
-<tr class="even">
-<td>observed data <span class="math inline">\(x\)</span></td>
-<td>parameters <span class="math inline">\(\theta\)</span></td>
-<td>the <strong>likelihood</strong> — a score for fitting</td>
-<td>meaningless</td>
-</tr>
-</tbody>
-</table>
-<p>The <a href="../materials/likelihood-lens.html">Likelihood Lens</a> shows both as slices of the same surface <span class="math inline">\(f(x;\mu) = \mathcal{N}(x; \mu, \sigma^2)\)</span>: the horizontal slice (fix <span class="math inline">\(\mu\)</span>) is a density in <span class="math inline">\(x\)</span>; the vertical slice (fix <span class="math inline">\(x\)</span>) is a likelihood in <span class="math inline">\(\mu\)</span>. For the Gaussian the two slices happen to have the same bell shape, because <span class="math inline">\(f(x;\mu) = f(\mu;x)\)</span> — a symmetry of this family, <em>not</em> a general fact (repeat the exercise mentally with a Gamma in <span class="math inline">\(\theta\)</span>). What is general: <strong>the likelihood is not a probability distribution over <span class="math inline">\(\theta\)</span></strong> — it need not integrate to 1, and only its argmax and local shape carry meaning.</p>
+<section id="a-useful-extension-correlated-gaussian-noise" class="level2">
+<h2 class="anchored" data-anchor-id="a-useful-extension-correlated-gaussian-noise">9. A useful extension: correlated Gaussian noise</h2>
+<p>If <span class="math inline">\(Y=X+\eta\)</span>, independently, with <span class="math inline">\(\eta\sim\mathcal N(0,\Sigma)\)</span> for known positive-definite <span class="math inline">\(\Sigma\)</span>, then</p>
+<p><span class="math display">\[\nabla_y p(y\mid x)=\Sigma^{-1}(x-y)p(y\mid x).\]</span></p>
+<p>Repeating the proof gives</p>
+<p><span class="math display">\[\boxed{\mathbb E[X\mid Y=y]=y+\Sigma\nabla_y\log p_Y(y).}\]</span></p>
+<p>For non-isotropic noise, the covariance transforms the score into a denoising displacement; they need not point in the same Euclidean direction. The simple <span class="math inline">\(\sigma^2\)</span> multiplier is specific to isotropic Gaussian corruption.</p>
 </section>
-<section id="the-gaussian-mle-in-full" class="level2">
-<h2 class="anchored" data-anchor-id="the-gaussian-mle-in-full">The Gaussian MLE, in full</h2>
+<section id="how-this-fits-into-diffusion-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="how-this-fits-into-diffusion-sampling">10. How this fits into diffusion sampling</h2>
+<p>At each positive noise level, the model estimates a local field that encodes a posterior mean. A diffusion sampler uses that field together with its known drift, noise schedule, and current time to take the next step along a path of distributions. Returning a posterior mean once, or repeatedly applying a fixed-noise denoiser, is not generally equivalent to drawing a clean-data sample.</p>
+<p>The <a href="../tutorials/22-vector-fields-to-score-diffusion.html">vector-fields tutorial</a> explains the reverse-SDE and probability-flow ODE updates. This note supplies their statistical bridge:</p>
 <p><span class="math display">\[
-\ell(\mu, \sigma^2)
-= -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^n (x_i - \mu)^2 .
+\text{squared-error optimality}
+\ \longrightarrow\ \text{posterior mean}
+\ \overset{\text{Gaussian corruption}}{\longleftrightarrow}\ \text{score}.
 \]</span></p>
-<p><strong>Maximize over <span class="math inline">\(\mu\)</span>.</strong> Only the second term involves <span class="math inline">\(\mu\)</span>:</p>
-<p><span class="math display">\[
-\frac{\partial \ell}{\partial \mu}
-= \frac{1}{\sigma^2}\sum_{i=1}^n (x_i - \mu)
-= \frac{n}{\sigma^2}(\bar{x} - \mu)
-\;\stackrel{!}{=}\; 0
-\quad\Longrightarrow\quad
-\boxed{\ \hat\mu = \bar{x}\ }
-\]</span></p>
-<p>for <strong>every</strong> <span class="math inline">\(\sigma\)</span> — which is why, in the Lens, changing <span class="math inline">\(\sigma\)</span> sharpens the log-likelihood parabola but never moves its peak.</p>
-<p><strong>Maximize over <span class="math inline">\(\sigma^2\)</span></strong> (treat <span class="math inline">\(v = \sigma^2\)</span> as the variable):</p>
-<p><span class="math display">\[
-\frac{\partial \ell}{\partial v}
-= -\frac{n}{2v} + \frac{1}{2v^2}\sum_i (x_i - \hat\mu)^2
-\;\stackrel{!}{=}\; 0
-\quad\Longrightarrow\quad
-\boxed{\ \hat\sigma^2 = \frac{1}{n}\sum_{i=1}^n (x_i - \bar{x})^2\ }
-\]</span></p>
-<p>(One should check this is a maximum, not merely critical: <span class="math inline">\(\ell \to -\infty\)</span> as <span class="math inline">\(v \to 0^+\)</span> and as <span class="math inline">\(v \to \infty\)</span>, and this is the only critical point.) Note the divisor <span class="math inline">\(n\)</span>: the MLE of the variance is <em>biased</em> — <span class="math inline">\(\mathbb{E}[\hat\sigma^2] =
-\frac{n-1}{n}\sigma^2\)</span> — which is where the familiar <span class="math inline">\(n-1\)</span> estimator comes from. For this course the distinction is a footnote; the MLE is what the theory produces.</p>
 </section>
-<section id="aside-binary-cross-entropy-is-a-likelihood" class="level2">
-<h2 class="anchored" data-anchor-id="aside-binary-cross-entropy-is-a-likelihood">Aside: binary cross-entropy is a likelihood</h2>
-<p>The most familiar loss in machine learning is a maximum-likelihood problem in disguise, and the disguise falls away the moment classification is read as a (conditional) generative model.</p>
-<p><strong>The model.</strong> For the <span class="math inline">\(i\)</span>-th sample with features <span class="math inline">\(x_i\)</span>, model the binary label as a Bernoulli trial,</p>
-<p><span class="math display">\[
-y_i \mid x_i \;\sim\; \text{Bernoulli}(\pi_i), \qquad y_i \in \{0, 1\},
-\]</span></p>
-<p>and let a neural network supply the <strong>logit</strong> — the log-<em>odds</em>, not the log-probability:</p>
-<p><span class="math display">\[
-s_i = f_\theta(x_i) = \log \frac{\pi_i}{1 - \pi_i}
-\quad\Longleftrightarrow\quad
-\pi_i = \operatorname{sigmoid}(s_i).
-\]</span></p>
-<p><strong>The likelihood.</strong> The Bernoulli pmf can be written in one line as <span class="math inline">\(p(y \mid \pi) = \pi^{y} (1-\pi)^{1-y}\)</span>, so for independent samples</p>
-<p><span class="math display">\[
-L(\theta) = \prod_{i=1}^n \pi_i^{\,y_i} (1 - \pi_i)^{1 - y_i},
-\qquad
--\ell(\theta) = -\sum_{i=1}^n \Big[ y_i \log \pi_i + (1 - y_i)\log(1 - \pi_i) \Big].
-\]</span></p>
-<p>The right-hand side is <strong>exactly binary cross-entropy</strong>. Training a classifier with BCE is maximum likelihood for a conditional Bernoulli model whose log-odds are the network output — nothing more. (The name is also earned: <span class="math inline">\(-\ell/n\)</span> is the cross-entropy between the empirical distribution of each label and the model’s Bernoulli.)</p>
-<p><strong>The <span class="math inline">\(\pm 1\)</span> convention.</strong> With labels <span class="math inline">\(y_i \in \{-1, +1\}\)</span>, the identity <span class="math inline">\(\operatorname{sigmoid}(-s) = 1 - \operatorname{sigmoid}(s)\)</span> collapses both cases into <span class="math inline">\(p(y_i \mid s_i) = \operatorname{sigmoid}(y_i s_i)\)</span>, and the negative log-likelihood becomes the <strong>logistic loss</strong>,</p>
-<p><span class="math display">\[
--\ell(\theta) = \sum_{i=1}^n \log\!\big(1 + e^{-y_i s_i}\big)
-\]</span></p>
-<p>— the same objective, rewritten.</p>
-<p><strong>The connection to this course.</strong> The latent posterior of W01 <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is precisely this model with logit <span class="math inline">\(s(x) = 2x/\sigma^2\)</span>: the optimal classifier of the hidden component is a Bernoulli model whose log-odds are linear in the observation. Classification, denoising, and latent inference are all the same likelihood computation wearing different clothes.</p>
-</section>
-<section id="fitting-the-other-families-honestly" class="level2">
-<h2 class="anchored" data-anchor-id="fitting-the-other-families-honestly">Fitting the other families — honestly</h2>
-<ul>
-<li><p><strong>Uniform.</strong> The likelihood is <span class="math inline">\((b-a)^{-n}\)</span> if all points lie in <span class="math inline">\([a,b]\)</span> and <span class="math inline">\(0\)</span> otherwise: to maximize, squeeze the interval as tight as the data allows — <span class="math inline">\(\hat a = \min_i x_i\)</span>, <span class="math inline">\(\hat b = \max_i x_i\)</span>. (No calculus; the maximum is on the boundary of the constraint. That is Exercise 2.)</p></li>
-<li><p><strong>Gamma and Beta have no closed-form MLE.</strong> Setting the derivatives to zero produces equations involving the digamma function, solvable only numerically. The playground therefore uses the <strong>method of moments (MoM)</strong>: equate the family’s mean and variance to the sample’s <span class="math inline">\(\bar x\)</span> and <span class="math inline">\(s^2\)</span> and solve —</p>
-<p><span class="math display">\[
-\text{Gamma: } \hat k = \frac{\bar{x}^2}{s^2},\ \ \hat\theta = \frac{s^2}{\bar{x}};
-\qquad
-\text{Beta: } c = \frac{\bar{x}(1-\bar{x})}{s^2} - 1,\ \
-\hat\alpha = \bar{x}\,c,\ \ \hat\beta = (1-\bar{x})\,c .
-\]</span></p>
-<p>MoM is a respectable estimator in its own right (consistent, and a standard warm start for numerical MLE); the honest label matters because “just maximize the likelihood” quietly assumes machinery we haven’t built.</p></li>
-<li><p><strong>Mixtures.</strong> Even MoM gets awkward; the right tool is expectation–maximization (EM), which belongs to a later conversation. Today the mixture plays a different role — see below.</p></li>
-</ul>
-</section>
-<section id="the-trap-right-method-wrong-family" class="level2">
-<h2 class="anchored" data-anchor-id="the-trap-right-method-wrong-family">The trap: right method, wrong family</h2>
-<p>In the playground: generate 3000 samples from the two-bump mixture, then fit a <strong>single Normal</strong> by maximum likelihood. The fit is <em>optimal within its family</em> — and its peak sits exactly in the empty valley between the clusters, because the best single Gaussian matches the overall mean and variance, not the shape.</p>
-<p>Two lessons. First, MLE optimizes <em>within the family you chose</em>; the choice of family is a modeling decision the likelihood cannot rescue. Second, we currently have no number that says <em>how wrong</em> this fit is. Constructing that number — the KL divergence, and its identity with maximum likelihood — is the next lecture.</p>
-</section>
-<section id="exercises" class="level2">
-<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<section id="exercises-with-checks" class="level2">
+<h2 class="anchored" data-anchor-id="exercises-with-checks">Exercises with checks</h2>
 <ol type="1">
-<li>Re-derive <span class="math inline">\(\hat\sigma^2\)</span> for the Gaussian, including the argument that the critical point is a maximum.</li>
-<li>Show that the Uniform MLE is <span class="math inline">\((\hat a, \hat b) = (\min_i x_i, \max_i x_i)\)</span>, and explain why calculus alone would miss it.</li>
-<li>Derive the Gamma method-of-moments estimators from <span class="math inline">\(\mathbb{E}X = k\theta\)</span> and <span class="math inline">\(\operatorname{Var} X = k\theta^2\)</span>.</li>
-<li>For a single observation <span class="math inline">\(x\)</span> from <span class="math inline">\(\mathcal{N}(\mu, \sigma^2)\)</span> with <span class="math inline">\(\sigma\)</span> known, sketch the likelihood in <span class="math inline">\(\mu\)</span>. Now hold <span class="math inline">\(\mu\)</span> known and sketch the likelihood in <span class="math inline">\(\sigma\)</span> — is it bell-shaped? Symmetric? (This kills the “likelihood looks like a pdf” illusion outside the Gaussian-mean case.)</li>
-<li><strong>BCE gradient.</strong> For the Bernoulli model of the aside with a linear logit <span class="math inline">\(s_i = \theta^\top x_i\)</span>, show that <span class="math inline">\(\nabla_\theta(-\ell) = \sum_i (\pi_i - y_i)\, x_i\)</span> — prediction error times input, the cleanest gradient in machine learning. Verify that the <span class="math inline">\(\pm 1\)</span> logistic form gives the same gradient.</li>
-<li>For a mixture <span class="math inline">\(\sum_i \pi_i f_i\)</span> with component means <span class="math inline">\(\mu_i\)</span> and variances <span class="math inline">\(\sigma_i^2\)</span>, show <span class="math inline">\(\operatorname{Var}(X) = \sum_i \pi_i \sigma_i^2 + \sum_i \pi_i (\mu_i - \bar\mu)^2\)</span> with <span class="math inline">\(\bar\mu = \sum_i \pi_i \mu_i\)</span> — within-component plus between-component spread. Use it to predict what <span class="math inline">\(\hat\sigma\)</span> the single-Gaussian fit in the trap will report.</li>
+<li>Let <span class="math inline">\(X\sim\mathcal N(0,4)\)</span> and noise variance be <span class="math inline">\(1\)</span>. Find <span class="math inline">\(s_Y(y)\)</span> and <span class="math inline">\(m(y)\)</span>. <strong>Check:</strong> <span class="math inline">\(s_Y=-y/5\)</span>, <span class="math inline">\(m=4y/5\)</span>.</li>
+<li>For equal two-point data, take <span class="math inline">\(\alpha=1\)</span>, <span class="math inline">\(\sigma=1\)</span>, <span class="math inline">\(y=0.5\)</span>. Compute the posterior mean, score, and minimum conditional risk. <strong>Check:</strong> approximately <span class="math inline">\(0.4621\)</span>, <span class="math inline">\(-0.0379\)</span>, and <span class="math inline">\(0.7864\)</span>.</li>
+<li>If <span class="math inline">\(P(X_0=+1)=\pi\in(0,1)\)</span>, derive the mean. <strong>Check:</strong> <span class="math inline">\(\tanh(\alpha x/\sigma^2+\tfrac12\log[\pi/(1-\pi)])\)</span>.</li>
+<li>Why is the sampled target <span class="math inline">\(-\varepsilon/\sigma_t\)</span> usually different from the true score at that input? <strong>Check:</strong> the score is its conditional average over all compatible clean-signal and noise pairs.</li>
 </ol>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Lai et al., <a href="https://arxiv.org/abs/2510.21890"><em>The Principles of Diffusion Models</em></a>, §3.3.4, Lemma 3.3.2 and Eq. (3.3.6), with the detailed proof in Appendix D.2.3; §3.3.5 connects denoising with Bayes optimality.</li>
+<li>Song et al., <a href="https://arxiv.org/abs/2011.13456"><em>Score-Based Generative Modeling through Stochastic Differential Equations</em></a>, for time-indexed score estimation and sampling.</li>
+<li><a href="../tutorials/21-one-estimator-many-parameterizations.html">One Estimator, Many Parameterizations</a> develops the broader conditional-mean parameterization argument in this course.</li>
+</ul>
 
 
 </section>
@@ -1101,13 +1146,13 @@ L(\theta) = \prod_{i=1}^n \pi_i^{\,y_i} (1 - \pi_i)^{1 - y_i},
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/16-joints-conditionals.html" class="pagination-link" aria-label="03 · Joint, Conditional, Marginal — and Bayes">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">03 · Joint, Conditional, Marginal — and Bayes</span>
+      <a href="../tutorials/24-sampling-with-scores.html" class="pagination-link" aria-label="Sampling with Scores: Worked Examples of the Probability-Flow ODE">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Sampling with Scores: Worked Examples of the Probability-Flow ODE</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/12-multivariate-gaussian.html" class="pagination-link" aria-label="05 · The Multivariate Gaussian — A Working Reference">
-        <span class="nav-page-text">05 · The Multivariate Gaussian — A Working Reference</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../materials/w01-deck-01-mechanics.html" class="pagination-link" aria-label="01 · Course Mechanics">
+        <span class="nav-page-text">01 · Course Mechanics</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

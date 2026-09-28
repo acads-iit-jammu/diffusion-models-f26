@@ -1307,6 +1307,490 @@
     ]
   },
   {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "",
+    "text": "Notation shared with The Probability-Flow ODE\nThe geometric introduction: vector fields, ODEs, flows, scores, and sampling. You need derivatives, Gaussian distributions, and the idea of an expectation. No previous stochastic calculus is assumed.\nHow to use these three notes. Start with Sections 1–8 here for fields, flows, and the difference between ascent and sampling. Then read Sampling with Scores for the worked Gaussian samplers and probability flows. Use Tweedie’s Formula for the statistical proof behind score estimation. The remaining sections here provide a geometric overview and a two-mode example; they can also be read as a self-contained route.\nImagine drawing an arrow at every possible image. The arrow has one component for every pixel value. It says how to change the image by a small amount. If we keep following the arrows, can a random image become a sample from a collection of real images?\nThat question has two parts. First, how do local arrows produce motion and a global transformation? Second, which arrows move an entire distribution in the right way? ODEs answer the first question. Scores and diffusion answer the second. We will build both answers in one dimension, where we can see everything.\nThe route is\n\\[\n\\text{vector field}\\ \\longrightarrow\\ \\text{ODE and flow}\n\\ \\longrightarrow\\ \\text{score}\\ \\longrightarrow\\ \\text{SDE sampler}\n\\ \\longrightarrow\\ \\text{probability-flow ODE}.\n\\]\nOpen the Score and Flow Lab alongside this note. Its first three experiments follow that order; the fourth explores Tweedie denoising. All scores in the lab are known analytically; no neural network is needed to isolate the mathematics.\nThis introduction uses the same symbols and backward-step convention as The Probability-Flow ODE. The new Sampling with Scores tutorial uses them too, with fully solved Gaussian examples and a sampler-first teaching sequence.\nBefore diffusion is introduced, \\(t\\) is simply elapsed ODE time. We use \\(u\\) for the independent clock of fixed-target score ascent and Langevin dynamics. A positive Euler step in those elementary examples is denoted \\(h\\); backward diffusion steps are explicitly \\(h_k&lt;0\\). Gaussian draws are \\(\\varepsilon\\) in fixed-time corruption and \\(z_k\\) in numerical SDE steps, as in the detailed note.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#notation-shared-with-the-probability-flow-ode",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#notation-shared-with-the-probability-flow-ode",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "",
+    "text": "Symbol\nMeaning\n\n\n\n\n\\(X_t\\), \\(x\\)\nRandom state at noise level \\(t\\); a particular position\n\n\n\\(p_0=p_{\\text{data}}\\), \\(p_t\\)\nClean-data law; forward-noised marginal density\n\n\n\\(f(x,t)\\), \\(g(t)\\), \\(W_t\\)\nForward drift, scalar diffusion coefficient, Brownian motion\n\n\n\\(s_t(x)\\), \\(s_\\theta(x,t)\\)\nExact score \\(\\nabla_x\\log p_t(x)\\); its learned approximation\n\n\n\\(v(x,t)\\)\nODE velocity; for probability flow, \\(f-\\tfrac12g^2s_t\\)\n\n\n\\(\\Psi_{s\\to t}\\)\nFlow taking a position at time \\(s\\) to its position at time \\(t\\)\n\n\n\\(\\Phi\\)\nStandard normal CDF, never a flow map\n\n\n\\(\\beta(t)\\), \\(\\alpha_t\\), \\(\\sigma_t\\)\nVP noise schedule, signal scale, corruption-noise standard deviation\n\n\n\\(\\tau=T-t\\), \\(\\bar W_\\tau\\)\nIncreasing reverse clock and its Brownian motion\n\n\n\\(h_k=t_{k-1}-t_k&lt;0\\)\nBackward step on \\(T=t_N&gt;\\cdots&gt;t_0=\\epsilon\\)\n\n\n\\(\\epsilon\\), \\(\\varepsilon\\)\nSmall endpoint time; a standard Gaussian corruption draw\n\n\n\\(\\widehat X_0(x,t)\\)\nPosterior-mean denoiser \\(\\mathbb E[X_0\\mid X_t=x]\\)",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#a-vector-field-attaches-a-velocity-to-each-position",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#a-vector-field-attaches-a-velocity-to-each-position",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "1. A vector field attaches a velocity to each position",
+    "text": "1. A vector field attaches a velocity to each position\nOn a line, a vector is a signed number: its sign gives direction and its magnitude gives speed. A vector field is a function \\(v:\\mathbb R\\to\\mathbb R\\) assigning one such vector to every position.\nFor \\(v(x)=-x\\), the arrow at \\(2\\) points left with speed \\(2\\), the arrow at \\(-3\\) points right with speed \\(3\\), and the arrow at \\(0\\) has zero length. The arrows are already there, whether or not a particle is present. A field is a rule on space; a trajectory is what happens to one particle following that rule.\nIn \\(d\\) dimensions, \\(v:\\mathbb R^d\\to\\mathbb R^d\\). For example, \\(v(x,y)=(-x,-y)\\) points toward the origin, whereas \\(v(x,y)=(-y,x)\\) points around the origin. A field need not point toward a destination, and need not be the gradient of any scalar function. The rotation field will keep moving a particle around a circle.\nWe will also need fields \\(v(x,t)\\) whose arrows change with time, even at a fixed position. Think of wind that changes throughout the day.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#an-ode-tells-a-particle-to-follow-the-field",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#an-ode-tells-a-particle-to-follow-the-field",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "2. An ODE tells a particle to follow the field",
+    "text": "2. An ODE tells a particle to follow the field\nPlace a particle at \\(x(0)=x_0\\). Its motion is specified by the initial-value problem\n\\[\n\\boxed{\\frac{dx(t)}{dt}=v(x(t),t),\\qquad x(0)=x_0.}\n\\]\nThe derivative is velocity. The right side evaluates the arrow at the particle’s current location and current time. Over a short interval \\(h\\),\n\\[x(t+h)\\approx x(t)+h\\,v(x(t),t).\\]\nRead the arrow, move a little, then read the new arrow. The particle does not need to know where it will eventually arrive.\n\nConstant motion\nIf \\(v(x)=2\\), then \\(\\dot x=2\\) and\n\\[x(t)=x_0+2t.\\]\nEvery particle moves right at the same speed. The distance between any two particles stays constant.\n\n\nMotion toward the origin\nIf \\(v(x)=-x\\), then \\(\\dot x=-x\\). For a nonzero solution, separation gives\n\\[\\frac{dx}{x}=-dt,\\qquad \\log|x|=-t+C,\\]\nso \\(x(t)=x_0e^{-t}\\). The solution \\(x(t)\\equiv0\\), excluded when dividing by \\(x\\), also satisfies the equation. Thus for every starting point,\n\\[\\boxed{x(t)=x_0e^{-t}.}\\]\nA particle starting at \\(5\\) is at approximately \\(1.84\\) after one time unit, \\(0.68\\) after two, and \\(0.25\\) after three. It approaches zero without reaching it at any finite time. A negative starting point approaches zero from the other side.\n\n\nMotion around the origin\nFor \\(\\dot x=-y\\) and \\(\\dot y=x\\),\n\\[\n\\begin{pmatrix}x(t)\\\\y(t)\\end{pmatrix}\n=\\begin{pmatrix}\\cos t&-\\sin t\\\\\\sin t&\\cos t\\end{pmatrix}\n\\begin{pmatrix}x_0\\\\y_0\\end{pmatrix}.\n\\]\nThe radius stays constant. Local arrows can therefore create translation, contraction, rotation, or much more complicated motion.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#the-flow-collects-all-the-trajectories-into-a-map",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#the-flow-collects-all-the-trajectories-into-a-map",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "3. The flow collects all the trajectories into a map",
+    "text": "3. The flow collects all the trajectories into a map\nFor each starting point, solve the ODE. Holding the elapsed time fixed gives a map\n\\[\\boxed{\\Psi_{0 \\to t}(x_0)=x(t).}\\]\nWe use \\(\\Psi\\) for flow maps, reserving \\(\\Phi\\) for the Gaussian CDF used elsewhere in the course. For contraction, \\(\\Psi_{0 \\to t}(x)=e^{-t}x\\). At time zero the map is the identity; at time one it shrinks the line by \\(e^{-1}\\).\n\n\n\nThe vector field supplies local velocities; integrating it sends all starting points to their time-one positions.\n\n\nFor an autonomous field \\(v(x)\\), unique solutions satisfy\n\\[\\Psi_{0 \\to t+s}=\\Psi_{0 \\to t}\\circ\\Psi_{0 \\to s},\\]\nwhenever the solutions exist for the times involved. Evolving for \\(s\\) and then for \\(t\\) is the same as evolving for \\(s+t\\).\nFor a time-dependent field, the starting clock time matters. Write \\(\\Psi_{s \\to t}(x)\\) for the position at time \\(t\\) of a particle placed at \\(x\\) at time \\(s\\). The correct composition law is\n\\[\\boxed{\\Psi_{s \\to t}=\\Psi_{r \\to t}\\circ\\Psi_{s \\to r}.}\\]\nHere \\(r\\) is an intermediate clock time between \\(s\\) and \\(t\\).\nFor instance, \\(\\dot x=t\\) gives \\(\\Psi_{s \\to t}(x)=x+(t^2-s^2)/2\\). Restarting the clock at zero would give a different motion. Diffusion samplers use these time-dependent flows.\n\n\n\n\n\n\nNoteWhen does a flow exist?\n\n\n\nContinuity in time and local Lipschitz continuity in position give local existence and uniqueness. Global existence needs additional control, such as linear growth; \\(\\dot x=x^2\\) can blow up in finite time. Under suitable regularity, finite-time flow maps are invertible where both forward and backward solutions exist. Even the contraction \\(e^{-t}x\\) is invertible at every finite \\(t\\); collapse to a point occurs only in the limit \\(t\\to\\infty\\).",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#eulers-method-turns-arrows-into-a-computation",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#eulers-method-turns-arrows-into-a-computation",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "4. Euler’s method turns arrows into a computation",
+    "text": "4. Euler’s method turns arrows into a computation\nWhen an exact solution is unavailable, choose a step size \\(h&gt;0\\) and use\n\\[\\boxed{x_{k+1}=x_k+h\\,v(x_k,t_k),\\qquad t_{k+1}=t_k+h.}\\]\nThis is explicit Euler: freeze the current arrow for one step. For \\(v(x)=-x\\), the update is \\(x_{k+1}=(1-h)x_k\\). Compare it with the exact multiplier \\(e^{-h}\\):\n\n\n\nStep size\nEuler’s behavior for \\(\\dot x=-x\\)\n\n\n\n\n\\(0&lt;h&lt;1\\)\nApproaches zero from the same side\n\n\n\\(h=1\\)\nJumps to zero in one step\n\n\n\\(1&lt;h&lt;2\\)\nAlternates sides while shrinking\n\n\n\\(h=2\\)\nAlternates sides without shrinking\n\n\n\\(h&gt;2\\)\nMagnitude grows\n\n\n\nOvershooting here is a numerical artifact, not a property of the ODE. For the rotation field, Euler multiplies the radius by \\(\\sqrt{1+h^2}\\) each step and spirals outward, even though the exact solution stays on a circle.\nLab 1 — fields and flows. Choose contraction, translation, or rotation. Compare the exact path with Euler’s path. Increase the step size for contraction past \\(1\\) and then past \\(2\\). Before looking, predict what changes.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#move-a-cloud-and-you-move-a-distribution",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#move-a-cloud-and-you-move-a-distribution",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "5. Move a cloud, and you move a distribution",
+    "text": "5. Move a cloud, and you move a distribution\nNow choose the starting point randomly: \\(X_0\\sim p_0\\). Applying the same flow to every particle gives \\(X_t=\\Psi_{0 \\to t}(X_0)\\). The randomness comes from the starting point; conditional on that point, an ODE trajectory is deterministic.\nFor contraction, if \\(X_0\\sim\\mathcal N(0,1)\\), then\n\\[X_t=e^{-t}X_0\\sim\\mathcal N(0,e^{-2t}).\\]\nThe whole distribution narrows. In one dimension, conservation of probability gives the change-of-variables relation\n\\[p_t(\\Psi_{0 \\to t}(x))\\,|\\Psi_{0 \\to t}'(x)|=p_0(x).\\]\nContraction makes intervals shorter, so their density must become taller to keep the same probability mass. A generative model must control this movement of mass, not merely make each individual particle look more probable.\nThat observation is our bridge to scores.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#why-a-score-is-a-natural-vector-field",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#why-a-score-is-a-natural-vector-field",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "6. Why a score is a natural vector field",
+    "text": "6. Why a score is a natural vector field\nLet \\(p(x)&gt;0\\) be a differentiable density. Its data-space score is\n\\[\\boxed{s(x)=\\nabla_x\\log p(x)=\\frac{\\nabla_xp(x)}{p(x)}.}\\]\nThe derivative is with respect to the sample coordinates \\(x\\), holding any model parameters fixed. In statistics, “score” often means \\(\\nabla_\\theta\\log p_\\theta(x)\\), a parameter gradient. Here it means the gradient of the log density in data space. Calling it a log-likelihood gradient is only unambiguous after specifying this differentiation variable.\nHere are four reasons this is a useful field, followed by a Gaussian example.\n\nIt gives one component for each direction of motion\nIn \\(d\\) dimensions,\n\\[s(x)=\\left(\\frac{\\partial\\log p}{\\partial x_1},\\ldots,\n\\frac{\\partial\\log p}{\\partial x_d}\\right)\\in\\mathbb R^d.\\]\nIts input and output dimensions match. This already makes it a vector field. Where it is sufficiently regular, it can serve as an ODE velocity.\n\n\nIt measures local relative changes in density\nFor a small displacement \\(\\delta\\),\n\\[\\log\\frac{p(x+\\delta)}{p(x)}=s(x)^\\top\\delta+o(\\|\\delta\\|).\\]\nAmong unit directions, the score direction maximizes the first-order increase in log density, when the score is nonzero. This is Euclidean geometry: “steepest” depends on the coordinates and metric. The score describes a local density change, not the probability of an individual point or the location of the nearest training example.\n\n\nThe unknown normalizing constant disappears\nIf \\(p(x)=\\widetilde p(x)/Z\\) with \\(Z\\) independent of \\(x\\), then\n\\[\\nabla_x\\log p(x)=\\nabla_x\\log\\widetilde p(x).\\]\nFor an energy model \\(p(x)\\propto e^{-E(x)}\\), the score is \\(-\\nabla E(x)\\). This connects to Sampling What You Cannot Normalise. Unlike \\(\\nabla p\\), the score is unchanged when the density is multiplied by an unknown positive constant.\n\n\nIt is precisely what converts diffusion into probability transport\nThe identity \\(p\\,s=\\nabla p\\) will allow us to rewrite the diffusion term in a density evolution equation as a probability current. This is the mathematical reason the score appears in the sampler. Being an uphill direction alone would not determine the correct sampling dynamics.\n\n\nThe Gaussian example connects to our first ODE\nFor \\(p=\\mathcal N(\\mu,\\varrho^2)\\),\n\\[\\log p(x)=C-\\frac{(x-\\mu)^2}{2\\varrho^2},\\qquad\n\\boxed{s(x)=-\\frac{x-\\mu}{\\varrho^2}.}\\]\nFor a standard Gaussian, \\(s(x)=-x\\): exactly our contraction field. In several dimensions, a Gaussian with positive-definite covariance \\(\\Sigma\\) has score \\(-\\Sigma^{-1}(x-\\mu)\\). Narrow directions have stronger restoring arrows.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#following-the-score-uphill-is-not-yet-sampling",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#following-the-score-uphill-is-not-yet-sampling",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "7. Following the score uphill is not yet sampling",
+    "text": "7. Following the score uphill is not yet sampling\nConsider the ODE \\(dx/du=s(x)=-x\\) for the standard Gaussian. Even if the initial cloud already has the correct law \\(\\mathcal N(0,1)\\), its variance becomes \\(e^{-2u}\\) and eventually approaches zero. The particles concentrate at the mode. They do not keep sampling the Gaussian.\nMore generally, along score ascent,\n\\[\\frac{d}{du}\\log p(x(u))=\\|s(x(u))\\|^2\\geq0.\\]\nThis is an optimization behavior. A distribution needs appropriate spread as well as high-density locations. In high dimensions, much of the probability mass can lie far from the density’s maximizer.\nTo maintain the spread for a fixed target, add calibrated random motion:\n\\[\\boxed{dX_u=s(X_u)\\,du+\\sqrt2\\,dW_u.}\\]\nThis is overdamped Langevin dynamics. The clock \\(u\\) is sampling time for a fixed target, not a diffusion noise level. Under suitable conditions, \\(p\\) is invariant and the dynamics converge to it from other starting distributions. Invariance alone does not guarantee fast mixing between separated modes.\nFor the standard Gaussian, the variance \\(V(u)\\) satisfies\n\\[\\frac{dV}{du}=-2V+2,\\qquad\nV(u)=1+(V(0)-1)e^{-2u}.\\]\nContraction removes spread; the Brownian term restores it. Their balance selects variance one. With the noise omitted, only the first term remains.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#eulermaruyama-an-arrow-plus-a-random-kick",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#eulermaruyama-an-arrow-plus-a-random-kick",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "8. Euler–Maruyama: an arrow plus a random kick",
+    "text": "8. Euler–Maruyama: an arrow plus a random kick\nBrownian motion has independent increments with\n\\[W_{t+h}-W_t\\sim\\mathcal N(0,hI).\\]\nAn SDE \\(dX_t=f(X_t,t)dt+g(t)dW_t\\) can therefore be approximated by\n\\[\\boxed{X_{k+1}=X_k+h\\,f(X_k,t_k)+g(t_k)\\sqrt h\\,z_k,\n\\qquad z_k\\overset{\\mathrm{iid}}\\sim\\mathcal N(0,I).}\\]\nThis is Euler–Maruyama. The deterministic displacement scales as \\(h\\); the random displacement scales as \\(\\sqrt h\\). Using \\(hz_k\\) instead would give vanishing accumulated noise variance as the mesh is refined.\nFor Langevin sampling, the update becomes\n\\[X_{k+1}=X_k+h\\,s(X_k)+\\sqrt{2h}\\,z_k.\\]\nEven a perfect score does not eliminate discretization error. For the standard Gaussian and \\(0&lt;h&lt;2\\), this discrete chain has stationary variance\n\\[V_h=(1-h)^2V_h+2h\n\\quad\\Longrightarrow\\quad\n\\boxed{V_h=\\frac{1}{1-h/2}.}\\]\nIt is too large at a finite step size. As \\(h\\to0\\), it approaches one.\nLab 2 — ascent versus sampling. Both clouds start from the same standard Gaussian particles. One follows score ascent; the other uses Euler–Maruyama for Langevin dynamics. Watch their histograms and variances. Increase \\(h\\) and compare the Langevin cloud with the discrete stationary variance above.\n\n\n\n\n\n\nNoteWhy Langevin preserves the target\n\n\n\nThe density \\(q_u\\) of Langevin particles obeys \\(\\partial_u q=-\\nabla\\cdot(qs)+\\Delta q\\). At \\(q=p\\), the identity \\(ps=\\nabla p\\) makes the right side zero. Here \\(\\nabla\\cdot\\) is divergence, or net outward flow, and \\(\\Delta\\) is the sum of second spatial derivatives. Suitable boundary or tail conditions ensure that probability does not leak away.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#diffusion-supplies-a-whole-family-of-easier-densities",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#diffusion-supplies-a-whole-family-of-easier-densities",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "9. Diffusion supplies a whole family of easier densities",
+    "text": "9. Diffusion supplies a whole family of easier densities\nDirectly learning and sampling a complicated data density is difficult. Instead, choose a forward noising process\n\\[\\boxed{dX_t=f(X_t,t)\\,dt+g(t)\\,dW_t,\\qquad X_0\\sim p_{\\rm data}.}\\]\nWe restrict attention to a scalar diffusion coefficient \\(g(t)\\) shared by all coordinates and independent of position. Position-dependent diffusion requires additional terms in the formulas below.\nThe process defines marginal densities \\(p_t\\) and their scores\n\\[s_t(x)=\\nabla_x\\log p_t(x).\\]\nAt each time, the score belongs to the density of all noisy data, not to the Gaussian corruption of a single training example. With Gaussian corruption and positive noise, even discrete data produce a smooth, positive density.\nAn especially simple variance-preserving example is\n\\[dX_t=-\\tfrac12\\beta(t)X_t\\,dt+\\sqrt{\\beta(t)}\\,dW_t,\\]\nwith \\(f(x,t)=-\\tfrac12\\beta(t)x\\) and \\(g(t)=\\sqrt{\\beta(t)}\\). Its coefficients are\n\\[\\alpha_t=\\exp\\!\\left(-\\tfrac12\\int_0^t\\beta(s)\\,ds\\right),\n\\qquad \\sigma_t^2=1-\\alpha_t^2.\\]\nWe now choose \\(\\beta(t)\\equiv1\\) to keep the first calculations transparent:\n\\[dX_t=-\\tfrac12X_t\\,dt+dW_t.\\]\nAt a fixed time its conditional law can be sampled as\n\\[X_t\\overset d=\\alpha_tX_0+\\sigma_t\\varepsilon,\n\\qquad \\alpha_t=e^{-t/2},\\quad \\sigma_t^2=1-e^{-t},\n\\quad\\varepsilon\\sim\\mathcal N(0,I),\\quad\\varepsilon\\perp X_0.\\]\nThe signal fades as noise grows. As \\(t\\to\\infty\\), the law approaches \\(\\mathcal N(0,I)\\). At a finite terminal time \\(T\\), replacing \\(p_T\\) by that Gaussian is an approximation. The fixed-time identity above does not describe an entire Brownian trajectory using a single fixed \\(\\varepsilon\\).",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#reverse-the-diffusion-using-the-score",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#reverse-the-diffusion-using-the-score",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "10. Reverse the diffusion using the score",
+    "text": "10. Reverse the diffusion using the score\nWe have a path \\(p_0\\to p_t\\to p_T\\). Generation starts at the noisy end and follows the path back. Use the increasing reverse clock \\(\\tau=T-t\\), exactly as in The Probability-Flow ODE. In reverse-clock formulas, \\(X\\) denotes the current sampler state and \\(t=T-\\tau\\) its noise level.\nThe time-reversal theorem, under appropriate smoothness and nondegeneracy conditions, gives\n\\[\\boxed{\ndX=\\left[-f(X,t)+g(t)^2s_t(X)\\right]d\\tau\n+g(t)\\,d\\bar W_\\tau,\\qquad t=T-\\tau.\n}\\]\nHere \\(\\bar W_\\tau\\) is Brownian motion in the increasing reverse clock. The reverse drift contains both the reversed forward drift and a score correction. The random kicks remain. This theorem and its use in score-based generation are presented in Song et al., §§3–4.\nWhy should the score enter? A noisy point can have many possible predecessors. Bayes’ rule favors predecessor regions with more prior probability mass. For a small step, the local log-density gradient supplies the leading correction to simply reversing the drift. The full theorem makes that heuristic precise.\nFor computation, use the detailed note’s descending grid\n\\[T=t_N&gt;t_{N-1}&gt;\\cdots&gt;t_0=\\epsilon,\\qquad\nh_k=t_{k-1}-t_k&lt;0.\\]\nThe index now counts down, \\(k=N,N-1,\\ldots,1\\), as the noise level decreases. The positive reverse-clock increment is \\(|h_k|\\). Euler–Maruyama gives\n\\[\\boxed{\nX\\leftarrow X+h_k\\left[f(X,t_k)-g(t_k)^2s_{t_k}(X)\\right]\n+g(t_k)\\sqrt{|h_k|}\\,z_k,\n\\qquad z_k\\overset{\\mathrm{iid}}\\sim\\mathcal N(0,I).\n}\\]\nEvaluate everything at the current state and time, then move to \\(t_{k-1}\\). The noise variance uses \\(|h_k|\\), never a negative time increment. The lab displays this positive step magnitude as \\(h=|h_k|\\); it is the same update in that display convention. With smooth data we may take \\(\\epsilon=0\\); for singular data we usually stop at positive \\(\\epsilon\\).\nFixed-target Langevin dynamics and reverse diffusion both use scores, but solve different problems. Langevin seeks equilibrium at one fixed density. Reverse diffusion tracks a prescribed, changing density \\(p_t\\) with a drift and noise scale determined by the forward process.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#a-deterministic-flow-can-follow-the-same-density-path",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#a-deterministic-flow-can-follow-the-same-density-path",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "11. A deterministic flow can follow the same density path",
+    "text": "11. A deterministic flow can follow the same density path\nThe surprising next step is that we can transport the same marginals without injecting fresh noise along each trajectory. The coefficient of the score must change when we do this.\nThe forward SDE density satisfies the Fokker–Planck equation\n\\[\\partial_t p_t=-\\nabla\\cdot(f p_t)+\\tfrac12g(t)^2\\Delta p_t.\\]\nRead this as conservation of probability. Drift carries mass; diffusion spreads it. Since \\(\\Delta p_t=\\nabla\\cdot(p_t s_t)\\), we can collect the two terms:\n\\[\n\\partial_t p_t\n=-\\nabla\\cdot\\left[p_t\\left(f-\\tfrac12g(t)^2s_t\\right)\\right].\n\\]\nBut the density of particles following an ODE \\(\\dot x=v(x,t)\\) satisfies the continuity equation \\(\\partial_t p=-\\nabla\\cdot(pv)\\). Therefore choose\n\\[\\boxed{v(x,t)=f(x,t)-\\tfrac12g(t)^2s_t(x).}\\]\nThis gives the probability-flow ODE\n\\[\\boxed{\\frac{dX_t}{dt}=f(X_t,t)-\\tfrac12g(t)^2s_t(X_t).}\\]\nGiven the exact score, matching initial law, and conditions ensuring well-posed dynamics, it has the same one-time marginals \\(p_t\\) as the forward SDE. In more than one dimension, other velocity fields can transport the same density path; this construction supplies a particular one.\nFor generation, integrate from \\(T\\) downward. In the increasing reverse clock,\n\\[\\frac{dX}{d\\tau}=-f(X,t)+\\tfrac12g(t)^2s_t(X),\\qquad t=T-\\tau.\\]\nOn the same descending grid, the Euler sampler is\n\\[\\boxed{X\\leftarrow X+h_k\\,v(X,t_k)\n=X+h_k\\left[f(X,t_k)-\\tfrac12g(t_k)^2s_{t_k}(X)\\right].}\\]\n\n\n\nSampler, with \\(h_k&lt;0\\)\nDeterministic increment\nFresh noise\n\n\n\n\nReverse SDE\n\\(h_k(f-g^2s_t)\\)\n\\(g\\sqrt{|h_k|}\\,z_k\\)\n\n\nProbability-flow ODE\n\\(h_k(f-\\tfrac12g^2s_t)\\)\nNone\n\n\n\nRemoving noise from the reverse SDE without halving its score term does not give the probability-flow ODE. The reverse SDE needs a stronger concentration drift because its Brownian term is still spreading particles.\nThere is a useful sanity check. If the forward process \\(dX=-X\\,dt/2+dW\\) already has \\(p_t=\\mathcal N(0,1)\\), then \\(s_t=-x\\) and the probability-flow velocity is \\(-x/2-(-x)/2=0\\). Every probability-flow ODE particle stays put, whereas the score-ascent ODE of Section 7 contracts toward zero. The SDE particles keep moving, yet the cloud has the same Gaussian law. Same marginals do not mean same paths or the same joint distribution across times.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#a-complete-example-with-two-modes-and-no-learned-quantities",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#a-complete-example-with-two-modes-and-no-learned-quantities",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "12. A complete example with two modes and no learned quantities",
+    "text": "12. A complete example with two modes and no learned quantities\nUse a smooth data distribution so that the score remains finite even at \\(t=0\\):\n\\[p_0=\\tfrac12\\mathcal N(-m,a^2)+\\tfrac12\\mathcal N(m,a^2),\n\\qquad m=2,\\quad a=0.35.\\]\nUnder \\(dX_t=-X_t\\,dt/2+dW_t\\), each component stays Gaussian. Set\n\\[b_t=e^{-t/2}m,\\qquad q_t=e^{-t}a^2+1-e^{-t}.\\]\nThen\n\\[p_t(x)=\\tfrac12\\mathcal N(x;-b_t,q_t)+\\tfrac12\\mathcal N(x;b_t,q_t).\\]\nTo compute its score, let \\(w_+(x,t)\\) be the posterior probability of the positive component. Differentiating the mixture gives a posterior-weighted average of component scores:\n\\[s_t(x)=w_+(x,t)\\frac{b_t-x}{q_t}\n+(1-w_+(x,t))\\frac{-b_t-x}{q_t}.\\]\nThe log odds of the positive component are \\(2b_tx/q_t\\), so \\(2w_+-1=\\tanh(b_tx/q_t)\\). Hence\n\\[\\boxed{s_t(x)=\\frac{b_t\\tanh(b_tx/q_t)-x}{q_t}.}\\]\nAt high noise, this field is nearly \\(-x\\). At low noise, it points toward the two high-density regions. The midpoint has score zero by symmetry even when it lies in a density valley. Zero score does not necessarily mean a mode.\nFor this example, the generation updates simplify to\n\\[\n\\begin{aligned}\n\\text{SDE:}\\quad X&\\leftarrow X+|h_k|\\left(\\tfrac12X+s_{t_k}(X)\\right)+\\sqrt{|h_k|}\\,z_k,\\\\\n\\text{ODE:}\\quad X&\\leftarrow X+|h_k|\\left(\\tfrac12X+\\tfrac12s_{t_k}(X)\\right).\n\\end{aligned}\n\\]\nLab 3 — two routes through the same distributions. Both samplers start from the same particles at \\(T=8\\). The default initialization samples the exact mixture \\(p_T\\), separating discretization error from initialization error. A second option starts from \\(\\mathcal N(0,1)\\), as in a practical model. Scrub the generation clock to see paths, histograms, the analytic \\(p_t\\), and the current score arrows.\nPredict what you will see before changing the controls:\n\nODE paths are smooth; SDE paths remain irregular.\nBoth histograms approach the two-mode target as the step size is refined.\nA particle’s SDE and ODE endpoints need not match, even from the same start.\nAt a finite step size and finite particle count, neither histogram exactly equals the analytic curve.\n\nIn one dimension, unique exact ODE solutions preserve particle order. The mass splits into two regions without crossing trajectories. A particle starting exactly at zero stays there by symmetry, but a continuous initial distribution assigns that single point probability zero.\nThe lab’s numerical core exposes the exact mixture density and score, and the three simulation routines, without external libraries. A small standalone Python sampler is available in the companion script.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#how-a-neural-network-supplies-the-missing-field",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#how-a-neural-network-supplies-the-missing-field",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "13. How a neural network supplies the missing field",
+    "text": "13. How a neural network supplies the missing field\nReal data do not come with the analytic mixture score. They do come with samples \\(x_0\\). Draw \\(x_0\\) and a standard Gaussian \\(\\varepsilon\\) independently. Gaussian corruption then creates training pairs without knowing \\(p_t\\):\n\\[x_t=\\alpha_t x_0+\\sigma_t\\varepsilon,\\qquad\n\\varepsilon\\sim\\mathcal N(0,I).\\]\nThe score of the conditional corruption density is known:\n\\[\\nabla_{x_t}\\log p_t(x_t\\mid x_0)\n=-\\frac{x_t-\\alpha_t x_0}{\\sigma_t^2}\n=-\\frac{\\varepsilon}{\\sigma_t}.\\]\nTrain a network using denoising score matching:\n\\[\\mathcal L(\\theta)=\\mathbb E\\left[\n\\lambda(t)\\left\\|s_\\theta(x_t,t)+\\frac{\\varepsilon}{\\sigma_t}\\right\\|^2\n\\right],\\qquad \\lambda(t)&gt;0.\\]\nUse positive noise levels and weights or a lower cutoff that keep the objective finite. Why does a conditional target learn a marginal score? Squared-error regression fits its target’s conditional mean. At the population optimum,\n\\[\n\\begin{aligned}\ns^\\star(x,t)\n&=\\mathbb E[\\nabla_x\\log p_t(x\\mid X_0)\\mid X_t=x]\\\\\n&=\\frac{\\int\\nabla_xp_t(x\\mid x_0)\\,p_0(dx_0)}{p_t(x)}\n=\\nabla_x\\log p_t(x),\n\\end{aligned}\n\\]\nwhere differentiation under the integral is justified by suitable regularity. The sampled target varies across examples; the learned field averages the targets compatible with the observed noisy input.\nThere is also a direct denoising interpretation:\n\\[\\widehat X_0(x,t):=\\mathbb E[X_0\\mid X_t=x],\\qquad\n\\boxed{\\sigma_t^2s_t(x)=\\alpha_t\\widehat X_0(x,t)-x.}\\]\nThe scaled score points from the noisy observation toward the posterior mean of the attenuated clean signal. It does not identify the particular clean example that produced the observation. The standalone Tweedie tutorial proves this identity and its Bayes optimality under squared error. See One Estimator, Many Parameterizations for the relation to noise prediction.\nAfter training, replace \\(s_t\\) by \\(s_\\theta\\) in either sampler. The network learns the score; the known drift and scaling construct the velocity or reverse drift. A generic network is not guaranteed to be an exact gradient field, and imperfect scores need not make the SDE and ODE share the same marginals. Their equivalence is an exact-score statement.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#what-has-actually-been-learned",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#what-has-actually-been-learned",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "14. What has actually been learned?",
+    "text": "14. What has actually been learned?\nThe hierarchy is now concrete. A field assigns local arrows. An ODE integrates those arrows into trajectories. A flow collects the trajectories into a global map. A score describes local relative density change. Diffusion supplies the time-indexed densities whose scores determine a stochastic reverse sampler and a deterministic probability flow.\nIn standard score-based training, the network does not directly learn an endpoint transport map. It estimates local information from which a numerical solver constructs that map, or a stochastic sampling process.\nOne terminological refinement: the ODE’s infinitesimal generator is the operator \\(\\mathcal L_t\\varphi=v(\\cdot,t)\\cdot\\nabla\\varphi\\) acting on test functions. For the forward SDE, it is \\(\\mathcal L_t\\varphi=f\\cdot\\nabla\\varphi+\\tfrac12g^2\\Delta\\varphi\\). Calling the network itself “the generator” is informal; learning local score information that determines the dynamics is the precise statement.\nFor an exact sampling claim we need an exact terminal law, exact scores, and exact integration under appropriate regularity. Practical models approximate all three. Stopping at a small positive time adds an endpoint approximation when the data score is singular at zero. Our smooth-mixture lab avoids that last issue so that the numerical effects remain easy to see.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#questions-to-work-through",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#questions-to-work-through",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "Questions to work through",
+    "text": "Questions to work through\n\nFor \\(v(x)=-3x\\), derive the exact flow and the range of stable Euler step sizes.\nFor \\(p=\\mathcal N(\\mu,\\varrho^2)\\), derive the score and show that \\(dX=s(X)du+\\sqrt2dW\\) has stationary variance \\(\\varrho^2\\).\nExplain why scaling an unnormalized density does not change its score, but multiplying the score by two generally changes a Langevin sampler’s target.\nFor pure Brownian noising \\(dX=dW\\), write both generation updates. Where does the factor of one-half appear?\nIn the stationary Gaussian example, remove the random term from the reverse SDE without changing its drift. What happens to the cloud’s variance?\n\n\n\n\n\n\n\nTipChecks for your answers\n\n\n\n\n\n\n\\(\\Psi_{0 \\to t}(x)=e^{-3t}x\\); Euler is asymptotically stable for \\(0&lt;h&lt;2/3\\).\n\\(s(x)=-(x-\\mu)/\\varrho^2\\); \\(V'=-2V/\\varrho^2+2\\), so \\(V=\\varrho^2\\) at equilibrium.\nA constant vanishes on differentiating its logarithm. With unchanged noise, using \\(2s\\) instead of \\(s\\) gives invariant density proportional to \\(p^2\\), when this is normalizable and the usual conditions hold.\nOn the descending grid, SDE: \\(X\\leftarrow X-h_k s_{t_k}(X)+\\sqrt{|h_k|}z_k\\); ODE: \\(X\\leftarrow X-\\tfrac12h_k s_{t_k}(X)\\), with \\(h_k&lt;0\\).\nThe reverse drift is \\(-x/2\\). Without noise, \\(V(\\tau)=e^{-\\tau}V(0)\\); the correct probability-flow ODE has zero velocity and preserves the variance.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/22-vector-fields-to-score-diffusion.html#reading-and-next-steps",
+    "href": "tutorials/22-vector-fields-to-score-diffusion.html#reading-and-next-steps",
+    "title": "From Local Arrows to Score-Based Diffusion",
+    "section": "Reading and next steps",
+    "text": "Reading and next steps\n\nLai, Song, Kim, Mitsufuji, and Ermon, The Principles of Diffusion Models. In the current text, Chapter 3 develops the score-based perspective, and Chapter 4 develops the score-SDE framework. Read §§3.2–3.3 for scores and denoising, then §§4.1–4.3 for reverse dynamics, matching marginals, and sampling.\nSong et al., Score-Based Generative Modeling through Stochastic Differential Equations, especially §§3.2, 4.1, 4.3 and Appendix D: reverse SDEs, numerical sampling, and probability flow.\nThe course’s Probability-Flow ODE draft gives a more detailed treatment after this introduction.",
+    "crumbs": [
+      "Lecture Notes",
+      "From Local Arrows to Score-Based Diffusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html",
+    "href": "tutorials/24-sampling-with-scores.html",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "",
+    "text": "1. Generation means producing samples\nA teaching sequence: generate particles, solve two Gaussian score fields, add noise to obtain a sampler, construct the probability-flow ODE, and finally learn the score through denoising. Derivatives, Gaussian distributions, and conditional expectation are enough to begin.\nPlace in the teaching sequence. This is the worked-solution track. Read Sections 1–8 of From Local Arrows first if fields and flows are new to you. Here we revisit those ideas through solved Gaussian examples, then build a sampler. The Tweedie tutorial supplies the separate statistical derivation when we reach score estimation. The overlap is intentional: the geometric note explains what the objects mean; this note computes with them.\nSuppose our target is a distribution \\(p_{\\text{data}}\\). To generate from it means to return a random variable whose distribution is \\(p_{\\text{data}}\\). Returning the most likely point every time would fail: it would give a point mass.\nOne way to generate is to draw an easy random starting point and move it:\n\\[\\text{random start}\\ \\longrightarrow\\ \\text{successive updates}\n\\ \\longrightarrow\\ \\text{output sample}.\\]\nAn ODE supplies deterministic updates. Given a velocity field \\(v\\), explicit Euler uses\n\\[\\boxed{X\\leftarrow X+h\\,v(X,t),\\qquad t\\leftarrow t+h.}\\]\nAn SDE also injects fresh randomness. For \\(dX_t=f(X_t,t)dt+g(t)dW_t\\), Euler–Maruyama uses a positive forward step \\(h\\):\n\\[\\boxed{X\\leftarrow X+h\\,f(X,t)+g(t)\\sqrt h\\,z,\n\\qquad z\\sim\\mathcal N(0,I).}\\]\nEach step draws a new independent \\(z\\). The \\(\\sqrt h\\) occurs because a Brownian increment over length \\(h\\) has covariance \\(hI\\).\nThese are computational recipes, not yet proofs of correct sampling. An ODE solver transports its input distribution; an SDE solver simulates drift and random motion. We still have to choose dynamics that deliver the desired law. That choice is where the score enters.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#generation-means-producing-samples",
+    "href": "tutorials/24-sampling-with-scores.html#generation-means-producing-samples",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "",
+    "text": "Our notation\nWe follow The Probability-Flow ODE: \\(p_t\\) is the forward-noised density; \\(s_t=\\nabla_x\\log p_t\\) its score; \\(f,g\\) the forward-SDE coefficients; \\(v\\) the probability-flow velocity. The flow from \\(s\\) to \\(t\\) is \\(\\Psi_{s\\to t}\\), and \\(\\Phi\\) is reserved for the standard normal CDF.\nFor generation we use \\(\\tau=T-t\\) and a descending grid with \\(h_k=t_{k-1}-t_k&lt;0\\). The positive elapsed-time variable \\(u\\) below is used only for experiments at a fixed target density. This keeps it distinct from the changing diffusion noise level \\(t\\).",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#first-solved-problem-the-score-of-a-standard-gaussian",
+    "href": "tutorials/24-sampling-with-scores.html#first-solved-problem-the-score-of-a-standard-gaussian",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "2. First solved problem: the score of a standard Gaussian",
+    "text": "2. First solved problem: the score of a standard Gaussian\nLet the target density be\n\\[p_{\\text{data}}(x)=\\frac{1}{\\sqrt{2\\pi}}e^{-x^2/2}.\\]\nTake the logarithm and differentiate with respect to the sample coordinate:\n\\[\\log p_{\\text{data}}(x)=-\\tfrac12x^2-\\tfrac12\\log(2\\pi),\n\\qquad \\boxed{s(x)=\\frac{d}{dx}\\log p_{\\text{data}}(x)=-x.}\\]\nAt \\(x=2\\) the score points left; at \\(x=-3\\) it points right; at zero it vanishes. The score is a contraction field toward the origin. Try using it directly as velocity:\n\\[\\frac{dx}{du}=s(x)=-x,\\qquad x(0)=x_0.\\]\nFor \\(x_0\\ne0\\), separate variables:\n\\[\\frac{dx}{x}=-du,\\qquad \\log|x|=-u+C,\n\\qquad \\boxed{x(u)=x_0e^{-u}.}\\]\nThe equilibrium solution \\(x\\equiv0\\) completes the case omitted by division by \\(x\\). Collecting all initial conditions gives the flow\n\\[\\boxed{\\Psi_{0\\to u}(x_0)=e^{-u}x_0.}\\]\nAfter one unit of time, every distance from zero has been multiplied by \\(e^{-1}\\). After \\(u+w\\) units, it has been multiplied by \\(e^{-u}e^{-w}\\). At every finite time, distinct particles remain distinct; they approach zero asymptotically.\nEuler approximates the exact multiplier \\(e^{-h}\\) by \\(1-h\\):\n\\[x_{k+1}=(1-h)x_k,\\qquad x_k=(1-h)^kx_0.\\]\nFor \\(0&lt;h&lt;1\\) this approaches zero without changing sign. For \\(1&lt;h&lt;2\\) it alternates sides while approaching zero. For \\(h&gt;2\\) it diverges. The last two behaviors remind us that a solver’s behavior can differ from the exact ODE.\nDoes this generate standard Gaussian samples? If \\(X_{\\mathrm{start}}\\sim\\mathcal N(0,1)\\), the output after time \\(u\\) is\n\\[\\Psi_{0\\to u}(X_{\\mathrm{start}})\\sim\\mathcal N(0,e^{-2u}).\\]\nIt is no longer standard Gaussian. The field is interpretable and the flow is correctly solved, but the dynamics concentrate the cloud at the mode. This is the score-ascent ODE, not yet the probability-flow ODE of a chosen noising process. Keep this solved example: it will let us check every later construction.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#second-solved-problem-a-gaussian-centered-at-mu",
+    "href": "tutorials/24-sampling-with-scores.html#second-solved-problem-a-gaussian-centered-at-mu",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "3. Second solved problem: a Gaussian centered at mu",
+    "text": "3. Second solved problem: a Gaussian centered at mu\nTranslate the target to \\(p_{\\text{data}}=\\mathcal N(\\mu,1)\\). Then\n\\[\\log p_{\\text{data}}(x)=C-\\tfrac12(x-\\mu)^2,\n\\qquad \\boxed{s(x)=\\mu-x.}\\]\nThe zero of the field has moved from \\(0\\) to \\(\\mu\\). For the ODE \\(dx/du=\\mu-x\\), set \\(z=x-\\mu\\). Because \\(\\mu\\) is constant,\n\\[\\frac{dz}{du}=-z.\\]\nWe have already solved this equation. Therefore\n\\[\\boxed{x(u)=\\mu+(x_0-\\mu)e^{-u},\\qquad\n\\Psi_{0\\to u}(x_0)=\\mu+e^{-u}(x_0-\\mu).}\\]\nFor example, with \\(\\mu=2\\) and \\(x_0=5\\), the particle is at \\(2+3e^{-1}\\approx3.10\\) after one unit. It approaches \\(2\\) without crossing it. The flow first measures displacement from \\(\\mu\\), shrinks that displacement, then adds \\(\\mu\\) back.\nEuler gives\n\\[x_{k+1}=x_k+h(\\mu-x_k),\\qquad\nx_k-\\mu=(1-h)^k(x_0-\\mu).\\]\nIf the starting cloud is \\(\\mathcal N(m_{\\mathrm{start}},V_{\\mathrm{start}})\\), the exact output law is\n\\[\\mathcal N\\!\\left(\\mu+e^{-u}(m_{\\mathrm{start}}-\\mu),\ne^{-2u}V_{\\mathrm{start}}\\right).\\]\nIts mean approaches the right location, but its variance approaches zero. Getting the center right is not enough to sample the target distribution.\nFor the slightly more general target \\(\\mathcal N(\\mu,\\varrho^2)\\),\n\\[s(x)=-\\frac{x-\\mu}{\\varrho^2},\\qquad\n\\Psi_{0\\to u}(x)=\\mu+(x-\\mu)e^{-u/\\varrho^2}.\\]\nWe use \\(\\varrho\\) for the target standard deviation so that \\(\\sigma_t\\) can retain its diffusion meaning: the standard deviation of the corruption noise.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#why-choose-a-score-field-geometry-and-energy",
+    "href": "tutorials/24-sampling-with-scores.html#why-choose-a-score-field-geometry-and-energy",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "4. Why choose a score field? Geometry and energy",
+    "text": "4. Why choose a score field? Geometry and energy\nThe Gaussian calculation is an instance of a general construction:\n\\[\\boxed{s(x)=\\nabla_x\\log p(x).}\\]\nIt produces one vector component per data coordinate. For a small displacement \\(\\delta\\),\n\\[\\log\\frac{p(x+\\delta)}{p(x)}=s(x)^\\top\\delta+o(\\|\\delta\\|).\\]\nThe score thus measures local relative density change. In Euclidean coordinates its direction is the steepest first-order increase in log density, where the score is nonzero. This gives a local direction rather than a global destination.\nAn energy interpretation supplies the same field. Write\n\\[p(x)=Z^{-1}e^{-E(x)}.\\]\nThen \\(\\log p=-E-\\log Z\\), and since \\(Z\\) does not depend on \\(x\\),\n\\[\\boxed{s(x)=-\\nabla E(x).}\\]\nThe score points downhill in energy; the unknown normalizing constant disappears. For \\(\\mathcal N(\\mu,\\varrho^2)\\), take \\(E(x)=(x-\\mu)^2/(2\\varrho^2)\\). Our Gaussian score ODE is precisely gradient descent in this quadratic energy.\nBut downhill motion alone settles at an energy minimum. A Gibbs distribution \\(e^{-E}/Z\\) occupies a range of energies. We need a mechanism that balances this concentration with spread. The energy picture motivates the score; the next calculation justifies its coefficient in a sampler.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#add-noise-langevin-sampling-and-eulermaruyama",
+    "href": "tutorials/24-sampling-with-scores.html#add-noise-langevin-sampling-and-eulermaruyama",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "5. Add noise: Langevin sampling and Euler–Maruyama",
+    "text": "5. Add noise: Langevin sampling and Euler–Maruyama\nFor a fixed target \\(p\\), consider\n\\[\\boxed{dX_u=s(X_u)\\,du+\\sqrt2\\,dW_u.}\\]\nThe deterministic part pulls uphill in density, and Brownian motion spreads the cloud. Euler–Maruyama makes this directly executable:\n\\[\\boxed{X\\leftarrow X+h\\,s(X)+\\sqrt{2h}\\,z_k,\n\\qquad z_k\\overset{\\mathrm{iid}}\\sim\\mathcal N(0,I).}\\]\nDraw many initial particles and run the update for each. With suitable regularity and ergodicity, continuous-time Langevin dynamics approach \\(p\\) as \\(u\\to\\infty\\). A finite-step discretization approximates that dynamics; it has discretization bias, and multimodal targets can mix slowly.\n\nSolve the Gaussian sampler too\nFor \\(p=\\mathcal N(\\mu,1)\\),\n\\[dX_u=(\\mu-X_u)du+\\sqrt2\\,dW_u.\\]\nMultiplying \\(X_u-\\mu\\) by the integrating factor \\(e^u\\) gives\n\\[X_u=\\mu+e^{-u}(X_{\\mathrm{start}}-\\mu)\n+\\sqrt2\\int_0^u e^{-(u-a)}\\,dW_a.\\]\nThe stochastic integral is a zero-mean Gaussian independent of the starting point, with variance \\(2\\int_0^u e^{-2(u-a)}da=1-e^{-2u}\\). Thus for a Gaussian start,\n\\[\\boxed{X_u\\sim\\mathcal N\\!\\left(\n\\mu+e^{-u}(m_{\\mathrm{start}}-\\mu),\ne^{-2u}V_{\\mathrm{start}}+1-e^{-2u}\\right).}\\]\nCompare with the score ODE: the mean behaves identically, but the variance now approaches one. If the initial law already is \\(\\mathcal N(\\mu,1)\\), it stays that way. This is the balance that makes it a sampler.\nEuler–Maruyama uses \\(X\\leftarrow(1-h)X+h\\mu+\\sqrt{2h}z_k\\). Its stationary variance, for \\(0&lt;h&lt;2\\), solves\n\\[V_h=(1-h)^2V_h+2h,\\qquad V_h=\\frac1{1-h/2}.\\]\nThe finite-step law is too broad. Reducing \\(h\\) improves the numerical approximation; running more steps at the same \\(h\\) does not remove this bias.\nPause for an experiment. In Lab 2, compare score ascent and Langevin sampling for \\(\\mu=0\\). Predict their variances before moving the time slider. Translating every particle by \\(\\mu\\) gives the unit-variance, nonzero-mean example just solved.\n\n\nWhy does this work for a general density?\nLet \\(q_u\\) be the density of the current particle cloud. Its evolution is\n\\[\\partial_u q_u=-\\nabla\\cdot(q_u s)+\\Delta q_u.\\]\nThe first term transports mass; the second spreads it. At \\(q_u=p\\), use \\(ps=p\\nabla\\log p=\\nabla p\\):\n\\[-\\nabla\\cdot(ps)+\\Delta p=-\\Delta p+\\Delta p=0.\\]\nThus \\(p\\) is invariant, with appropriate boundary or tail conditions. This is a specific justification for using the score with noise coefficient \\(\\sqrt2\\). Invariance and convergence are distinct: convergence also requires conditions that rule out trapping or explosion.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#from-one-fixed-target-to-a-path-of-noisy-densities",
+    "href": "tutorials/24-sampling-with-scores.html#from-one-fixed-target-to-a-path-of-noisy-densities",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "6. From one fixed target to a path of noisy densities",
+    "text": "6. From one fixed target to a path of noisy densities\nFor real data, the fixed-target score is unknown and the density may have separated modes or singular support. Diffusion instead constructs a path of increasingly smoothed distributions, then learns their time-indexed scores.\nChoose the forward SDE\n\\[dX_t=f(X_t,t)dt+g(t)dW_t,\\qquad X_0\\sim p_0=p_{\\text{data}}.\\]\nHere \\(g(t)\\) is scalar and independent of position. Our common VP choice is\n\\[f(x,t)=-\\tfrac12\\beta(t)x,\\qquad g(t)=\\sqrt{\\beta(t)},\\]\nwith\n\\[\\alpha_t=\\exp\\!\\left(-\\tfrac12\\int_0^t\\beta(a)da\\right),\n\\qquad\\sigma_t^2=1-\\alpha_t^2.\\]\nAt each fixed time, the conditional law is generated by\n\\[\\boxed{X_t\\overset d=\\alpha_tX_0+\\sigma_t\\varepsilon,\n\\qquad\\varepsilon\\sim\\mathcal N(0,I),\\quad\\varepsilon\\perp X_0.}\\]\nThis is a statement about one time slice, not a prescription to reuse a single \\(\\varepsilon\\) for a Brownian path. The density \\(p_t\\) depends on both the known corruption kernel and the unknown data law. Its score is \\(s_t=\\nabla\\log p_t\\).\nChoose \\(T\\) so that \\(\\alpha_T\\) is small; \\(p_T\\) is then approximately standard Gaussian for suitably scaled data. Generation aims to move from \\(p_T\\) back to \\(p_0\\). It does not wait for equilibrium at every intermediate density.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#the-reverse-sde-sampler-in-the-common-notation",
+    "href": "tutorials/24-sampling-with-scores.html#the-reverse-sde-sampler-in-the-common-notation",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "7. The reverse-SDE sampler, in the common notation",
+    "text": "7. The reverse-SDE sampler, in the common notation\nThe reverse-time theorem gives, in the increasing clock \\(\\tau=T-t\\),\n\\[\\boxed{dX=[-f(X,t)+g(t)^2s_t(X)]d\\tau+g(t)d\\bar W_\\tau.}\\]\nHere \\(X\\) is the current sampler state and \\(t=T-\\tau\\). The theorem needs suitable regularity and nondegeneracy. Its score correction accounts for how probable different predecessors are, conditional on the current noisy state.\nUse \\(T=t_N&gt;\\cdots&gt;t_0=\\epsilon\\) and \\(h_k=t_{k-1}-t_k&lt;0\\). The corresponding Euler–Maruyama sampler is\n\\[\\boxed{X\\leftarrow X+h_k[f(X,t_k)-g(t_k)^2s_{t_k}(X)]\n+g(t_k)\\sqrt{|h_k|}\\,z_k.}\\]\nThe drift is evaluated at the current point. Brownian variance is proportional to the positive reverse elapsed time \\(|h_k|\\). In VP form this becomes\n\\[X\\leftarrow X+|h_k|\\beta(t_k)\n\\left[\\tfrac12X+s_{t_k}(X)\\right]\n+\\sqrt{\\beta(t_k)|h_k|}\\,z_k.\\]\nWith the exact terminal law, exact scores, and exact continuous-time dynamics, the sampler traverses the marginals backward. Finite steps approximate this result. Starting instead from \\(\\mathcal N(0,I)\\) introduces terminal-prior error.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#derive-the-probability-flow-ode-by-conserving-probability",
+    "href": "tutorials/24-sampling-with-scores.html#derive-the-probability-flow-ode-by-conserving-probability",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "8. Derive the probability-flow ODE by conserving probability",
+    "text": "8. Derive the probability-flow ODE by conserving probability\nNow ask: can deterministic particles follow the same density path?\nThe forward SDE evolves its density by Fokker–Planck:\n\\[\\partial_t p_t=-\\nabla\\cdot(f p_t)+\\tfrac12g(t)^2\\Delta p_t.\\]\nAn ODE \\(dX_t/dt=v(X_t,t)\\) evolves its density by continuity:\n\\[\\partial_t p_t=-\\nabla\\cdot(p_t v).\\]\nIn one dimension, \\(-\\partial_x(p_tv)\\) is the net inflow of mass per unit length. The multidimensional divergence expresses the same conservation principle. To match these equations, write the probability current as\n\\[p_t v=f p_t-\\tfrac12g^2\\nabla p_t.\\]\nDivide by the positive density. This division is where the log derivative appears:\n\\[\\boxed{v=f-\\tfrac12g^2\\frac{\\nabla p_t}{p_t}\n=f-\\tfrac12g^2s_t.}\\]\nConsequently,\n\\[\\boxed{\\frac{dX_t}{dt}=v(X_t,t)\n=f(X_t,t)-\\tfrac12g(t)^2s_t(X_t).}\\]\nThis is the probability-flow ODE. Under conditions ensuring well-posed density evolution and flows, it has the same marginals as the forward SDE when initialized with a matching law. It gives a particular transport field; in higher dimensions the density path need not determine a unique field.\nThe score is therefore more than an attractive direction. It is the exact quantity that converts a diffusive probability current into a velocity field.\nFor VP noising,\n\\[\\boxed{v(x,t)=-\\tfrac12\\beta(t)[x+s_t(x)].}\\]\nSampling is now ordinary Euler integration on the descending grid:\n\\[\\boxed{X\\leftarrow X+h_kv(X,t_k),\\qquad h_k&lt;0.}\\]\n\n\n\nDynamics toward lower noise\nIncrement to \\(X\\)\n\n\n\n\nReverse SDE\n\\(h_k(f-g^2s_t)+g\\sqrt{|h_k|}z_k\\)\n\n\nProbability-flow ODE\n\\(h_k(f-\\tfrac12g^2s_t)\\)\n\n\n\nThe ODE needs half the score coefficient because it no longer injects spreading noise. Simply removing the random term from the reverse SDE gives the wrong deterministic dynamics. Randomness in an ODE sampler comes from its starting sample; randomness in the SDE sampler also comes from its Brownian increments.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#return-to-the-solved-gaussians-now-solve-their-probability-flows",
+    "href": "tutorials/24-sampling-with-scores.html#return-to-the-solved-gaussians-now-solve-their-probability-flows",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "9. Return to the solved Gaussians: now solve their probability flows",
+    "text": "9. Return to the solved Gaussians: now solve their probability flows\nWe can test the entire construction using the two targets from the beginning.\n\nStandard normal data under VP noising\nIf \\(p_0=\\mathcal N(0,1)\\), then \\(p_t=\\mathcal N(0,\\alpha_t^2+\\sigma_t^2)=\\mathcal N(0,1)\\). Thus\n\\[s_t(x)=-x,\\qquad\n\\boxed{v(x,t)=-\\tfrac12\\beta(t)[x-x]=0.}\\]\nThe exact solution is \\(X_t=X_s\\) and\n\\[\\boxed{\\Psi_{s\\to t}(x)=x.}\\]\nThe probability-flow sampler leaves each initial standard Gaussian draw in place. This is correct: its source and target distributions already agree. The score contracts, but its contribution cancels the known VP drift in the probability-flow velocity. The score-ascent flow \\(e^{-u}x\\) solved earlier and this identity flow answer different questions.\n\n\nData with mean mu and unit variance\nIf \\(p_0=\\mathcal N(\\mu,1)\\), VP noising gives\n\\[p_t=\\mathcal N(\\alpha_t\\mu,1),\\qquad s_t(x)=\\alpha_t\\mu-x.\\]\nSubstitute into the probability-flow velocity:\n\\[v(x,t)=-\\tfrac12\\beta(t)\\alpha_t\\mu=\\alpha_t'\\mu.\\]\nThe dependence on \\(x\\) cancels. Integrating from \\(s\\) to \\(t\\),\n\\[\\boxed{\\Psi_{s\\to t}(x)=x+(\\alpha_t-\\alpha_s)\\mu.}\\]\nThis is a translation, preserving all distances and the variance. Forward time moves the mean toward zero; backward generation restores it. Since \\(\\alpha_0=1\\),\n\\[X_T\\sim\\mathcal N(\\alpha_T\\mu,1)\n\\quad\\Longrightarrow\\quad\n\\Psi_{T\\to0}(X_T)=X_T+(1-\\alpha_T)\\mu\\sim\\mathcal N(\\mu,1).\\]\nFor \\(\\beta\\equiv1\\), \\(\\alpha_t=e^{-t/2}\\). With \\(\\mu=2\\), \\(T=2\\), the exact starting mean is \\(2e^{-1}\\approx0.736\\) and generation adds approximately \\(1.264\\) to every particle. Its mean becomes \\(2\\), while its variance stays one.\nStarting from a standard Gaussian at this finite \\(T\\) instead would give mean \\((1-\\alpha_T)\\mu\\), not \\(\\mu\\). This explicitly exhibits terminal-prior mismatch, even with a perfect score and exact solver.\n\n\nExtension: a different target variance\nFor \\(p_0=\\mathcal N(\\mu,\\varrho^2)\\) define its noisy marginal variance\n\\[q_t=\\alpha_t^2\\varrho^2+\\sigma_t^2.\\]\nThen \\(p_t=\\mathcal N(\\alpha_t\\mu,q_t)\\), and\n\\[s_t(x)=-\\frac{x-\\alpha_t\\mu}{q_t},\\qquad\nv(x,t)=\\alpha_t'\\mu+\\frac{q_t'}{2q_t}(x-\\alpha_t\\mu).\\]\nHere \\(q_t'=\\beta(t)(1-q_t)\\). Differentiate the standardized coordinate \\(z_t=(X_t-\\alpha_t\\mu)/\\sqrt{q_t}\\) along this ODE; its derivative is zero. Consequently,\n\\[\\boxed{\\Psi_{s\\to t}(x)=\\alpha_t\\mu+\n\\sqrt{\\frac{q_t}{q_s}}(x-\\alpha_s\\mu).}\\]\nThe map translates the center and rescales its spread. This is an exact, fully interpretable generative flow, and reduces to the preceding translation when \\(\\varrho=1\\).\nCheck in the lab. Lab 3 uses a two-Gaussian mixture instead of one Gaussian. The score and both samplers are still explicit, but the transport can now separate a cloud into two modes. Compare histograms rather than expecting SDE and ODE particle paths to match. The lab displays the positive step magnitude \\(h=|h_k|\\); this note uses signed backward steps \\(h_k&lt;0\\). The numerical updates are the same.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#we-can-sample-if-we-know-the-score.-how-do-we-learn-it",
+    "href": "tutorials/24-sampling-with-scores.html#we-can-sample-if-we-know-the-score.-how-do-we-learn-it",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "10. We can sample if we know the score. How do we learn it?",
+    "text": "10. We can sample if we know the score. How do we learn it?\nFor the Gaussian examples, differentiating an explicit density was easy. Real data supply examples \\(x_0\\), not an evaluable marginal density \\(p_t\\). Directly asking a network to match \\(\\nabla\\log p_t\\) would require an unavailable target.\nBut we can manufacture noisy/clean training pairs by drawing \\(x_0\\) and \\(\\varepsilon\\) independently:\n\\[x_0\\sim p_{\\text{data}},\\qquad\nx_t=\\alpha_t x_0+\\sigma_t\\varepsilon,\\qquad\n\\varepsilon\\sim\\mathcal N(0,I).\\]\nA familiar regression problem is now available: predict \\(x_0\\) from \\((x_t,t)\\) under squared error. Its population-optimal prediction is\n\\[\\widehat X_0(x,t):=\\mathbb E[X_0\\mid X_t=x].\\]\nTo see why, write \\(X_0-D=(X_0-\\widehat X_0)+(\\widehat X_0-D)\\). Conditional on \\(X_t=x\\), the first bracket has mean zero, so the cross term vanishes and\n\\[\\mathbb E[\\|X_0-D\\|^2\\mid X_t=x]\n=\\operatorname{tr}\\operatorname{Cov}(X_0\\mid X_t=x)\n+\\|\\widehat X_0(x,t)-D\\|^2.\\]\nThe second term is minimized at \\(D=\\widehat X_0\\). We can therefore learn a posterior-mean denoiser. Does a denoiser give the score needed by the sampler? This is the question that motivates Tweedie’s formula.\n\nDerive the bridge\nAt a fixed positive noise level,\n\\[p_t(x)=\\int\\mathcal N(x;\\alpha_t x_0,\\sigma_t^2I)\\,p_0(dx_0).\\]\nDifferentiate the Gaussian kernel with respect to its observed argument \\(x\\):\n\\[\\nabla_xp_t(x\\mid x_0)\n=\\frac{\\alpha_t x_0-x}{\\sigma_t^2}p_t(x\\mid x_0).\\]\nDifferentiating under the integral, dividing by \\(p_t(x)\\), and recognizing Bayes’ posterior gives\n\\[\n\\begin{aligned}\ns_t(x)\n&=\\int\\frac{\\alpha_t x_0-x}{\\sigma_t^2}\n\\frac{p_t(x\\mid x_0)p_0(dx_0)}{p_t(x)}\\\\\n&=\\boxed{\\frac{\\alpha_t\\widehat X_0(x,t)-x}{\\sigma_t^2}}.\n\\end{aligned}\n\\]\nFor \\(\\alpha_t&gt;0\\), equivalently,\n\\[\\boxed{\\widehat X_0(x,t)=\\frac{x+\\sigma_t^2s_t(x)}{\\alpha_t}.}\\]\nThis is VP Tweedie. It says that a posterior-mean denoiser and a score carry the same information at a fixed nondegenerate noise level. For the separate additive observation model \\(Y=X_0+\\sigma\\varepsilon\\), with freely chosen \\(\\sigma&gt;0\\), the displacement \\(\\sigma^2\\nabla_y\\log p_Y(y)\\) points directly toward the posterior mean. This additive model does not impose the VP constraint \\(\\alpha_t^2+\\sigma_t^2=1\\): setting \\(\\alpha_t=1\\) within that constraint would force zero noise. In VP coordinates, \\(\\sigma_t^2s_t(x)\\) points toward the attenuated mean \\(\\alpha_t\\widehat X_0(x,t)\\).\nThe standalone Tweedie tutorial supplies the regularity conditions, additive-noise derivation, and two-point posterior example.\n\n\nDirect score training and noise prediction\nThe conditional corruption score is the available random target\n\\[\\nabla_{x_t}\\log p_t(x_t\\mid x_0)=-\\varepsilon/\\sigma_t.\\]\nSquared-error regression against that target fits its conditional mean:\n\\[s^\\star(x,t)=\\mathbb E[-\\varepsilon/\\sigma_t\\mid X_t=x]=s_t(x).\\]\nThus we can train \\(s_\\theta\\) with\n\\[\\mathcal L(\\theta)=\\mathbb E\\left[\\lambda(t)\n\\left\\|s_\\theta(x_t,t)+\\frac{\\varepsilon}{\\sigma_t}\\right\\|^2\\right],\\]\nusing positive-noise times and suitable weighting or a lower cutoff to keep the objective finite. Alternatively, a squared-error noise predictor estimates \\(\\varepsilon^\\star(x,t)=\\mathbb E[\\varepsilon\\mid X_t=x]\\), with\n\\[s_t(x)=-\\varepsilon^\\star(x,t)/\\sigma_t.\\]\nThe estimated function is a conditional mean, not the particular unseen noise realization. Loss weights must be adjusted when comparing parameterizations; finite networks and optimization need not give identical results.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#the-probability-flow-sampler-we-can-now-implement",
+    "href": "tutorials/24-sampling-with-scores.html#the-probability-flow-sampler-we-can-now-implement",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "11. The probability-flow sampler we can now implement",
+    "text": "11. The probability-flow sampler we can now implement\nAfter training, choose the grid \\(T=t_N&gt;\\cdots&gt;t_0=\\epsilon\\) and follow\n\\[\n\\boxed{\n\\begin{aligned}\n&X\\sim\\mathcal N(0,I)\\quad\\text{(approximation to }p_T\\text{)};\\\\\n&\\text{for }k=N,N-1,\\ldots,1:\\\\\n&\\qquad h_k\\leftarrow t_{k-1}-t_k;\\\\\n&\\qquad s\\leftarrow s_\\theta(X,t_k);\\\\\n&\\qquad v\\leftarrow-\\tfrac12\\beta(t_k)(X+s);\\\\\n&\\qquad X\\leftarrow X+h_kv;\\\\\n&\\text{return }X.\n\\end{aligned}}\n\\]\nEvery step reevaluates the score because both the state and noise level change. The algorithm uses the learned velocity\n\\[v_\\theta(x,t)=-\\tfrac12\\beta(t)[x+s_\\theta(x,t)].\\]\nWrite its flow as \\(\\Psi^\\theta_{T\\to\\epsilon}\\). Under the usual convergence conditions, refining the Euler mesh converges to this learned flow. The exact probability-flow map \\(\\Psi_{T\\to\\epsilon}\\) instead uses \\(s_t\\). They coincide when the learned and exact velocity fields agree; reducing the numerical step size alone does not eliminate score-estimation error.\nThere are four separate approximations: replacing \\(p_T\\) by a Gaussian, estimating the score, integrating with finite steps, and stopping at \\(\\epsilon&gt;0\\) instead of zero. With a smooth target the endpoint may be regular at zero; atomic data typically require a limiting argument. The exact SDE/ODE marginal equivalence does not automatically survive an imperfect learned score.\nA posterior mean from one noisy observation is also not the same object as this integrated flow. Denoising estimates a hidden clean value under squared loss; sampling must reproduce the population’s distribution.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#problems-for-discussion",
+    "href": "tutorials/24-sampling-with-scores.html#problems-for-discussion",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "Problems for discussion",
+    "text": "Problems for discussion\n\nFor \\(p=\\mathcal N(3,4)\\), compute the score-ascent flow and its Euler stability range. Check: \\(3+(x-3)e^{-u/4}\\); \\(0&lt;h&lt;8\\).\nFor that same target, show that Langevin variance satisfies \\(V'=-V/2+2\\). What is its limiting value? Check: \\(4\\).\nUnder VP noising, take \\(p_0=\\mathcal N(3,1)\\) and \\(\\beta\\equiv1\\). Write the exact map from \\(T\\) to zero. Check: \\(x+3(1-e^{-T/2})\\).\nWhy is \\(s_t(x)=-x\\) compatible with zero probability-flow velocity? Check: its correction cancels the VP forward drift.\nIf an exact denoiser is available, how do we obtain a score for the sampler? Check: \\((\\alpha_t\\widehat X_0-x)/\\sigma_t^2\\), at positive noise.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/24-sampling-with-scores.html#reading",
+    "href": "tutorials/24-sampling-with-scores.html#reading",
+    "title": "Sampling with Scores: Worked Examples of the Probability-Flow ODE",
+    "section": "Reading",
+    "text": "Reading\n\nLai et al., The Principles of Diffusion Models, Chapter 3 for energy, scores, Langevin dynamics, and denoising; §3.3.4 for Tweedie; §§4.1–4.3 for score SDEs, matching marginals, and numerical sampling.\nSong et al., Score-Based Generative Modeling through Stochastic Differential Equations, §§3–4 and Appendix D.\nFrom Local Arrows to Score-Based Diffusion for the geometric groundwork; The Probability-Flow ODE for the longer technical treatment using the same notation.",
+    "crumbs": [
+      "Lecture Notes",
+      "Sampling with Scores: Worked Examples of the Probability-Flow ODE"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html",
+    "href": "tutorials/23-tweedie-bayes-denoising.html",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "",
+    "text": "1. What does “Bayes-optimal denoiser” mean?\nA standalone derivation. Prerequisites: Gaussian densities, Bayes’ rule, conditional expectation, and differentiation. No ODE or SDE theory is needed.\nPlace in the teaching sequence. This is the statistical derivation in the three-note sequence: geometric introduction → worked sampling tutorial → this proof. It can also be read independently. We reserve \\(\\varrho\\) for a Gaussian prior’s standard deviation, keeping \\(\\tau\\) available for the reverse clock in the companion notes.\nWe observe a corrupted signal\n\\[\\boxed{Y=X+\\sigma\\varepsilon,\\qquad\n\\varepsilon\\sim\\mathcal N(0,I_d),\\quad\\varepsilon\\perp X,\\quad\\sigma&gt;0.}\\]\nThe clean signal \\(X\\) is random because it represents the population of possible data. Its law \\(P_X\\) is our prior. We observe \\(Y=y\\), but do not know either \\(X\\) or the particular noise realization. What should we return as a denoised estimate?\nThe answer depends on the loss. Under squared Euclidean error, the best answer is the posterior mean. Tweedie’s formula expresses that mean using only the score of the noisy marginal density:\n\\[\\boxed{\\mathbb E[X\\mid Y=y]=y+\\sigma^2\\nabla_y\\log p_Y(y).}\\]\nWe will prove both statements: why this is Bayes-optimal, and why the score gives exactly that estimate. Open Lab 4: Tweedie’s denoiser to explore the two-point example as you read.\nA denoiser is a function \\(D\\) that turns an observation into an estimate \\(D(Y)\\). Its mean squared error, or Bayes risk, is\n\\[R(D)=\\mathbb E\\|X-D(Y)\\|^2.\\]\nAssume \\(\\mathbb E\\|X\\|^2&lt;\\infty\\) and consider denoisers with finite risk. Then \\(D(Y)\\) is square-integrable too, so the cross term below is well defined. Let \\(m(Y)=\\mathbb E[X\\mid Y]\\). Add and subtract \\(m(Y)\\) inside the error:\n\\[X-D(Y)=[X-m(Y)]+[m(Y)-D(Y)].\\]\nExpanding the squared norm produces two squared terms and a cross term. Given \\(Y\\), the second bracket is known and \\(\\mathbb E[X-m(Y)\\mid Y]=0\\). Therefore the cross term has expectation zero:\n\\[\n\\mathbb E\\big[(X-m(Y))^\\top(m(Y)-D(Y))\\big]=0.\n\\]\nIt follows that\n\\[\\boxed{\nR(D)=\\underbrace{\\mathbb E\\|X-m(Y)\\|^2}_{\\text{irreducible posterior uncertainty}}\n+\\underbrace{\\mathbb E\\|m(Y)-D(Y)\\|^2}_{\\text{avoidable estimation error}}.\n}\\]\nThe first term does not depend on \\(D\\). The second is nonnegative and is zero exactly when \\(D(Y)=m(Y)\\) almost surely. Thus\n\\[\\boxed{D^*(y)=\\mathbb E[X\\mid Y=y].}\\]\nAt a particular observation, the same argument reads\n\\[\\mathbb E[\\|X-a\\|^2\\mid Y=y]\n=\\operatorname{tr}\\operatorname{Cov}(X\\mid Y=y)+\\|m(y)-a\\|^2.\\]\n“Optimal” means optimal for this loss and this joint model, not guaranteed to recover the actual hidden signal. The remaining risk is the average posterior variance. With other losses, the optimal estimate can change: absolute error in one dimension gives a posterior median, for example.",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#the-density-we-differentiate-is-the-noisy-marginal",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#the-density-we-differentiate-is-the-noisy-marginal",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "2. The density we differentiate is the noisy marginal",
+    "text": "2. The density we differentiate is the noisy marginal\nConditional on \\(X=x\\), the observation is Gaussian:\n\\[p(y\\mid x)=\\frac{1}{(2\\pi\\sigma^2)^{d/2}}\n\\exp\\left[-\\frac{\\|y-x\\|^2}{2\\sigma^2}\\right].\\]\nAveraging over possible clean signals gives\n\\[\\boxed{p_Y(y)=\\int p(y\\mid x)\\,P_X(dx).}\\]\nIf \\(X\\) has a density, \\(P_X(dx)=p_X(x)dx\\). If \\(X\\) takes finitely many values, the integral is a sum. This notation lets the same proof apply to continuous data, discrete data, and data supported on a lower-dimensional set. Gaussian noise with \\(\\sigma&gt;0\\) makes \\(p_Y\\) smooth and strictly positive everywhere.\nThe score in this tutorial is\n\\[s_Y(y)=\\nabla_y\\log p_Y(y).\\]\nIt is a gradient with respect to the observed data coordinates. It is not a parameter gradient, not the clean-data score, and not the score of one fixed conditional likelihood \\(p(y\\mid x)\\).",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#differentiate-the-gaussian-then-use-bayes-rule",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#differentiate-the-gaussian-then-use-bayes-rule",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "3. Differentiate the Gaussian, then use Bayes’ rule",
+    "text": "3. Differentiate the Gaussian, then use Bayes’ rule\nThe Gaussian kernel has derivative\n\\[\\nabla_y p(y\\mid x)=\\frac{x-y}{\\sigma^2}p(y\\mid x).\\]\nDifferentiate under the integral:\n\\[\n\\begin{aligned}\n\\nabla_y p_Y(y)\n&=\\int\\nabla_y p(y\\mid x)\\,P_X(dx)\\\\\n&=\\frac{1}{\\sigma^2}\\int(x-y)p(y\\mid x)\\,P_X(dx).\n\\end{aligned}\n\\]\nFor fixed positive \\(\\sigma\\), Gaussian kernels and their first derivatives are locally uniformly bounded as functions of \\(x\\) for \\(y\\) in a compact set. This provides a dominating integrable bound against the probability measure \\(P_X\\) and justifies the interchange. The finite-second-moment assumption above also makes the squared-error decision problem well defined.\nNow divide by the positive marginal density:\n\\[\\frac{\\nabla_y p_Y(y)}{p_Y(y)}\n=\\frac{1}{\\sigma^2}\\int(x-y)\n\\frac{p(y\\mid x)P_X(dx)}{p_Y(y)}.\\]\nBayes’ rule identifies the fraction as the posterior measure:\n\\[P_{X\\mid Y=y}(dx)=\\frac{p(y\\mid x)P_X(dx)}{p_Y(y)}.\\]\nHence\n\\[\n\\begin{aligned}\n\\nabla_y\\log p_Y(y)\n&=\\frac{1}{\\sigma^2}\\int(x-y)\\,P_{X\\mid Y=y}(dx)\\\\\n&=\\frac{\\mathbb E[X\\mid Y=y]-y}{\\sigma^2}.\n\\end{aligned}\n\\]\nRearranging proves Tweedie’s formula:\n\\[\\boxed{m(y)=y+\\sigma^2s_Y(y).}\\]\nThe whole proof is a Gaussian derivative followed by Bayes’ rule. Bayes optimality comes from the squared-error decomposition in Section 1, not from differentiating the density alone.",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#what-the-formula-tells-us-geometrically",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#what-the-formula-tells-us-geometrically",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "4. What the formula tells us geometrically",
+    "text": "4. What the formula tells us geometrically\nThe vector\n\\[\\boxed{\\sigma^2s_Y(y)=m(y)-y}\\]\nis the displacement from the observed noisy point to its posterior-mean clean estimate. Thus a score is not merely an abstract derivative: it encodes a denoising displacement, measured in units of noise variance.\nThis is an exact identity for this Gaussian observation model. It is not an instruction to keep applying a fixed denoiser as a sampling algorithm. A posterior mean averages uncertainty and can lie between plausible clean signals. Likewise, repeated score ascent can concentrate particles at modes instead of reproducing a distribution.\nFor additive noise, \\(s_Y(y)\\) points toward \\(m(y)\\). For scaled corruption, the correct endpoint of that arrow is the scaled posterior mean; we will make that distinction explicit below.",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#check-it-on-a-gaussian-prior",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#check-it-on-a-gaussian-prior",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "5. Check it on a Gaussian prior",
+    "text": "5. Check it on a Gaussian prior\nLet \\(X\\sim\\mathcal N(\\mu,\\varrho^2)\\) in one dimension, with \\(\\varrho&gt;0\\). Then\n\\[Y\\sim\\mathcal N(\\mu,\\varrho^2+\\sigma^2),\\qquad\ns_Y(y)=-\\frac{y-\\mu}{\\varrho^2+\\sigma^2}.\\]\nTweedie gives\n\\[\n\\begin{aligned}\nm(y)&=y-\\frac{\\sigma^2}{\\varrho^2+\\sigma^2}(y-\\mu)\\\\\n&=\\boxed{\\frac{\\varrho^2}{\\varrho^2+\\sigma^2}y\n+\\frac{\\sigma^2}{\\varrho^2+\\sigma^2}\\mu}.\n\\end{aligned}\n\\]\nThe denoiser balances observation and prior mean. If observation noise is small, it trusts \\(y\\). If noise is large, it trusts \\(\\mu\\). The posterior variance is \\(\\varrho^2\\sigma^2/(\\varrho^2+\\sigma^2)\\), so even the optimal estimate usually has nonzero error.\nNotice why the marginal matters. The clean score would be \\(-(y-\\mu)/\\varrho^2\\) and would give the wrong shrinkage. Tweedie requires the score of the noise-smoothed density \\(p_Y\\).",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#the-vp-diffusion-form",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#the-vp-diffusion-form",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "6. The VP diffusion form",
+    "text": "6. The VP diffusion form\nAt a fixed time, consider\n\\[\\boxed{X_t=\\alpha_tX_0+\\sigma_t\\varepsilon,\\qquad\n\\varepsilon\\perp X_0,\\quad\\sigma_t&gt;0.}\\]\nIn the usual VP convention, \\(\\alpha_t^2+\\sigma_t^2=1\\), but the derivation needs only the linear Gaussian observation model. Set \\(Z=\\alpha_tX_0\\) and apply the additive formula to \\(X_t=Z+\\sigma_t\\varepsilon\\):\n\\[\\mathbb E[Z\\mid X_t=x]=x+\\sigma_t^2s_t(x),\\qquad\ns_t(x)=\\nabla_x\\log p_t(x).\\]\nBecause \\(\\alpha_t\\) is known at the fixed time,\n\\[\\boxed{\\alpha_t\\mathbb E[X_0\\mid X_t=x]\n=x+\\sigma_t^2s_t(x).}\\]\nWhen \\(\\alpha_t\\ne0\\) (usually \\(\\alpha_t&gt;0\\)), this gives\n\\[\\boxed{m_t(x)=\\mathbb E[X_0\\mid X_t=x]\n=\\frac{x+\\sigma_t^2s_t(x)}{\\alpha_t}.}\\]\nThe companion tutorials write this same posterior mean as \\(\\widehat X_0(x,t)=m_t(x)\\). The shorter \\(m_t\\) notation here emphasizes that it is a conditional mean, and is also used in the denoising lab.\nEquivalently,\n\\[\\boxed{s_t(x)=\\frac{\\alpha_t m_t(x)-x}{\\sigma_t^2}.}\\]\nThe score points from \\(x\\) toward \\(\\alpha_t m_t(x)\\), not generally toward \\(m_t(x)\\) itself. The distinction matters when the clean signal has been attenuated. At \\(\\alpha_t=0\\), the observation contains no information about \\(X_0\\), so its posterior mean is the prior mean. Dividing by \\(\\alpha_t\\) is then invalid. At \\(\\sigma_t=0\\), the smoothed-score formula cannot be used as written.",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#noise-prediction-is-another-expression-of-the-same-conditional-mean",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#noise-prediction-is-another-expression-of-the-same-conditional-mean",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "7. Noise prediction is another expression of the same conditional mean",
+    "text": "7. Noise prediction is another expression of the same conditional mean\nRearrange the corruption equation and take conditional expectations:\n\\[\n\\begin{aligned}\n\\varepsilon&=\\frac{X_t-\\alpha_tX_0}{\\sigma_t},\\\\\n\\mathbb E[\\varepsilon\\mid X_t=x]\n&=\\frac{x-\\alpha_t m_t(x)}{\\sigma_t}\n=-\\sigma_t s_t(x).\n\\end{aligned}\n\\]\nWrite \\(e_t(x)=\\mathbb E[\\varepsilon\\mid X_t=x]\\). This is \\(\\varepsilon^\\star(x,t)\\) in the companion tutorials; a fitted predictor \\(e_\\theta(x,t)\\) here corresponds to their \\(\\varepsilon_\\theta(x,t)\\). Then\n\\[\\boxed{\ns_t=-e_t/\\sigma_t,\\qquad\nm_t=(x-\\sigma_te_t)/\\alpha_t,\\qquad\ne_t=(x-\\alpha_tm_t)/\\sigma_t.\n}\\]\nThese are identities between optimal fitted functions, not claims that the particular random noise realization can be recovered. Under squared loss, a noise predictor estimates \\(e_t\\), a clean-data predictor estimates \\(m_t\\), and denoising score matching estimates \\(s_t\\).\nIndeed, the conditional-score target is \\(-\\varepsilon/\\sigma_t\\), and\n\\[\\mathbb E[-\\varepsilon/\\sigma_t\\mid X_t=x]=s_t(x).\\]\nThat is why regression against a known corruption target can recover the unknown marginal score.\nThe parameterizations encode the same information at the population optimum when \\(\\alpha_t,\\sigma_t\\ne0\\). Their training losses are not automatically equivalent under arbitrary time weighting. For example, with \\(s_\\theta=-e_\\theta/\\sigma_t\\),\n\\[\\lambda(t)\\|s_\\theta+\\varepsilon/\\sigma_t\\|^2\n=\\frac{\\lambda(t)}{\\sigma_t^2}\\|e_\\theta-\\varepsilon\\|^2.\\]\nWith \\(s_\\theta=(\\alpha_tD_\\theta-x_t)/\\sigma_t^2\\), the same score-target loss equals \\(\\lambda(t)\\alpha_t^2\\|D_\\theta-X_0\\|^2/\\sigma_t^4\\). Finite networks, optimization, and time weights can therefore make the practical training problems behave differently.",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#two-possible-clean-values-derive-the-tanh-denoiser",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#two-possible-clean-values-derive-the-tanh-denoiser",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "8. Two possible clean values: derive the tanh denoiser",
+    "text": "8. Two possible clean values: derive the tanh denoiser\nSuppose \\(X_0\\) takes values \\(-1\\) and \\(+1\\) with equal probabilities. Observe\n\\[X_t=\\alpha_tX_0+\\sigma_t\\varepsilon,\\qquad \\alpha_t&gt;0,\\ \\sigma_t&gt;0.\\]\nThe two likelihoods are Gaussians centered at \\(-\\alpha_t\\) and \\(+\\alpha_t\\). By Bayes’ rule, the posterior odds are\n\\[\\frac{P(X_0=+1\\mid x)}{P(X_0=-1\\mid x)}\n=\\exp\\left[\\frac{(x+\\alpha_t)^2-(x-\\alpha_t)^2}{2\\sigma_t^2}\\right]\n=\\exp\\left(\\frac{2\\alpha_t x}{\\sigma_t^2}\\right).\\]\nWriting \\(\\kappa=\\alpha_t x/\\sigma_t^2\\) gives\n\\[w_+(x)=\\frac{1}{1+e^{-2\\kappa}},\\qquad w_-(x)=1-w_+(x).\\]\nThe posterior mean is their signed difference:\n\\[\\boxed{m_t(x)=w_+(x)-w_-(x)=\\tanh\\left(\\frac{\\alpha_t x}{\\sigma_t^2}\\right).}\\]\nSubstitution into Tweedie yields\n\\[\\boxed{s_t(x)=\\frac{\n\\alpha_t\\tanh(\\alpha_t x/\\sigma_t^2)-x}{\\sigma_t^2}.}\\]\nThe tanh denoiser and the mixture score are two expressions of the same posterior calculation. An unequal prior would add half the log prior odds inside the tanh; the symmetric formula relies on the equal weights.\n\nPosterior mean, posterior mode, and posterior sample differ\nAt \\(x=0\\), the posterior gives probability \\(1/2\\) to each clean value. Consequently:\n\n\n\n\n\n\n\nDecision or draw\nResult at \\(x=0\\)\n\n\n\n\nPosterior mean, optimal under squared error\n\\(0\\)\n\n\nPosterior mode (MAP)\nA tie between \\(-1\\) and \\(+1\\)\n\n\nPosterior sample\nRandomly \\(-1\\) or \\(+1\\), each with probability \\(1/2\\)\n\n\n\nZero is not an allowed clean value, but it is the best squared-error estimate. Its conditional risk is \\(1\\). Always choosing either endpoint has risk \\(2\\). An independent draw from the posterior also has conditional risk \\(2\\) here. Plausibility as a clean sample and optimality as a point estimate are different criteria.\nFor a general observation in this two-point example,\n\\[\\operatorname{Var}(X_0\\mid x)=1-m_t(x)^2,\\]\nand an estimate \\(a\\) has conditional risk\n\\[\\boxed{R_x(a)=1-m_t(x)^2+(a-m_t(x))^2.}\\]\nLab 4. Move the observed value, signal scale, and noise level. Read the posterior weights, posterior mean, and the score displacement. Move the candidate estimate away from the mean and watch its squared-error risk increase. At \\(x=0\\), compare the posterior mean with both possible clean values.\n\n\nThe small-noise limit needs a qualification\nIf \\(\\alpha_t\\to1\\) and \\(\\sigma_t\\to0\\), then for each fixed \\(x\\ne0\\),\n\\[m_t(x)=\\tanh(\\alpha_t x/\\sigma_t^2)\\longrightarrow\\operatorname{sign}(x).\\]\nAt \\(x=0\\), the posterior mean remains zero by symmetry. This is a pointwise statement away from the decision boundary; it is not uniform near zero. At exactly zero noise the data law is atomic, with no ordinary density score on \\(\\mathbb R\\). The positive-noise score has a different limiting behavior from the posterior mean. For every fixed \\(x\\notin\\{-1,0,1\\}\\),\n\\[\\sigma_t^2s_t(x)\\longrightarrow\\operatorname{sign}(x)-x\\ne0,\\]\nso its magnitude diverges as the noise vanishes. At \\(x=0\\), the score remains exactly zero by symmetry. At the clean points \\(x=\\pm1\\), the behavior depends on how the signal scale approaches one: with additive corruption (\\(\\alpha_t\\equiv1\\)) the score tends to zero, whereas with VP corruption (\\(\\alpha_t=\\sqrt{1-\\sigma_t^2}\\)) it tends to \\(\\mp\\tfrac12\\). These are limits of smoothed-density scores, not scores of the atomic law itself.",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#a-useful-extension-correlated-gaussian-noise",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#a-useful-extension-correlated-gaussian-noise",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "9. A useful extension: correlated Gaussian noise",
+    "text": "9. A useful extension: correlated Gaussian noise\nIf \\(Y=X+\\eta\\), independently, with \\(\\eta\\sim\\mathcal N(0,\\Sigma)\\) for known positive-definite \\(\\Sigma\\), then\n\\[\\nabla_y p(y\\mid x)=\\Sigma^{-1}(x-y)p(y\\mid x).\\]\nRepeating the proof gives\n\\[\\boxed{\\mathbb E[X\\mid Y=y]=y+\\Sigma\\nabla_y\\log p_Y(y).}\\]\nFor non-isotropic noise, the covariance transforms the score into a denoising displacement; they need not point in the same Euclidean direction. The simple \\(\\sigma^2\\) multiplier is specific to isotropic Gaussian corruption.",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#how-this-fits-into-diffusion-sampling",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#how-this-fits-into-diffusion-sampling",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "10. How this fits into diffusion sampling",
+    "text": "10. How this fits into diffusion sampling\nAt each positive noise level, the model estimates a local field that encodes a posterior mean. A diffusion sampler uses that field together with its known drift, noise schedule, and current time to take the next step along a path of distributions. Returning a posterior mean once, or repeatedly applying a fixed-noise denoiser, is not generally equivalent to drawing a clean-data sample.\nThe vector-fields tutorial explains the reverse-SDE and probability-flow ODE updates. This note supplies their statistical bridge:\n\\[\n\\text{squared-error optimality}\n\\ \\longrightarrow\\ \\text{posterior mean}\n\\ \\overset{\\text{Gaussian corruption}}{\\longleftrightarrow}\\ \\text{score}.\n\\]",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#exercises-with-checks",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#exercises-with-checks",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "Exercises with checks",
+    "text": "Exercises with checks\n\nLet \\(X\\sim\\mathcal N(0,4)\\) and noise variance be \\(1\\). Find \\(s_Y(y)\\) and \\(m(y)\\). Check: \\(s_Y=-y/5\\), \\(m=4y/5\\).\nFor equal two-point data, take \\(\\alpha=1\\), \\(\\sigma=1\\), \\(y=0.5\\). Compute the posterior mean, score, and minimum conditional risk. Check: approximately \\(0.4621\\), \\(-0.0379\\), and \\(0.7864\\).\nIf \\(P(X_0=+1)=\\pi\\in(0,1)\\), derive the mean. Check: \\(\\tanh(\\alpha x/\\sigma^2+\\tfrac12\\log[\\pi/(1-\\pi)])\\).\nWhy is the sampled target \\(-\\varepsilon/\\sigma_t\\) usually different from the true score at that input? Check: the score is its conditional average over all compatible clean-signal and noise pairs.",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
+    "objectID": "tutorials/23-tweedie-bayes-denoising.html#references",
+    "href": "tutorials/23-tweedie-bayes-denoising.html#references",
+    "title": "Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser",
+    "section": "References",
+    "text": "References\n\nLai et al., The Principles of Diffusion Models, §3.3.4, Lemma 3.3.2 and Eq. (3.3.6), with the detailed proof in Appendix D.2.3; §3.3.5 connects denoising with Bayes optimality.\nSong et al., Score-Based Generative Modeling through Stochastic Differential Equations, for time-indexed score estimation and sampling.\nOne Estimator, Many Parameterizations develops the broader conditional-mean parameterization argument in this course.",
+    "crumbs": [
+      "Lecture Notes",
+      "Tweedie's Formula: The Score as a Bayes-Optimal Denoiser"
+    ]
+  },
+  {
     "objectID": "tutorials/13-inequalities.html",
     "href": "tutorials/13-inequalities.html",
     "title": "Inequalities Worth Knowing",

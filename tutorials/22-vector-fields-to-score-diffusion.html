@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>From Local Arrows to Score-Based Diffusion – ID-5-02 (TO)</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/24-sampling-with-scores.html" rel="next">
+<link href="../tutorials/19-generative-adversarial-networks.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-970586c648819a176f05aa782ae30df3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-4e42ae105fa35cf935172ecd058ec8f7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/22-vector-fields-to-score-diffusion.html">From Local Arrows to Score-Based Diffusion</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">ID-5-02 (TO)</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Syllabus</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../curriculum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Curriculum</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assignments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lecture Notes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">00 · Introduction and Motivation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/17-density-estimation-many-dimensions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Estimating a Density in Many Dimensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/19-generative-adversarial-networks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/22-vector-fields-to-score-diffusion.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">From Local Arrows to Score-Based Diffusion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/24-sampling-with-scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling with Scores: Worked Examples of the Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Decks</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Course Mechanics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-02-motivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Why Diffusion Models?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-03-toy-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-00-probability-joints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-01-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-02-genai-maps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w03-deck-01-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · The Multivariate Gaussian</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-01-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-02-gans.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inequalities Worth Knowing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/20-random-walk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Random Walk: Forward, and Backward</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Perspectives</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Deterministic Map, Proved</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/09-discrete-transport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-03-map-limit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deck · The Map, Proved</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Draft</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/21-one-estimator-many-parameterizations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">One Estimator, Many Parameterizations</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resources</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#notation-shared-with-the-probability-flow-ode" id="toc-notation-shared-with-the-probability-flow-ode" class="nav-link active" data-scroll-target="#notation-shared-with-the-probability-flow-ode">Notation shared with The Probability-Flow ODE</a></li>
+  <li><a href="#a-vector-field-attaches-a-velocity-to-each-position" id="toc-a-vector-field-attaches-a-velocity-to-each-position" class="nav-link" data-scroll-target="#a-vector-field-attaches-a-velocity-to-each-position">1. A vector field attaches a velocity to each position</a></li>
+  <li><a href="#an-ode-tells-a-particle-to-follow-the-field" id="toc-an-ode-tells-a-particle-to-follow-the-field" class="nav-link" data-scroll-target="#an-ode-tells-a-particle-to-follow-the-field">2. An ODE tells a particle to follow the field</a>
+  <ul class="collapse">
+  <li><a href="#constant-motion" id="toc-constant-motion" class="nav-link" data-scroll-target="#constant-motion">Constant motion</a></li>
+  <li><a href="#motion-toward-the-origin" id="toc-motion-toward-the-origin" class="nav-link" data-scroll-target="#motion-toward-the-origin">Motion toward the origin</a></li>
+  <li><a href="#motion-around-the-origin" id="toc-motion-around-the-origin" class="nav-link" data-scroll-target="#motion-around-the-origin">Motion around the origin</a></li>
+  </ul></li>
+  <li><a href="#the-flow-collects-all-the-trajectories-into-a-map" id="toc-the-flow-collects-all-the-trajectories-into-a-map" class="nav-link" data-scroll-target="#the-flow-collects-all-the-trajectories-into-a-map">3. The flow collects all the trajectories into a map</a></li>
+  <li><a href="#eulers-method-turns-arrows-into-a-computation" id="toc-eulers-method-turns-arrows-into-a-computation" class="nav-link" data-scroll-target="#eulers-method-turns-arrows-into-a-computation">4. Euler’s method turns arrows into a computation</a></li>
+  <li><a href="#move-a-cloud-and-you-move-a-distribution" id="toc-move-a-cloud-and-you-move-a-distribution" class="nav-link" data-scroll-target="#move-a-cloud-and-you-move-a-distribution">5. Move a cloud, and you move a distribution</a></li>
+  <li><a href="#why-a-score-is-a-natural-vector-field" id="toc-why-a-score-is-a-natural-vector-field" class="nav-link" data-scroll-target="#why-a-score-is-a-natural-vector-field">6. Why a score is a natural vector field</a>
+  <ul class="collapse">
+  <li><a href="#it-gives-one-component-for-each-direction-of-motion" id="toc-it-gives-one-component-for-each-direction-of-motion" class="nav-link" data-scroll-target="#it-gives-one-component-for-each-direction-of-motion">It gives one component for each direction of motion</a></li>
+  <li><a href="#it-measures-local-relative-changes-in-density" id="toc-it-measures-local-relative-changes-in-density" class="nav-link" data-scroll-target="#it-measures-local-relative-changes-in-density">It measures local relative changes in density</a></li>
+  <li><a href="#the-unknown-normalizing-constant-disappears" id="toc-the-unknown-normalizing-constant-disappears" class="nav-link" data-scroll-target="#the-unknown-normalizing-constant-disappears">The unknown normalizing constant disappears</a></li>
+  <li><a href="#it-is-precisely-what-converts-diffusion-into-probability-transport" id="toc-it-is-precisely-what-converts-diffusion-into-probability-transport" class="nav-link" data-scroll-target="#it-is-precisely-what-converts-diffusion-into-probability-transport">It is precisely what converts diffusion into probability transport</a></li>
+  <li><a href="#the-gaussian-example-connects-to-our-first-ode" id="toc-the-gaussian-example-connects-to-our-first-ode" class="nav-link" data-scroll-target="#the-gaussian-example-connects-to-our-first-ode">The Gaussian example connects to our first ODE</a></li>
+  </ul></li>
+  <li><a href="#following-the-score-uphill-is-not-yet-sampling" id="toc-following-the-score-uphill-is-not-yet-sampling" class="nav-link" data-scroll-target="#following-the-score-uphill-is-not-yet-sampling">7. Following the score uphill is not yet sampling</a></li>
+  <li><a href="#eulermaruyama-an-arrow-plus-a-random-kick" id="toc-eulermaruyama-an-arrow-plus-a-random-kick" class="nav-link" data-scroll-target="#eulermaruyama-an-arrow-plus-a-random-kick">8. Euler–Maruyama: an arrow plus a random kick</a></li>
+  <li><a href="#diffusion-supplies-a-whole-family-of-easier-densities" id="toc-diffusion-supplies-a-whole-family-of-easier-densities" class="nav-link" data-scroll-target="#diffusion-supplies-a-whole-family-of-easier-densities">9. Diffusion supplies a whole family of easier densities</a></li>
+  <li><a href="#reverse-the-diffusion-using-the-score" id="toc-reverse-the-diffusion-using-the-score" class="nav-link" data-scroll-target="#reverse-the-diffusion-using-the-score">10. Reverse the diffusion using the score</a></li>
+  <li><a href="#a-deterministic-flow-can-follow-the-same-density-path" id="toc-a-deterministic-flow-can-follow-the-same-density-path" class="nav-link" data-scroll-target="#a-deterministic-flow-can-follow-the-same-density-path">11. A deterministic flow can follow the same density path</a></li>
+  <li><a href="#a-complete-example-with-two-modes-and-no-learned-quantities" id="toc-a-complete-example-with-two-modes-and-no-learned-quantities" class="nav-link" data-scroll-target="#a-complete-example-with-two-modes-and-no-learned-quantities">12. A complete example with two modes and no learned quantities</a></li>
+  <li><a href="#how-a-neural-network-supplies-the-missing-field" id="toc-how-a-neural-network-supplies-the-missing-field" class="nav-link" data-scroll-target="#how-a-neural-network-supplies-the-missing-field">13. How a neural network supplies the missing field</a></li>
+  <li><a href="#what-has-actually-been-learned" id="toc-what-has-actually-been-learned" class="nav-link" data-scroll-target="#what-has-actually-been-learned">14. What has actually been learned?</a></li>
+  <li><a href="#questions-to-work-through" id="toc-questions-to-work-through" class="nav-link" data-scroll-target="#questions-to-work-through">Questions to work through</a></li>
+  <li><a href="#reading-and-next-steps" id="toc-reading-and-next-steps" class="nav-link" data-scroll-target="#reading-and-next-steps">Reading and next steps</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/22-vector-fields-to-score-diffusion.html">From Local Arrows to Score-Based Diffusion</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">From Local Arrows to Score-Based Diffusion</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>The geometric introduction: vector fields, ODEs, flows, scores, and sampling. You need derivatives, Gaussian distributions, and the idea of an expectation. No previous stochastic calculus is assumed.</em></p>
+<p><strong>How to use these three notes.</strong> Start with Sections 1–8 here for fields, flows, and the difference between ascent and sampling. Then read <a href="../tutorials/24-sampling-with-scores.html">Sampling with Scores</a> for the worked Gaussian samplers and probability flows. Use <a href="../tutorials/23-tweedie-bayes-denoising.html">Tweedie’s Formula</a> for the statistical proof behind score estimation. The remaining sections here provide a geometric overview and a two-mode example; they can also be read as a self-contained route.</p>
+<p>Imagine drawing an arrow at every possible image. The arrow has one component for every pixel value. It says how to change the image by a small amount. If we keep following the arrows, can a random image become a sample from a collection of real images?</p>
+<p>That question has two parts. First, how do local arrows produce motion and a global transformation? Second, which arrows move an entire <strong>distribution</strong> in the right way? ODEs answer the first question. Scores and diffusion answer the second. We will build both answers in one dimension, where we can see everything.</p>
+<p>The route is</p>
+<p><span class="math display">\[
+\text{vector field}\ \longrightarrow\ \text{ODE and flow}
+\ \longrightarrow\ \text{score}\ \longrightarrow\ \text{SDE sampler}
+\ \longrightarrow\ \text{probability-flow ODE}.
+\]</span></p>
+<p>Open the <a href="../materials/score-flow-lab.html">Score and Flow Lab</a> alongside this note. Its first three experiments follow that order; the fourth explores Tweedie denoising. All scores in the lab are known analytically; no neural network is needed to isolate the mathematics.</p>
+<section id="notation-shared-with-the-probability-flow-ode" class="level2">
+<h2 class="anchored" data-anchor-id="notation-shared-with-the-probability-flow-ode">Notation shared with The Probability-Flow ODE</h2>
+<p>This introduction uses the same symbols and backward-step convention as <a href="../tutorials/07-probability-flow-ode.html">The Probability-Flow ODE</a>. The new <a href="../tutorials/24-sampling-with-scores.html">Sampling with Scores</a> tutorial uses them too, with fully solved Gaussian examples and a sampler-first teaching sequence.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(X_t\)</span>, <span class="math inline">\(x\)</span></td>
+<td>Random state at noise level <span class="math inline">\(t\)</span>; a particular position</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(p_0=p_{\text{data}}\)</span>, <span class="math inline">\(p_t\)</span></td>
+<td>Clean-data law; forward-noised marginal density</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(f(x,t)\)</span>, <span class="math inline">\(g(t)\)</span>, <span class="math inline">\(W_t\)</span></td>
+<td>Forward drift, scalar diffusion coefficient, Brownian motion</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(s_t(x)\)</span>, <span class="math inline">\(s_\theta(x,t)\)</span></td>
+<td>Exact score <span class="math inline">\(\nabla_x\log p_t(x)\)</span>; its learned approximation</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(v(x,t)\)</span></td>
+<td>ODE velocity; for probability flow, <span class="math inline">\(f-\tfrac12g^2s_t\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\Psi_{s\to t}\)</span></td>
+<td>Flow taking a position at time <span class="math inline">\(s\)</span> to its position at time <span class="math inline">\(t\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\Phi\)</span></td>
+<td>Standard normal CDF, never a flow map</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\beta(t)\)</span>, <span class="math inline">\(\alpha_t\)</span>, <span class="math inline">\(\sigma_t\)</span></td>
+<td>VP noise schedule, signal scale, corruption-noise standard deviation</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\tau=T-t\)</span>, <span class="math inline">\(\bar W_\tau\)</span></td>
+<td>Increasing reverse clock and its Brownian motion</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(h_k=t_{k-1}-t_k&lt;0\)</span></td>
+<td>Backward step on <span class="math inline">\(T=t_N&gt;\cdots&gt;t_0=\epsilon\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\epsilon\)</span>, <span class="math inline">\(\varepsilon\)</span></td>
+<td>Small endpoint time; a standard Gaussian corruption draw</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\widehat X_0(x,t)\)</span></td>
+<td>Posterior-mean denoiser <span class="math inline">\(\mathbb E[X_0\mid X_t=x]\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Before diffusion is introduced, <span class="math inline">\(t\)</span> is simply elapsed ODE time. We use <span class="math inline">\(u\)</span> for the independent clock of fixed-target score ascent and Langevin dynamics. A positive Euler step in those elementary examples is denoted <span class="math inline">\(h\)</span>; backward diffusion steps are explicitly <span class="math inline">\(h_k&lt;0\)</span>. Gaussian draws are <span class="math inline">\(\varepsilon\)</span> in fixed-time corruption and <span class="math inline">\(z_k\)</span> in numerical SDE steps, as in the detailed note.</p>
+</section>
+<section id="a-vector-field-attaches-a-velocity-to-each-position" class="level2">
+<h2 class="anchored" data-anchor-id="a-vector-field-attaches-a-velocity-to-each-position">1. A vector field attaches a velocity to each position</h2>
+<p>On a line, a vector is a signed number: its sign gives direction and its magnitude gives speed. A <strong>vector field</strong> is a function <span class="math inline">\(v:\mathbb R\to\mathbb R\)</span> assigning one such vector to every position.</p>
+<p>For <span class="math inline">\(v(x)=-x\)</span>, the arrow at <span class="math inline">\(2\)</span> points left with speed <span class="math inline">\(2\)</span>, the arrow at <span class="math inline">\(-3\)</span> points right with speed <span class="math inline">\(3\)</span>, and the arrow at <span class="math inline">\(0\)</span> has zero length. The arrows are already there, whether or not a particle is present. A field is a rule on space; a trajectory is what happens to one particle following that rule.</p>
+<p>In <span class="math inline">\(d\)</span> dimensions, <span class="math inline">\(v:\mathbb R^d\to\mathbb R^d\)</span>. For example, <span class="math inline">\(v(x,y)=(-x,-y)\)</span> points toward the origin, whereas <span class="math inline">\(v(x,y)=(-y,x)\)</span> points around the origin. A field need not point toward a destination, and need not be the gradient of any scalar function. The rotation field will keep moving a particle around a circle.</p>
+<p>We will also need fields <span class="math inline">\(v(x,t)\)</span> whose arrows change with time, even at a fixed position. Think of wind that changes throughout the day.</p>
+</section>
+<section id="an-ode-tells-a-particle-to-follow-the-field" class="level2">
+<h2 class="anchored" data-anchor-id="an-ode-tells-a-particle-to-follow-the-field">2. An ODE tells a particle to follow the field</h2>
+<p>Place a particle at <span class="math inline">\(x(0)=x_0\)</span>. Its motion is specified by the initial-value problem</p>
+<p><span class="math display">\[
+\boxed{\frac{dx(t)}{dt}=v(x(t),t),\qquad x(0)=x_0.}
+\]</span></p>
+<p>The derivative is velocity. The right side evaluates the arrow <strong>at the particle’s current location and current time</strong>. Over a short interval <span class="math inline">\(h\)</span>,</p>
+<p><span class="math display">\[x(t+h)\approx x(t)+h\,v(x(t),t).\]</span></p>
+<p>Read the arrow, move a little, then read the new arrow. The particle does not need to know where it will eventually arrive.</p>
+<section id="constant-motion" class="level3">
+<h3 class="anchored" data-anchor-id="constant-motion">Constant motion</h3>
+<p>If <span class="math inline">\(v(x)=2\)</span>, then <span class="math inline">\(\dot x=2\)</span> and</p>
+<p><span class="math display">\[x(t)=x_0+2t.\]</span></p>
+<p>Every particle moves right at the same speed. The distance between any two particles stays constant.</p>
+</section>
+<section id="motion-toward-the-origin" class="level3">
+<h3 class="anchored" data-anchor-id="motion-toward-the-origin">Motion toward the origin</h3>
+<p>If <span class="math inline">\(v(x)=-x\)</span>, then <span class="math inline">\(\dot x=-x\)</span>. For a nonzero solution, separation gives</p>
+<p><span class="math display">\[\frac{dx}{x}=-dt,\qquad \log|x|=-t+C,\]</span></p>
+<p>so <span class="math inline">\(x(t)=x_0e^{-t}\)</span>. The solution <span class="math inline">\(x(t)\equiv0\)</span>, excluded when dividing by <span class="math inline">\(x\)</span>, also satisfies the equation. Thus for every starting point,</p>
+<p><span class="math display">\[\boxed{x(t)=x_0e^{-t}.}\]</span></p>
+<p>A particle starting at <span class="math inline">\(5\)</span> is at approximately <span class="math inline">\(1.84\)</span> after one time unit, <span class="math inline">\(0.68\)</span> after two, and <span class="math inline">\(0.25\)</span> after three. It approaches zero without reaching it at any finite time. A negative starting point approaches zero from the other side.</p>
+</section>
+<section id="motion-around-the-origin" class="level3">
+<h3 class="anchored" data-anchor-id="motion-around-the-origin">Motion around the origin</h3>
+<p>For <span class="math inline">\(\dot x=-y\)</span> and <span class="math inline">\(\dot y=x\)</span>,</p>
+<p><span class="math display">\[
+\begin{pmatrix}x(t)\\y(t)\end{pmatrix}
+=\begin{pmatrix}\cos t&amp;-\sin t\\\sin t&amp;\cos t\end{pmatrix}
+\begin{pmatrix}x_0\\y_0\end{pmatrix}.
+\]</span></p>
+<p>The radius stays constant. Local arrows can therefore create translation, contraction, rotation, or much more complicated motion.</p>
+</section>
+</section>
+<section id="the-flow-collects-all-the-trajectories-into-a-map" class="level2">
+<h2 class="anchored" data-anchor-id="the-flow-collects-all-the-trajectories-into-a-map">3. The flow collects all the trajectories into a map</h2>
+<p>For each starting point, solve the ODE. Holding the elapsed time fixed gives a map</p>
+<p><span class="math display">\[\boxed{\Psi_{0 \to t}(x_0)=x(t).}\]</span></p>
+<p>We use <span class="math inline">\(\Psi\)</span> for flow maps, reserving <span class="math inline">\(\Phi\)</span> for the Gaussian CDF used elsewhere in the course. For contraction, <span class="math inline">\(\Psi_{0 \to t}(x)=e^{-t}x\)</span>. At time zero the map is the identity; at time one it shrinks the line by <span class="math inline">\(e^{-1}\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/score-field-flow.svg" class="img-fluid figure-img" alt="Arrows of v(x)=-x point toward zero with length proportional to distance. The flow maps each x to x/e, contracting all distances while preserving order."></p>
+<figcaption>The vector field supplies local velocities; integrating it sends all starting points to their time-one positions.</figcaption>
+</figure>
+</div>
+<p>For an <strong>autonomous</strong> field <span class="math inline">\(v(x)\)</span>, unique solutions satisfy</p>
+<p><span class="math display">\[\Psi_{0 \to t+s}=\Psi_{0 \to t}\circ\Psi_{0 \to s},\]</span></p>
+<p>whenever the solutions exist for the times involved. Evolving for <span class="math inline">\(s\)</span> and then for <span class="math inline">\(t\)</span> is the same as evolving for <span class="math inline">\(s+t\)</span>.</p>
+<p>For a time-dependent field, the starting clock time matters. Write <span class="math inline">\(\Psi_{s \to t}(x)\)</span> for the position at time <span class="math inline">\(t\)</span> of a particle placed at <span class="math inline">\(x\)</span> at time <span class="math inline">\(s\)</span>. The correct composition law is</p>
+<p><span class="math display">\[\boxed{\Psi_{s \to t}=\Psi_{r \to t}\circ\Psi_{s \to r}.}\]</span></p>
+<p>Here <span class="math inline">\(r\)</span> is an intermediate clock time between <span class="math inline">\(s\)</span> and <span class="math inline">\(t\)</span>.</p>
+<p>For instance, <span class="math inline">\(\dot x=t\)</span> gives <span class="math inline">\(\Psi_{s \to t}(x)=x+(t^2-s^2)/2\)</span>. Restarting the clock at zero would give a different motion. Diffusion samplers use these time-dependent flows.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>When does a flow exist?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Continuity in time and local Lipschitz continuity in position give local existence and uniqueness. Global existence needs additional control, such as linear growth; <span class="math inline">\(\dot x=x^2\)</span> can blow up in finite time. Under suitable regularity, finite-time flow maps are invertible where both forward and backward solutions exist. Even the contraction <span class="math inline">\(e^{-t}x\)</span> is invertible at every finite <span class="math inline">\(t\)</span>; collapse to a point occurs only in the limit <span class="math inline">\(t\to\infty\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="eulers-method-turns-arrows-into-a-computation" class="level2">
+<h2 class="anchored" data-anchor-id="eulers-method-turns-arrows-into-a-computation">4. Euler’s method turns arrows into a computation</h2>
+<p>When an exact solution is unavailable, choose a step size <span class="math inline">\(h&gt;0\)</span> and use</p>
+<p><span class="math display">\[\boxed{x_{k+1}=x_k+h\,v(x_k,t_k),\qquad t_{k+1}=t_k+h.}\]</span></p>
+<p>This is <strong>explicit Euler</strong>: freeze the current arrow for one step. For <span class="math inline">\(v(x)=-x\)</span>, the update is <span class="math inline">\(x_{k+1}=(1-h)x_k\)</span>. Compare it with the exact multiplier <span class="math inline">\(e^{-h}\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Step size</th>
+<th>Euler’s behavior for <span class="math inline">\(\dot x=-x\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(0&lt;h&lt;1\)</span></td>
+<td>Approaches zero from the same side</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(h=1\)</span></td>
+<td>Jumps to zero in one step</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(1&lt;h&lt;2\)</span></td>
+<td>Alternates sides while shrinking</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(h=2\)</span></td>
+<td>Alternates sides without shrinking</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(h&gt;2\)</span></td>
+<td>Magnitude grows</td>
+</tr>
+</tbody>
+</table>
+<p>Overshooting here is a numerical artifact, not a property of the ODE. For the rotation field, Euler multiplies the radius by <span class="math inline">\(\sqrt{1+h^2}\)</span> each step and spirals outward, even though the exact solution stays on a circle.</p>
+<p><strong>Lab 1 — fields and flows.</strong> Choose contraction, translation, or rotation. Compare the exact path with Euler’s path. Increase the step size for contraction past <span class="math inline">\(1\)</span> and then past <span class="math inline">\(2\)</span>. Before looking, predict what changes.</p>
+</section>
+<section id="move-a-cloud-and-you-move-a-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="move-a-cloud-and-you-move-a-distribution">5. Move a cloud, and you move a distribution</h2>
+<p>Now choose the starting point randomly: <span class="math inline">\(X_0\sim p_0\)</span>. Applying the same flow to every particle gives <span class="math inline">\(X_t=\Psi_{0 \to t}(X_0)\)</span>. The randomness comes from the starting point; conditional on that point, an ODE trajectory is deterministic.</p>
+<p>For contraction, if <span class="math inline">\(X_0\sim\mathcal N(0,1)\)</span>, then</p>
+<p><span class="math display">\[X_t=e^{-t}X_0\sim\mathcal N(0,e^{-2t}).\]</span></p>
+<p>The whole distribution narrows. In one dimension, conservation of probability gives the change-of-variables relation</p>
+<p><span class="math display">\[p_t(\Psi_{0 \to t}(x))\,|\Psi_{0 \to t}'(x)|=p_0(x).\]</span></p>
+<p>Contraction makes intervals shorter, so their density must become taller to keep the same probability mass. A generative model must control this movement of <strong>mass</strong>, not merely make each individual particle look more probable.</p>
+<p>That observation is our bridge to scores.</p>
+</section>
+<section id="why-a-score-is-a-natural-vector-field" class="level2">
+<h2 class="anchored" data-anchor-id="why-a-score-is-a-natural-vector-field">6. Why a score is a natural vector field</h2>
+<p>Let <span class="math inline">\(p(x)&gt;0\)</span> be a differentiable density. Its <strong>data-space score</strong> is</p>
+<p><span class="math display">\[\boxed{s(x)=\nabla_x\log p(x)=\frac{\nabla_xp(x)}{p(x)}.}\]</span></p>
+<p>The derivative is with respect to the sample coordinates <span class="math inline">\(x\)</span>, holding any model parameters fixed. In statistics, “score” often means <span class="math inline">\(\nabla_\theta\log p_\theta(x)\)</span>, a parameter gradient. Here it means the gradient of the <strong>log density in data space</strong>. Calling it a log-likelihood gradient is only unambiguous after specifying this differentiation variable.</p>
+<p>Here are four reasons this is a useful field, followed by a Gaussian example.</p>
+<section id="it-gives-one-component-for-each-direction-of-motion" class="level3">
+<h3 class="anchored" data-anchor-id="it-gives-one-component-for-each-direction-of-motion">It gives one component for each direction of motion</h3>
+<p>In <span class="math inline">\(d\)</span> dimensions,</p>
+<p><span class="math display">\[s(x)=\left(\frac{\partial\log p}{\partial x_1},\ldots,
+\frac{\partial\log p}{\partial x_d}\right)\in\mathbb R^d.\]</span></p>
+<p>Its input and output dimensions match. This already makes it a vector field. Where it is sufficiently regular, it can serve as an ODE velocity.</p>
+</section>
+<section id="it-measures-local-relative-changes-in-density" class="level3">
+<h3 class="anchored" data-anchor-id="it-measures-local-relative-changes-in-density">It measures local relative changes in density</h3>
+<p>For a small displacement <span class="math inline">\(\delta\)</span>,</p>
+<p><span class="math display">\[\log\frac{p(x+\delta)}{p(x)}=s(x)^\top\delta+o(\|\delta\|).\]</span></p>
+<p>Among unit directions, the score direction maximizes the first-order increase in log density, when the score is nonzero. This is Euclidean geometry: “steepest” depends on the coordinates and metric. The score describes a local density change, not the probability of an individual point or the location of the nearest training example.</p>
+</section>
+<section id="the-unknown-normalizing-constant-disappears" class="level3">
+<h3 class="anchored" data-anchor-id="the-unknown-normalizing-constant-disappears">The unknown normalizing constant disappears</h3>
+<p>If <span class="math inline">\(p(x)=\widetilde p(x)/Z\)</span> with <span class="math inline">\(Z\)</span> independent of <span class="math inline">\(x\)</span>, then</p>
+<p><span class="math display">\[\nabla_x\log p(x)=\nabla_x\log\widetilde p(x).\]</span></p>
+<p>For an energy model <span class="math inline">\(p(x)\propto e^{-E(x)}\)</span>, the score is <span class="math inline">\(-\nabla E(x)\)</span>. This connects to <a href="../tutorials/18-metropolis-hastings.html">Sampling What You Cannot Normalise</a>. Unlike <span class="math inline">\(\nabla p\)</span>, the score is unchanged when the density is multiplied by an unknown positive constant.</p>
+</section>
+<section id="it-is-precisely-what-converts-diffusion-into-probability-transport" class="level3">
+<h3 class="anchored" data-anchor-id="it-is-precisely-what-converts-diffusion-into-probability-transport">It is precisely what converts diffusion into probability transport</h3>
+<p>The identity <span class="math inline">\(p\,s=\nabla p\)</span> will allow us to rewrite the diffusion term in a density evolution equation as a probability current. This is the mathematical reason the score appears in the sampler. Being an uphill direction alone would not determine the correct sampling dynamics.</p>
+</section>
+<section id="the-gaussian-example-connects-to-our-first-ode" class="level3">
+<h3 class="anchored" data-anchor-id="the-gaussian-example-connects-to-our-first-ode">The Gaussian example connects to our first ODE</h3>
+<p>For <span class="math inline">\(p=\mathcal N(\mu,\varrho^2)\)</span>,</p>
+<p><span class="math display">\[\log p(x)=C-\frac{(x-\mu)^2}{2\varrho^2},\qquad
+\boxed{s(x)=-\frac{x-\mu}{\varrho^2}.}\]</span></p>
+<p>For a standard Gaussian, <span class="math inline">\(s(x)=-x\)</span>: exactly our contraction field. In several dimensions, a Gaussian with positive-definite covariance <span class="math inline">\(\Sigma\)</span> has score <span class="math inline">\(-\Sigma^{-1}(x-\mu)\)</span>. Narrow directions have stronger restoring arrows.</p>
+</section>
+</section>
+<section id="following-the-score-uphill-is-not-yet-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="following-the-score-uphill-is-not-yet-sampling">7. Following the score uphill is not yet sampling</h2>
+<p>Consider the ODE <span class="math inline">\(dx/du=s(x)=-x\)</span> for the standard Gaussian. Even if the initial cloud already has the correct law <span class="math inline">\(\mathcal N(0,1)\)</span>, its variance becomes <span class="math inline">\(e^{-2u}\)</span> and eventually approaches zero. The particles concentrate at the mode. They do <strong>not</strong> keep sampling the Gaussian.</p>
+<p>More generally, along score ascent,</p>
+<p><span class="math display">\[\frac{d}{du}\log p(x(u))=\|s(x(u))\|^2\geq0.\]</span></p>
+<p>This is an optimization behavior. A distribution needs appropriate spread as well as high-density locations. In high dimensions, much of the probability mass can lie far from the density’s maximizer.</p>
+<p>To maintain the spread for a fixed target, add calibrated random motion:</p>
+<p><span class="math display">\[\boxed{dX_u=s(X_u)\,du+\sqrt2\,dW_u.}\]</span></p>
+<p>This is overdamped <strong>Langevin dynamics</strong>. The clock <span class="math inline">\(u\)</span> is sampling time for a fixed target, not a diffusion noise level. Under suitable conditions, <span class="math inline">\(p\)</span> is invariant and the dynamics converge to it from other starting distributions. Invariance alone does not guarantee fast mixing between separated modes.</p>
+<p>For the standard Gaussian, the variance <span class="math inline">\(V(u)\)</span> satisfies</p>
+<p><span class="math display">\[\frac{dV}{du}=-2V+2,\qquad
+V(u)=1+(V(0)-1)e^{-2u}.\]</span></p>
+<p>Contraction removes spread; the Brownian term restores it. Their balance selects variance one. With the noise omitted, only the first term remains.</p>
+</section>
+<section id="eulermaruyama-an-arrow-plus-a-random-kick" class="level2">
+<h2 class="anchored" data-anchor-id="eulermaruyama-an-arrow-plus-a-random-kick">8. Euler–Maruyama: an arrow plus a random kick</h2>
+<p>Brownian motion has independent increments with</p>
+<p><span class="math display">\[W_{t+h}-W_t\sim\mathcal N(0,hI).\]</span></p>
+<p>An SDE <span class="math inline">\(dX_t=f(X_t,t)dt+g(t)dW_t\)</span> can therefore be approximated by</p>
+<p><span class="math display">\[\boxed{X_{k+1}=X_k+h\,f(X_k,t_k)+g(t_k)\sqrt h\,z_k,
+\qquad z_k\overset{\mathrm{iid}}\sim\mathcal N(0,I).}\]</span></p>
+<p>This is <strong>Euler–Maruyama</strong>. The deterministic displacement scales as <span class="math inline">\(h\)</span>; the random displacement scales as <span class="math inline">\(\sqrt h\)</span>. Using <span class="math inline">\(hz_k\)</span> instead would give vanishing accumulated noise variance as the mesh is refined.</p>
+<p>For Langevin sampling, the update becomes</p>
+<p><span class="math display">\[X_{k+1}=X_k+h\,s(X_k)+\sqrt{2h}\,z_k.\]</span></p>
+<p>Even a perfect score does not eliminate discretization error. For the standard Gaussian and <span class="math inline">\(0&lt;h&lt;2\)</span>, this discrete chain has stationary variance</p>
+<p><span class="math display">\[V_h=(1-h)^2V_h+2h
+\quad\Longrightarrow\quad
+\boxed{V_h=\frac{1}{1-h/2}.}\]</span></p>
+<p>It is too large at a finite step size. As <span class="math inline">\(h\to0\)</span>, it approaches one.</p>
+<p><strong>Lab 2 — ascent versus sampling.</strong> Both clouds start from the same standard Gaussian particles. One follows score ascent; the other uses Euler–Maruyama for Langevin dynamics. Watch their histograms and variances. Increase <span class="math inline">\(h\)</span> and compare the Langevin cloud with the discrete stationary variance above.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why Langevin preserves the target
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The density <span class="math inline">\(q_u\)</span> of Langevin particles obeys <span class="math inline">\(\partial_u q=-\nabla\cdot(qs)+\Delta q\)</span>. At <span class="math inline">\(q=p\)</span>, the identity <span class="math inline">\(ps=\nabla p\)</span> makes the right side zero. Here <span class="math inline">\(\nabla\cdot\)</span> is divergence, or net outward flow, and <span class="math inline">\(\Delta\)</span> is the sum of second spatial derivatives. Suitable boundary or tail conditions ensure that probability does not leak away.</p>
+</div>
+</div>
+</section>
+<section id="diffusion-supplies-a-whole-family-of-easier-densities" class="level2">
+<h2 class="anchored" data-anchor-id="diffusion-supplies-a-whole-family-of-easier-densities">9. Diffusion supplies a whole family of easier densities</h2>
+<p>Directly learning and sampling a complicated data density is difficult. Instead, choose a <strong>forward noising process</strong></p>
+<p><span class="math display">\[\boxed{dX_t=f(X_t,t)\,dt+g(t)\,dW_t,\qquad X_0\sim p_{\rm data}.}\]</span></p>
+<p>We restrict attention to a scalar diffusion coefficient <span class="math inline">\(g(t)\)</span> shared by all coordinates and independent of position. Position-dependent diffusion requires additional terms in the formulas below.</p>
+<p>The process defines marginal densities <span class="math inline">\(p_t\)</span> and their scores</p>
+<p><span class="math display">\[s_t(x)=\nabla_x\log p_t(x).\]</span></p>
+<p>At each time, the score belongs to the density of <strong>all noisy data</strong>, not to the Gaussian corruption of a single training example. With Gaussian corruption and positive noise, even discrete data produce a smooth, positive density.</p>
+<p>An especially simple variance-preserving example is</p>
+<p><span class="math display">\[dX_t=-\tfrac12\beta(t)X_t\,dt+\sqrt{\beta(t)}\,dW_t,\]</span></p>
+<p>with <span class="math inline">\(f(x,t)=-\tfrac12\beta(t)x\)</span> and <span class="math inline">\(g(t)=\sqrt{\beta(t)}\)</span>. Its coefficients are</p>
+<p><span class="math display">\[\alpha_t=\exp\!\left(-\tfrac12\int_0^t\beta(s)\,ds\right),
+\qquad \sigma_t^2=1-\alpha_t^2.\]</span></p>
+<p>We now choose <span class="math inline">\(\beta(t)\equiv1\)</span> to keep the first calculations transparent:</p>
+<p><span class="math display">\[dX_t=-\tfrac12X_t\,dt+dW_t.\]</span></p>
+<p>At a fixed time its conditional law can be sampled as</p>
+<p><span class="math display">\[X_t\overset d=\alpha_tX_0+\sigma_t\varepsilon,
+\qquad \alpha_t=e^{-t/2},\quad \sigma_t^2=1-e^{-t},
+\quad\varepsilon\sim\mathcal N(0,I),\quad\varepsilon\perp X_0.\]</span></p>
+<p>The signal fades as noise grows. As <span class="math inline">\(t\to\infty\)</span>, the law approaches <span class="math inline">\(\mathcal N(0,I)\)</span>. At a finite terminal time <span class="math inline">\(T\)</span>, replacing <span class="math inline">\(p_T\)</span> by that Gaussian is an approximation. The fixed-time identity above does not describe an entire Brownian trajectory using a single fixed <span class="math inline">\(\varepsilon\)</span>.</p>
+</section>
+<section id="reverse-the-diffusion-using-the-score" class="level2">
+<h2 class="anchored" data-anchor-id="reverse-the-diffusion-using-the-score">10. Reverse the diffusion using the score</h2>
+<p>We have a path <span class="math inline">\(p_0\to p_t\to p_T\)</span>. Generation starts at the noisy end and follows the path back. Use the increasing <strong>reverse clock</strong> <span class="math inline">\(\tau=T-t\)</span>, exactly as in <a href="../tutorials/07-probability-flow-ode.html">The Probability-Flow ODE</a>. In reverse-clock formulas, <span class="math inline">\(X\)</span> denotes the current sampler state and <span class="math inline">\(t=T-\tau\)</span> its noise level.</p>
+<p>The time-reversal theorem, under appropriate smoothness and nondegeneracy conditions, gives</p>
+<p><span class="math display">\[\boxed{
+dX=\left[-f(X,t)+g(t)^2s_t(X)\right]d\tau
++g(t)\,d\bar W_\tau,\qquad t=T-\tau.
+}\]</span></p>
+<p>Here <span class="math inline">\(\bar W_\tau\)</span> is Brownian motion in the increasing reverse clock. The reverse drift contains both the reversed forward drift and a score correction. The random kicks remain. This theorem and its use in score-based generation are presented in <a href="https://arxiv.org/html/2011.13456v2#S3">Song et al., §§3–4</a>.</p>
+<p>Why should the score enter? A noisy point can have many possible predecessors. Bayes’ rule favors predecessor regions with more prior probability mass. For a small step, the local log-density gradient supplies the leading correction to simply reversing the drift. The full theorem makes that heuristic precise.</p>
+<p>For computation, use the detailed note’s descending grid</p>
+<p><span class="math display">\[T=t_N&gt;t_{N-1}&gt;\cdots&gt;t_0=\epsilon,\qquad
+h_k=t_{k-1}-t_k&lt;0.\]</span></p>
+<p>The index now counts down, <span class="math inline">\(k=N,N-1,\ldots,1\)</span>, as the noise level decreases. The positive reverse-clock increment is <span class="math inline">\(|h_k|\)</span>. Euler–Maruyama gives</p>
+<p><span class="math display">\[\boxed{
+X\leftarrow X+h_k\left[f(X,t_k)-g(t_k)^2s_{t_k}(X)\right]
++g(t_k)\sqrt{|h_k|}\,z_k,
+\qquad z_k\overset{\mathrm{iid}}\sim\mathcal N(0,I).
+}\]</span></p>
+<p>Evaluate everything at the current state and time, then move to <span class="math inline">\(t_{k-1}\)</span>. The noise variance uses <span class="math inline">\(|h_k|\)</span>, never a negative time increment. The lab displays this positive step magnitude as <span class="math inline">\(h=|h_k|\)</span>; it is the same update in that display convention. With smooth data we may take <span class="math inline">\(\epsilon=0\)</span>; for singular data we usually stop at positive <span class="math inline">\(\epsilon\)</span>.</p>
+<p>Fixed-target Langevin dynamics and reverse diffusion both use scores, but solve different problems. Langevin seeks equilibrium at one fixed density. Reverse diffusion tracks a prescribed, changing density <span class="math inline">\(p_t\)</span> with a drift and noise scale determined by the forward process.</p>
+</section>
+<section id="a-deterministic-flow-can-follow-the-same-density-path" class="level2">
+<h2 class="anchored" data-anchor-id="a-deterministic-flow-can-follow-the-same-density-path">11. A deterministic flow can follow the same density path</h2>
+<p>The surprising next step is that we can transport the same marginals without injecting fresh noise along each trajectory. The coefficient of the score must change when we do this.</p>
+<p>The forward SDE density satisfies the <strong>Fokker–Planck equation</strong></p>
+<p><span class="math display">\[\partial_t p_t=-\nabla\cdot(f p_t)+\tfrac12g(t)^2\Delta p_t.\]</span></p>
+<p>Read this as conservation of probability. Drift carries mass; diffusion spreads it. Since <span class="math inline">\(\Delta p_t=\nabla\cdot(p_t s_t)\)</span>, we can collect the two terms:</p>
+<p><span class="math display">\[
+\partial_t p_t
+=-\nabla\cdot\left[p_t\left(f-\tfrac12g(t)^2s_t\right)\right].
+\]</span></p>
+<p>But the density of particles following an ODE <span class="math inline">\(\dot x=v(x,t)\)</span> satisfies the <strong>continuity equation</strong> <span class="math inline">\(\partial_t p=-\nabla\cdot(pv)\)</span>. Therefore choose</p>
+<p><span class="math display">\[\boxed{v(x,t)=f(x,t)-\tfrac12g(t)^2s_t(x).}\]</span></p>
+<p>This gives the <strong>probability-flow ODE</strong></p>
+<p><span class="math display">\[\boxed{\frac{dX_t}{dt}=f(X_t,t)-\tfrac12g(t)^2s_t(X_t).}\]</span></p>
+<p>Given the exact score, matching initial law, and conditions ensuring well-posed dynamics, it has the same one-time marginals <span class="math inline">\(p_t\)</span> as the forward SDE. In more than one dimension, other velocity fields can transport the same density path; this construction supplies a particular one.</p>
+<p>For generation, integrate from <span class="math inline">\(T\)</span> downward. In the increasing reverse clock,</p>
+<p><span class="math display">\[\frac{dX}{d\tau}=-f(X,t)+\tfrac12g(t)^2s_t(X),\qquad t=T-\tau.\]</span></p>
+<p>On the same descending grid, the <strong>Euler sampler</strong> is</p>
+<p><span class="math display">\[\boxed{X\leftarrow X+h_k\,v(X,t_k)
+=X+h_k\left[f(X,t_k)-\tfrac12g(t_k)^2s_{t_k}(X)\right].}\]</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Sampler, with <span class="math inline">\(h_k&lt;0\)</span></th>
+<th>Deterministic increment</th>
+<th>Fresh noise</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reverse SDE</td>
+<td><span class="math inline">\(h_k(f-g^2s_t)\)</span></td>
+<td><span class="math inline">\(g\sqrt{|h_k|}\,z_k\)</span></td>
+</tr>
+<tr class="even">
+<td>Probability-flow ODE</td>
+<td><span class="math inline">\(h_k(f-\tfrac12g^2s_t)\)</span></td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Removing noise from the reverse SDE without halving its score term does not give the probability-flow ODE.</strong> The reverse SDE needs a stronger concentration drift because its Brownian term is still spreading particles.</p>
+<p>There is a useful sanity check. If the forward process <span class="math inline">\(dX=-X\,dt/2+dW\)</span> already has <span class="math inline">\(p_t=\mathcal N(0,1)\)</span>, then <span class="math inline">\(s_t=-x\)</span> and the probability-flow velocity is <span class="math inline">\(-x/2-(-x)/2=0\)</span>. Every probability-flow ODE particle stays put, whereas the score-ascent ODE of Section 7 contracts toward zero. The SDE particles keep moving, yet the cloud has the same Gaussian law. <strong>Same marginals do not mean same paths or the same joint distribution across times.</strong></p>
+</section>
+<section id="a-complete-example-with-two-modes-and-no-learned-quantities" class="level2">
+<h2 class="anchored" data-anchor-id="a-complete-example-with-two-modes-and-no-learned-quantities">12. A complete example with two modes and no learned quantities</h2>
+<p>Use a smooth data distribution so that the score remains finite even at <span class="math inline">\(t=0\)</span>:</p>
+<p><span class="math display">\[p_0=\tfrac12\mathcal N(-m,a^2)+\tfrac12\mathcal N(m,a^2),
+\qquad m=2,\quad a=0.35.\]</span></p>
+<p>Under <span class="math inline">\(dX_t=-X_t\,dt/2+dW_t\)</span>, each component stays Gaussian. Set</p>
+<p><span class="math display">\[b_t=e^{-t/2}m,\qquad q_t=e^{-t}a^2+1-e^{-t}.\]</span></p>
+<p>Then</p>
+<p><span class="math display">\[p_t(x)=\tfrac12\mathcal N(x;-b_t,q_t)+\tfrac12\mathcal N(x;b_t,q_t).\]</span></p>
+<p>To compute its score, let <span class="math inline">\(w_+(x,t)\)</span> be the posterior probability of the positive component. Differentiating the mixture gives a <strong>posterior-weighted</strong> average of component scores:</p>
+<p><span class="math display">\[s_t(x)=w_+(x,t)\frac{b_t-x}{q_t}
++(1-w_+(x,t))\frac{-b_t-x}{q_t}.\]</span></p>
+<p>The log odds of the positive component are <span class="math inline">\(2b_tx/q_t\)</span>, so <span class="math inline">\(2w_+-1=\tanh(b_tx/q_t)\)</span>. Hence</p>
+<p><span class="math display">\[\boxed{s_t(x)=\frac{b_t\tanh(b_tx/q_t)-x}{q_t}.}\]</span></p>
+<p>At high noise, this field is nearly <span class="math inline">\(-x\)</span>. At low noise, it points toward the two high-density regions. The midpoint has score zero by symmetry even when it lies in a density valley. Zero score does not necessarily mean a mode.</p>
+<p>For this example, the generation updates simplify to</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{SDE:}\quad X&amp;\leftarrow X+|h_k|\left(\tfrac12X+s_{t_k}(X)\right)+\sqrt{|h_k|}\,z_k,\\
+\text{ODE:}\quad X&amp;\leftarrow X+|h_k|\left(\tfrac12X+\tfrac12s_{t_k}(X)\right).
+\end{aligned}
+\]</span></p>
+<p><strong>Lab 3 — two routes through the same distributions.</strong> Both samplers start from the same particles at <span class="math inline">\(T=8\)</span>. The default initialization samples the exact mixture <span class="math inline">\(p_T\)</span>, separating discretization error from initialization error. A second option starts from <span class="math inline">\(\mathcal N(0,1)\)</span>, as in a practical model. Scrub the generation clock to see paths, histograms, the analytic <span class="math inline">\(p_t\)</span>, and the current score arrows.</p>
+<p>Predict what you will see before changing the controls:</p>
+<ol type="1">
+<li>ODE paths are smooth; SDE paths remain irregular.</li>
+<li>Both histograms approach the two-mode target as the step size is refined.</li>
+<li>A particle’s SDE and ODE endpoints need not match, even from the same start.</li>
+<li>At a finite step size and finite particle count, neither histogram exactly equals the analytic curve.</li>
+</ol>
+<p>In one dimension, unique exact ODE solutions preserve particle order. The mass splits into two regions without crossing trajectories. A particle starting exactly at zero stays there by symmetry, but a continuous initial distribution assigns that single point probability zero.</p>
+<p>The <a href="../materials/score-flow-core.js">lab’s numerical core</a> exposes the exact mixture density and score, and the three simulation routines, without external libraries. A small standalone Python sampler is available in <a href="../materials/score-diffusion-example.py">the companion script</a>.</p>
+</section>
+<section id="how-a-neural-network-supplies-the-missing-field" class="level2">
+<h2 class="anchored" data-anchor-id="how-a-neural-network-supplies-the-missing-field">13. How a neural network supplies the missing field</h2>
+<p>Real data do not come with the analytic mixture score. They do come with samples <span class="math inline">\(x_0\)</span>. Draw <span class="math inline">\(x_0\)</span> and a standard Gaussian <span class="math inline">\(\varepsilon\)</span> independently. Gaussian corruption then creates training pairs without knowing <span class="math inline">\(p_t\)</span>:</p>
+<p><span class="math display">\[x_t=\alpha_t x_0+\sigma_t\varepsilon,\qquad
+\varepsilon\sim\mathcal N(0,I).\]</span></p>
+<p>The score of the <strong>conditional corruption density</strong> is known:</p>
+<p><span class="math display">\[\nabla_{x_t}\log p_t(x_t\mid x_0)
+=-\frac{x_t-\alpha_t x_0}{\sigma_t^2}
+=-\frac{\varepsilon}{\sigma_t}.\]</span></p>
+<p>Train a network using denoising score matching:</p>
+<p><span class="math display">\[\mathcal L(\theta)=\mathbb E\left[
+\lambda(t)\left\|s_\theta(x_t,t)+\frac{\varepsilon}{\sigma_t}\right\|^2
+\right],\qquad \lambda(t)&gt;0.\]</span></p>
+<p>Use positive noise levels and weights or a lower cutoff that keep the objective finite. Why does a conditional target learn a marginal score? Squared-error regression fits its target’s conditional mean. At the population optimum,</p>
+<p><span class="math display">\[
+\begin{aligned}
+s^\star(x,t)
+&amp;=\mathbb E[\nabla_x\log p_t(x\mid X_0)\mid X_t=x]\\
+&amp;=\frac{\int\nabla_xp_t(x\mid x_0)\,p_0(dx_0)}{p_t(x)}
+=\nabla_x\log p_t(x),
+\end{aligned}
+\]</span></p>
+<p>where differentiation under the integral is justified by suitable regularity. The sampled target varies across examples; the learned field averages the targets compatible with the observed noisy input.</p>
+<p>There is also a direct denoising interpretation:</p>
+<p><span class="math display">\[\widehat X_0(x,t):=\mathbb E[X_0\mid X_t=x],\qquad
+\boxed{\sigma_t^2s_t(x)=\alpha_t\widehat X_0(x,t)-x.}\]</span></p>
+<p>The scaled score points from the noisy observation toward the posterior mean of the attenuated clean signal. It does not identify the particular clean example that produced the observation. The standalone <a href="../tutorials/23-tweedie-bayes-denoising.html">Tweedie tutorial</a> proves this identity and its Bayes optimality under squared error. See <a href="../tutorials/21-one-estimator-many-parameterizations.html">One Estimator, Many Parameterizations</a> for the relation to noise prediction.</p>
+<p>After training, replace <span class="math inline">\(s_t\)</span> by <span class="math inline">\(s_\theta\)</span> in either sampler. The network learns the score; the known drift and scaling construct the velocity or reverse drift. A generic network is not guaranteed to be an exact gradient field, and imperfect scores need not make the SDE and ODE share the same marginals. Their equivalence is an exact-score statement.</p>
+</section>
+<section id="what-has-actually-been-learned" class="level2">
+<h2 class="anchored" data-anchor-id="what-has-actually-been-learned">14. What has actually been learned?</h2>
+<p>The hierarchy is now concrete. A field assigns local arrows. An ODE integrates those arrows into trajectories. A flow collects the trajectories into a global map. A score describes local relative density change. Diffusion supplies the time-indexed densities whose scores determine a stochastic reverse sampler and a deterministic probability flow.</p>
+<p>In standard score-based training, the network does not directly learn an endpoint transport map. It estimates local information from which a numerical solver constructs that map, or a stochastic sampling process.</p>
+<p>One terminological refinement: the ODE’s <em>infinitesimal generator</em> is the operator <span class="math inline">\(\mathcal L_t\varphi=v(\cdot,t)\cdot\nabla\varphi\)</span> acting on test functions. For the forward SDE, it is <span class="math inline">\(\mathcal L_t\varphi=f\cdot\nabla\varphi+\tfrac12g^2\Delta\varphi\)</span>. Calling the network itself “the generator” is informal; <strong>learning local score information that determines the dynamics</strong> is the precise statement.</p>
+<p>For an exact sampling claim we need an exact terminal law, exact scores, and exact integration under appropriate regularity. Practical models approximate all three. Stopping at a small positive time adds an endpoint approximation when the data score is singular at zero. Our smooth-mixture lab avoids that last issue so that the numerical effects remain easy to see.</p>
+</section>
+<section id="questions-to-work-through" class="level2">
+<h2 class="anchored" data-anchor-id="questions-to-work-through">Questions to work through</h2>
+<ol type="1">
+<li>For <span class="math inline">\(v(x)=-3x\)</span>, derive the exact flow and the range of stable Euler step sizes.</li>
+<li>For <span class="math inline">\(p=\mathcal N(\mu,\varrho^2)\)</span>, derive the score and show that <span class="math inline">\(dX=s(X)du+\sqrt2dW\)</span> has stationary variance <span class="math inline">\(\varrho^2\)</span>.</li>
+<li>Explain why scaling an unnormalized density does not change its score, but multiplying the score by two generally changes a Langevin sampler’s target.</li>
+<li>For pure Brownian noising <span class="math inline">\(dX=dW\)</span>, write both generation updates. Where does the factor of one-half appear?</li>
+<li>In the stationary Gaussian example, remove the random term from the reverse SDE without changing its drift. What happens to the cloud’s variance?</li>
+</ol>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Checks for your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><span class="math inline">\(\Psi_{0 \to t}(x)=e^{-3t}x\)</span>; Euler is asymptotically stable for <span class="math inline">\(0&lt;h&lt;2/3\)</span>.</li>
+<li><span class="math inline">\(s(x)=-(x-\mu)/\varrho^2\)</span>; <span class="math inline">\(V'=-2V/\varrho^2+2\)</span>, so <span class="math inline">\(V=\varrho^2\)</span> at equilibrium.</li>
+<li>A constant vanishes on differentiating its logarithm. With unchanged noise, using <span class="math inline">\(2s\)</span> instead of <span class="math inline">\(s\)</span> gives invariant density proportional to <span class="math inline">\(p^2\)</span>, when this is normalizable and the usual conditions hold.</li>
+<li>On the descending grid, SDE: <span class="math inline">\(X\leftarrow X-h_k s_{t_k}(X)+\sqrt{|h_k|}z_k\)</span>; ODE: <span class="math inline">\(X\leftarrow X-\tfrac12h_k s_{t_k}(X)\)</span>, with <span class="math inline">\(h_k&lt;0\)</span>.</li>
+<li>The reverse drift is <span class="math inline">\(-x/2\)</span>. Without noise, <span class="math inline">\(V(\tau)=e^{-\tau}V(0)\)</span>; the correct probability-flow ODE has zero velocity and preserves the variance.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="reading-and-next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="reading-and-next-steps">Reading and next steps</h2>
+<ul>
+<li>Lai, Song, Kim, Mitsufuji, and Ermon, <a href="https://arxiv.org/abs/2510.21890"><em>The Principles of Diffusion Models</em></a>. In the current text, Chapter 3 develops the score-based perspective, and Chapter 4 develops the score-SDE framework. Read §§3.2–3.3 for scores and denoising, then §§4.1–4.3 for reverse dynamics, matching marginals, and sampling.</li>
+<li>Song et al., <a href="https://arxiv.org/abs/2011.13456"><em>Score-Based Generative Modeling through Stochastic Differential Equations</em></a>, especially §§3.2, 4.1, 4.3 and Appendix D: reverse SDEs, numerical sampling, and probability flow.</li>
+<li>The course’s <a href="../tutorials/07-probability-flow-ode.html">Probability-Flow ODE</a> draft gives a more detailed treatment after this introduction.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/acads-iit-jammu\.github\.io\/diffusion-models-f26");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../tutorials/19-generative-adversarial-networks.html" class="pagination-link" aria-label="09 · Generative Adversarial Networks">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">09 · Generative Adversarial Networks</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../tutorials/24-sampling-with-scores.html" class="pagination-link" aria-label="Sampling with Scores: Worked Examples of the Probability-Flow ODE">
+        <span class="nav-page-text">Sampling with Scores: Worked Examples of the Probability-Flow ODE</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Score and Flow Lab</title>
+<style>
+  :root {color-scheme:light dark; --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --secondary:#52514e; --grid:#deded7; --blue:#2a78d6; --orange:#c95020; --green:#29804b;}
+  @media(prefers-color-scheme:dark){:root {--page:#111110; --surface:#1a1a19; --ink:#f5f5f0; --secondary:#c3c2b7; --grid:#44443e; --blue:#6cafff; --orange:#ff9970; --green:#7dd89a;}}
+  *{box-sizing:border-box} body{margin:0;background:var(--page);color:var(--ink);font:16px/1.6 system-ui,sans-serif}
+  main{max-width:1120px;margin:auto;padding:32px 24px 70px} h1{font-size:clamp(28px,5vw,46px);line-height:1.15;letter-spacing:-.03em;margin:10px 0 16px} h2{font-size:26px;line-height:1.3;margin:0 0 12px} h3{font-size:17px;margin:8px 0} p{max-width:78ch} a{color:var(--blue)} nav{display:flex;gap:18px;flex-wrap:wrap;margin:24px 0} .kicker{text-transform:uppercase;letter-spacing:.1em;font-size:12px;color:var(--secondary)} section{padding:32px 0;border-top:1px solid var(--grid);scroll-margin-top:20px}
+  .controls{display:flex;flex-wrap:wrap;align-items:end;gap:16px;margin:22px 0} label{display:flex;flex-direction:column;gap:5px;font-size:14px;min-width:140px;flex:1;max-width:260px} select,button,input{font:inherit;accent-color:var(--blue)} select,button{padding:8px 12px;border:1px solid var(--grid);border-radius:5px;background:var(--surface);color:var(--ink);min-height:42px} button{cursor:pointer} input[type=range]{width:100%;min-height:28px} button:hover{border-color:var(--blue)} :focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+  .plots{display:grid;grid-template-columns:1fr 1fr;gap:22px} .wide{grid-column:1/-1} figure{margin:0;min-width:0} canvas{display:block;width:100%;height:270px} figcaption,.subtle{font-size:14px;color:var(--secondary)} .equation{font-family:ui-monospace,monospace;font-size:15px;overflow-wrap:anywhere;padding:12px 0} .readout{padding:10px 0;min-height:36px;font-variant-numeric:tabular-nums} .legend{display:flex;flex-wrap:wrap;gap:18px;font-size:14px;margin:10px 0}.dot{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px;background:var(--blue)} .orange{background:var(--orange)} .green{background:var(--green)} .dash{background:transparent;border-top:2px dashed var(--ink)} .posterior{display:grid;grid-template-columns:1fr 1fr;gap:20px}.bar{height:16px;background:var(--grid);margin:6px 0}.bar span{height:100%;display:block;background:var(--blue)} .risk{font-size:17px}.note{border-left:3px solid var(--grid);padding-left:16px} footer{margin-top:30px;color:var(--secondary);font-size:14px}
+  @media(max-width:650px){main{padding:24px 16px 50px}.plots{grid-template-columns:1fr}h2{font-size:23px}.controls{gap:12px}label{min-width:125px;max-width:none}canvas{height:250px}}
+</style>
+</head>
+<body><main>
+<div class="kicker">ID-5-02 · Mathematical Foundations of Diffusion Models</div>
+<h1>From local arrows to samples</h1>
+<p>Four experiments with exact fields and scores. Follow a particle, follow a cloud, then connect a score to a posterior mean. Everything runs locally in your browser.</p>
+<nav aria-label="Experiments"><a href="#fields">1 · Fields and flows</a><a href="#langevin">2 · Why noise matters</a><a href="#reverse">3 · Reverse diffusion</a><a href="#tweedie">4 · Tweedie's denoiser</a></nav>
+<p class="subtle"><a href="../tutorials/22-vector-fields-to-score-diffusion.html">Read the vector-fields tutorial</a> · <a href="../tutorials/24-sampling-with-scores.html">Read the sampling tutorial</a> · <a href="../tutorials/23-tweedie-bayes-denoising.html">Read the standalone Tweedie derivation</a></p>
+
+<section id="fields"><h2>1. A field gives arrows. A flow gives destinations.</h2>
+<p>The particle begins at (3, 0). Solid blue is the exact motion; orange dots are Euler steps. For contraction, try a step larger than 1, then larger than 2. For rotation, watch Euler's radius grow.</p>
+<div class="controls">
+<label>Vector field<select id="field"><option value="contraction">Contraction: v = (−x, −y)</option><option value="constant">Translation: v = (2, 0)</option><option value="rotation">Rotation: v = (−y, x)</option></select></label>
+<label>Euler step h<select id="ode-h"><option>0.05</option><option selected>0.2</option><option>0.8</option><option>1.2</option><option>2.2</option></select></label>
+<label>Elapsed time <output id="ode-time"></output><input id="ode-progress" type="range" min="0" max="100" value="65" aria-label="ODE elapsed time"></label>
+</div>
+<div class="legend"><span><i class="dot"></i>Exact flow</span><span><i class="dot orange"></i>Euler, with step markers</span></div>
+<div class="plots"><figure><canvas id="field-canvas" role="img" aria-label="Two-dimensional vector field and particle paths"></canvas><figcaption>Spatial arrows have a common scale; the largest sets the display length.</figcaption></figure><figure><canvas id="ode-canvas" role="img" aria-label="Exact and Euler x coordinate against elapsed time"></canvas><figcaption>A short final step lands exactly at time 6.</figcaption></figure></div>
+<div id="ode-readout" class="readout" aria-live="polite"></div>
+</section>
+
+<section id="langevin"><h2>2. Score ascent concentrates. Langevin sampling preserves spread.</h2>
+<p>Both clouds begin with the same 1,200 standard Gaussian draws. The target score is s(x) = −x. The left cloud follows the exact ascent ODE. The right cloud uses Euler–Maruyama with fresh noise.</p>
+<div class="equation">Ascent: dx/du = −x &nbsp; · &nbsp; Langevin: x ← (1 − h)x + √(2h)z</div>
+<div class="controls"><label>Step h<select id="langevin-h"><option>0.01</option><option selected>0.05</option><option>0.2</option><option>0.8</option><option>1.5</option></select></label><label>Sampling time <output id="langevin-time"></output><input id="langevin-progress" type="range" min="0" max="100" value="65" aria-label="Langevin sampling time"></label><button id="langevin-resample" type="button">New random draws</button></div>
+<div class="legend"><span><i class="dot"></i>Ascent histogram</span><span><i class="dot orange"></i>Langevin histogram</span><span><i class="dot dash"></i>Target N(0,1)</span></div>
+<div class="plots"><figure><h3>Exact score-ascent ODE</h3><canvas id="ascent-canvas" role="img" aria-label="Score-ascent particle density versus target Gaussian"></canvas></figure><figure><h3>Langevin Euler–Maruyama</h3><canvas id="langevin-canvas" role="img" aria-label="Langevin particle density versus target Gaussian"></canvas></figure></div>
+<div id="langevin-readout" class="readout" aria-live="polite"></div><p class="subtle">Both histograms share axes. A narrow spike has a high density; the target curve can look small beside it. Finite-step stationary variance is 1/(1 − h/2); this is a limiting value, not necessarily reached by time 6.</p>
+</section>
+
+<section id="reverse"><h2>3. One score, two samplers, the same target density path.</h2>
+<p>Data are an equal mixture of N(−2, 0.35²) and N(2, 0.35²). Forward noising follows dX = −X dt/2 + dW. Generation starts at T = 8 and moves toward t = 0, with reverse clock τ = T − t. The exact score is evaluated at the current forward time. The displayed positive step h is |hₖ| in the tutorials’ backward-step notation.</p>
+<div class="equation">SDE: x ← x + h(x/2 + sₜ(x)) + √h z<br>ODE: x ← x + h(x/2 + sₜ(x)/2)</div>
+<div class="controls"><label>Integration steps<select id="reverse-steps"><option>100</option><option selected>400</option><option>1600</option></select></label><label>Initial distribution<select id="reverse-prior"><option value="exact">Exact p at T = 8</option><option value="gaussian">Approximate N(0,1)</option></select></label><label>Generation progress <output id="reverse-time"></output><input id="reverse-progress" type="range" min="0" max="100" value="100" aria-label="Reverse diffusion generation progress"></label><button id="reverse-resample" type="button">New random draws</button></div>
+<div class="legend"><span><i class="dot"></i>Probability-flow ODE</span><span><i class="dot orange"></i>Reverse SDE</span><span><i class="dot dash"></i>Analytic pₜ</span></div>
+<div class="plots"><figure><h3>Probability-flow ODE</h3><canvas id="reverse-ode-density" role="img" aria-label="ODE histogram against exact current marginal density"></canvas></figure><figure><h3>Reverse SDE</h3><canvas id="reverse-sde-density" role="img" aria-label="Reverse SDE histogram against exact current marginal density"></canvas></figure><figure><canvas id="reverse-ode-path" role="img" aria-label="Twelve ODE particle trajectories against generation time"></canvas></figure><figure><canvas id="reverse-sde-path" role="img" aria-label="Twelve SDE particle trajectories against generation time"></canvas></figure><figure class="wide"><canvas id="score-canvas" role="img" aria-label="Current mixture score field against position"></canvas><figcaption>These are score arrows. The sampler adds the reversed drift and the appropriate score coefficient.</figcaption></figure></div>
+<div id="reverse-readout" class="readout" aria-live="polite"></div><p class="subtle">Each histogram uses all 1,200 particles; paths show the same first 12 starting particles. Stored path frames are subsampled when needed, but all integration steps are computed. Scores are exact; finite steps and finite clouds still produce error.</p>
+</section>
+
+<section id="tweedie"><h2>4. The score encodes a Bayes-optimal denoising displacement.</h2>
+<p>The clean value is −1 or +1 with equal prior probability. Observe y = αX + σε. Adjust the observation and noise, then compare a candidate estimate with the posterior mean.</p>
+<div class="controls"><label>Observation y <output id="tw-y-value"></output><input id="tw-y" type="range" min="-3" max="3" step="0.02" value="0.5"></label><label>Signal scale α <output id="tw-alpha-value"></output><input id="tw-alpha" type="range" min="0.1" max="1" step="0.02" value="1"></label><label>Noise σ <output id="tw-sigma-value"></output><input id="tw-sigma" type="range" min="0.15" max="2" step="0.01" value="1"></label><label>Candidate estimate a <output id="tw-a-value"></output><input id="tw-a" type="range" min="-1.5" max="1.5" step="0.02" value="0"></label><button id="tw-optimal" type="button">Use posterior mean</button></div>
+<div class="posterior"><div>P(X = −1 | y) = <output id="tw-minus"></output><div class="bar"><span id="tw-minus-bar"></span></div></div><div>P(X = +1 | y) = <output id="tw-plus"></output><div class="bar"><span id="tw-plus-bar"></span></div></div></div>
+<div class="plots"><figure><canvas id="tweedie-map" role="img" aria-label="Posterior mean curve against noisy observation"></canvas><figcaption>Blue: posterior mean. Dashed: clean values ±1. The dot marks the current observation.</figcaption></figure><figure><canvas id="tweedie-risk" role="img" aria-label="Conditional squared-error risk against candidate estimate"></canvas><figcaption>Orange: conditional risk. Blue dot: minimum at the posterior mean. Orange dot: candidate estimate.</figcaption></figure></div>
+<div id="tweedie-readout" class="readout risk" aria-live="polite"></div>
+<p class="note">For α = 1, σ²s(y) points from y to the posterior mean. For general α, it points to the scaled mean αm(y). This lab allows α and σ to vary independently; VP corruption is the special case α² + σ² = 1.</p>
+</section>
+<footer>Exact analytic examples; no network, tracking, or external dependencies. <a href="score-diffusion-example.py" download>Download the Python sampler</a>.</footer>
+</main><script src="score-flow-core.js"></script><script src="score-flow-lab.js"></script></body></html>
