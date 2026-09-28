@@ -223,8 +223,10 @@ than learned).
 
 ## Learning the score
 
-Three objects must be kept distinct in this section; conflating any two of them
-is a standard error.
+Two statistical objects must be kept distinct: the random target sampled for a
+training pair, and the deterministic conditional-mean field fitted under
+squared loss. Noise and score prediction are parameterizations of the second
+object, not two further random objects.
 
 **Object 1: the sampled conditional target.** The forward process manufactures
 training data: draw $x_0 \sim p_{\text{data}}$, a time $t$ (from a range bounded
@@ -240,7 +242,7 @@ $$
 
 This is a *random target*, different for every draw.
 
-**Object 2: the marginal score — the posterior mean of the target.** Denoising
+**Object 2: the marginal score — the conditional mean of the target.** Denoising
 score matching trains a network $s_\theta(x, t)$ against Object 1:
 
 $$
@@ -271,10 +273,10 @@ care — Vincent's identity. Note also that with $\lambda \equiv 1$ the target
 variance behaves like $1/\sigma_t^2$ near $t = 0$, which is why practical recipes
 either weight or avoid the smallest times.)
 
-**Object 3: the noise-predictor parameterization.** Many implementations train
+**A parameterization of Object 2: the noise predictor.** Many implementations train
 $\varepsilon_\theta(x_t, t)$ to predict the injected noise. Its population
 optimum is the posterior mean $\varepsilon^\star(x, t) = \mathbb{E}[\varepsilon
-\mid x_t = x]$ — *not* the per-sample $\varepsilon$ — and the two optima are
+\mid x_t = x, t]$ — *not* the per-sample $\varepsilon$ — and the two optima are
 linked by
 
 $$
@@ -283,12 +285,19 @@ s^\star(x, t) = -\frac{\varepsilon^\star(x, t)}{\sigma_t},
 s_\theta = -\frac{\varepsilon_\theta}{\sigma_t}.
 $$
 
-Score prediction and noise prediction are the same estimator in different units;
-a score loss with weight $\lambda(t)$ equals a noise loss with weight
-$\lambda(t)/\sigma_t^2$.
+At the unrestricted population optimum, score prediction and noise prediction
+represent the same conditional-mean field in different units; a score loss with
+weight $\lambda(t)$ equals a noise loss with weight
+$\lambda(t)/\sigma_t^2$. The parameterization can still matter for a finite
+network and optimizer because it changes conditioning and effective weighting.
 
 ::: {.callout-warning icon="false"}
 ## "Noise prediction" is conditional-mean estimation
+
+This box records the terminology problem only where it enters the ODE
+derivation. The general affine result, the $x_0$/$\varepsilon$/score/$v$
+dictionary, and the scope of each equivalence are developed separately in
+[One Estimator, Many Parameterizations](./21-one-estimator-many-parameterizations.qmd).
 
 The account above is the standard one and its algebra is correct — but the
 phrase *"the network predicts the injected noise"*, read literally, is
@@ -335,7 +344,9 @@ Quotes verified against the live page.
 
 [^nak-q]: Nakkiran, Bradley, Zhou, Advani, *Step-by-Step Diffusion: An
 Elementary Tutorial* ([arXiv:2406.08929](https://arxiv.org/abs/2406.08929)),
-§5 and Appendix B.10. In ordinary usage *noise* connotes
+§5 and Appendix B.10.
+
+In ordinary usage *noise* connotes
 structureless randomness, and nothing structureless can be predicted. What makes
 the objective work is that $\varepsilon$, while independent of $X_0$, is **not**
 independent of the pair $(x_t, t)$ that the network sees: the observation is
@@ -765,8 +776,9 @@ $$
    family $\{p_t\}$.
 2. The score $\nabla \log p_t$ is the only learned time-dependent function the
    sampler needs, trained by denoising score matching on synthetically corrupted
-   data; noise prediction is the same estimator in different units, with
-   population optimum $-\mathbb{E}[\varepsilon \mid x_t]/\sigma_t$.
+   data. A noise-prediction head has population optimum
+   $\mathbb{E}[\varepsilon \mid x_t,t]$; the corresponding score is
+   $-\mathbb{E}[\varepsilon \mid x_t,t]/\sigma_t$.
 3. The probability-flow ODE replaces the SDE's noise by an extra drift along the
    score, reproducing the same marginals deterministically on $[\epsilon, T]$:
    $v = f - \tfrac12 g^2 s$.

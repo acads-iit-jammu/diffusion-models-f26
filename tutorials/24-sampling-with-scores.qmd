@@ -1,0 +1,602 @@
+# Sampling with Scores: Worked Examples of the Probability-Flow ODE {.unnumbered}
+
+*A teaching sequence: generate particles, solve two Gaussian score fields, add
+noise to obtain a sampler, construct the probability-flow ODE, and finally learn
+the score through denoising. Derivatives, Gaussian distributions, and conditional
+expectation are enough to begin.*
+
+**Place in the teaching sequence.** This is the worked-solution track. Read
+Sections 1–8 of [From Local Arrows](./22-vector-fields-to-score-diffusion.qmd)
+first if fields and flows are new to you. Here we revisit those ideas through
+solved Gaussian examples, then build a sampler. The
+[Tweedie tutorial](./23-tweedie-bayes-denoising.qmd) supplies the separate
+statistical derivation when we reach score estimation. The overlap is intentional:
+the geometric note explains what the objects mean; this note computes with them.
+
+## 1. Generation means producing samples
+
+Suppose our target is a distribution $p_{\text{data}}$. To generate from it means
+to return a random variable whose distribution is $p_{\text{data}}$. Returning
+the most likely point every time would fail: it would give a point mass.
+
+One way to generate is to draw an easy random starting point and move it:
+
+$$\text{random start}\ \longrightarrow\ \text{successive updates}
+\ \longrightarrow\ \text{output sample}.$$
+
+An ODE supplies deterministic updates. Given a velocity field $v$, explicit
+Euler uses
+
+$$\boxed{X\leftarrow X+h\,v(X,t),\qquad t\leftarrow t+h.}$$
+
+An SDE also injects fresh randomness. For $dX_t=f(X_t,t)dt+g(t)dW_t$,
+Euler–Maruyama uses a positive forward step $h$:
+
+$$\boxed{X\leftarrow X+h\,f(X,t)+g(t)\sqrt h\,z,
+\qquad z\sim\mathcal N(0,I).}$$
+
+Each step draws a new independent $z$. The $\sqrt h$ occurs because a Brownian
+increment over length $h$ has covariance $hI$.
+
+These are computational recipes, not yet proofs of correct sampling. An ODE
+solver transports its input distribution; an SDE solver simulates drift and
+random motion. We still have to choose dynamics that deliver the desired law.
+That choice is where the score enters.
+
+### Our notation
+
+We follow [The Probability-Flow ODE](./07-probability-flow-ode.qmd): $p_t$ is the
+forward-noised density; $s_t=\nabla_x\log p_t$ its score; $f,g$ the forward-SDE
+coefficients; $v$ the probability-flow velocity. The flow from $s$ to $t$ is
+$\Psi_{s\to t}$, and $\Phi$ is reserved for the standard normal CDF.
+
+For generation we use $\tau=T-t$ and a descending grid with
+$h_k=t_{k-1}-t_k<0$. The positive elapsed-time variable $u$ below is used only
+for experiments at a **fixed target density**. This keeps it distinct from the
+changing diffusion noise level $t$.
+
+## 2. First solved problem: the score of a standard Gaussian
+
+Let the target density be
+
+$$p_{\text{data}}(x)=\frac{1}{\sqrt{2\pi}}e^{-x^2/2}.$$
+
+Take the logarithm and differentiate with respect to the **sample coordinate**:
+
+$$\log p_{\text{data}}(x)=-\tfrac12x^2-\tfrac12\log(2\pi),
+\qquad \boxed{s(x)=\frac{d}{dx}\log p_{\text{data}}(x)=-x.}$$
+
+At $x=2$ the score points left; at $x=-3$ it points right; at zero it vanishes.
+The score is a contraction field toward the origin. Try using it directly as
+velocity:
+
+$$\frac{dx}{du}=s(x)=-x,\qquad x(0)=x_0.$$
+
+For $x_0\ne0$, separate variables:
+
+$$\frac{dx}{x}=-du,\qquad \log|x|=-u+C,
+\qquad \boxed{x(u)=x_0e^{-u}.}$$
+
+The equilibrium solution $x\equiv0$ completes the case omitted by division by
+$x$. Collecting all initial conditions gives the flow
+
+$$\boxed{\Psi_{0\to u}(x_0)=e^{-u}x_0.}$$
+
+After one unit of time, every distance from zero has been multiplied by $e^{-1}$.
+After $u+w$ units, it has been multiplied by $e^{-u}e^{-w}$. At every finite
+time, distinct particles remain distinct; they approach zero asymptotically.
+
+Euler approximates the exact multiplier $e^{-h}$ by $1-h$:
+
+$$x_{k+1}=(1-h)x_k,\qquad x_k=(1-h)^kx_0.$$
+
+For $0<h<1$ this approaches zero without changing sign. For $1<h<2$ it
+alternates sides while approaching zero. For $h>2$ it diverges. The last two
+behaviors remind us that a solver's behavior can differ from the exact ODE.
+
+**Does this generate standard Gaussian samples?** If
+$X_{\mathrm{start}}\sim\mathcal N(0,1)$, the output after time $u$ is
+
+$$\Psi_{0\to u}(X_{\mathrm{start}})\sim\mathcal N(0,e^{-2u}).$$
+
+It is no longer standard Gaussian. The field is interpretable and the flow is
+correctly solved, but the dynamics concentrate the cloud at the mode. This is
+the **score-ascent ODE**, not yet the probability-flow ODE of a chosen noising
+process. Keep this solved example: it will let us check every later construction.
+
+## 3. Second solved problem: a Gaussian centered at mu
+
+Translate the target to $p_{\text{data}}=\mathcal N(\mu,1)$. Then
+
+$$\log p_{\text{data}}(x)=C-\tfrac12(x-\mu)^2,
+\qquad \boxed{s(x)=\mu-x.}$$
+
+The zero of the field has moved from $0$ to $\mu$. For the ODE
+$dx/du=\mu-x$, set $z=x-\mu$. Because $\mu$ is constant,
+
+$$\frac{dz}{du}=-z.$$
+
+We have already solved this equation. Therefore
+
+$$\boxed{x(u)=\mu+(x_0-\mu)e^{-u},\qquad
+\Psi_{0\to u}(x_0)=\mu+e^{-u}(x_0-\mu).}$$
+
+For example, with $\mu=2$ and $x_0=5$, the particle is at
+$2+3e^{-1}\approx3.10$ after one unit. It approaches $2$ without crossing it.
+The flow first measures displacement from $\mu$, shrinks that displacement,
+then adds $\mu$ back.
+
+Euler gives
+
+$$x_{k+1}=x_k+h(\mu-x_k),\qquad
+x_k-\mu=(1-h)^k(x_0-\mu).$$
+
+If the starting cloud is $\mathcal N(m_{\mathrm{start}},V_{\mathrm{start}})$,
+the exact output law is
+
+$$\mathcal N\!\left(\mu+e^{-u}(m_{\mathrm{start}}-\mu),
+e^{-2u}V_{\mathrm{start}}\right).$$
+
+Its mean approaches the right location, but its variance approaches zero.
+Getting the center right is not enough to sample the target distribution.
+
+For the slightly more general target $\mathcal N(\mu,\varrho^2)$,
+
+$$s(x)=-\frac{x-\mu}{\varrho^2},\qquad
+\Psi_{0\to u}(x)=\mu+(x-\mu)e^{-u/\varrho^2}.$$
+
+We use $\varrho$ for the target standard deviation so that $\sigma_t$ can retain
+its diffusion meaning: the standard deviation of the corruption noise.
+
+## 4. Why choose a score field? Geometry and energy
+
+The Gaussian calculation is an instance of a general construction:
+
+$$\boxed{s(x)=\nabla_x\log p(x).}$$
+
+It produces one vector component per data coordinate. For a small displacement
+$\delta$,
+
+$$\log\frac{p(x+\delta)}{p(x)}=s(x)^\top\delta+o(\|\delta\|).$$
+
+The score thus measures local **relative** density change. In Euclidean
+coordinates its direction is the steepest first-order increase in log density,
+where the score is nonzero. This gives a local direction rather than a global
+destination.
+
+An energy interpretation supplies the same field. Write
+
+$$p(x)=Z^{-1}e^{-E(x)}.$$
+
+Then $\log p=-E-\log Z$, and since $Z$ does not depend on $x$,
+
+$$\boxed{s(x)=-\nabla E(x).}$$
+
+The score points downhill in energy; the unknown normalizing constant disappears.
+For $\mathcal N(\mu,\varrho^2)$, take
+$E(x)=(x-\mu)^2/(2\varrho^2)$. Our Gaussian score ODE is precisely gradient
+descent in this quadratic energy.
+
+But downhill motion alone settles at an energy minimum. A Gibbs distribution
+$e^{-E}/Z$ occupies a range of energies. We need a mechanism that balances this
+concentration with spread. The energy picture motivates the score; the next
+calculation justifies its coefficient in a sampler.
+
+## 5. Add noise: Langevin sampling and Euler–Maruyama
+
+For a fixed target $p$, consider
+
+$$\boxed{dX_u=s(X_u)\,du+\sqrt2\,dW_u.}$$
+
+The deterministic part pulls uphill in density, and Brownian motion spreads the
+cloud. Euler–Maruyama makes this directly executable:
+
+$$\boxed{X\leftarrow X+h\,s(X)+\sqrt{2h}\,z_k,
+\qquad z_k\overset{\mathrm{iid}}\sim\mathcal N(0,I).}$$
+
+Draw many initial particles and run the update for each. With suitable
+regularity and ergodicity, continuous-time Langevin dynamics approach $p$ as
+$u\to\infty$. A finite-step discretization approximates that dynamics; it has
+discretization bias, and multimodal targets can mix slowly.
+
+### Solve the Gaussian sampler too
+
+For $p=\mathcal N(\mu,1)$,
+
+$$dX_u=(\mu-X_u)du+\sqrt2\,dW_u.$$
+
+Multiplying $X_u-\mu$ by the integrating factor $e^u$ gives
+
+$$X_u=\mu+e^{-u}(X_{\mathrm{start}}-\mu)
++\sqrt2\int_0^u e^{-(u-a)}\,dW_a.$$
+
+The stochastic integral is a zero-mean Gaussian independent of the starting
+point, with variance $2\int_0^u e^{-2(u-a)}da=1-e^{-2u}$. Thus for a Gaussian
+start,
+
+$$\boxed{X_u\sim\mathcal N\!\left(
+\mu+e^{-u}(m_{\mathrm{start}}-\mu),
+e^{-2u}V_{\mathrm{start}}+1-e^{-2u}\right).}$$
+
+Compare with the score ODE: the mean behaves identically, but the variance now
+approaches **one**. If the initial law already is $\mathcal N(\mu,1)$, it stays
+that way. This is the balance that makes it a sampler.
+
+Euler–Maruyama uses $X\leftarrow(1-h)X+h\mu+\sqrt{2h}z_k$. Its stationary
+variance, for $0<h<2$, solves
+
+$$V_h=(1-h)^2V_h+2h,\qquad V_h=\frac1{1-h/2}.$$
+
+The finite-step law is too broad. Reducing $h$ improves the numerical
+approximation; running more steps at the same $h$ does not remove this bias.
+
+**Pause for an experiment.** In [Lab 2](../materials/score-flow-lab.html#langevin),
+compare score ascent and Langevin sampling for $\mu=0$. Predict their variances
+before moving the time slider. Translating every particle by $\mu$ gives the
+unit-variance, nonzero-mean example just solved.
+
+### Why does this work for a general density?
+
+Let $q_u$ be the density of the current particle cloud. Its evolution is
+
+$$\partial_u q_u=-\nabla\cdot(q_u s)+\Delta q_u.$$
+
+The first term transports mass; the second spreads it. At $q_u=p$, use
+$ps=p\nabla\log p=\nabla p$:
+
+$$-\nabla\cdot(ps)+\Delta p=-\Delta p+\Delta p=0.$$
+
+Thus $p$ is invariant, with appropriate boundary or tail conditions. This is a
+specific justification for using the score with noise coefficient $\sqrt2$.
+Invariance and convergence are distinct: convergence also requires conditions
+that rule out trapping or explosion.
+
+## 6. From one fixed target to a path of noisy densities
+
+For real data, the fixed-target score is unknown and the density may have
+separated modes or singular support. Diffusion instead constructs a path of
+increasingly smoothed distributions, then learns their time-indexed scores.
+
+Choose the forward SDE
+
+$$dX_t=f(X_t,t)dt+g(t)dW_t,\qquad X_0\sim p_0=p_{\text{data}}.$$
+
+Here $g(t)$ is scalar and independent of position. Our common VP choice is
+
+$$f(x,t)=-\tfrac12\beta(t)x,\qquad g(t)=\sqrt{\beta(t)},$$
+
+with
+
+$$\alpha_t=\exp\!\left(-\tfrac12\int_0^t\beta(a)da\right),
+\qquad\sigma_t^2=1-\alpha_t^2.$$
+
+At each fixed time, the conditional law is generated by
+
+$$\boxed{X_t\overset d=\alpha_tX_0+\sigma_t\varepsilon,
+\qquad\varepsilon\sim\mathcal N(0,I),\quad\varepsilon\perp X_0.}$$
+
+This is a statement about one time slice, not a prescription to reuse a single
+$\varepsilon$ for a Brownian path. The density $p_t$ depends on both the known
+corruption kernel and the unknown data law. Its score is $s_t=\nabla\log p_t$.
+
+Choose $T$ so that $\alpha_T$ is small; $p_T$ is then approximately standard
+Gaussian for suitably scaled data. Generation aims to move from $p_T$ back to
+$p_0$. It does not wait for equilibrium at every intermediate density.
+
+## 7. The reverse-SDE sampler, in the common notation
+
+The reverse-time theorem gives, in the increasing clock $\tau=T-t$,
+
+$$\boxed{dX=[-f(X,t)+g(t)^2s_t(X)]d\tau+g(t)d\bar W_\tau.}$$
+
+Here $X$ is the current sampler state and $t=T-\tau$. The theorem needs suitable
+regularity and nondegeneracy. Its score correction accounts for how probable
+different predecessors are, conditional on the current noisy state.
+
+Use $T=t_N>\cdots>t_0=\epsilon$ and $h_k=t_{k-1}-t_k<0$. The corresponding
+Euler–Maruyama sampler is
+
+$$\boxed{X\leftarrow X+h_k[f(X,t_k)-g(t_k)^2s_{t_k}(X)]
++g(t_k)\sqrt{|h_k|}\,z_k.}$$
+
+The drift is evaluated at the current point. Brownian variance is proportional
+to the positive reverse elapsed time $|h_k|$. In VP form this becomes
+
+$$X\leftarrow X+|h_k|\beta(t_k)
+\left[\tfrac12X+s_{t_k}(X)\right]
++\sqrt{\beta(t_k)|h_k|}\,z_k.$$
+
+With the exact terminal law, exact scores, and exact continuous-time dynamics,
+the sampler traverses the marginals backward. Finite steps approximate this
+result. Starting instead from $\mathcal N(0,I)$ introduces terminal-prior error.
+
+## 8. Derive the probability-flow ODE by conserving probability
+
+Now ask: can deterministic particles follow the **same density path**?
+
+The forward SDE evolves its density by Fokker–Planck:
+
+$$\partial_t p_t=-\nabla\cdot(f p_t)+\tfrac12g(t)^2\Delta p_t.$$
+
+An ODE $dX_t/dt=v(X_t,t)$ evolves its density by continuity:
+
+$$\partial_t p_t=-\nabla\cdot(p_t v).$$
+
+In one dimension, $-\partial_x(p_tv)$ is the net inflow of mass per unit length.
+The multidimensional divergence expresses the same conservation principle.
+To match these equations, write the probability current as
+
+$$p_t v=f p_t-\tfrac12g^2\nabla p_t.$$
+
+Divide by the positive density. **This division is where the log derivative
+appears**:
+
+$$\boxed{v=f-\tfrac12g^2\frac{\nabla p_t}{p_t}
+=f-\tfrac12g^2s_t.}$$
+
+Consequently,
+
+$$\boxed{\frac{dX_t}{dt}=v(X_t,t)
+=f(X_t,t)-\tfrac12g(t)^2s_t(X_t).}$$
+
+This is the probability-flow ODE. Under conditions ensuring well-posed density
+evolution and flows, it has the same marginals as the forward SDE when
+initialized with a matching law. It gives a particular transport field; in
+higher dimensions the density path need not determine a unique field.
+
+The score is therefore more than an attractive direction. It is the exact
+quantity that converts a diffusive probability current into a velocity field.
+
+For VP noising,
+
+$$\boxed{v(x,t)=-\tfrac12\beta(t)[x+s_t(x)].}$$
+
+Sampling is now ordinary Euler integration on the descending grid:
+
+$$\boxed{X\leftarrow X+h_kv(X,t_k),\qquad h_k<0.}$$
+
+| Dynamics toward lower noise | Increment to $X$ |
+|---|---|
+| Reverse SDE | $h_k(f-g^2s_t)+g\sqrt{|h_k|}z_k$ |
+| Probability-flow ODE | $h_k(f-\tfrac12g^2s_t)$ |
+
+The ODE needs half the score coefficient because it no longer injects spreading
+noise. Simply removing the random term from the reverse SDE gives the wrong
+deterministic dynamics. Randomness in an ODE sampler comes from its starting
+sample; randomness in the SDE sampler also comes from its Brownian increments.
+
+## 9. Return to the solved Gaussians: now solve their probability flows
+
+We can test the entire construction using the two targets from the beginning.
+
+### Standard normal data under VP noising
+
+If $p_0=\mathcal N(0,1)$, then
+$p_t=\mathcal N(0,\alpha_t^2+\sigma_t^2)=\mathcal N(0,1)$. Thus
+
+$$s_t(x)=-x,\qquad
+\boxed{v(x,t)=-\tfrac12\beta(t)[x-x]=0.}$$
+
+The exact solution is $X_t=X_s$ and
+
+$$\boxed{\Psi_{s\to t}(x)=x.}$$
+
+The probability-flow sampler leaves each initial standard Gaussian draw in
+place. This is correct: its source and target distributions already agree.
+The **score** contracts, but its contribution cancels the known VP drift in the
+**probability-flow velocity**. The score-ascent flow $e^{-u}x$ solved earlier
+and this identity flow answer different questions.
+
+### Data with mean mu and unit variance
+
+If $p_0=\mathcal N(\mu,1)$, VP noising gives
+
+$$p_t=\mathcal N(\alpha_t\mu,1),\qquad s_t(x)=\alpha_t\mu-x.$$
+
+Substitute into the probability-flow velocity:
+
+$$v(x,t)=-\tfrac12\beta(t)\alpha_t\mu=\alpha_t'\mu.$$
+
+The dependence on $x$ cancels. Integrating from $s$ to $t$,
+
+$$\boxed{\Psi_{s\to t}(x)=x+(\alpha_t-\alpha_s)\mu.}$$
+
+This is a **translation**, preserving all distances and the variance. Forward
+time moves the mean toward zero; backward generation restores it. Since
+$\alpha_0=1$,
+
+$$X_T\sim\mathcal N(\alpha_T\mu,1)
+\quad\Longrightarrow\quad
+\Psi_{T\to0}(X_T)=X_T+(1-\alpha_T)\mu\sim\mathcal N(\mu,1).$$
+
+For $\beta\equiv1$, $\alpha_t=e^{-t/2}$. With $\mu=2$, $T=2$, the exact starting
+mean is $2e^{-1}\approx0.736$ and generation adds approximately $1.264$ to every
+particle. Its mean becomes $2$, while its variance stays one.
+
+Starting from a standard Gaussian at this finite $T$ instead would give mean
+$(1-\alpha_T)\mu$, not $\mu$. This explicitly exhibits terminal-prior mismatch,
+even with a perfect score and exact solver.
+
+### Extension: a different target variance
+
+For $p_0=\mathcal N(\mu,\varrho^2)$ define its noisy marginal variance
+
+$$q_t=\alpha_t^2\varrho^2+\sigma_t^2.$$
+
+Then $p_t=\mathcal N(\alpha_t\mu,q_t)$, and
+
+$$s_t(x)=-\frac{x-\alpha_t\mu}{q_t},\qquad
+v(x,t)=\alpha_t'\mu+\frac{q_t'}{2q_t}(x-\alpha_t\mu).$$
+
+Here $q_t'=\beta(t)(1-q_t)$. Differentiate the standardized coordinate
+$z_t=(X_t-\alpha_t\mu)/\sqrt{q_t}$ along this ODE; its derivative is zero.
+Consequently,
+
+$$\boxed{\Psi_{s\to t}(x)=\alpha_t\mu+
+\sqrt{\frac{q_t}{q_s}}(x-\alpha_s\mu).}$$
+
+The map translates the center and rescales its spread. This is an exact,
+fully interpretable generative flow, and reduces to the preceding translation
+when $\varrho=1$.
+
+**Check in the lab.** [Lab 3](../materials/score-flow-lab.html#reverse) uses a
+two-Gaussian mixture instead of one Gaussian. The score and both samplers are
+still explicit, but the transport can now separate a cloud into two modes.
+Compare histograms rather than expecting SDE and ODE particle paths to match.
+The lab displays the positive step magnitude $h=|h_k|$; this note uses signed
+backward steps $h_k<0$. The numerical updates are the same.
+
+## 10. We can sample if we know the score. How do we learn it?
+
+For the Gaussian examples, differentiating an explicit density was easy. Real
+data supply examples $x_0$, not an evaluable marginal density $p_t$. Directly
+asking a network to match $\nabla\log p_t$ would require an unavailable target.
+
+But we can manufacture noisy/clean training pairs by drawing $x_0$ and
+$\varepsilon$ independently:
+
+$$x_0\sim p_{\text{data}},\qquad
+x_t=\alpha_t x_0+\sigma_t\varepsilon,\qquad
+\varepsilon\sim\mathcal N(0,I).$$
+
+A familiar regression problem is now available: predict $x_0$ from $(x_t,t)$
+under squared error. Its population-optimal prediction is
+
+$$\widehat X_0(x,t):=\mathbb E[X_0\mid X_t=x].$$
+
+To see why, write $X_0-D=(X_0-\widehat X_0)+(\widehat X_0-D)$. Conditional on
+$X_t=x$, the first bracket has mean zero, so the cross term vanishes and
+
+$$\mathbb E[\|X_0-D\|^2\mid X_t=x]
+=\operatorname{tr}\operatorname{Cov}(X_0\mid X_t=x)
++\|\widehat X_0(x,t)-D\|^2.$$
+
+The second term is minimized at $D=\widehat X_0$. We can therefore learn a
+posterior-mean denoiser. **Does a denoiser give the score needed by the sampler?**
+This is the question that motivates Tweedie's formula.
+
+### Derive the bridge
+
+At a fixed positive noise level,
+
+$$p_t(x)=\int\mathcal N(x;\alpha_t x_0,\sigma_t^2I)\,p_0(dx_0).$$
+
+Differentiate the Gaussian kernel with respect to its observed argument $x$:
+
+$$\nabla_xp_t(x\mid x_0)
+=\frac{\alpha_t x_0-x}{\sigma_t^2}p_t(x\mid x_0).$$
+
+Differentiating under the integral, dividing by $p_t(x)$, and recognizing Bayes'
+posterior gives
+
+$$
+\begin{aligned}
+s_t(x)
+&=\int\frac{\alpha_t x_0-x}{\sigma_t^2}
+\frac{p_t(x\mid x_0)p_0(dx_0)}{p_t(x)}\\
+&=\boxed{\frac{\alpha_t\widehat X_0(x,t)-x}{\sigma_t^2}}.
+\end{aligned}
+$$
+
+For $\alpha_t>0$, equivalently,
+
+$$\boxed{\widehat X_0(x,t)=\frac{x+\sigma_t^2s_t(x)}{\alpha_t}.}$$
+
+This is VP Tweedie. It says that a posterior-mean denoiser and a score carry the
+same information at a fixed nondegenerate noise level. For the separate additive
+observation model $Y=X_0+\sigma\varepsilon$, with freely chosen $\sigma>0$,
+the displacement $\sigma^2\nabla_y\log p_Y(y)$ points directly toward the
+posterior mean. This additive model does not impose the VP constraint
+$\alpha_t^2+\sigma_t^2=1$: setting $\alpha_t=1$ within that constraint would
+force zero noise. In VP coordinates, $\sigma_t^2s_t(x)$ points toward the
+**attenuated** mean $\alpha_t\widehat X_0(x,t)$.
+
+The [standalone Tweedie tutorial](./23-tweedie-bayes-denoising.qmd) supplies the
+regularity conditions, additive-noise derivation, and two-point posterior example.
+
+### Direct score training and noise prediction
+
+The conditional corruption score is the available random target
+
+$$\nabla_{x_t}\log p_t(x_t\mid x_0)=-\varepsilon/\sigma_t.$$
+
+Squared-error regression against that target fits its conditional mean:
+
+$$s^\star(x,t)=\mathbb E[-\varepsilon/\sigma_t\mid X_t=x]=s_t(x).$$
+
+Thus we can train $s_\theta$ with
+
+$$\mathcal L(\theta)=\mathbb E\left[\lambda(t)
+\left\|s_\theta(x_t,t)+\frac{\varepsilon}{\sigma_t}\right\|^2\right],$$
+
+using positive-noise times and suitable weighting or a lower cutoff to keep the
+objective finite. Alternatively, a squared-error noise predictor estimates
+$\varepsilon^\star(x,t)=\mathbb E[\varepsilon\mid X_t=x]$, with
+
+$$s_t(x)=-\varepsilon^\star(x,t)/\sigma_t.$$
+
+The estimated function is a conditional mean, not the particular unseen noise
+realization. Loss weights must be adjusted when comparing parameterizations;
+finite networks and optimization need not give identical results.
+
+## 11. The probability-flow sampler we can now implement
+
+After training, choose the grid $T=t_N>\cdots>t_0=\epsilon$ and follow
+
+$$
+\boxed{
+\begin{aligned}
+&X\sim\mathcal N(0,I)\quad\text{(approximation to }p_T\text{)};\\
+&\text{for }k=N,N-1,\ldots,1:\\
+&\qquad h_k\leftarrow t_{k-1}-t_k;\\
+&\qquad s\leftarrow s_\theta(X,t_k);\\
+&\qquad v\leftarrow-\tfrac12\beta(t_k)(X+s);\\
+&\qquad X\leftarrow X+h_kv;\\
+&\text{return }X.
+\end{aligned}}
+$$
+
+Every step reevaluates the score because both the state and noise level change.
+The algorithm uses the **learned velocity**
+
+$$v_\theta(x,t)=-\tfrac12\beta(t)[x+s_\theta(x,t)].$$
+
+Write its flow as $\Psi^\theta_{T\to\epsilon}$. Under the usual convergence
+conditions, refining the Euler mesh converges to this learned flow. The exact
+probability-flow map $\Psi_{T\to\epsilon}$ instead uses $s_t$. They coincide
+when the learned and exact velocity fields agree; reducing the numerical step
+size alone does not eliminate score-estimation error.
+
+There are four separate approximations: replacing $p_T$ by a Gaussian, estimating
+the score, integrating with finite steps, and stopping at $\epsilon>0$ instead
+of zero. With a smooth target the endpoint may be regular at zero; atomic data
+typically require a limiting argument. The exact SDE/ODE marginal equivalence
+does not automatically survive an imperfect learned score.
+
+A posterior mean from one noisy observation is also not the same object as this
+integrated flow. Denoising estimates a hidden clean value under squared loss;
+sampling must reproduce the population's distribution.
+
+## Problems for discussion
+
+1. For $p=\mathcal N(3,4)$, compute the score-ascent flow and its Euler stability
+   range. **Check:** $3+(x-3)e^{-u/4}$; $0<h<8$.
+2. For that same target, show that Langevin variance satisfies
+   $V'=-V/2+2$. What is its limiting value? **Check:** $4$.
+3. Under VP noising, take $p_0=\mathcal N(3,1)$ and $\beta\equiv1$. Write the
+   exact map from $T$ to zero. **Check:** $x+3(1-e^{-T/2})$.
+4. Why is $s_t(x)=-x$ compatible with zero probability-flow velocity?
+   **Check:** its correction cancels the VP forward drift.
+5. If an exact denoiser is available, how do we obtain a score for the sampler?
+   **Check:** $(\alpha_t\widehat X_0-x)/\sigma_t^2$, at positive noise.
+
+## Reading
+
+- Lai et al., [*The Principles of Diffusion Models*](https://arxiv.org/abs/2510.21890),
+  Chapter 3 for energy, scores, Langevin dynamics, and denoising; §3.3.4 for
+  Tweedie; §§4.1–4.3 for score SDEs, matching marginals, and numerical sampling.
+- Song et al., [*Score-Based Generative Modeling through Stochastic Differential
+  Equations*](https://arxiv.org/abs/2011.13456), §§3–4 and Appendix D.
+- [From Local Arrows to Score-Based Diffusion](./22-vector-fields-to-score-diffusion.qmd)
+  for the geometric groundwork; [The Probability-Flow ODE](./07-probability-flow-ode.qmd)
+  for the longer technical treatment using the same notation.

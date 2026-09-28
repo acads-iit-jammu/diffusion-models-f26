@@ -1,0 +1,441 @@
+# One Estimator, Many Parameterizations {.unnumbered}
+
+::: {.callout-important}
+## Draft
+
+This note isolates one claim that is easily blurred in standard introductions to
+diffusion models: a network trained to “predict noise” does not predict an
+unrevealed realization of randomness. Under squared loss it estimates a
+conditional mean, expressed in a particular coordinate system.
+:::
+
+*Standalone companion to [The Probability-Flow ODE](./07-probability-flow-ode.qmd).
+That note uses the score to construct a sampler; this one studies what the
+different training heads estimate. The two arguments are logically separate.*
+
+## The claim
+
+Fix a noise level $t$ and begin with the minimal linear observation model
+
+$$
+\boxed{\;X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
+\alpha_t,\sigma_t\ \text{known}.\;}
+$$
+
+Assume the conditional means below exist and $\sigma_t>0$; require also
+$\alpha_t>0$ when inverting the relation. The standard diffusion instance adds
+$\varepsilon\sim\mathcal N(0,I)$ independent of $X_0$, but the first identity
+does not need either Gaussianity or independence.
+
+The phrase *predict the injected noise* suggests that a network recovers the
+particular random draw $\varepsilon$. It does not. If the network is trained by
+squared error, its unrestricted population optimum is
+
+$$
+\varepsilon_t^\star(x)
+=\mathbb E[\varepsilon\mid X_t=x,t].
+$$
+
+This is a deterministic function of the network input. More strongly, it is an
+affine transformation of the familiar posterior-mean denoiser
+
+$$
+m_t(x)=\mathbb E[X_0\mid X_t=x,t].
+$$
+
+Taking the conditional expectation of the corruption equation gives
+
+$$
+x=\alpha_t m_t(x)+\sigma_t\varepsilon_t^\star(x),
+$$
+
+and hence, whenever $\alpha_t,\sigma_t>0$,
+
+$$
+\boxed{
+\varepsilon_t^\star(x)
+=\frac{x-\alpha_t m_t(x)}{\sigma_t},
+\qquad
+m_t(x)=\frac{x-\sigma_t\varepsilon_t^\star(x)}{\alpha_t}.
+}
+$$
+
+The two estimators contain exactly the same information. “Noise prediction” and
+posterior-mean denoising are not rival explanations of what the population
+regressor learns; they are two coordinate systems for the same conditional
+expectation.
+
+## Scope of the identity
+
+The affine identity above uses only:
+
+1. the linear observation equation;
+2. known coefficients $\alpha_t$ and $\sigma_t$;
+3. existence of the relevant conditional expectations.
+
+Squared-error training is a separate assumption: it is what makes these
+conditional means the population targets of trained regression heads, not what
+makes the affine identity true.
+
+It does not require a density for $X_0$, Gaussian data, a two-point support, a
+closed-form posterior, or even independence of $X_0$ and $\varepsilon$. It
+applies in any dimension and to discrete, continuous, singular, or mixed data
+laws. The squared-loss decomposition below additionally assumes finite second
+moments. Gaussianity and independence of the corruption noise become important
+when connecting the estimator to the marginal score; neither is needed for the
+affine equivalence between the two conditional means.
+
+The identity is therefore not special to the two-point example. That example is
+special only because the posterior mean is explicit. For independent Gaussian
+corruption and $X_0$ uniform on $\{-1,+1\}$,
+For $X_0$ uniform on $\{-1,+1\}$,
+
+$$
+m_t(x)=\tanh\!\left(\frac{\alpha_t x}{\sigma_t^2}\right),
+$$
+
+so
+
+$$
+\varepsilon_t^\star(x)
+=\frac{x-\alpha_t\tanh(\alpha_t x/\sigma_t^2)}{\sigma_t}.
+$$
+
+The closed form makes the general fact visible: the fitted output is a field,
+not a fresh noise draw.
+
+## Why squared loss learns a mean
+
+Let $h(X_t,t)$ be any predictor. Conditional expectation gives the orthogonal
+decomposition
+
+$$
+\varepsilon
+=\underbrace{\mathbb E[\varepsilon\mid X_t,t]}_{\varepsilon_t^\star(X_t)}
++\underbrace{\left(\varepsilon-
+\mathbb E[\varepsilon\mid X_t,t]\right)}_{R_t},
+\qquad \mathbb E[R_t\mid X_t,t]=0.
+$$
+
+Consequently,
+
+$$
+\boxed{
+\mathbb E\|h(X_t,t)-\varepsilon\|^2
+=\mathbb E\|h(X_t,t)-\varepsilon_t^\star(X_t)\|^2
++\mathbb E\|R_t\|^2.
+}
+$$
+
+Only the first term can be reduced by learning. The second is irreducible. Thus
+the random sample $\varepsilon$ is the **training label**, while
+$\varepsilon_t^\star$ is the **function being estimated** — the population
+optimum that a fitted $\varepsilon_\theta$ approximates. Calling all three “the
+noise” is the source of the confusion.
+
+The residual uncertainty is also an affine image of uncertainty about the clean
+sample. Rearranging the observation equation gives the pathwise identity
+
+$$
+\varepsilon-\varepsilon_t^\star(X_t)
+=-\frac{\alpha_t}{\sigma_t}\bigl(X_0-m_t(X_t)\bigr),
+$$
+
+and therefore, after conditioning on $(X_t,t)$,
+
+$$
+\boxed{
+\operatorname{Cov}(\varepsilon\mid X_t,t)
+=\frac{\alpha_t^2}{\sigma_t^2}
+\operatorname{Cov}(X_0\mid X_t,t).
+}
+$$
+
+What remains unpredictable about the noise is precisely what remains uncertain
+about the clean sample, expressed in different units. Neither this covariance
+identity nor the affine mean identity needs Gaussianity or independence.
+
+## Gaussian corruption: the score is the same field again
+
+For Gaussian corruption,
+
+$$
+p_t(x\mid x_0)=
+\mathcal N(x;\alpha_t x_0,\sigma_t^2I),
+\qquad
+\nabla_x\log p_t(x\mid x_0)
+=-\frac{x-\alpha_t x_0}{\sigma_t^2}.
+$$
+
+Averaging the conditional score over the posterior of $X_0$ gives the marginal
+score — the denoising-score identity derived in
+[the companion note](./07-probability-flow-ode.qmd#learning-the-score)[^vincent]:
+
+$$
+s_t(x)=\nabla_x\log p_t(x)
+=\frac{\alpha_t m_t(x)-x}{\sigma_t^2}
+=-\frac{\varepsilon_t^\star(x)}{\sigma_t}.
+$$
+
+Thus the common population estimands are connected by invertible affine
+maps:
+
+| Name of head | Population-optimal output |
+|---|---|
+| clean-sample prediction | $m_t(x)=\mathbb E[X_0\mid X_t=x,t]$ |
+| noise prediction | $\varepsilon_t^\star(x)=(x-\alpha_t m_t(x))/\sigma_t$ |
+| score prediction | $s_t(x)=(\alpha_t m_t(x)-x)/\sigma_t^2$ |
+
+The score identity is specifically Gaussian. The mean-to-noise identity is not.
+
+## The $v$ parameterization
+
+For any linear corruption, define the $v$ target introduced for diffusion-model
+parameterization by Salimans and Ho[^vpred]:
+
+$$
+v_t=\alpha_t\varepsilon-\sigma_tX_0.
+$$
+
+Then
+
+$$
+\begin{bmatrix}X_t\\v_t\end{bmatrix}
+=
+\begin{bmatrix}
+\alpha_t&\sigma_t\\
+-\sigma_t&\alpha_t
+\end{bmatrix}
+\begin{bmatrix}X_0\\\varepsilon\end{bmatrix}.
+$$
+
+When $\alpha_t^2+\sigma_t^2=1$, as in a variance-preserving schedule, the matrix
+is a rotation. Its population-optimal regression target is
+
+$$
+v_t^\star(x)
+=\mathbb E[v_t\mid X_t=x,t]
+=\alpha_t\varepsilon_t^\star(x)-\sigma_t m_t(x).
+$$
+
+So $v$-prediction is a fourth representation of the same conditional-mean
+information. Under the VP normalization the inverse rotation gives
+
+$$
+\boxed{
+m_t(x)=\alpha_t x-\sigma_t v_t^\star(x),
+\qquad
+\varepsilon_t^\star(x)=\sigma_t x+\alpha_t v_t^\star(x).
+}
+$$
+
+If $\alpha_t=\cos\phi_t$ and $\sigma_t=\sin\phi_t$, $v_t$ is also the derivative
+of the interpolation with respect to the angle $\phi_t$. The companion note uses
+$v$ for the probability-flow ODE velocity; here $v$ is reserved for the
+prediction target, so call the ODE velocity $u_t$. From the ODE derived
+[there](./07-probability-flow-ode.qmd#from-sde-to-ode-the-derivation), for the VP SDE,
+
+$$
+u_t(x)=-\tfrac12\beta(t)\bigl(x+s_t(x)\bigr)
+=\dot\phi_t\,v_t^\star(x),
+\qquad
+\dot\phi_t=\frac{\beta(t)\alpha_t}{2\sigma_t}.
+$$
+
+Thus, at interior times with $\sigma_t>0$, the conditional mean of the $v$ target
+is the probability-flow velocity after the deterministic time change
+$t\mapsto\phi_t$. The derivative $\dot\phi_t$ generally diverges as
+$\sigma_t\downarrow0$, so this is not a regular reparameterization at the clean
+endpoint.
+
+## Equivalent estimands, different training problems
+
+The affine equivalence is a population statement. It does **not** imply that all
+parameterizations train equally well with a finite network, finite data, and a
+particular optimizer.
+
+Coordinate conversion makes the endpoint conditioning visible. An error
+$\delta_\varepsilon$ in a noise head produces
+
+$$
+\delta_{x_0}=-\frac{\sigma_t}{\alpha_t}\delta_\varepsilon,
+$$
+
+which is amplified near the high-noise endpoint. In the other direction,
+
+$$
+\delta_\varepsilon=-\frac{\alpha_t}{\sigma_t}\delta_{x_0},
+$$
+
+which is amplified near the clean endpoint.
+
+These factors alone do **not** prove that one head is easier to learn: the same
+affine map rescales signal, approximation error, and the irreducible conditional
+variance together. A comparison becomes meaningful only after specifying the
+error consumed downstream — score, denoised sample, reverse mean, or velocity —
+and the approximation error achieved by a fixed finite model in each coordinate
+system. Parameterization matters because architectures, loss weights, numerical
+precision, and optimizers are not invariant to these time-dependent rescalings,
+not because the Bayes estimands contain different information.
+
+## Why did $\varepsilon$-prediction become the default?
+
+If the heads contain the same population information, a preference among them
+can come only from approximation, optimization, loss weighting, downstream
+numerics, or historical convention — not from one head containing additional
+population information. The reasons below mix documented design history with a
+retrospective conditioning analysis; they should not be mistaken for a single
+causal story.
+
+### A normalized supervised target
+
+At every noise level the sampled label has the same known marginal law,
+
+$$
+\varepsilon\sim\mathcal N(0,I).
+$$
+
+Its coordinate scale does not inherit image brightness, dataset covariance, or
+the changing signal-to-noise ratio. Direct $x_0$ targets retain the structure and
+scale of the data, while conditional-score targets
+$-\varepsilon/\sigma_t$ diverge in magnitude as $\sigma_t\downarrow0$.
+Predicting $\varepsilon$ avoids that small-noise target explosion. Earlier
+noise-conditional score models used an explicitly noise-scaled output for the
+same normalization reason.[^ncsn]
+
+This statement concerns the **sampled labels**, not the fitted function. The
+population-optimal output remains
+$\mathbb E[\varepsilon\mid X_t=x,t]$, whose distribution and difficulty do vary
+with $t$ and with the data law.
+
+### A useful implicit weighting over noise levels
+
+Because $\varepsilon_\theta=-\sigma_t s_\theta$ and
+$\varepsilon^\star=-\sigma_t s_t$,
+
+$$
+\|\varepsilon_\theta-\varepsilon^\star\|^2
+=\sigma_t^2\|s_\theta-s_t\|^2.
+$$
+
+An unweighted $\varepsilon$ objective is therefore a score objective weighted by
+$\sigma_t^2$. Relative to an unweighted score objective, it gives less weight to
+the small-$\sigma_t$ region in which conditional score labels have scale
+$1/\sigma_t$. Equivalently, a score loss with weight
+$\lambda(t)$ becomes a noise loss with weight
+$\lambda(t)/\sigma_t^2$. The familiar “simple” DDPM objective is consequently
+not just a relabeling: it chooses a consequential weighting across noise levels.
+This is best read as an analysis of the objective, not by itself as a historical
+account of why it was adopted.
+
+### Direct use in the DDPM reverse mean
+
+For a discrete DDPM, write the one-step retention as $a_k$, its cumulative
+product as $\bar a_k=\prod_{j=1}^k a_j$, and
+$X_k=\sqrt{\bar a_k}X_0+\sqrt{1-\bar a_k}\,\varepsilon$. The exact posterior
+$q(x_{k-1}\mid x_k,x_0)$ has a mean affine in $x_0$. Averaging over
+$X_0\mid X_k=x$ therefore makes the exact conditional reverse mean a fifth
+coordinate of the same estimator:
+
+$$
+\mathbb E[X_{k-1}\mid X_k=x]
+=\frac{1}{\sqrt{a_k}}
+\left(x-\frac{1-a_k}{\sqrt{1-\bar a_k}}\,
+\varepsilon_k^\star(x)\right).
+$$
+
+The full reverse conditional need not be Gaussian, but this conditional-mean
+identity is exact. The DDPM Gaussian model uses the same expression with
+$\varepsilon_k^\star$ replaced by $\varepsilon_\theta$.[^ddpm] This made the
+training target and reverse update compact: generate a known standard-normal
+label, fit it by MSE, and insert the output into the reverse mean. Unlike the
+probability-flow velocity $u_t$, this is a discrete-time conditional expectation
+of the previous state, not a continuous-time derivative.
+
+### Empirical success became convention
+
+The original DDPM work arrived at $\varepsilon$-prediction by reparameterizing
+the variational reverse mean and reported its effectiveness empirically; its
+ablations also tie the result to the simplified objective rather than to output
+coordinates alone.[^ddpm] Subsequent
+architectures, schedulers, software interfaces, and explanations standardized
+around it. Part of its status as the “preferred” parameterization is therefore
+path dependence: a successful baseline became the default language of the
+field. That history is evidence for usefulness, not proof of universal
+optimality.
+
+### It is not uniformly well-conditioned
+
+The endpoint factors do identify where a coordinate conversion is ill-conditioned,
+provided we say which downstream quantity must be accurate. Near the high-noise
+endpoint, an apparently small $\varepsilon$ error can become a large $x_0$ error
+after multiplication by $\sigma_t/\alpha_t$; the observation is nearly the noise,
+and the small difference that carries clean-signal information is difficult to
+resolve. Near the clean endpoint, an $x_0$ error becomes a large
+$\varepsilon$ or score error after multiplication by $\alpha_t/\sigma_t$.
+Accordingly, $\varepsilon$ coordinates resolve the small residual naturally near
+clean data, while $x_0$ coordinates avoid the singular recovery of clean signal
+near zero SNR. The VP rotation motivates $v$-prediction as a more balanced
+coordinate system.[^vpred] EDM-style formulations go further by explicitly
+preconditioning the input, output, and loss rather than treating any raw head as
+intrinsically correct.[^edm]
+
+The preference can therefore be summarized precisely:
+
+> $\varepsilon$-prediction became standard not because noise is the fundamental
+> object being learned, but because noise coordinates give normalized sampled
+> labels, a useful implicit timestep weighting, and a convenient reverse-step
+> formula. These properties, empirical results, and subsequent convention made
+> it a practical default, not a uniquely privileged statistical target.
+
+The defensible conclusion is:
+
+> The standard prediction heads are information-equivalent at the unrestricted
+> population optimum, but they are not necessarily optimization-equivalent in
+> practice.
+
+## What the phrase gets wrong
+
+“Noise prediction” is defensible as shorthand for the target used in a
+regression problem. It becomes misleading when read as a description of the
+fitted function.
+
+- The network does not reproduce a hidden random draw exactly; an irreducible
+  conditional variance generally remains.
+- Its output is a deterministic function of $(x,t)$, not newly generated static.
+- The predictable component is the posterior-mean displacement from the noisy
+  observation to the attenuated clean signal.
+- Under Gaussian corruption, that component is precisely the score in different
+  units.
+
+A more faithful phrase would be **conditional-noise mean estimation**. Better
+still, present $x_0$-, $\varepsilon$-, score-, and $v$-prediction together as
+alternative parameterizations of one learned conditional-mean field.
+
+[^vincent]: Pascal Vincent, “A Connection Between Score Matching and Denoising
+    Autoencoders,” *Neural Computation* 23(7), 2011,
+    [doi:10.1162/NECO_a_00142](https://doi.org/10.1162/NECO_a_00142). The
+    conditional-to-marginal score averaging used here is often called Vincent's
+    identity in the diffusion-model literature.
+
+[^ncsn]: Yang Song and Stefano Ermon, “Generative Modeling by Estimating
+    Gradients of the Data Distribution,” NeurIPS 2019,
+    [arXiv:1907.05600](https://arxiv.org/abs/1907.05600). Noise-conditional score
+    networks normalize the output and objective across noise scales, anticipating
+    the conditioning role later played by $\varepsilon$ parameterization.
+
+[^ddpm]: Jonathan Ho, Ajay Jain, and Pieter Abbeel, “Denoising Diffusion
+    Probabilistic Models,” NeurIPS 2020,
+    [arXiv:2006.11239](https://arxiv.org/abs/2006.11239), especially §3.2 and
+    Table 2. The paper derives the $\varepsilon$ parameterization from the
+    reverse-process mean and studies it together with the simplified objective.
+
+[^vpred]: Tim Salimans and Jonathan Ho, “Progressive Distillation for Fast
+    Sampling of Diffusion Models,” ICLR 2022,
+    [arXiv:2202.00512](https://arxiv.org/abs/2202.00512), §4. The paper introduces
+    the angular/velocity parameterization used here.
+
+[^edm]: Tero Karras, Miika Aittala, Timo Aila, and Samuli Laine, “Elucidating
+    the Design Space of Diffusion-Based Generative Models,” NeurIPS 2022,
+    [arXiv:2206.00364](https://arxiv.org/abs/2206.00364), especially §5 and
+    Table 1 on input, output, skip, and loss preconditioning.

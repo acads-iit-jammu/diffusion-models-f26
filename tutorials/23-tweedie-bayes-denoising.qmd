@@ -1,0 +1,417 @@
+# Tweedie's Formula: The Score as a Bayes-Optimal Denoiser {.unnumbered}
+
+*A standalone derivation. Prerequisites: Gaussian densities, Bayes' rule,
+conditional expectation, and differentiation. No ODE or SDE theory is needed.*
+
+**Place in the teaching sequence.** This is the statistical derivation in the
+three-note sequence: [geometric introduction](./22-vector-fields-to-score-diffusion.qmd)
+→ [worked sampling tutorial](./24-sampling-with-scores.qmd) → this proof.
+It can also be read independently. We reserve $\varrho$ for a Gaussian prior's
+standard deviation, keeping $\tau$ available for the reverse clock in the
+companion notes.
+
+We observe a corrupted signal
+
+$$\boxed{Y=X+\sigma\varepsilon,\qquad
+\varepsilon\sim\mathcal N(0,I_d),\quad\varepsilon\perp X,\quad\sigma>0.}$$
+
+The clean signal $X$ is random because it represents the population of possible
+data. Its law $P_X$ is our prior. We observe $Y=y$, but do not know either $X$ or
+the particular noise realization. What should we return as a denoised estimate?
+
+The answer depends on the loss. Under squared Euclidean error, the best answer
+is the **posterior mean**. Tweedie's formula expresses that mean using only the
+score of the noisy marginal density:
+
+$$\boxed{\mathbb E[X\mid Y=y]=y+\sigma^2\nabla_y\log p_Y(y).}$$
+
+We will prove both statements: why this is Bayes-optimal, and why the score gives
+exactly that estimate. Open [Lab 4: Tweedie's denoiser](../materials/score-flow-lab.html#tweedie)
+to explore the two-point example as you read.
+
+## 1. What does “Bayes-optimal denoiser” mean?
+
+A denoiser is a function $D$ that turns an observation into an estimate $D(Y)$.
+Its mean squared error, or Bayes risk, is
+
+$$R(D)=\mathbb E\|X-D(Y)\|^2.$$
+
+Assume $\mathbb E\|X\|^2<\infty$ and consider denoisers with finite risk.
+Then $D(Y)$ is square-integrable too, so the cross term below is well defined.
+Let $m(Y)=\mathbb E[X\mid Y]$. Add and subtract
+$m(Y)$ inside the error:
+
+$$X-D(Y)=[X-m(Y)]+[m(Y)-D(Y)].$$
+
+Expanding the squared norm produces two squared terms and a cross term. Given
+$Y$, the second bracket is known and
+$\mathbb E[X-m(Y)\mid Y]=0$. Therefore the cross term has expectation zero:
+
+$$
+\mathbb E\big[(X-m(Y))^\top(m(Y)-D(Y))\big]=0.
+$$
+
+It follows that
+
+$$\boxed{
+R(D)=\underbrace{\mathbb E\|X-m(Y)\|^2}_{\text{irreducible posterior uncertainty}}
++\underbrace{\mathbb E\|m(Y)-D(Y)\|^2}_{\text{avoidable estimation error}}.
+}$$
+
+The first term does not depend on $D$. The second is nonnegative and is zero
+exactly when $D(Y)=m(Y)$ almost surely. Thus
+
+$$\boxed{D^*(y)=\mathbb E[X\mid Y=y].}$$
+
+At a particular observation, the same argument reads
+
+$$\mathbb E[\|X-a\|^2\mid Y=y]
+=\operatorname{tr}\operatorname{Cov}(X\mid Y=y)+\|m(y)-a\|^2.$$
+
+“Optimal” means optimal for this loss and this joint model, not guaranteed to
+recover the actual hidden signal. The remaining risk is the average posterior
+variance. With other losses, the optimal estimate can change: absolute error in
+one dimension gives a posterior median, for example.
+
+## 2. The density we differentiate is the noisy marginal
+
+Conditional on $X=x$, the observation is Gaussian:
+
+$$p(y\mid x)=\frac{1}{(2\pi\sigma^2)^{d/2}}
+\exp\left[-\frac{\|y-x\|^2}{2\sigma^2}\right].$$
+
+Averaging over possible clean signals gives
+
+$$\boxed{p_Y(y)=\int p(y\mid x)\,P_X(dx).}$$
+
+If $X$ has a density, $P_X(dx)=p_X(x)dx$. If $X$ takes finitely many values, the
+integral is a sum. This notation lets the same proof apply to continuous data,
+discrete data, and data supported on a lower-dimensional set. Gaussian noise
+with $\sigma>0$ makes $p_Y$ smooth and strictly positive everywhere.
+
+The score in this tutorial is
+
+$$s_Y(y)=\nabla_y\log p_Y(y).$$
+
+It is a gradient with respect to the observed data coordinates. It is not a
+parameter gradient, not the clean-data score, and not the score of one fixed
+conditional likelihood $p(y\mid x)$.
+
+## 3. Differentiate the Gaussian, then use Bayes' rule
+
+The Gaussian kernel has derivative
+
+$$\nabla_y p(y\mid x)=\frac{x-y}{\sigma^2}p(y\mid x).$$
+
+Differentiate under the integral:
+
+$$
+\begin{aligned}
+\nabla_y p_Y(y)
+&=\int\nabla_y p(y\mid x)\,P_X(dx)\\
+&=\frac{1}{\sigma^2}\int(x-y)p(y\mid x)\,P_X(dx).
+\end{aligned}
+$$
+
+For fixed positive $\sigma$, Gaussian kernels and their first derivatives are
+locally uniformly bounded as functions of $x$ for $y$ in a compact set. This
+provides a dominating integrable bound against the probability measure $P_X$
+and justifies the interchange. The finite-second-moment assumption above also
+makes the squared-error decision problem well defined.
+
+Now divide by the positive marginal density:
+
+$$\frac{\nabla_y p_Y(y)}{p_Y(y)}
+=\frac{1}{\sigma^2}\int(x-y)
+\frac{p(y\mid x)P_X(dx)}{p_Y(y)}.$$
+
+Bayes' rule identifies the fraction as the posterior measure:
+
+$$P_{X\mid Y=y}(dx)=\frac{p(y\mid x)P_X(dx)}{p_Y(y)}.$$
+
+Hence
+
+$$
+\begin{aligned}
+\nabla_y\log p_Y(y)
+&=\frac{1}{\sigma^2}\int(x-y)\,P_{X\mid Y=y}(dx)\\
+&=\frac{\mathbb E[X\mid Y=y]-y}{\sigma^2}.
+\end{aligned}
+$$
+
+Rearranging proves Tweedie's formula:
+
+$$\boxed{m(y)=y+\sigma^2s_Y(y).}$$
+
+The whole proof is a Gaussian derivative followed by Bayes' rule. Bayes optimality
+comes from the squared-error decomposition in Section 1, not from differentiating
+the density alone.
+
+## 4. What the formula tells us geometrically
+
+The vector
+
+$$\boxed{\sigma^2s_Y(y)=m(y)-y}$$
+
+is the displacement from the observed noisy point to its posterior-mean clean
+estimate. Thus a score is not merely an abstract derivative: it encodes a
+denoising displacement, measured in units of noise variance.
+
+This is an exact identity for this Gaussian observation model. It is not an
+instruction to keep applying a fixed denoiser as a sampling algorithm. A
+posterior mean averages uncertainty and can lie between plausible clean signals.
+Likewise, repeated score ascent can concentrate particles at modes instead of
+reproducing a distribution.
+
+For additive noise, $s_Y(y)$ points toward $m(y)$. For scaled corruption, the
+correct endpoint of that arrow is the **scaled** posterior mean; we will make
+that distinction explicit below.
+
+## 5. Check it on a Gaussian prior
+
+Let $X\sim\mathcal N(\mu,\varrho^2)$ in one dimension, with $\varrho>0$. Then
+
+$$Y\sim\mathcal N(\mu,\varrho^2+\sigma^2),\qquad
+s_Y(y)=-\frac{y-\mu}{\varrho^2+\sigma^2}.$$
+
+Tweedie gives
+
+$$
+\begin{aligned}
+m(y)&=y-\frac{\sigma^2}{\varrho^2+\sigma^2}(y-\mu)\\
+&=\boxed{\frac{\varrho^2}{\varrho^2+\sigma^2}y
++\frac{\sigma^2}{\varrho^2+\sigma^2}\mu}.
+\end{aligned}
+$$
+
+The denoiser balances observation and prior mean. If observation noise is small,
+it trusts $y$. If noise is large, it trusts $\mu$. The posterior variance is
+$\varrho^2\sigma^2/(\varrho^2+\sigma^2)$, so even the optimal estimate usually has
+nonzero error.
+
+Notice why the marginal matters. The clean score would be
+$-(y-\mu)/\varrho^2$ and would give the wrong shrinkage. Tweedie requires the score
+of the **noise-smoothed** density $p_Y$.
+
+## 6. The VP diffusion form
+
+At a fixed time, consider
+
+$$\boxed{X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
+\varepsilon\perp X_0,\quad\sigma_t>0.}$$
+
+In the usual VP convention, $\alpha_t^2+\sigma_t^2=1$, but the derivation needs
+only the linear Gaussian observation model. Set $Z=\alpha_tX_0$ and apply the
+additive formula to $X_t=Z+\sigma_t\varepsilon$:
+
+$$\mathbb E[Z\mid X_t=x]=x+\sigma_t^2s_t(x),\qquad
+s_t(x)=\nabla_x\log p_t(x).$$
+
+Because $\alpha_t$ is known at the fixed time,
+
+$$\boxed{\alpha_t\mathbb E[X_0\mid X_t=x]
+=x+\sigma_t^2s_t(x).}$$
+
+When $\alpha_t\ne0$ (usually $\alpha_t>0$), this gives
+
+$$\boxed{m_t(x)=\mathbb E[X_0\mid X_t=x]
+=\frac{x+\sigma_t^2s_t(x)}{\alpha_t}.}$$
+
+The companion tutorials write this same posterior mean as
+$\widehat X_0(x,t)=m_t(x)$. The shorter $m_t$ notation here emphasizes that it
+is a conditional mean, and is also used in the denoising lab.
+
+Equivalently,
+
+$$\boxed{s_t(x)=\frac{\alpha_t m_t(x)-x}{\sigma_t^2}.}$$
+
+The score points from $x$ toward $\alpha_t m_t(x)$, not generally toward
+$m_t(x)$ itself. The distinction matters when the clean signal has been
+attenuated. At $\alpha_t=0$, the observation contains no information about
+$X_0$, so its posterior mean is the prior mean. Dividing by $\alpha_t$ is then
+invalid. At $\sigma_t=0$, the smoothed-score formula cannot be used as written.
+
+## 7. Noise prediction is another expression of the same conditional mean
+
+Rearrange the corruption equation and take conditional expectations:
+
+$$
+\begin{aligned}
+\varepsilon&=\frac{X_t-\alpha_tX_0}{\sigma_t},\\
+\mathbb E[\varepsilon\mid X_t=x]
+&=\frac{x-\alpha_t m_t(x)}{\sigma_t}
+=-\sigma_t s_t(x).
+\end{aligned}
+$$
+
+Write $e_t(x)=\mathbb E[\varepsilon\mid X_t=x]$. This is
+$\varepsilon^\star(x,t)$ in the companion tutorials; a fitted predictor
+$e_\theta(x,t)$ here corresponds to their $\varepsilon_\theta(x,t)$. Then
+
+$$\boxed{
+s_t=-e_t/\sigma_t,\qquad
+m_t=(x-\sigma_te_t)/\alpha_t,\qquad
+e_t=(x-\alpha_tm_t)/\sigma_t.
+}$$
+
+These are identities between optimal fitted functions, not claims that the
+particular random noise realization can be recovered. Under squared loss, a
+noise predictor estimates $e_t$, a clean-data predictor estimates $m_t$, and
+denoising score matching estimates $s_t$.
+
+Indeed, the conditional-score target is $-\varepsilon/\sigma_t$, and
+
+$$\mathbb E[-\varepsilon/\sigma_t\mid X_t=x]=s_t(x).$$
+
+That is why regression against a known corruption target can recover the
+unknown marginal score.
+
+The parameterizations encode the same information at the population optimum
+when $\alpha_t,\sigma_t\ne0$. Their training losses are not automatically
+equivalent under arbitrary time weighting. For example, with
+$s_\theta=-e_\theta/\sigma_t$,
+
+$$\lambda(t)\|s_\theta+\varepsilon/\sigma_t\|^2
+=\frac{\lambda(t)}{\sigma_t^2}\|e_\theta-\varepsilon\|^2.$$
+
+With $s_\theta=(\alpha_tD_\theta-x_t)/\sigma_t^2$, the same score-target loss
+equals $\lambda(t)\alpha_t^2\|D_\theta-X_0\|^2/\sigma_t^4$. Finite networks,
+optimization, and time weights can therefore make the practical training
+problems behave differently.
+
+## 8. Two possible clean values: derive the tanh denoiser
+
+Suppose $X_0$ takes values $-1$ and $+1$ with **equal probabilities**. Observe
+
+$$X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad \alpha_t>0,\ \sigma_t>0.$$
+
+The two likelihoods are Gaussians centered at $-\alpha_t$ and $+\alpha_t$.
+By Bayes' rule, the posterior odds are
+
+$$\frac{P(X_0=+1\mid x)}{P(X_0=-1\mid x)}
+=\exp\left[\frac{(x+\alpha_t)^2-(x-\alpha_t)^2}{2\sigma_t^2}\right]
+=\exp\left(\frac{2\alpha_t x}{\sigma_t^2}\right).$$
+
+Writing $\kappa=\alpha_t x/\sigma_t^2$ gives
+
+$$w_+(x)=\frac{1}{1+e^{-2\kappa}},\qquad w_-(x)=1-w_+(x).$$
+
+The posterior mean is their signed difference:
+
+$$\boxed{m_t(x)=w_+(x)-w_-(x)=\tanh\left(\frac{\alpha_t x}{\sigma_t^2}\right).}$$
+
+Substitution into Tweedie yields
+
+$$\boxed{s_t(x)=\frac{
+\alpha_t\tanh(\alpha_t x/\sigma_t^2)-x}{\sigma_t^2}.}$$
+
+The tanh denoiser and the mixture score are two expressions of the same posterior
+calculation. An unequal prior would add half the log prior odds inside the tanh;
+the symmetric formula relies on the equal weights.
+
+### Posterior mean, posterior mode, and posterior sample differ
+
+At $x=0$, the posterior gives probability $1/2$ to each clean value. Consequently:
+
+| Decision or draw | Result at $x=0$ |
+|---|---|
+| Posterior mean, optimal under squared error | $0$ |
+| Posterior mode (MAP) | A tie between $-1$ and $+1$ |
+| Posterior sample | Randomly $-1$ or $+1$, each with probability $1/2$ |
+
+Zero is not an allowed clean value, but it is the best squared-error estimate.
+Its conditional risk is $1$. Always choosing either endpoint has risk $2$.
+An independent draw from the posterior also has conditional risk $2$ here.
+Plausibility as a clean sample and optimality as a point estimate are different
+criteria.
+
+For a general observation in this two-point example,
+
+$$\operatorname{Var}(X_0\mid x)=1-m_t(x)^2,$$
+
+and an estimate $a$ has conditional risk
+
+$$\boxed{R_x(a)=1-m_t(x)^2+(a-m_t(x))^2.}$$
+
+**Lab 4.** Move the observed value, signal scale, and noise level. Read the
+posterior weights, posterior mean, and the score displacement. Move the candidate
+estimate away from the mean and watch its squared-error risk increase. At
+$x=0$, compare the posterior mean with both possible clean values.
+
+### The small-noise limit needs a qualification
+
+If $\alpha_t\to1$ and $\sigma_t\to0$, then for each fixed $x\ne0$,
+
+$$m_t(x)=\tanh(\alpha_t x/\sigma_t^2)\longrightarrow\operatorname{sign}(x).$$
+
+At $x=0$, the posterior mean remains zero by symmetry. This is a pointwise
+statement away from the decision boundary; it is not uniform near zero. At
+exactly zero noise the data law is atomic, with no ordinary density score on
+$\mathbb R$. The positive-noise score has a different limiting behavior from
+the posterior mean. For every fixed $x\notin\{-1,0,1\}$,
+
+$$\sigma_t^2s_t(x)\longrightarrow\operatorname{sign}(x)-x\ne0,$$
+
+so its magnitude diverges as the noise vanishes. At $x=0$, the score remains
+exactly zero by symmetry. At the clean points $x=\pm1$, the behavior depends on
+how the signal scale approaches one: with additive corruption ($\alpha_t\equiv1$)
+the score tends to zero, whereas with VP corruption
+($\alpha_t=\sqrt{1-\sigma_t^2}$) it tends to $\mp\tfrac12$.
+These are limits of smoothed-density scores, not scores of the atomic law itself.
+
+## 9. A useful extension: correlated Gaussian noise
+
+If $Y=X+\eta$, independently, with
+$\eta\sim\mathcal N(0,\Sigma)$ for known positive-definite $\Sigma$, then
+
+$$\nabla_y p(y\mid x)=\Sigma^{-1}(x-y)p(y\mid x).$$
+
+Repeating the proof gives
+
+$$\boxed{\mathbb E[X\mid Y=y]=y+\Sigma\nabla_y\log p_Y(y).}$$
+
+For non-isotropic noise, the covariance transforms the score into a denoising
+displacement; they need not point in the same Euclidean direction. The simple
+$\sigma^2$ multiplier is specific to isotropic Gaussian corruption.
+
+## 10. How this fits into diffusion sampling
+
+At each positive noise level, the model estimates a local field that encodes a
+posterior mean. A diffusion sampler uses that field together with its known
+drift, noise schedule, and current time to take the next step along a path of
+distributions. Returning a posterior mean once, or repeatedly applying a
+fixed-noise denoiser, is not generally equivalent to drawing a clean-data sample.
+
+The [vector-fields tutorial](./22-vector-fields-to-score-diffusion.qmd) explains
+the reverse-SDE and probability-flow ODE updates. This note supplies their
+statistical bridge:
+
+$$
+\text{squared-error optimality}
+\ \longrightarrow\ \text{posterior mean}
+\ \overset{\text{Gaussian corruption}}{\longleftrightarrow}\ \text{score}.
+$$
+
+## Exercises with checks
+
+1. Let $X\sim\mathcal N(0,4)$ and noise variance be $1$. Find $s_Y(y)$ and
+   $m(y)$. **Check:** $s_Y=-y/5$, $m=4y/5$.
+2. For equal two-point data, take $\alpha=1$, $\sigma=1$, $y=0.5$. Compute the
+   posterior mean, score, and minimum conditional risk. **Check:** approximately
+   $0.4621$, $-0.0379$, and $0.7864$.
+3. If $P(X_0=+1)=\pi\in(0,1)$, derive the mean. **Check:**
+   $\tanh(\alpha x/\sigma^2+\tfrac12\log[\pi/(1-\pi)])$.
+4. Why is the sampled target $-\varepsilon/\sigma_t$ usually different from the
+   true score at that input? **Check:** the score is its conditional average over
+   all compatible clean-signal and noise pairs.
+
+## References
+
+- Lai et al., [*The Principles of Diffusion Models*](https://arxiv.org/abs/2510.21890),
+  §3.3.4, Lemma 3.3.2 and Eq. (3.3.6), with the detailed proof in Appendix D.2.3;
+  §3.3.5 connects denoising with Bayes optimality.
+- Song et al., [*Score-Based Generative Modeling through Stochastic Differential
+  Equations*](https://arxiv.org/abs/2011.13456), for time-indexed score estimation
+  and sampling.
+- [One Estimator, Many Parameterizations](./21-one-estimator-many-parameterizations.qmd)
+  develops the broader conditional-mean parameterization argument in this course.

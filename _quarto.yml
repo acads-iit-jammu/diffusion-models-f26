@@ -25,6 +25,10 @@ project:
     - materials/w04-deck-01-metropolis-hastings.html
     - materials/w04-deck-02-gans.html
     - materials/walk-lab.html
+    - materials/score-flow-lab.html
+    - materials/score-flow-core.js
+    - materials/score-flow-lab.js
+    - materials/score-diffusion-example.py
     - materials/img/**
     - materials/site_libs/**
     - homeworks/*.pdf
@@ -65,6 +69,9 @@ book:
         - tutorials/15-comparing-distributions.qmd
         - tutorials/18-metropolis-hastings.qmd
         - tutorials/19-generative-adversarial-networks.qmd
+        - tutorials/22-vector-fields-to-score-diffusion.qmd
+        - tutorials/24-sampling-with-scores.qmd
+        - tutorials/23-tweedie-bayes-denoising.qmd
     - part: "Decks"
       chapters:
         - href: materials/w01-deck-01-mechanics.html
@@ -103,6 +110,7 @@ book:
     - part: "Draft"
       chapters:
         - tutorials/07-probability-flow-ode.qmd
+        - tutorials/21-one-estimator-many-parameterizations.qmd
     - resources.qmd
 
 format:
