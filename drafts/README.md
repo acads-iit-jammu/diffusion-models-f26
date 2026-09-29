@@ -19,7 +19,13 @@ W04 onwards as bare placeholders — dates, deadlines, holidays, nothing more. T
 teaching plan for those weeks is here, not on the site, so the site never claims a
 lecture that has not been committed to.
 
-## Promotion rule
+## `tutorials/` — published score-based diffusion sequence
+
+The four tutorials have been promoted to the course's Score-Based Diffusion
+section. Their [reading guide](../tutorials/score-based-diffusion-guide.qmd)
+provides the sequence and shared notation. Review records remain under `reviews/`.
+
+## Promotion rule for lecture-log pages
 
 **Draft → Live only if we follow the exact curriculum.** A week page goes back into
 `_quarto.yml` when the week it describes has been taught as the curriculum card says

@@ -1,0 +1,526 @@
+# Diffusion, Neural ODEs, and Normalizing Flows: The Same Density, Different Journeys {.unnumbered}
+
+::: {.callout-important}
+## Tutorial 3 of 4 · Connections
+
+**Question:** How does the probability-flow sampler connect to neural ODEs,
+normalizing flows, and flow matching?
+
+**Before this:** [Probability-Flow Sampling](./26-probability-flow-sampling.qmd).
+See the [series guide](./score-based-diffusion-guide.qmd) for the full route.
+
+**Core route:** change of variables → continuous transport → density tracking
+→ Gaussian couplings → likelihood → an introduction to flow matching.
+The infinitesimal determinant calculation and the flow-matching proof are
+optional derivation subsections.
+:::
+
+*Prerequisites: the first two tutorials, elementary calculus, and basic matrix
+algebra. This note introduces Jacobians through linear volume scaling. The
+published [From Local Arrows](./22-vector-fields-to-score-diffusion.qmd)
+is optional geometric background.*
+
+Suppose we can draw Gaussian noise, but want samples from a complicated data
+distribution. We need a mechanism that moves an entire random cloud into the
+right shape. An invertible neural network, a neural ODE, and a score-based
+diffusion model offer related ways to do this.
+
+The connection is easiest to understand by keeping two questions separate:
+
+1. **Particle question:** where does this particular starting point go?
+2. **Density question:** how is the whole population distributed at each time?
+
+An SDE and an ODE can give different answers to the first question while giving
+the same answer to the second. That is the central idea of this tutorial.
+
+## From discrete transformations to neural ODEs
+
+### Fix the notation and the direction of time
+
+We retain the notation of the earlier tutorials.
+
+| Symbol | Meaning |
+|---|---|
+| $p_0=p_{\mathrm{data}}$ | Clean-data density |
+| $p_t$ | Density at forward noising time $t$ |
+| $s_t(x)=\nabla_x\log p_t(x)$ | Score, differentiated with respect to the sample coordinate |
+| $f(x,t),g(t)$ | Forward-SDE drift and scalar noise amplitude |
+| $v(x,t)$ | Deterministic velocity field |
+| $\Psi_{s\to t}$ | ODE flow from time $s$ to time $t$ |
+| $\tau=T-t$ | Increasing generation clock |
+
+Here $\Phi$ remains reserved for the standard normal CDF. Forward time means
+**data to noise**; generation traverses that time interval backward.
+When discussing a generic flow, we write its density as $q_t$ to distinguish it
+from the prescribed diffusion marginals $p_t$.
+
+### Start with sampling as a transformation
+
+Draw $Z\sim p_Z$, then return $X=F(Z)$. The output is random even when $F$ is
+deterministic: the randomness came from $Z$.
+
+For a first example, let $Z\sim\mathcal N(0,1)$ and
+
+$$F(z)=\mu+az,\qquad a>0.$$
+
+Then $X\sim\mathcal N(\mu,a^2)$. Translation changes the mean; stretching
+changes the standard deviation. Because an interval has become $a$ times as
+wide, its probability density must become $1/a$ as large:
+
+$$p_X(x)=\frac1a p_Z\!\left(\frac{x-\mu}{a}\right).$$
+
+This is the intuition behind a normalizing flow. In $d$ dimensions, take an
+invertible differentiable map with differentiable inverse—a diffeomorphism—and
+write
+
+$$F=F_K\circ\cdots\circ F_1,\qquad x=F(z).$$
+
+First consider a linear map $X=AZ$ with invertible matrix $A$. A unit box
+becomes a parallelepiped of volume $|\det A|$. The same probability occupies
+that new volume, so
+
+$$p_X(x)=\frac{p_Z(A^{-1}x)}{|\det A|}.$$
+
+For example, $A=\operatorname{diag}(2,3)$ multiplies area by six and divides
+the corresponding density by six. Translation does not change area.
+
+A differentiable nonlinear map is approximately linear near $z$:
+$F(z+\delta z)\approx F(z)+J_F(z)\delta z$. Here the Jacobian matrix has entries
+$(J_F)_{ij}=\partial F_i/\partial z_j$. Applying the linear volume argument
+locally gives the nonlinear change-of-variables formula:
+
+$$\boxed{\log p_X(x)=\log p_Z(F^{-1}(x))
+-\log|\det J_F(F^{-1}(x))|.}$$
+
+The determinant measures local volume expansion. An expansion lowers density;
+a contraction raises it. Composing tractable invertible layers lets us build a
+complicated deformation while evaluating both its inverse and its density.
+
+### Replace layers by continuous motion
+
+A small residual layer has the form
+
+$$x_{k+1}=x_k+h\,v(x_k,t_k).$$
+
+This is also explicit Euler's approximation to
+
+$$\boxed{\dot x_t=v(x_t,t).}$$
+
+As the step size tends to zero under the usual convergence assumptions, the
+sequence of updates approaches an ODE trajectory. The resulting map is
+
+$$x_t=\Psi_{s\to t}(x_s).$$
+
+If $v$ is continuously differentiable in space, suitably regular in time, and
+solutions exist uniquely throughout the interval in both directions, the flow
+is a diffeomorphism. Global spatial Lipschitz bounds on a finite interval are
+one useful sufficient condition for existence and uniqueness.
+
+Why does uniqueness give invertibility? If two trajectories meet at the same
+point **at the same time**, solving backward from that state must recover the
+same initial point. Thus distinct initial states cannot merge. Spatial curves
+can pass through the same location at different times; that causes no problem.
+
+For a time-dependent field, the correct composition law is
+
+$$\boxed{\Psi_{r\to t}=\Psi_{s\to t}\circ\Psi_{r\to s},
+\qquad \Psi_{s\to t}^{-1}=\Psi_{t\to s}.}$$
+
+::: {.callout-note}
+## The exact flow and its numerical approximation are different objects
+
+For $\dot x=-x$, the exact map after duration $h$ is $x\mapsto e^{-h}x$,
+which is invertible for every finite $h$. Euler gives $x\mapsto(1-h)x$;
+at $h=1$ it collapses every point to zero. An arbitrary residual layer or
+finite solver step does not automatically inherit the exact flow's properties.
+:::
+
+When a neural network parameterizes $v_\theta$, this is a **neural ODE**.
+When we use that ODE to transport a base density and track its density change,
+it becomes a **continuous normalizing flow (CNF)**. A neural ODE used only for
+prediction or hidden-state evolution need not be a generative density model.
+See [Chen et al., Neural Ordinary Differential Equations](https://arxiv.org/abs/1806.07366).
+
+
+## Track density along the flow
+
+### From a Jacobian determinant to divergence
+
+Let $q_t$ be the density of particles moving with velocity $v$. Recall
+[Tutorial 2's box argument](./26-probability-flow-sampling.qmd): probability changes
+inside a small box only through its faces. The net outflow per unit volume
+in direction $i$ is $\partial_{x_i}(q_tv_i)$. Summing over coordinates gives
+
+$$\boxed{\partial_tq_t=-\nabla\cdot(q_tv).}$$
+
+This is the **continuity equation**. Assume densities are positive and smooth
+where we differentiate. Expanding the product gives
+
+$$\partial_t q_t=-v\cdot\nabla q_t-q_t\nabla\cdot v.$$
+
+Along a particle satisfying $\dot x_t=v(x_t,t)$, the chain rule now yields
+
+$$\begin{aligned}
+\frac{d}{dt}\log q_t(x_t)
+&=\frac{\partial_t q_t}{q_t}(x_t)
+  +v(x_t,t)\cdot\nabla\log q_t(x_t)\\
+&=\boxed{-\nabla\cdot v(x_t,t)}.
+\end{aligned}$$
+
+The two terms involving spatial density gradients cancel. Only the local
+expansion or compression of the velocity field remains.
+
+**Check with contraction.** For $v(x)=-x$ in $d$ dimensions,
+$\nabla\cdot v=-d$, so density along a trajectory grows as $e^{d\,t}$.
+The map shrinks volume by $e^{-d\,t}$. Their product stays constant, as
+conservation of probability requires.
+
+### Optional derivation: the infinitesimal Jacobian determinant
+
+A tiny Euler layer has Jacobian $I+hJ_v$. In two dimensions, for
+$A=\begin{pmatrix}a&b\\c&e\end{pmatrix}$,
+
+$$\det(I+hA)=(1+ha)(1+he)-h^2bc
+=1+h(a+e)+h^2(ae-bc).$$
+
+The first-order term is $h\operatorname{tr}A$, the sum of diagonal entries.
+The same expansion holds in any dimension. Since $\log(1+z)=z+O(z^2)$,
+
+$$\log\det(I+hJ_v)=h\operatorname{tr}J_v+O(h^2),
+\qquad\operatorname{tr}J_v=\nabla\cdot v.$$
+
+The discrete log-volume change therefore becomes divergence per unit time.
+The previous continuity-equation argument already established the result;
+this calculation connects it directly to the discrete flow formula.
+
+## Recall the probability-flow construction
+
+[Tutorial 2](./26-probability-flow-sampling.qmd) derives the density equation for
+$dX_t=f(X_t,t)dt+g(t)dW_t$ and rewrites its flux using $\nabla p_t=p_t s_t$.
+The resulting ODE velocity is
+
+$$\boxed{v(x,t)=f(x,t)-\tfrac12g(t)^2s_t(x).}$$
+
+With the exact score and the same initial law, it has the same one-time
+marginals as the forward SDE under the stated uniqueness and regularity
+conditions. The construction is due to
+[Song et al.](https://arxiv.org/abs/2011.13456). We now ask what its trajectories
+and density tracking reveal about the generative model.
+
+## Solve and compare Gaussian couplings
+
+### Solved example: Brownian spreading without random trajectories
+
+Take a one-dimensional Gaussian data distribution and constant noise amplitude:
+
+$$X_0\sim\mathcal N(\mu,a^2),\qquad dX_t=g\,dW_t,
+\qquad a>0,\quad g>0.$$
+
+The SDE has solution $X_t=X_0+gW_t$, so
+
+$$p_t=\mathcal N(\mu,V_t),\qquad V_t=a^2+g^2t.$$
+
+Here $V_t$ is the **total marginal variance**, not just the added noise variance.
+The score and probability-flow velocity are
+
+$$s_t(x)=-\frac{x-\mu}{V_t},\qquad
+v(x,t)=\frac{g^2}{2V_t}(x-\mu).$$
+
+The score points inward; the forward probability-flow velocity points outward.
+Set $y_t=x_t-\mu$. Then
+
+$$\frac{\dot y_t}{y_t}=\frac{g^2}{2(a^2+g^2t)}.$$
+
+Integration, with the equilibrium $y_t=0$ included separately, gives
+
+$$\boxed{\Psi_{s\to t}(x)
+=\mu+\sqrt{\frac{V_t}{V_s}}(x-\mu).}$$
+
+Every displacement from the mean is stretched by the same factor. Starting
+with variance $V_s$, the output variance is $(V_t/V_s)V_s=V_t$, exactly as
+required. No Brownian increments were needed to obtain this spreading cloud.
+
+For $\mu=2$, $a=1$, $g=1$, and $T=3$, the standard deviation doubles:
+
+| Starting point $x_0$ | ODE endpoint $x_3=2+2(x_0-2)$ |
+|---:|---:|
+| 0 | -2 |
+| 1 | 0 |
+| 2 | 2 |
+| 3 | 4 |
+| 4 | 6 |
+
+To generate the original data, sample $X_T\sim\mathcal N(2,4)$ and use
+$X_0=2+(X_T-2)/2$. This pure Brownian example does **not** make $p_T$ standard
+normal; we sample its actual terminal law.
+
+The density equation gives a second check:
+
+$$\partial_xv=\frac{g^2}{2V_t},\qquad
+\log p_t(x_t)-\log p_s(x_s)
+=-\tfrac12\log\frac{V_t}{V_s}.$$
+
+At a fixed standardized position, the Gaussian height falls in inverse
+proportion to its standard deviation, matching the change-of-variables rule.
+
+### Same marginals does not mean the same coupling
+
+For the Brownian example, both constructions have marginal variance $V_t$.
+Their relationships to the starting point differ:
+
+| Quantity, for $t>0$ | Forward SDE | Probability-flow ODE |
+|---|---|---|
+| Conditional endpoint given $X_0=x$ | $\mathcal N(x,g^2t)$ | Point mass at $\mu+\sqrt{V_t/a^2}(x-\mu)$ |
+| Marginal endpoint | $\mathcal N(\mu,V_t)$ | $\mathcal N(\mu,V_t)$ |
+| $\operatorname{Corr}(X_0,X_t)$ | $a/\sqrt{V_t}$ | $1$ |
+
+The correlations follow from independence of $X_0$ and $W_t$ for the SDE,
+and the positive affine relationship for the ODE. They quantify the distinction:
+the histograms agree, but the pairings between starts and endpoints do not.
+
+Consequently, inverting the probability-flow map for a noisy observation does
+not generally recover the clean point that generated that observation through
+the SDE. It inverts the **ODE coupling**. It is also generally different from
+Tweedie's posterior mean denoiser for the stochastic observation model.
+
+**A sharper example.** Consider stationary VP diffusion:
+
+$$dX_t=-\tfrac12\beta(t)X_t\,dt+\sqrt{\beta(t)}\,dW_t,
+\qquad X_0\sim\mathcal N(0,1).$$
+
+The density stays standard normal, so $s_t(x)=-x$. Therefore
+
+$$v(x,t)=-\tfrac12\beta(t)x-\tfrac12\beta(t)(-x)=0.$$
+
+SDE particles wander while every probability-flow particle stays still.
+Both clouds are standard normal at every time. The bare score-ascent ODE
+$\dot x=-x$, which contracts the cloud, is a third and different dynamics.
+
+
+## Use the flow for generation and likelihood
+
+### Generation: integrate the ODE backward
+
+For VP diffusion more generally,
+
+$$X_t\mid X_0=x_0\sim\mathcal N(\alpha_t x_0,\sigma_t^2I),$$
+
+$$\alpha_t=\exp\!\left[-\tfrac12\int_0^t\beta(r)\,dr\right],
+\qquad\sigma_t^2=1-\alpha_t^2.$$
+
+The terminal density approaches standard normal as the signal coefficient
+becomes small. Given the exact score, the exact generative map is
+
+$$X_T\sim p_T,\qquad X_0=\Psi_{T\to0}(X_T).$$
+
+With $\tau=T-t$, the generation velocity is
+
+$$\frac{dY_\tau}{d\tau}
+=-v(Y_\tau,T-\tau)
+=-f(Y_\tau,T-\tau)+\tfrac12g(T-\tau)^2s_{T-\tau}(Y_\tau).$$
+
+On a regular interval down to $t_0=t_{\min}$, take a descending grid
+$t_N=T>\cdots>t_0$. With positive step magnitudes, Euler gives
+
+$$\boxed{x_{k-1}=x_k-h_k v_\theta(x_k,t_k),\qquad
+h_k=t_k-t_{k-1}>0.}$$
+
+The [stochastic-sampler comparison](./26-probability-flow-sampling.qmd#reverse-sde)
+in Tutorial 2 derives why adding fresh noise changes the generation drift from
+$-f+g^2s/2$ to $-f+g^2s$. These are two different samplers, not the same update
+with a noise switch.
+
+Exact distributional recovery requires the exact score, the actual terminal
+law, and exact integration. Practical sampling introduces score error,
+terminal-prior approximation, and numerical error.
+
+### Diffusion's deterministic sampler is a CNF
+
+Under the smoothness and existence conditions stated above, we now have an
+invertible transport and a density-change equation. Those are
+the ingredients of a continuous normalizing flow.
+
+For a learned score, define
+
+$$v_\theta=f-\tfrac12g^2s_\theta.$$
+
+Let $\pi_T$ be the chosen terminal density, usually standard normal. The model
+density induced by backward integration is $q_{\theta,0}$. For an input $x_0$,
+solve **forward** to $x_T$ and integrate divergence:
+
+$$\boxed{\log q_{\theta,0}(x_0)
+=\log\pi_T(x_T)
++\int_0^T\nabla\cdot v_\theta(x_t,t)\,dt.}$$
+
+The plus sign follows by rearranging
+$\log q_{\theta,T}(x_T)-\log q_{\theta,0}(x_0)
+=-\int_0^T\nabla\cdot v_\theta\,dt$.
+
+This computes the learned ODE model's likelihood, not automatically the true
+data likelihood. With an approximate score, its intermediate densities need
+not equal the prescribed $p_t$, nor those of the approximate reverse SDE.
+Numerical integration and stochastic trace estimators can also introduce
+evaluation error. The change-of-variables identity itself is exact. If we
+stop at $t_{\min}>0$, replace the lower integration limit and $x_0$ by
+$t_{\min}$ and $x_{t_{\min}}$. That gives the model density at positive
+noise, not a likelihood for the unnoised clean law.
+
+There is an endpoint qualification: a smooth diffeomorphism of a full-dimensional
+Gaussian cannot produce an exactly discrete distribution or one supported on a
+lower-dimensional surface. Such targets require a singular limit, smoothing,
+or stopping at positive noise. The finite-time invertibility claims apply on
+intervals where the stated regularity holds.
+
+
+## Connect score learning to velocity learning
+
+### Recall: score training is conditional averaging
+
+[Tutorial 1](./25-learning-the-score.qmd#mse-lemma) proves that squared-error
+regression learns a conditional mean. Applied to corruption targets it gives
+
+$$s_t(x)=\mathbb E[-\epsilon/\sigma_t\mid X_t=x],\qquad
+\mathbb E[X_0\mid X_t=x]=\frac{x+\sigma_t^2s_t(x)}{\alpha_t}.$$
+
+This uses positive noise and $\alpha_t>0$. We train away from the singular
+endpoint, or choose appropriate time weighting as explained in Tutorial 1.
+We can use the same conditional-averaging idea to learn velocities directly.
+
+### Where flow matching fits
+
+The architecture and the training objective are separate choices. A CNF may be
+trained by likelihood, by score-derived objectives, or by direct velocity
+regression. Flow matching provides a way to construct tractable velocity
+targets along chosen conditional paths, including paths beyond diffusion.
+See [Lipman et al., Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747).
+
+The idea is to prescribe simple paths for individual training pairs, then
+regress on their known velocities. If several paths pass through the same
+region, the learned velocity averages their directions conditional on the
+current position. For example, a path from a point $a$ to a point $b$ can be
+written $(1-r)a+rb$, with velocity $b-a$. Fitting those velocities can train
+an ODE without first predicting a score. The fitted ODE need not reproduce
+each training pair's path.
+
+The optional calculation below shows that one particular family of Gaussian
+paths recovers the probability-flow velocity. The main connection is already
+visible: both methods use regression to learn local information and integration
+to generate a global transport. The paper uses noise-to-data time; here we
+retain data-to-noise time and generate backward.
+
+### Optional derivation: velocity regression on a diffusion path
+
+Work on an interior interval where $\alpha_t,\sigma_t>0$ are differentiable,
+with finite moments and sufficient regularity to differentiate expectations.
+This proof reuses conditional expectation from Tutorial 1 and the probe-function
+argument from Tutorial 2.
+Keep a single pair $(X_0,\epsilon)$ fixed and define the interpolant
+
+$$\widetilde X_t=\alpha_tX_0+\sigma_t\epsilon.$$
+
+Its one-time laws are $p_t$, but this differentiable interpolant is **not** a
+Brownian sample path. Its conditional velocity is
+
+$$U_t=\dot\alpha_tX_0+\dot\sigma_t\epsilon.$$
+
+For a smooth test function $\varphi$, differentiation gives
+
+$$\frac{d}{dt}\mathbb E[\varphi(\widetilde X_t)]
+=\mathbb E[\nabla\varphi(\widetilde X_t)\cdot U_t]
+=\mathbb E[\nabla\varphi(\widetilde X_t)\cdot
+\mathbb E[U_t\mid\widetilde X_t]].$$
+
+The last equality is the tower property: once $\widetilde X_t$ is fixed,
+$\nabla\varphi(\widetilde X_t)$ is fixed, so we can average $U_t$ conditionally.
+Define $u_t(x)=\mathbb E[U_t\mid\widetilde X_t=x]$. For smooth probe functions
+that vanish outside a bounded region, integration by parts gives
+
+$$\int\varphi\,\partial_t p_t\,dx
+=\int p_t\nabla\varphi\cdot u_t\,dx
+=-\int\varphi\,\nabla\cdot(p_tu_t)\,dx.$$
+
+Equality for all probes says $\partial_t p_t=-\nabla\cdot(p_tu_t)$.
+This integrated form is called the **weak continuity equation**. Under smoothness
+it gives the ordinary density equation, exactly as in Tutorial 2. The MSE lemma
+shows that regression onto $U_t$ learns $u_t$.
+
+For a linear forward SDE with $f(x,t)=a_t x$, the coefficients satisfy
+
+$$\dot\alpha_t=a_t\alpha_t,\qquad
+2\sigma_t\dot\sigma_t=2a_t\sigma_t^2+g(t)^2.$$
+
+Using Tweedie and $\mathbb E[\epsilon\mid x]=-\sigma_t s_t(x)$,
+
+$$\begin{aligned}
+u_t(x)
+&=\frac{\dot\alpha_t}{\alpha_t}
+   [x+\sigma_t^2s_t(x)]-\sigma_t\dot\sigma_t s_t(x)\\
+&=a_t x-\tfrac12g(t)^2s_t(x)\\
+&=v(x,t).
+\end{aligned}$$
+
+For this choice of path, velocity regression and score regression recover the
+same population velocity. For VP with $\beta(0)>0$,
+$\dot\sigma_t$ grows like $1/\sqrt t$ near zero, so the second moment of the
+velocity target can diverge like $1/t$. As with score training, use a positive
+time cutoff or weighting that makes the expected loss finite. Smooth endpoint
+behavior must not be assumed from this interior calculation.
+
+Other interpolation paths can give different
+transports. Straight conditional paths do not imply that the learned marginal
+ODE trajectories are themselves straight; the conditional averaging matters.
+
+
+## Review the model relationships
+
+### A map of the connections
+
+```{mermaid}
+flowchart TD
+    A[Invertible discrete layers] -->|Continuous limit of small updates| B[ODE transport]
+    N[Neural velocity field] --> B
+    B -->|Track divergence| C[Continuous normalizing flow]
+    D[Forward diffusion SDE] --> E[Prescribed density path]
+    E --> F[Learn the score through denoising]
+    F --> G[Construct probability-flow velocity]
+    G --> C
+    H[Conditional paths and velocity targets] -->|Flow matching| C
+```
+
+| Approach | What is represented or learned? | How are samples produced? |
+|---|---|---|
+| Discrete normalizing flow | Invertible transformations with tractable Jacobians | Apply the transformations to base samples |
+| Likelihood-trained CNF | A velocity and its induced density | Integrate the learned ODE |
+| Score-based diffusion | Scores of prescribed noisy marginals | Integrate a reverse SDE or probability-flow ODE |
+| Flow-matching CNF | A velocity from conditional-path regression | Integrate the learned ODE |
+
+This is a map of relationships, not a claim that every discrete flow is the
+flow of an ODE. For example, an ODE flow starting at the identity has positive
+Jacobian determinant wherever regular, whereas an invertible discrete map may
+reverse orientation.
+
+### Check your understanding
+
+1. **A standard Gaussian has score $-x$. Why does this not imply its
+   probability-flow ODE contracts?** The probability-flow velocity also includes
+   $f$ and the coefficient $-g^2/2$. For stationary VP diffusion, they cancel.
+2. **Two simulators have identical histograms at every time. Must their
+   start–endpoint scatter plots agree?** No. In the Brownian example one is
+   scattered, while the ODE pairs lie on a straight line.
+3. **Why can deterministic generation produce random samples?** Its input is
+   random; the flow transports that randomness.
+4. **Why is a conditional-score training target useful when it is not the
+   marginal score?** Squared-error regression averages over possible clean
+   origins conditional on the observed noisy point, recovering the marginal score.
+5. **What does a learned ODE likelihood describe?** The density induced by its
+   chosen terminal law and velocity, which need not equal the true data density.
+
+The central distinction to retain is between a path of distributions and a
+coupling of particles across time. Diffusion specifies one stochastic coupling;
+its probability-flow ODE supplies a deterministic one with the same marginals
+in the ideal construction. That deterministic transport is where diffusion and
+continuous normalizing flows meet.
+
+
+**Continue:** [Tutorial 4: Langevin Dynamics](./28-langevin-dynamics.qmd)
+connects equilibrium sampling, reverse diffusion, and annealed Langevin.

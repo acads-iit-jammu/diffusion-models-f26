@@ -1,0 +1,416 @@
+# Langevin Dynamics: Keeping a Density Still, Moving a Density Backward {.unnumbered}
+
+::: {.callout-note}
+## Tutorial 4 of 4 · Langevin sampling
+
+**Question:** How does the same score support both equilibrium sampling and
+reverse diffusion, and why are these different dynamics?
+
+**Before this:** [Tutorial 1](./25-learning-the-score.qmd) introduces Gaussian
+increments and Euler–Maruyama; [Tutorial 2](./26-probability-flow-sampling.qmd)
+derives Fokker–Planck and reverse-time sampling. No additional SDE background
+is assumed. [Tutorial 3](./27-diffusion-neural-odes-normalizing-flows.qmd) provides
+the optional transport perspective.
+
+**Core route:** a numerical sampler → Gaussian example → stationary density
+→ comparison with reverse diffusion → annealing and predictor–corrector sampling.
+Longer calculations sit in derivation subsections; the final density-operator
+view is optional.
+:::
+
+## Start with a fixed target and a sampling update
+
+Suppose we want samples from one fixed density $p(x)$ and know its score
+$s(x)=\nabla_x\log p(x)$. Use a positive step size $\eta$ and independent
+$\xi_k\sim\mathcal N(0,I)$:
+
+$$\boxed{x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,\xi_k.}$$
+
+The score term draws the particle toward higher density. The random term
+spreads the cloud and allows exploration. Their relative sizes matter:
+adding arbitrary noise to gradient ascent does not automatically sample $p$.
+The initial point can come from an easy distribution; there is no promise
+that the first few iterates already have the target law.
+
+This update is Euler–Maruyama for **overdamped Langevin dynamics**:
+
+$$\boxed{dZ_u=s(Z_u)\,du+\sqrt2\,dB_u.}$$
+
+“Overdamped” means we model position directly, without a separate momentum
+variable. $B_u$ is standard Brownian motion, with independent increments of
+covariance $hI$ over a time interval of length $h$.
+
+### Keep three clocks distinct
+
+| Symbol | Meaning |
+|---|---|
+| $u$ | Algorithmic Langevin time; the target $p$ is fixed |
+| $t$ | Forward diffusion time; the noisy density $p_t$ changes |
+| $\tau=T-t$ | Increasing reverse-diffusion clock |
+| $q_u$ | Current Langevin sampler density, which need not yet equal $p$ |
+
+We keep $\tau$ reserved for reverse diffusion, as in the earlier tutorials.
+Langevin runs longer by increasing $u$; this does not change the target's noise
+level. At a fixed diffusion level $t$, one can run a separate Langevin process
+in $u$ targeting the frozen density $p_t$.
+
+### Energy interpretation: the normalizing constant disappears
+
+Suppose $p(x)=e^{-E(x)}/C$, where $C=\int e^{-E(x)}dx$ is finite. Then
+
+$$s(x)=-\nabla E(x),\qquad
+x_{k+1}=x_k-\eta\nabla E(x_k)+\sqrt{2\eta}\,\xi_k.$$
+
+The deterministic part resembles gradient descent on energy, but the aim is
+to sample a distribution of states, rather than return an energy minimizer.
+We do not need $C$ because its logarithm has zero spatial derivative.
+For $p(x)\propto e^{-E(x)/\mathcal T}$ at temperature $\mathcal T>0$,
+$dZ_u=-\nabla E(Z_u)du+\sqrt{2\mathcal T}\,dB_u$ has the corresponding
+balance. We use $\mathcal T=1$ below.
+
+## First solved problem: a Gaussian target
+
+Let $p=\mathcal N(\mu,a^2)$ in one dimension, with $a>0$. Its score is
+$s(x)=-(x-\mu)/a^2$, so
+
+$$dZ_u=-\frac{Z_u-\mu}{a^2}\,du+\sqrt2\,dB_u.$$
+
+If we deleted the noise, the ODE would give
+$z_u=\mu+e^{-u/a^2}(z_0-\mu)$, contracting every point toward the mean.
+Langevin keeps adding variance while the drift removes it.
+
+### Derivation: the mean and variance approach the target
+
+The expected Taylor formula from Tutorial 1 is
+$d\mathbb E[\varphi(Z_u)]/du=\mathbb E[s\varphi'+\varphi'']$.
+Setting $\varphi(z)=z$ gives, with $m_u=\mathbb E[Z_u]$,
+
+$$\dot m_u=-\frac{m_u-\mu}{a^2},\qquad
+m_u=\mu+e^{-u/a^2}(m_0-\mu).$$
+
+Apply the same formula to $(z-\mu)^2$, then subtract $(m_u-\mu)^2$ to obtain
+
+$$\dot V_u=-\frac{2}{a^2}V_u+2,\qquad
+\boxed{V_u=a^2+e^{-2u/a^2}(V_0-a^2).}$$
+
+This calculation assumes finite second moments. It shows how variance approaches
+$a^2$; moment convergence alone would not prove convergence of the full law.
+Here the linear Gaussian structure gives more: conditional on $Z_0=z_0$,
+
+$$\boxed{Z_u\mid Z_0=z_0\sim
+\mathcal N\!\left(\mu+e^{-u/a^2}(z_0-\mu),
+a^2(1-e^{-2u/a^2})\right).}$$
+
+As in Tutorial 1, repeated linear updates are weighted sums of independent
+Gaussians; their small-step limit explains this conditional Gaussian law. Equivalently, at
+one time we may write
+
+$$Z_u=\mu+e^{-u/a^2}(Z_0-\mu)
++a\sqrt{1-e^{-2u/a^2}}\,\epsilon,\qquad\epsilon\sim\mathcal N(0,1),\quad\epsilon\perp Z_0.$$
+
+The initial contribution vanishes and the noise contribution approaches
+$\mathcal N(0,a^2)$. This establishes convergence in distribution to the Gaussian target from any
+initial probability law; this last distributional argument does not require
+the finite moments used in the earlier moment calculation.
+If $Z_0\sim p$ already, the law stays $p$, although individual particles move.
+
+**Example:** take $\mu=2$, $a=1$, and $Z_0=5$. At $u=1$, the sampler has
+mean $2+3e^{-1}\approx3.104$ and variance $1-e^{-2}\approx0.865$.
+At long times it approaches $\mathcal N(2,1)$, not a point mass at 2.
+
+## Why the target is stationary
+
+### Derivation: cancellation in Fokker–Planck
+
+Tutorial 2 shows that drift $b$ and scalar noise amplitude $g$ give the density
+change $-\nabla\cdot(bq)+g^2\Delta q/2$. For Langevin, $b=s$ and $g=\sqrt2$:
+
+$$\partial_u q_u=-\nabla\cdot(q_u\nabla\log p)+\Delta q_u.$$
+
+Substitute $q_u=p$. Since $p\nabla\log p=\nabla p$,
+
+$$-\nabla\cdot(p\nabla\log p)+\Delta p
+=-\Delta p+\Delta p=0.$$
+
+Thus $p$ is **stationary**, or invariant: starting at $p$ keeps the same density.
+We assume a smooth positive target, a well-defined nonexplosive process, and
+boundary behavior that conserves probability. The calculation is about the
+continuous-time SDE, not automatically about a finite-step algorithm.
+
+### Stationarity is not a convergence proof
+
+Stationarity answers “does the process preserve $p$?” Convergence asks “does
+it approach $p$ from another initial law?” Convergence needs further conditions
+ensuring exploration and return from the tails. For instance, a sufficiently
+regular strongly convex confining energy gives a useful favorable case.
+We proved convergence explicitly for the Gaussian rather than assume it from
+stationarity. With multiple separated modes, a sampler can take a long time
+to move between them: this is slow **mixing**. Imagine a cloud concentrated
+around one peak of a two-mode density: local steps may explore that peak well
+long before any particle crosses the low-density region to the other peak.
+
+A chain's successive outputs are also correlated. Many steps do not necessarily
+mean many nearly independent samples, especially when mixing is slow.
+
+## The numerical sampler introduces its own error
+
+The Euler–Maruyama update is often called the **unadjusted Langevin algorithm
+(ULA)**. “Unadjusted” means that no accept/reject correction is added.
+Even with the exact score, ULA's stationary law, when it exists, generally
+differs from the target at a fixed positive step.
+
+### Derivation: finite-step bias for the Gaussian
+
+For our Gaussian, write $\gamma=1-\eta/a^2$. Then
+
+$$x_{k+1}-\mu=\gamma(x_k-\mu)+\sqrt{2\eta}\,\xi_k.$$
+
+Independence gives the variance recursion
+$V_{k+1}=\gamma^2 V_k+2\eta$. A stationary variance exists when $|\gamma|<1$, or
+$0<\eta<2a^2$. Solving $V_\eta=\gamma^2V_\eta+2\eta$ gives
+
+$$\boxed{V_\eta=\frac{2\eta}{1-(1-\eta/a^2)^2}
+=\frac{a^2}{1-\eta/(2a^2)}.}$$
+
+It is too large. For a standard normal target and $\eta=0.2$, the stationary
+variance is $1/0.9\approx1.111$, not 1. Running longer removes initialization
+error but not this discretization bias. At $\eta=2a^2$ no finite stationary
+variance exists, and larger steps are unstable for this example.
+
+**An exact Gaussian step for comparison:** for any $\eta>0$,
+
+$$x_{k+1}=\mu+e^{-\eta/a^2}(x_k-\mu)
++a\sqrt{1-e^{-2\eta/a^2}}\,\xi_k$$
+
+preserves the correct Gaussian. Its contraction and noise variance come from
+the exact conditional law above. Non-Gaussian targets usually do not supply
+such a closed-form transition. Step refinement reduces numerical error under
+appropriate conditions, but general ULA stability needs more than a valid score.
+
+## Compare Langevin with reverse diffusion
+
+The forward/reverse SDE pair and the translation from Song's negative-$dt$
+notation are displayed explicitly in
+[Tutorial 2](./26-probability-flow-sampling.qmd#song-sde-conventions).
+
+
+Use Tutorial 2's [reverse-SDE check](./26-probability-flow-sampling.qmd#reverse-sde)
+for this comparison. If you skipped it, the density calculation below also
+verifies the marginal evolution. Write all reverse-diffusion quantities at
+$t=T-\tau$:
+
+$$\text{reverse SDE:}\quad
+ dY_\tau=[-f(Y_\tau,t)+g(t)^2s_t(Y_\tau)]d\tau
+ +g(t)d\overline W_\tau,$$
+
+$$\text{probability-flow ODE:}\quad
+ \frac{dY_\tau}{d\tau}=-f(Y_\tau,t)+\tfrac12g(t)^2s_t(Y_\tau)
+ =-v(Y_\tau,t).$$
+
+The reverse SDE evolves through a prescribed sequence $p_{T-\tau}$ when
+initialized at the exact $p_T$ and supplied the exact score. It does not wait
+for equilibrium at each time. Ordinary Langevin keeps one target fixed and
+approaches its equilibrium over algorithmic time $u$.
+
+### Derivation: time scaling cannot repair a coefficient mismatch {#coefficient-balance}
+
+Freeze a target $p$ and consider constants $A,D>0$:
+
+$$dZ_u=A\,s(Z_u)du+\sqrt{2D}\,dB_u.$$
+
+A density with zero probability flux satisfies
+$Aq\nabla\log p-D\nabla q=0$, hence
+
+$$\nabla\log q=\frac{A}{D}\nabla\log p,
+\qquad q(x)\propto p(x)^{A/D}.$$
+
+When this expression is normalizable and the dynamics are well defined, it
+provides a stationary density. To target $p$ itself, choose $A=D$.
+Changing to $w=cu$, where $c>0$, divides both $A$ and $D$ by $c$.
+To see why, over a $w$-interval of length $h$, the old clock advances by $h/c$.
+The drift increment is $A s\,h/c$. The noise increment has covariance
+$2D(h/c)I$, the same as noise amplitude $\sqrt{2D/c}$ over an interval of
+length $h$ in the new clock. Thus
+
+$$A\longmapsto A/c,\qquad D\longmapsto D/c,$$
+
+while the noise amplitude scales by $1/\sqrt c$, not $1/c$.
+The ratio $A/D$ is unchanged. This explains the equivalent conventions
+
+$$dZ=s(Z)du+\sqrt2\,dB_u,
+\qquad dZ=\tfrac12s(Z)dw+d\widetilde B_w,\quad w=2u,$$
+
+where $\widetilde B$ is a standard Brownian motion in the new clock.
+
+A factor of two in the score alone cannot be absorbed by changing the clock.
+
+### Drift-free diffusion: similar ingredients, different balance
+
+For $dX_t=g(t)dW_t$, the reverse SDE is
+
+$$dY_\tau=g(t)^2s_t(Y_\tau)d\tau+g(t)d\overline W_\tau.$$
+
+At a frozen time with $g(t)>0$, its constants are $A=g^2$, $D=g^2/2$.
+Their ratio is 2. If we artificially held that score and those coefficients
+fixed, the zero-flux stationary density would be proportional to $p_t^2$,
+when normalizable, rather than $p_t$.
+
+For a Gaussian $p_t=\mathcal N(\mu,V_t)$, this frozen process equilibrates to
+$\mathcal N(\mu,V_t/2)$. That is a concrete way to see the mismatch.
+The genuine reverse process does not freeze $t$: it changes the score and
+coefficients while transporting a changing density.
+
+In particular, define a new reverse-sampling clock $\lambda$ by
+$d\lambda=g(t)^2d\tau/2$, on an interval where $g>0$. Brownian variance scaling
+then gives
+
+$$dY=2s_t(Y)\,d\lambda+\sqrt2\,d\widetilde B_\lambda,$$
+
+with $t$ still changing along $\lambda$. This is a change of the reverse clock,
+not the fixed-target Langevin clock $u$. The coefficient 2 remains; it is not
+ordinary Langevin targeting $p_t$.
+
+For this drift-free forward process, the added variance is
+$\sigma_t^2=\int_0^t g(r)^2dr$ when initial added noise is zero. Increasing
+noise of this form gives the variance-exploding (VE) construction. It need not
+make $p_T$ a standard normal: both its variance scale and residual data matter.
+
+### VP diffusion: the reversed drift also matters
+
+For VP, $f(x,t)=-\beta(t)x/2$ and $g(t)^2=\beta(t)$, so
+
+$$dY_\tau=\left[\tfrac12\beta(t)Y_\tau+\beta(t)s_t(Y_\tau)\right]d\tau
++\sqrt{\beta(t)}d\overline W_\tau.$$
+
+The $+\beta Y/2$ reverses the forward contraction. Ignoring it changes the
+sampling process. There is a useful special case: if the data law itself is
+$\mathcal N(0,I)$, VP leaves it unchanged, so $p_t=\mathcal N(0,I)$ and
+$s_t(x)=-x$ at every time. Its complete reverse drift is then $-\beta x/2$.
+Together with noise $\sqrt\beta$, this is correctly balanced Langevin for
+$\mathcal N(0,I)$, with a time-dependent rate. Ordinary reverse VP for a changing,
+non-Gaussian $p_t$ is not fixed-target Langevin.
+
+## The precise bridge: transport plus a Langevin contribution
+
+Split the reverse drift algebraically:
+
+$$\boxed{-f+g^2s_t
+=\underbrace{-f+\tfrac12g^2s_t}_{\text{probability-flow transport }-v}
++\underbrace{\tfrac12g^2s_t}_{\text{Langevin drift}}.}$$
+
+Pair the second term with the existing Brownian noise $g\,d\overline W$.
+At a frozen noise level, drift $g^2s_t/2$ and noise amplitude $g$ have
+$A=D=g^2/2$, the correct Langevin balance for $p_t$.
+
+So the reverse SDE combines transport that changes the target density with
+an instantaneous Langevin contribution that leaves that target unchanged.
+This is a decomposition of drift and density evolution, not a claim that two
+independent trajectories can be added together.
+
+### Optional derivation: check the decomposition on densities
+
+At reverse time $\tau$, let $q$ be an arbitrary current density. Here $s_t$
+is the score of the prescribed target $p_t$, not the score of $q$. Its evolution
+under the reverse SDE can be written
+
+$$\partial_\tau q=\nabla\cdot(qv)
++\tfrac12g^2\left[\Delta q-\nabla\cdot(qs_t)\right].$$
+
+The first term is the generation-clock ODE's transport. The bracket is the
+Langevin contribution. Substituting $q=p_t$ makes the bracket vanish because
+$\nabla p_t=p_t s_t$. The remaining term produces the prescribed reverse
+marginal evolution. If $q\ne p_t$, the bracket need not vanish.
+
+This also explains the half-factor: fresh noise adds spreading, which requires
+an additional half-score drift beyond the deterministic transport. Removing
+noise while retaining that extra drift generally changes the density path.
+
+## Annealing and predictor–corrector sampling
+
+### Annealed Langevin: equilibrate approximately, then change the target
+
+Construct smoothed data densities using additive noise,
+$p_{\sigma_i}$ being the law of $X_0+\sigma_i\epsilon$, with
+$\sigma_1>\cdots>\sigma_L>0$. The subscript here is a **noise standard deviation**,
+not a clock. At level $i$, hold $\sigma_i$ fixed for $K_i$ iterations:
+
+$$x\leftarrow x+\eta_i s_\theta(x,\sigma_i)
++\sqrt{2\eta_i}\,\xi.$$
+
+Then move to $\sigma_{i+1}$ using the current particles as starting states.
+Large noise can smooth sharp structure and help travel between separated modes;
+smaller noise gradually restores detail. This is the annealed Langevin approach
+used by [Song and Ermon](https://arxiv.org/abs/1907.05600).
+
+It is a sequence of fixed-target sampling problems. Finite iterations, finite
+steps, and approximate scores need not yield equilibrium at any level. Even
+perfect equilibration at the last level gives $p_{\sigma_L}$, a smoothed law,
+not exactly the clean distribution. The starting distribution at the largest
+noise level is also a choice or approximation, not automatically exact.
+
+### Predictor–corrector: change the noise level, then improve sampling there
+
+A predictor advances from $t_k$ to $t_{k-1}<t_k$ using a reverse-SDE or
+probability-flow step. A corrector then holds $t_{k-1}$ fixed and runs a few
+Langevin updates targeting $p_{t_{k-1}}$. This is the predictor–corrector
+framework of [Song et al.](https://arxiv.org/abs/2011.13456).
+
+A schematic ODE-predictor version is
+
+```text
+start with a terminal sample x
+# v_theta(x,t) = f(x,t) - 0.5*g(t)^2 * s_theta(x,t)
+for each descending pair t_k, t_{k-1}:
+    h = t_k - t_{k-1}                  # h > 0
+    x = x - h * v_theta(x, t_k)        # predictor: change level
+    repeat K times:
+        draw fresh xi ~ N(0, I)
+        x = x + eta * s_theta(x, t_{k-1}) + sqrt(2*eta) * xi
+                                        # corrector: hold level fixed
+return x at a positive minimum noise level
+```
+
+Exact Langevin transitions preserve the target at the frozen level. Euler
+corrector steps generally have discretization bias, and a few such steps are
+not guaranteed to improve every error. The density-level decomposition motivates
+the method; arbitrary finite predictor/corrector steps are not an exact
+factorization of the reverse-SDE transition.
+
+### Compare the objectives
+
+| Method | What is held fixed or changed? | Ideal density statement |
+|---|---|---|
+| Ordinary Langevin | One target $p$, increasing $u$ | Preserves $p$; convergence needs additional conditions |
+| Annealed Langevin | A sequence of frozen smoothed targets | Approaches each target with exact dynamics and enough time; ULA adds step bias |
+| Reverse diffusion SDE | $t=T-\tau$ changes continuously | Follows $p_{T-\tau}$ with exact initialization, score, and dynamics |
+| Probability-flow ODE | The same changing noise level | Same prescribed marginals with exact initialization, score, and integration; different trajectories |
+
+Langevin uses the score to preserve a density while particles explore it.
+Reverse diffusion uses the score, the reversed drift, and a changing noise
+level to move through a prescribed family of densities. Their exact connection
+is the transport-plus-Langevin decomposition, not a time rescaling that removes
+the difference in coefficients.
+
+## Check your understanding
+
+1. Why is $s(x)$ alone insufficient for sampling a Gaussian target?
+2. Does proving $p$ stationary show that every initial distribution converges to it?
+3. For a standard normal target, what stationary variance does ULA with
+   $\eta=0.2$ produce? Does doubling the number of iterations remove that bias?
+4. Freeze $p_t=\mathcal N(\mu,V_t)$ in drift-free reverse diffusion. What law
+   would its frozen dynamics target, and can changing time alone fix it?
+5. Which part of reverse diffusion leaves $p_t$ invariant at a frozen time?
+6. During a Langevin corrector, does diffusion time $t$ change?
+
+::: {.callout-tip collapse="true"}
+## Answers
+
+1. Its deterministic flow contracts the cloud to the mean; balanced noise
+   maintains the target variance.
+2. No. Invariance and convergence are different claims; mixing also controls
+   how long sampling takes.
+3. $1/0.9\approx1.111$. Longer runs do not remove fixed-step bias.
+4. $\mathcal N(\mu,V_t/2)$. Time scaling preserves the drift-to-diffusion ratio.
+5. Drift $g^2s_t/2$ paired with Brownian amplitude $g$.
+6. No. The corrector evolves in algorithmic time at one frozen noise level.
+:::

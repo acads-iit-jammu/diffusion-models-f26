@@ -1,0 +1,455 @@
+# Learning the Score: VP Diffusion from First Principles {.unnumbered}
+
+::: {.callout-note}
+## Tutorial 1 of 4 · Learning
+
+**Question:** How can adding noise give us training targets for an unknown density?
+
+**Prerequisites:** derivatives, second-order Taylor expansion, elementary ODEs,
+Gaussian distributions, independence, and Bayes' rule. No SDE or stochastic
+calculus background is assumed. Conditional expectation is introduced below.
+
+**Core route:** random steps → VP corruption → conditional averaging → score
+learning → denoising. The stochastic-integral subsection is optional.
+
+**Next:** [Probability-Flow Sampling](./26-probability-flow-sampling.qmd).
+The [series guide](./score-based-diffusion-guide.qmd) lists the full reading sequence.
+:::
+
+## What are we trying to learn?
+
+### The score is a derivative in data space
+
+A density $p(x)$ describes a population. Its **score** is
+
+$$s(x)=\nabla_x\log p(x).$$
+
+In one dimension this is an ordinary derivative. In several dimensions,
+$\nabla_x$ collects one partial derivative for each coordinate, so the score
+is a vector. It points in the direction of fastest increase of log density.
+For $p=\mathcal N(\mu,a^2)$,
+
+$$\log p(x)=C-\frac{(x-\mu)^2}{2a^2},\qquad
+s(x)=-\frac{x-\mu}{a^2}.$$
+
+We want a network $s_\theta(x,t)$ that approximates the score $s_t(x)$ of a
+noisy-data density $p_t$. The derivative is with respect to the **data
+coordinate** $x$. It is different from the training gradient
+$\nabla_\theta\mathcal L$ and from a particle's velocity $dx/dt$.
+
+### A convention for random quantities
+
+$X_t$ denotes a random variable: the possible outcomes at time $t$. A lowercase
+$x$ is a particular value. One run gives a trajectory $x_t$; many independent
+runs give a cloud whose histogram approximates $p_t$.
+
+Forward time $t$ runs from data to noise. We use $\epsilon$ for the noise in a
+single corruption observation, and fresh $\xi_k$ for successive simulation
+steps. Every step size $h$ is positive; the direction of time is stated separately.
+
+## From Gaussian random steps to an SDE
+
+### Why the random step has size square root of h
+
+Draw independent $\xi_k\sim\mathcal N(0,1)$ and form
+
+$$W^{(h)}_{kh}=\sqrt h\sum_{j=0}^{k-1}\xi_j.$$
+
+Since independent variances add, at $t=kh$ this random walk has variance
+$kh=t$. Halving the step size doubles the number of steps and halves each
+increment's variance, preserving the total spread. If we used $h\xi_j$
+instead, the total variance would be $kh^2=th$, which vanishes as $h\to0$.
+
+**Brownian motion** $W_t$ is the continuous-time random-motion model obtained
+in the appropriate limit. It starts at zero, has continuous paths, and has
+independent Gaussian increments:
+
+$$W_{t+h}-W_t\sim\mathcal N(0,h).$$
+
+In $d$ dimensions, use independent copies in each coordinate; the increment
+covariance is $hI$. Brownian paths are not differentiable like ODE trajectories.
+We describe their increments rather than assign them an ordinary velocity.
+
+### Euler–Maruyama gives an SDE computational meaning
+
+An ODE $\dot x=f(x,t)$ can be approximated by Euler:
+$x_{k+1}=x_k+h f(x_k,t_k)$. Add a random step to obtain
+
+$$\boxed{\widehat X_{k+1}=\widehat X_k+h f(\widehat X_k,t_k)
++g(t_k)\sqrt h\,\xi_k.}$$
+
+This is **Euler–Maruyama**. The hat distinguishes the numerical approximation
+from the continuous-time process. Draw a new independent $\xi_k$ at every step.
+The corresponding **stochastic differential equation (SDE)** is written
+
+$$\boxed{dX_t=f(X_t,t)\,dt+g(t)\,dW_t.}$$
+
+Under suitable regularity, smaller numerical steps approximate that process.
+The SDE notation records deterministic drift $f$ and random spreading with
+amplitude $g$. It is not an instruction to differentiate $W_t$ ordinarily.
+We use scalar $g(t)$ depending only on time throughout this series.
+
+**One step you can calculate.** From $x=2$, let $f(x)=-x/2$, $g=1$, and
+$h=0.01$. Euler–Maruyama gives $1.99+0.1\xi$, a Gaussian with mean $1.99$ and
+variance $0.01$. The drift is fixed given the current position; the noise changes
+from run to run. A finite Euler–Maruyama step is generally not the exact SDE transition.
+
+### Derivation: the expected Taylor step {#expected-taylor-step}
+
+We can calculate how averages change using ordinary Taylor expansion. In one
+dimension, condition on $X_t=x$ and use the small-step increment
+$\Delta X=hf(x,t)+g(t)\sqrt h\,\xi$. For a smooth function $\varphi$,
+
+$$\varphi(x+\Delta X)=\varphi(x)+\varphi'(x)\Delta X
++\tfrac12\varphi''(x)(\Delta X)^2+\text{higher-order terms}.$$
+
+Because $\mathbb E\xi=0$ and $\mathbb E\xi^2=1$,
+
+$$\mathbb E[\Delta X\mid X_t=x]=hf,
+\qquad\mathbb E[(\Delta X)^2\mid X_t=x]=g^2h+f^2h^2.$$
+
+Divide the expected change by $h$ and let $h\to0$. Under smoothness and moment
+conditions that justify the limit and averaging, this gives
+
+$$\boxed{\frac{d}{dt}\mathbb E[\varphi(X_t)]
+=\mathbb E\left[f(X_t,t)\varphi'(X_t)
++\tfrac12g(t)^2\varphi''(X_t)\right].}$$
+
+The last term is the **Itô correction**. A deterministic increment is of size
+$h$, whose square is negligible after dividing by $h$. A random increment is
+of size $\sqrt h$, whose square contributes at order $h$. That is why ordinary
+first-order chain-rule reasoning misses the change in variance.
+
+**Check:** if $f=0$, $g=1$, and $\varphi(x)=x^2$, the formula gives
+$d\mathbb E[X_t^2]/dt=1$. Starting from zero, $\mathbb E[X_t^2]=t$, exactly as
+in the Gaussian random walk.
+
+## Construct the variance-preserving corruption law
+
+### Choose a balanced drift and noise rate
+
+Choose a nonnegative schedule $\beta(t)$ and set
+
+$$f(x,t)=-\tfrac12\beta(t)x,\qquad g(t)=\sqrt{\beta(t)}.$$
+
+This defines **variance-preserving (VP) diffusion**:
+
+$$dX_t=-\tfrac12\beta(t)X_t\,dt+\sqrt{\beta(t)}\,dW_t.$$
+
+The drift shrinks the cloud; the random steps spread it. We will show that this
+particular balance preserves unit variance. It is a design choice, not a rule
+that every diffusion must follow. Assume $X_0$ has finite second moment and is
+independent of the Brownian increments.
+
+### Derivation: the mean determines the signal coefficient
+
+Set $\varphi(x)=x$ in the expected Taylor formula. With $m_t=\mathbb E[X_t]$,
+
+$$\dot m_t=-\tfrac12\beta(t)m_t,\qquad
+m_t=\alpha_t m_0,\qquad
+\boxed{\alpha_t=\exp\left[-\tfrac12\int_0^t\beta(r)\,dr\right].}$$
+
+Thus $\dot\alpha_t/\alpha_t=-\beta(t)/2$. The same contraction factor applies
+to a fixed initial point before accounting for the added noise.
+
+For constant $\beta$, $\alpha_t=e^{-\beta t/2}$. For a linear schedule on
+$0\le t\le1$,
+
+$$\beta(t)=\beta_{\min}+t(\beta_{\max}-\beta_{\min}),\qquad
+\log\alpha_t=-\tfrac12\beta_{\min}t
+-\tfrac14(\beta_{\max}-\beta_{\min})t^2.$$
+
+The logarithm of the signal coefficient is quadratic in time. For example,
+$\beta_{\min}=0.1$, $\beta_{\max}=20$ gives $\alpha_1=e^{-5.025}\approx0.00657$:
+only about $4.32\times10^{-5}$ of the original signal variance coefficient remains.
+
+### Derivation: second moment and variance are different
+
+Let $M_2(t)=\mathbb E[X_t^2]$. Set $\varphi(x)=x^2$ in the expected Taylor formula:
+
+$$\dot M_2(t)=\mathbb E[-\beta(t)X_t^2+\beta(t)]
+=\beta(t)[1-M_2(t)].$$
+
+Variance is $V_t=M_2(t)-m_t^2$. Differentiating and substituting $\dot m_t$ gives
+
+$$\dot V_t=\beta(t)(1-V_t),\qquad
+\boxed{V_t=\alpha_t^2V_0+(1-\alpha_t^2).}$$
+
+One way to solve is to set $R_t=V_t-1$; then $\dot R_t=-\beta(t)R_t$.
+Unit initial variance stays one, even when the mean is nonzero. Other initial
+variances move toward one as the signal coefficient decays.
+
+**Worked check:** if $X_0\sim\mathcal N(3,1)$, then
+
+$$\mathbb E[X_t]=3\alpha_t,\qquad V_t=1,
+\qquad\mathbb E[X_t^2]=1+9\alpha_t^2.$$
+
+Only the variance is preserved; neither the mean nor the second moment is constant.
+
+### Derivation: why the conditional distribution is Gaussian {#gaussian-kernel}
+
+Fix $X_0=x_0$. The VP numerical update is linear:
+
+$$\widehat X_{k+1}=a_k\widehat X_k+b_k\xi_k,
+\qquad a_k=1-\tfrac12\beta(t_k)h,\quad b_k=\sqrt{\beta(t_k)h}.$$
+
+After two steps,
+
+$$\widehat X_2=a_1a_0x_0+a_1b_0\xi_0+b_1\xi_1.$$
+
+After any number of steps it remains a fixed multiple of $x_0$ plus a weighted
+sum of independent Gaussians. The weights are deterministic because $\beta$
+is prescribed. It is therefore Gaussian at every grid time. As $h\to0$, the
+mean tends to $\alpha_t x_0$; the variance tends to the solution above with
+$V_0=0$, since we fixed the initial value. Define
+
+$$\boxed{\sigma_t^2=1-\alpha_t^2.}$$
+
+The limiting Gaussian has that mean and variance. Coordinatewise in $d$ dimensions,
+
+$$\boxed{X_t\mid X_0=x_0\sim\mathcal N(\alpha_t x_0,\sigma_t^2I).}$$
+
+We can therefore sample a noisy observation directly, without simulating a path:
+
+$$\boxed{X_t=\alpha_tX_0+\sigma_t\epsilon,
+\qquad\epsilon\sim\mathcal N(0,I),\quad\epsilon\perp X_0.}$$
+
+This identity describes a **one-time conditional law**. It does not say that
+one fixed $\epsilon$ generates a Brownian trajectory across all times. For
+$s<t$, the actual transition instead has the representation
+
+$$X_t=\frac{\alpha_t}{\alpha_s}X_s+
+\sqrt{1-\frac{\alpha_t^2}{\alpha_s^2}}\,\epsilon',
+\qquad\epsilon'\perp X_s.$$
+
+There is new randomness between times $s$ and $t$.
+
+### Conditional variance versus marginal variance
+
+The conditional variance, with the starting point fixed, is $\sigma_t^2$.
+When the starting point is random, independence gives
+
+$$\operatorname{Var}(X_t)=
+\underbrace{\alpha_t^2\operatorname{Var}(X_0)}_{\text{remaining signal variance}}
++\underbrace{\sigma_t^2}_{\text{added noise variance}}.$$
+
+In several dimensions the same statement is
+$\operatorname{Cov}(X_t)=\alpha_t^2\operatorname{Cov}(X_0)+\sigma_t^2I$.
+Preserving covariance $I$ does not make a non-Gaussian distribution Gaussian
+at every time. The shape changes as the signal is suppressed.
+
+For example, if $X_0\sim\mathcal N(0,c)$ then
+$p_T=\mathcal N(0,1+\alpha_T^2(c-1))$. A finite terminal time usually gives a
+**near-Gaussian** law, not exactly $\mathcal N(0,1)$.
+
+### Optional derivation: stochastic-integral notation
+
+*Skip this subsection on a first reading; the Gaussian kernel is already established.*
+
+For deterministic $c(s)$, the notation $\int_0^t c(s)\,dW_s$ denotes the
+mean-square limit of weighted increment sums
+$\sum_k c(t_k)(W_{t_{k+1}}-W_{t_k})$. Independence gives
+
+$$\mathbb E\left[\left(\int_0^t c(s)\,dW_s\right)^2\right]
+=\int_0^t c(s)^2\,ds.$$
+
+This rule is the deterministic-integrand case of **Itô isometry**; it is the
+continuous version of adding squared weights to compute a Gaussian sum's variance.
+
+Multiplying the VP equation by the integrating factor $1/\alpha_t$ cancels its
+drift, since $d(1/\alpha_t)/dt=\beta(t)/(2\alpha_t)$. The factor is deterministic,
+so the ordinary product rule with this factor gives
+
+$$d(X_t/\alpha_t)=\frac{\sqrt{\beta(t)}}{\alpha_t}\,dW_t,
+\qquad
+X_t=\alpha_tX_0+\alpha_t\int_0^t
+\frac{\sqrt{\beta(s)}}{\alpha_s}\,dW_s.$$
+
+The added term has variance
+
+$$\alpha_t^2\int_0^t\frac{\beta(s)}{\alpha_s^2}\,ds
+=\alpha_t^2[\alpha_t^{-2}-1]=1-\alpha_t^2,$$
+
+because $d(\alpha_s^{-2})/ds=\beta(s)\alpha_s^{-2}$.
+This confirms the elementary Gaussian-step derivation.
+
+## Learn an unknown score from known targets
+
+### Conditional and marginal densities
+
+The **conditional density** $p(x\mid x_0)$ describes noise around one fixed
+clean point. The **marginal density** averages these conditional densities over
+all possible clean origins:
+
+$$p_t(x)=\int p(x\mid x_0)p_{\mathrm{data}}(x_0)\,dx_0.$$
+
+For a discrete distribution replace the integral by a weighted sum. For the
+empirical distribution on $N$ training points, it is $N^{-1}\sum_i p(x\mid x_0^{(i)})$.
+Gaussian corruption gives a smooth positive marginal at $\sigma_t>0$ even
+when the clean distribution is discrete.
+
+The conditional Gaussian score is known:
+
+$$\nabla_x\log p(x\mid x_0)=-\frac{x-\alpha_t x_0}{\sigma_t^2}.$$
+
+Evaluated at a random training pair, this target is
+
+$$\left.\nabla_x\log p(x\mid X_0)\right|_{x=X_t}
+=-\frac{\epsilon}{\sigma_t}.$$
+
+We generated $\epsilon$, so we know the target. But the sampler needs the
+**marginal score** $s_t(x)=\nabla_x\log p_t(x)$, which need not equal this
+single pair's conditional score.
+
+### Worked example: conditional expectation as a posterior average {#two-point-posterior}
+
+Let $X_0$ be $+1$ or $-1$, each with probability one half. Observing $X_t=x$
+does not reveal its clean origin. Bayes' rule assigns relative weights using
+
+$$\frac{p(x\mid X_0=+1)}{p(x\mid X_0=-1)}
+=\exp\left[\frac{(x+\alpha_t)^2-(x-\alpha_t)^2}{2\sigma_t^2}\right]
+=e^{2\alpha_t x/\sigma_t^2}.$$
+
+Thus, with $w(x)=P(X_0=+1\mid X_t=x)$,
+
+$$w(x)=\frac1{1+e^{-2\alpha_t x/\sigma_t^2}},\qquad
+\mathbb E[X_0\mid X_t=x]=w(x)-(1-w(x))
+=\tanh\left(\frac{\alpha_t x}{\sigma_t^2}\right).$$
+
+The notation $\mathbb E[A\mid X_t=x]$ means the average of $A$ under the
+posterior distribution associated with the observed value $x$. For a continuous
+observation, we compute that posterior using densities, rather than divide by
+$P(X_t=x)$, which is zero. A useful identity is the **tower property**:
+averaging these conditional averages over the observations gives the original
+average, $\mathbb E[\mathbb E[A\mid X_t]]=\mathbb E[A]$.
+
+At $x=0$ both origins have weight one half. Their conditional-score targets are
+$+\alpha_t/\sigma_t^2$ and $-\alpha_t/\sigma_t^2$. The appropriate average is zero.
+
+### Derivation: averaging conditional scores gives the marginal score {#marginal-score}
+
+Differentiate the mixture, using Gaussian smoothness to justify the operation:
+
+$$\begin{aligned}
+\nabla_xp_t(x)
+&=\int p(x\mid x_0)\nabla_x\log p(x\mid x_0)
+                  p_{\mathrm{data}}(x_0)\,dx_0,\\
+\nabla_x\log p_t(x)
+&=\int p(x_0\mid x)\nabla_x\log p(x\mid x_0)\,dx_0.
+\end{aligned}$$
+
+The second line follows by dividing by $p_t(x)>0$ and applying Bayes' rule.
+The same algebra holds with sums for a discrete prior. Consequently,
+
+$$\boxed{s_t(x)=\mathbb E[-\epsilon/\sigma_t\mid X_t=x].}$$
+
+For the two-point example, averaging the two targets gives
+
+$$s_t(x)=\frac{\alpha_t\tanh(\alpha_t x/\sigma_t^2)-x}{\sigma_t^2}.$$
+
+### Derivation: why squared-error regression learns this average {#mse-lemma}
+
+Let $Y$ be a square-integrable target, $Z$ an input, and
+$m(Z)=\mathbb E[Y\mid Z]$. For a predictor $a(Z)$, write
+
+$$a(Z)-Y=[a(Z)-m(Z)]+[m(Z)-Y].$$
+
+On squaring and averaging, the cross term is zero: conditional on $Z$,
+$\mathbb E[m(Z)-Y\mid Z]=0$. The tower property therefore gives
+
+$$\boxed{\mathbb E\|a(Z)-Y\|^2
+=\mathbb E\|a(Z)-m(Z)\|^2+\mathbb E\|Y-m(Z)\|^2.}$$
+
+Only the first term depends on the predictor, and it is minimized by $a=m$.
+At fixed $t>0$ with $\sigma_t>0$, use $Z=X_t$, $Y=-\epsilon/\sigma_t$:
+
+$$\mathcal L_t(\theta)=\mathbb E\|s_\theta(X_t,t)+\epsilon/\sigma_t\|^2,
+\qquad s^*(x,t)=s_t(x).$$
+
+This is **denoising score matching (DSM)**. Its minimum is generally positive:
+a single noisy observation does not determine its training target. At $x=0$
+in the two-point example, even the ideal output zero leaves conditional loss
+$\alpha_t^2/\sigma_t^4$.
+
+### Train across noise levels without a singular target {#training-recipe}
+
+A concrete training loop is:
+
+1. Draw $X_0$ from the data and $t$ from $[t_{\min},T]$, where $t_{\min}>0$.
+2. Draw independent $\epsilon\sim\mathcal N(0,I)$.
+3. Construct $X_t=\alpha_tX_0+\sigma_t\epsilon$ directly.
+4. Minimize $\lambda(t)\|s_\theta(X_t,t)+\epsilon/\sigma_t\|^2$.
+
+Choose an interval where $\sigma_t$ is bounded away from zero. This avoids the
+singular endpoint target. For a smooth schedule with $\beta(0)>0$,
+$\sigma_t^2\approx\beta(0)t$, so
+$\mathbb E\|\epsilon/\sigma_t\|^2=d/\sigma_t^2$ grows like $1/t$.
+With smooth clean densities, even the irreducible unweighted DSM loss can
+have a divergent time integral at zero. Endpoint behavior depends on the data
+and schedule; positive-time training is the simple prescription used here.
+
+### Noise prediction and time weighting
+
+Define $\epsilon_\theta(x,t)=-\sigma_t s_\theta(x,t)$. Then pointwise,
+
+$$\boxed{\sigma_t^2\|s_\theta(X_t,t)+\epsilon/\sigma_t\|^2
+=\|\epsilon_\theta(X_t,t)-\epsilon\|^2.}$$
+
+Thus choosing $\lambda(t)=\sigma_t^2$ gives the noise-prediction loss. This
+removes the explicit inverse-noise scaling; finite expected loss still requires
+finite second moments of the predictions. At the population optimum,
+$\epsilon^*(x,t)=\mathbb E[\epsilon\mid X_t=x]=-\sigma_t s_t(x)$.
+The targets contain equivalent information, but different time weights and
+finite-capacity parameterizations can produce different learned fits.
+
+## Interpret the score as a denoiser
+
+### Derivation: Tweedie's formula
+
+Average the conditional Gaussian score over the clean posterior:
+
+$$s_t(x)=\frac{\alpha_t\mathbb E[X_0\mid X_t=x]-x}{\sigma_t^2}.$$
+
+For $\alpha_t>0$ this rearranges to
+
+$$\boxed{\mathbb E[X_0\mid X_t=x]
+=\frac{x+\sigma_t^2s_t(x)}{\alpha_t}.}$$
+
+The MSE lemma above, now with target $X_0$, proves that this posterior mean is
+the Bayes-optimal squared-error denoiser. For unscaled additive noise
+$Y=X+\sigma\epsilon$, set $\alpha=1$ to get
+$\mathbb E[X\mid Y=y]=y+\sigma^2\nabla_y\log p_Y(y)$.
+A denoised posterior mean need not itself be a data sample: for the two-point
+prior and observation zero it equals zero, although the clean values are $\pm1$.
+
+## What comes next?
+
+We chose a VP corruption law, derived its Gaussian conditional distribution,
+and proved why regression on known noisy targets recovers the marginal score.
+[Tutorial 2](./26-probability-flow-sampling.qmd) will derive the sampling velocity
+
+$$v(x,t)=f(x,t)-\tfrac12g(t)^2s_t(x).$$
+
+For now this is a preview: a spatial score must be combined with drift and
+noise scaling before it becomes a temporal velocity. Learning the score and
+using it to transport a population are separate steps.
+
+### Check your understanding
+
+1. If the random increment were $h\xi$ instead of $\sqrt h\xi$, what would
+   happen to the variance over a fixed time as $h\to0$?
+2. For VP starting from $\mathcal N(3,1)$, which of mean, variance, and second
+   moment stays constant?
+3. At $X_t=0$ for the two-point prior, why are the individual training targets
+   nonzero while the ideal score prediction is zero?
+4. Does one fixed $\epsilon$ in the corruption formula specify a Brownian path?
+
+::: {.callout-tip collapse="true"}
+## Answers
+
+1. The variance tends to zero, so the random spreading disappears.
+2. Variance stays one; the mean is $3\alpha_t$ and second moment $1+9\alpha_t^2$.
+3. The conditional targets have opposite signs and equal posterior weights.
+4. No. The formula specifies a one-time law; a path requires the correct fresh
+   randomness between times.
+:::

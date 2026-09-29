@@ -1,0 +1,84 @@
+# Score-Based Diffusion: Reading Guide {.unnumbered}
+
+These tutorials are written for undergraduates with no prior SDE background.
+Read them in order. The numbers below identify the four parts of this series.
+
+| Order | Tutorial | Teaching question | Longer derivations, kept as subsections |
+|---|---|---|---|
+| 1 | [Learning the Score: VP Diffusion from First Principles](./25-learning-the-score.qmd) | How do we learn an unknown marginal score from a known corruption process? | Gaussian increments and expected Taylor step; VP moments and Gaussian kernel; posterior averaging and MSE proof; optional stochastic-integral derivation |
+| 2 | [Probability-Flow Sampling: From Density Evolution to Samples](./26-probability-flow-sampling.qmd) | Why does the score give a sampling velocity, and how do we use it? | Probability flux, Gaussian smoothing and Fokker–Planck; probability-flow construction; quantile maps; optional integration-by-parts and reverse-SDE checks |
+| 3 | [Diffusion, Neural ODEs, and Normalizing Flows](./27-diffusion-neural-odes-normalizing-flows.qmd) | What connects diffusion sampling to invertible transport and density estimation? | Continuous change of variables; Gaussian flow and coupling comparison; likelihood identity; conditional velocity regression and its score connection |
+| 4 | [Langevin Dynamics](./28-langevin-dynamics.qmd) | How does fixed-target sampling differ from reverse diffusion? | Gaussian moments and ULA bias; stationarity; time-scaling ratio; transport-plus-Langevin decomposition |
+
+Each tutorial has a core reading route, worked examples, and derivation
+subsections. Advanced proofs are labelled optional. Topic ownership is explicit:
+Tutorial 1 proves the corruption and learning identities; Tutorial 2 derives
+density evolution and sampling; Tutorial 3 develops transport and likelihood; Tutorial 4 connects fixed-target
+Langevin sampling to diffusion and annealing.
+
+## Prerequisite ladder and reading route
+
+| Stage | New material | Where introduced |
+|---|---|---|
+| Entry | Elementary derivatives, Taylor expansion, ODEs, Gaussian algebra, independence, Bayes' rule | Assumed; no stochastic calculus or PDE course required |
+| Random steps | Random variable versus realization, Gaussian increments, square-root step scaling, Euler–Maruyama | Tutorial 1: From Gaussian random steps to an SDE |
+| Corruption law | Expected Taylor step, mean/variance equations, Gaussian sums | Tutorial 1: Construct the variance-preserving corruption law |
+| Learning | Conditional expectation, tower property, posterior weights, MSE-optimality proof | Tutorial 1: Learn an unknown score from known targets |
+| Density dynamics | Particle versus population, flux, partial derivatives, divergence, Laplacian, Fokker–Planck | Tutorial 2: Describe motion of an entire density |
+| Sampling | Probability-flow velocity, backward steps, cutoff and terminal-prior errors | Tutorial 2: Construct the velocity and generate backward |
+| Transport | Jacobian volume scaling, invertibility, density change, couplings and likelihood | Tutorial 3 |
+| Equilibrium sampling | Langevin balance, invariance versus convergence, finite-step bias, annealing | Tutorial 4 |
+
+The published [From Local Arrows](./22-vector-fields-to-score-diffusion.qmd)
+and [Sampling with Scores](./24-sampling-with-scores.qmd) are
+optional geometric background, not substitutes for the SDE introduction here.
+The [score-flow lab](../materials/score-flow-lab.html) accompanies the
+Gaussian and two-point examples.
+
+**First reading:** follow the four tutorials' core routes and attempt the
+understanding checks before opening the answers. In Tutorial 1, skip the
+stochastic-integral subsection. In Tutorial 2, the Gaussian-smoothing derivation
+provides the main intuition; the integration-by-parts proof and stochastic
+sampler can be a second pass. In Tutorial 3, the infinitesimal determinant and
+flow-matching proofs are enrichment. The remaining main arguments do not
+require those proofs. Tutorial 4 uses only the SDE and density tools from
+Tutorials 1–2; it can also be read directly after Tutorial 2. Its density-operator
+calculation is optional. Its reverse-diffusion comparison uses the
+[reverse-SDE check in Tutorial 2](./26-probability-flow-sampling.qmd#reverse-sde).
+
+The complete MSE proof is now inside Tutorial 1. The existing
+[Tweedie tutorial](./23-tweedie-bayes-denoising.qmd) remains a
+separate statistical treatment for additional practice.
+
+## Shared notation
+
+| Symbol | Meaning throughout the series |
+|---|---|
+| $X_t$, $x$ | Random state and a particular observed value, respectively |
+| $\epsilon$, $\xi_k$ | Corruption noise and independent numerical-step noise |
+| $p_t$, $s_t=\nabla_x\log p_t$ | Forward-noised density and its marginal score |
+| $s_\theta$ | Learned score approximation |
+| $f(x,t)$, $g(t)$ | Forward-SDE drift and scalar, time-dependent noise amplitude |
+| $\alpha_t$, $\sigma_t$ | Signal coefficient and conditional noise standard deviation |
+| $v(x,t)=f-\tfrac12g^2s_t$ | Forward-time probability-flow velocity |
+| $\Psi_{s\to t}$ | Flow map between specified times |
+| $\Phi$ | Standard normal CDF, never a flow map |
+| $\tau=T-t$ | Increasing generation clock |
+| $u$, $q_u$ | Fixed-target Langevin time and current sampler density |
+| $p_\sigma$ | Smoothed law indexed by noise standard deviation in Tutorial 4 |
+| $\varrho$ | Mixture-component standard deviation |
+
+Every numerical step magnitude is positive. A forward update uses $+h v$;
+a backward update uses $-h v$. On a descending grid, $h_k=t_k-t_{k-1}>0$.
+This local convention differs from the signed-step notation in some older notes.
+The conditional noise variance $\sigma_t^2$ is distinguished from total marginal
+variance, and exact sampling from $p_T$ from its Gaussian approximation.
+
+## Relationship to the existing course notes
+
+The published notes 22, 24, and 23 provide geometric intuition, introductory
+worked sampling, and standalone statistical denoising, respectively. This
+series is the next derivation sequence: learning → sampling → connections → equilibrium sampling.
+It does not replace those notes. The existing broad
+[probability-flow perspective](./07-probability-flow-ode.qmd)
+can remain an alternative overview alongside this sequence.

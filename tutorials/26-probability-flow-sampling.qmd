@@ -1,0 +1,412 @@
+# Probability-Flow Sampling: From Density Evolution to Samples {.unnumbered}
+
+::: {.callout-note}
+## Tutorial 2 of 4 · Sampling
+
+**Question:** Why does the learned score give a valid sampling velocity?
+
+**Before this:** [Learning the Score](./25-learning-the-score.qmd), including
+Gaussian increments and the expected Taylor step. No prior PDE course is needed.
+
+**Core route:** particle motion → probability flux → density evolution →
+probability-flow ODE → backward sampling → examples. The multidimensional
+notation, integration-by-parts proof, and stochastic-sampler comparison are
+labelled subsections; the one-dimensional derivation gives the main argument.
+
+**Next:** [Diffusion, Neural ODEs, and Normalizing Flows](./27-diffusion-neural-odes-normalizing-flows.qmd).
+:::
+
+## Separate the particle question from the density question
+
+A particle question asks: **where does this starting point go?** A density
+question asks: **how is the whole population distributed at a given time?**
+An ODE and an SDE can answer the particle question differently while giving
+the same density at every time. This tutorial constructs such a pair.
+
+Write $p_0=p_{\mathrm{data}}$ and let $p_t$ be the forward-noised density from
+Tutorial 1. Our aim is to move random samples from $p_T$ back to $p_0$. For VP
+with enough signal attenuation, $p_T$ is approximately standard Gaussian.
+Exact arguments use $p_T$; practical samplers often substitute a Gaussian.
+
+### Recall: fields, trajectories, and flow maps
+
+A vector field $v(x,t)$ assigns a velocity vector to each location and time.
+The ODE $\dot x_t=v(x_t,t)$ says that a particle follows its current local
+vector. For $v(x)=-x$,
+
+$$\dot x=-x,\qquad x_t=e^{-t}x_0,\qquad
+\Psi_{0\to t}(x_0)=e^{-t}x_0.$$
+
+Separation of variables gives this solution when $x_0\ne0$, and $x\equiv0$
+completes the equilibrium case. The **flow map** $\Psi_{s\to t}$ collects the
+solutions for every starting state at time $s$. Existence and uniqueness are
+needed for this map to be well defined; smooth fields with appropriate growth
+bounds suffice on the intervals we use. Tutorial 3 examines invertibility.
+
+A deterministic map can generate random outputs: start it with a random input.
+But the contraction above takes $\mathcal N(0,1)$ to $\mathcal N(0,e^{-2t})$,
+so following the bare Gaussian score $-x$ does not preserve Gaussian samples.
+
+### Recall: stochastic motion
+
+The forward SDE is
+
+$$dX_t=f(X_t,t)\,dt+g(t)\,dW_t.$$
+
+Tutorial 1 explains its Euler–Maruyama approximation:
+
+$$\widehat X_{k+1}=\widehat X_k+h f(\widehat X_k,t_k)
++g(t_k)\sqrt h\,\xi_k,\qquad h>0.$$
+
+The $\xi_k\sim\mathcal N(0,I)$ are independent. For VP,
+$f=-\beta(t)x/2$, $g^2=\beta(t)$, and the one-time conditional law is
+$X_t=\alpha_tX_0+\sigma_t\epsilon$ with
+$\sigma_t^2=1-\alpha_t^2$. A shared $\epsilon$ across times is not a Brownian path.
+
+## Describe motion of an entire density
+
+### Derivation: probability flux in one dimension
+
+Suppose particles move deterministically with velocity $v(x,t)$. A small
+interval of width $\Delta x$ contains probability approximately
+$p_t(x)\Delta x$. Define **probability flux**
+
+$$J(x,t)=p_t(x)v(x,t).$$
+
+This is signed probability crossing a location per unit time. The interval
+gains mass from its left boundary and loses mass through its right boundary:
+
+$$\frac{d}{dt}[p_t(x)\Delta x]=J(x,t)-J(x+\Delta x,t).$$
+
+Expand $J(x+\Delta x,t)=J(x,t)+\partial_xJ(x,t)\Delta x+o(\Delta x)$.
+After dividing by $\Delta x$ and taking the limit,
+
+$$\boxed{\partial_t p_t=-\partial_x(p_t v).}$$
+
+This is the **continuity equation**, expressing conservation of probability.
+It is a partial differential equation (PDE) because $p$ depends on both $x$
+and $t$. The derivative $\partial_t$ holds location fixed; the derivative
+$\partial_x$ holds time fixed.
+
+### Multidimensional notation: gradient, divergence, Laplacian
+
+For a scalar function $p$, $\nabla p$ collects its coordinate derivatives.
+For a vector field $v=(v_1,\ldots,v_d)$, define
+
+$$\nabla\cdot v=\sum_{i=1}^d\partial_{x_i}v_i,
+\qquad\Delta p=\sum_{i=1}^d\partial_{x_i}^2p=\nabla\cdot(\nabla p).$$
+
+The first is **divergence**, measuring local expansion; the second is the
+**Laplacian**, adding the curvature in all coordinate directions. For $v=x$,
+$\nabla\cdot v=d>0$: a small cloud expands. For $v=-x$, it contracts.
+
+Apply the one-dimensional flux argument to opposite faces of a small box.
+The net outward flux in coordinate $i$ is
+$\partial_{x_i}(p_t v_i)$ times the box volume. Add all directions:
+
+$$\boxed{\partial_t p_t=-\nabla\cdot(p_t v).}$$
+
+No surface-integral theorem is needed for this box argument.
+
+### Derivation: how Gaussian spreading changes a density {#fokker-planck}
+
+Without drift, freeze $g$ during a small positive step $h$. Adding an independent
+$\eta=g(t)\sqrt h\,\xi$ averages shifted copies of the old density:
+
+$$p_{t+h}(x)\approx\mathbb E_\eta[p_t(x-\eta)].$$
+
+This is the density-level version of the Euler–Maruyama step; for constant $g$
+and zero drift, that Gaussian increment is exact. Taylor expansion gives
+
+$$p_t(x-\eta)=p_t(x)-\eta p_t'(x)+\tfrac12\eta^2p_t''(x)+\cdots.$$
+
+The odd Gaussian moments vanish and $\mathbb E\eta^2=g(t)^2h$. For sufficiently
+smooth densities, the frozen-step expansion is therefore
+
+$$\mathbb E[p_t(x-\eta)]
+=p_t(x)+\tfrac12g(t)^2h\,p_t''(x)+O(h^2).$$
+
+Dividing the change by $h$ and taking the limit gives
+$\partial_t p_t=\tfrac12g(t)^2\partial_x^2p_t$. The factor one half comes from
+Taylor's quadratic term; it is not an arbitrary modeling constant.
+
+**Check at a Gaussian peak:** $p_t''(\mu)<0$, so the peak height decreases as
+noise spreads its mass. The same density gains mass farther out in its tails.
+
+Drift contributes $-\partial_x(fp_t)$ and random spreading contributes the
+second-derivative term. Together they give **Fokker–Planck**:
+
+$$\boxed{\partial_t p_t=-\partial_x(fp_t)+\tfrac12g(t)^2\partial_x^2p_t.}$$
+
+The next subsection justifies adding these effects. In $d$ dimensions the
+independent noise coordinates contribute separate second derivatives, so
+
+$$\boxed{\partial_t p_t=-\nabla\cdot(fp_t)+\tfrac12g(t)^2\Delta p_t.}$$
+
+These formulas use scalar, spatially constant $g(t)$. A state-dependent noise
+matrix requires a different diffusion term.
+
+### Optional derivation: combining drift and noise rigorously enough for calculus
+
+Take a smooth function $\varphi$ that vanishes outside a bounded interval.
+Think of it as a smooth probe that measures probability near a chosen region.
+Tutorial 1's [expected Taylor step](./25-learning-the-score.qmd#expected-taylor-step) says
+
+$$\frac{d}{dt}\mathbb E[\varphi(X_t)]
+=\mathbb E[f\varphi'+\tfrac12g^2\varphi''].$$
+
+Write averages as integrals against $p_t$. Integration by parts once on the
+drift term and twice on the noise term gives
+
+$$\int\varphi\,\partial_t p_t\,dx
+=\int\varphi[-\partial_x(fp_t)+\tfrac12g^2\partial_x^2p_t],dx.$$
+
+Boundary terms vanish because the probe is zero outside its bounded support.
+If two continuous expressions have equal integrals against every such probe,
+they agree pointwise: otherwise a probe around a region where they differ
+would distinguish them. This proves the displayed Fokker–Planck equation
+under the assumed differentiability. The same reasoning in each coordinate
+proves its multidimensional form.
+
+## Construct the probability-flow velocity
+
+### Derivation: turn diffusive flux into density times velocity
+
+Where $p_t>0$, the score satisfies $\nabla p_t=p_t\nabla\log p_t=p_t s_t$.
+Consequently,
+
+$$\begin{aligned}
+\partial_t p_t
+&=-\nabla\cdot(fp_t)+\tfrac12g^2\nabla\cdot(p_t s_t)\\
+&=-\nabla\cdot\left[p_t\left(f-\tfrac12g^2s_t\right)\right].
+\end{aligned}$$
+
+Compare this with the continuity equation. A deterministic velocity producing
+the same density evolution is
+
+$$\boxed{v(x,t)=f(x,t)-\tfrac12g(t)^2s_t(x).}$$
+
+The score appears because diffusive probability flux involves $\nabla p_t$,
+and writing flux as density times velocity divides that gradient by $p_t$.
+This yields $\nabla\log p_t$.
+
+With the same initial law, and regularity and uniqueness of the density
+evolution, the SDE and this ODE have the same one-time marginals. This is the
+probability-flow construction of [Song et al.](https://arxiv.org/abs/2011.13456).
+It does not identify their trajectories or their start–endpoint pairings.
+
+The construction supplies **a** velocity, not necessarily the only one.
+Adding $w$ with $\nabla\cdot(p_t w)=0$ leaves the density equation unchanged.
+
+### Worked check: the stationary Gaussian does not collapse
+
+For VP, $v(x,t)=-\beta(t)[x+s_t(x)]/2$. If $p_0=\mathcal N(0,I)$, Tutorial 1's
+Gaussian kernel shows that $p_t$ remains $\mathcal N(0,I)$. Thus $s_t(x)=-x$ and
+
+$$v(x,t)=-\tfrac12\beta(t)x+\tfrac12\beta(t)x=0.$$
+
+Every probability-flow particle stays still. SDE particles continue moving,
+but their population remains standard Gaussian. Following the score alone
+would contract this population; the complete probability-flow field does not.
+
+## Generate by integrating backward
+
+### What backward integration means {#backward-integration}
+
+Forward diffusion time runs from data at $t=0$ to noise at $t=T$. We know how
+to sample a terminal state, so specify $x(T)=z$ and solve the **same ODE** in
+decreasing $t$. With a positive step magnitude $h$,
+
+$$x(t-h)\approx x(t)-h\,v(x(t),t).$$
+
+The minus sign comes from the time increment $-h$. Alternatively, use an
+increasing generation clock $\tau=T-t$ and $Y_\tau=X_{T-\tau}$:
+
+$$\frac{dY_\tau}{d\tau}=-v(Y_\tau,T-\tau).$$
+
+Neither description requires undoing individual forward Brownian increments.
+
+### A usable ODE sampling recipe
+
+Take a descending grid $T=t_N>\cdots>t_0=t_{\min}>0$.
+
+1. Draw $x_N$ from $p_T$, or use its Gaussian approximation in practice.
+2. For $k=N,\ldots,1$, let $h_k=t_k-t_{k-1}>0$.
+3. Evaluate $v_\theta(x_k,t_k)=f(x_k,t_k)-g(t_k)^2s_\theta(x_k,t_k)/2$.
+4. Apply Euler: $x_{k-1}=x_k-h_kv_\theta(x_k,t_k)$.
+
+For VP the last update becomes
+$x_{k-1}=x_k+\beta(t_k)h_k[x_k+s_\theta(x_k,t_k)]/2$.
+Exact integration with the exact score and terminal law returns $p_{t_{\min}}$.
+Where the flow remains regular to zero, the exact map can reach $p_0$.
+For discrete data the endpoint is singular; keep the positive cutoff and
+interpret the clean law as a limit. Applying a final denoiser is an additional
+approximation, not an identity equating a posterior mean with a transport endpoint.
+
+Score estimation, a Gaussian substitute for $p_T$, finite solver steps, and a
+positive cutoff introduce different approximation errors. Making the solver
+more accurate does not remove the other three.
+
+## Work through discrete and continuous targets
+
+### Two-point data: reuse the posterior, construct the motion
+
+Let $P(X_0=+1)=P(X_0=-1)=1/2$. This is a distribution with two atoms, not an
+ordinary density at $t=0$. At positive noise,
+
+$$p_t(x)=\tfrac12\mathcal N(x;-\alpha_t,\sigma_t^2)
++\tfrac12\mathcal N(x;\alpha_t,\sigma_t^2).$$
+
+Tutorial 1's [two-point calculation](./25-learning-the-score.qmd#two-point-posterior)
+and marginal-score identity give
+
+$$D_t(x)=\mathbb E[X_0\mid X_t=x]=\tanh(\alpha_t x/\sigma_t^2),
+\qquad s_t(x)=\frac{\alpha_tD_t(x)-x}{\sigma_t^2}.$$
+
+Substitute into the VP velocity:
+
+$$v(x,t)=-\frac{\beta(t)}2
+\left[x+\frac{\alpha_t\tanh(\alpha_t x/\sigma_t^2)-x}{\sigma_t^2}\right].$$
+
+Positive-time trajectories preserve their order and cannot cross zero under
+uniqueness, since zero is itself an equilibrium trajectory. In the limit
+$t\downarrow0$, the exact flow takes positive terminal points to $+1$ and
+negative points to $-1$. The endpoint is therefore $\operatorname{sign}(X_T)$
+almost surely under a continuous terminal law. The zero trajectory stays zero,
+a probability-zero exception. The quantile argument below explains this limit.
+
+Starting with a symmetric Gaussian also gives equal endpoint masses in this
+special example. That symmetry does not make its intermediate marginals exact,
+and does not justify replacing $p_T$ arbitrarily for other data distributions.
+The sign map is a singular limit, not a finite-time diffeomorphism.
+
+### Derivation: one-dimensional flow preserves probability rank
+
+Let $F_t(x)=P(X_t\le x)$ be the CDF. A one-dimensional ODE with unique solutions
+preserves order: trajectories cannot cross at the same time. Thus its map
+between two smooth positive-density marginals is increasing. For such a map,
+
+$$F_t(\Psi_{T\to t}(x))=F_T(x),\qquad
+\boxed{\Psi_{T\to t}(x)=F_t^{-1}(F_T(x)).}$$
+
+The first equality says that all particles below $x$ remain below its image;
+their total probability is unchanged. This derives the map without solving
+the ODE explicitly. In the symmetric two-point limit, ranks below one half
+approach $-1$ and ranks above one half approach $+1$.
+
+### A continuous two-Gaussian target and the terminal-prior approximation
+
+Let
+
+$$p_0=\tfrac12\mathcal N(-1,\varrho^2)+\tfrac12\mathcal N(1,\varrho^2),
+\qquad\varrho>0.$$
+
+Now the endpoint density is smooth and the exact probability-flow map is
+$F_0^{-1}\circ F_T$. The actual finite-time terminal density is
+
+$$p_T=\tfrac12\mathcal N(-\alpha_T,\alpha_T^2\varrho^2+\sigma_T^2)
++\tfrac12\mathcal N(\alpha_T,\alpha_T^2\varrho^2+\sigma_T^2).$$
+
+It is generally only close to standard normal. Let $\Phi$ denote the standard
+normal CDF and $Z\sim\mathcal N(0,1)$. The ideal direct Gaussian-to-data map is
+$F_0^{-1}(\Phi(Z))$. Feeding $Z$ into the finite-time probability-flow map
+instead gives $F_0^{-1}(F_T(Z))$, which need not have density $p_0$.
+This makes the terminal-prior approximation visible in a single formula.
+
+### A posterior denoiser is not a transport endpoint
+
+Tweedie's estimate $D_t(x)=(x+\sigma_t^2s_t(x))/\alpha_t$ averages possible clean
+origins under the **stochastic corruption** model. The ODE map follows one
+particle through scores at successive times. They solve different problems.
+For two-point data, a small positive observation can have posterior mean close
+to zero, whereas its limiting ODE endpoint is $+1$.
+
+## Reading Song's forward and reverse SDEs {#song-sde-conventions}
+
+[Song's blog, “Reversing the SDE for sample generation”](https://yang-song.net/blog/2021/score/#reversing-the-sde-for-sample-generation)
+writes the reverse SDE in the original clock with **negative** $dt$. Our
+increasing-clock notation describes the same reverse process. Keep the three
+equations distinct:
+
+| Dynamics | Equation | Time direction |
+|---|---|---|
+| Forward corruption SDE | $dX_t=f(X_t,t)dt+g(t)dW_t$ | $t:0\to T$ |
+| Reverse SDE, original clock | $dX_t=[f(X_t,t)-g(t)^2s_t(X_t)]dt+g(t)d\overline W_t$ | $t:T\to0$ |
+| Probability-flow ODE | $dx_t=[f(x_t,t)-\tfrac12g(t)^2s_t(x_t)]dt$ | Either direction |
+
+Here $\overline W$ denotes Brownian motion in reverse time, not the original
+forward noise replayed. For a descending step $dt=-h$, its increment has
+covariance $hI=|dt|I$. Never take $\sqrt{dt}$ for negative $dt$.
+With $Y_\tau=X_{T-\tau}$, the reverse SDE becomes
+
+$$dY_\tau=[-f(Y_\tau,t)+g(t)^2s_t(Y_\tau)]d\tau
++g(t)d\overline W_\tau,\qquad t=T-\tau.$$
+
+Thus Euler–Maruyama gives
+$x_{\mathrm{next}}=x+h[-f(x,t)+g(t)^2s_\theta(x,t)]+g(t)\sqrt h\,\xi$,
+then $t\leftarrow t-h$. This is the stochastic update used in the next
+subsection and in Tutorial 4. The ODE uses half the score coefficient and no
+fresh noise; equal marginals do not imply identical trajectories.
+
+## Optional comparison: the stochastic sampler {#reverse-sde}
+
+The generation-clock probability-flow velocity is $-v$. Suppose we want to
+add fresh noise while keeping the same density evolution. A noise term with
+amplitude $g$ adds $g^2\Delta q/2$ to Fokker–Planck, where $q_\tau=p_{T-\tau}$.
+Compensate with additional drift $g^2s/2$:
+
+$$b=-v+\tfrac12g^2s=-f+g^2s.$$
+
+### Derivation: check the marginals and the factor of two
+
+All forward quantities below are evaluated at $t=T-\tau$ and the current location.
+Since $\nabla q=q s$,
+
+$$\begin{aligned}
+-\nabla\cdot(qb)+\tfrac12g^2\Delta q
+&=\nabla\cdot(qv)-\tfrac12g^2\nabla\cdot(qs)+\tfrac12g^2\Delta q\\
+&=\nabla\cdot(qv)=\partial_\tau q.
+\end{aligned}$$
+
+Thus the SDE $dY_\tau=b\,d\tau+g(T-\tau)d\overline W_\tau$ has the desired
+reverse-time marginals under the same regularity assumptions. Identifying it
+with the reversed stochastic **path law** requires a time-reversal theorem;
+matching marginals alone does not prove that theorem.
+
+Euler–Maruyama in increasing $\tau$ uses a positive step $h$:
+
+$$y_{j+1}=y_j+h[-f(y_j,t)+g(t)^2s_\theta(y_j,t)]
++g(t)\sqrt h\,\xi_j.$$
+
+The reverse SDE's score coefficient is one, while the probability-flow ODE's
+is one half. Deleting the noise from the reverse SDE retains the extra drift
+but removes the spreading it compensates for, generally changing the marginals.
+
+**Gaussian check:** for stationary VP, $s=-x$. Deleting reverse-SDE noise gives
+$dY/d\tau=-\beta Y/2$, which incorrectly contracts the cloud. The correct
+probability-flow velocity is zero.
+
+## Check your understanding
+
+1. Why does a density obey a PDE even when every particle follows an ODE?
+2. Where does the one half in the probability-flow formula come from?
+3. If an exact sampler starts from a Gaussian approximation to $p_T$, does an
+   exact solver guarantee the correct data distribution?
+4. What distribution does an exact sampler return when stopped at $t_{\min}>0$?
+
+::: {.callout-tip collapse="true"}
+## Answers
+
+1. Density depends on both location and time; flux determines its local change.
+2. The quadratic term of the Gaussian-step Taylor expansion.
+3. No. An exact solver still transports the substituted initial distribution.
+4. $p_{t_{\min}}$, when both the score and terminal law are exact.
+:::
+
+**Training recap:** draw a positive noise level, corrupt a clean example, and
+regress onto its known conditional-score target. The posterior averaging proof,
+Tweedie derivation, and time-weighting rule are in
+[Tutorial 1](./25-learning-the-score.qmd#training-recipe).
+
+**Continue:** [Tutorial 3](./27-diffusion-neural-odes-normalizing-flows.qmd) connects
+this deterministic transport to neural ODEs, likelihood, and flow matching.
