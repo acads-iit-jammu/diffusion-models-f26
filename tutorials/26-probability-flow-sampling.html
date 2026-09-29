@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>08 · Metropolis–Hastings: Sampling What You Cannot Normalise – ID-5-02 (TO)</title>
+<title>Probability-Flow Sampling: From Density Evolution to Samples – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/19-generative-adversarial-networks.html" rel="next">
-<link href="../tutorials/15-comparing-distributions.html" rel="prev">
+<link href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" rel="next">
+<link href="../tutorials/25-learning-the-score.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/18-metropolis-hastings.html">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/26-probability-flow-sampling.html">Probability-Flow Sampling: From Density Evolution to Samples</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -182,13 +182,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Lecture Notes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
@@ -239,7 +239,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span></a>
   </div>
 </li>
@@ -271,13 +271,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
  <span class="menu-text">Score-Based Diffusion</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
@@ -292,7 +292,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/26-probability-flow-sampling.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/26-probability-flow-sampling.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Probability-Flow Sampling: From Density Evolution to Samples</span></a>
   </div>
 </li>
@@ -496,28 +496,50 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-problem-stated-exactly" id="toc-the-problem-stated-exactly" class="nav-link active" data-scroll-target="#the-problem-stated-exactly">1. The problem, stated exactly</a></li>
-  <li><a href="#chains-kernels-and-what-converges-means" id="toc-chains-kernels-and-what-converges-means" class="nav-link" data-scroll-target="#chains-kernels-and-what-converges-means">2. Chains, kernels, and what “converges” means</a></li>
-  <li><a href="#detailed-balance-a-sufficient-condition-you-can-actually-check" id="toc-detailed-balance-a-sufficient-condition-you-can-actually-check" class="nav-link" data-scroll-target="#detailed-balance-a-sufficient-condition-you-can-actually-check">3. Detailed balance: a sufficient condition you can actually check</a></li>
-  <li><a href="#the-algorithm" id="toc-the-algorithm" class="nav-link" data-scroll-target="#the-algorithm">4. The algorithm</a>
+  <li><a href="#separate-the-particle-question-from-the-density-question" id="toc-separate-the-particle-question-from-the-density-question" class="nav-link active" data-scroll-target="#separate-the-particle-question-from-the-density-question">Separate the particle question from the density question</a>
   <ul class="collapse">
-  <li><a href="#why-it-works" id="toc-why-it-works" class="nav-link" data-scroll-target="#why-it-works">Why it works</a></li>
+  <li><a href="#recall-fields-trajectories-and-flow-maps" id="toc-recall-fields-trajectories-and-flow-maps" class="nav-link" data-scroll-target="#recall-fields-trajectories-and-flow-maps">Recall: fields, trajectories, and flow maps</a></li>
+  <li><a href="#recall-stochastic-motion" id="toc-recall-stochastic-motion" class="nav-link" data-scroll-target="#recall-stochastic-motion">Recall: stochastic motion</a></li>
   </ul></li>
-  <li><a href="#the-three-special-cases-you-will-meet" id="toc-the-three-special-cases-you-will-meet" class="nav-link" data-scroll-target="#the-three-special-cases-you-will-meet">5. The three special cases you will meet</a></li>
-  <li><a href="#a-worked-example-two-lines-of-arithmetic" id="toc-a-worked-example-two-lines-of-arithmetic" class="nav-link" data-scroll-target="#a-worked-example-two-lines-of-arithmetic">6. A worked example: two lines of arithmetic</a></li>
-  <li><a href="#what-it-costs-burn-in-correlation-and-tuning" id="toc-what-it-costs-burn-in-correlation-and-tuning" class="nav-link" data-scroll-target="#what-it-costs-burn-in-correlation-and-tuning">7. What it costs: burn-in, correlation, and tuning</a></li>
-  <li><a href="#the-structural-reason-this-is-not-a-generative-model" id="toc-the-structural-reason-this-is-not-a-generative-model" class="nav-link" data-scroll-target="#the-structural-reason-this-is-not-a-generative-model">8. The structural reason this is not a generative model</a></li>
-  <li><a href="#where-this-returns" id="toc-where-this-returns" class="nav-link" data-scroll-target="#where-this-returns">9. Where this returns</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  <li><a href="#describe-motion-of-an-entire-density" id="toc-describe-motion-of-an-entire-density" class="nav-link" data-scroll-target="#describe-motion-of-an-entire-density">Describe motion of an entire density</a>
+  <ul class="collapse">
+  <li><a href="#derivation-probability-flux-in-one-dimension" id="toc-derivation-probability-flux-in-one-dimension" class="nav-link" data-scroll-target="#derivation-probability-flux-in-one-dimension">Derivation: probability flux in one dimension</a></li>
+  <li><a href="#multidimensional-notation-gradient-divergence-laplacian" id="toc-multidimensional-notation-gradient-divergence-laplacian" class="nav-link" data-scroll-target="#multidimensional-notation-gradient-divergence-laplacian">Multidimensional notation: gradient, divergence, Laplacian</a></li>
+  <li><a href="#fokker-planck" id="toc-fokker-planck" class="nav-link" data-scroll-target="#fokker-planck">Derivation: how Gaussian spreading changes a density</a></li>
+  <li><a href="#optional-derivation-combining-drift-and-noise-rigorously-enough-for-calculus" id="toc-optional-derivation-combining-drift-and-noise-rigorously-enough-for-calculus" class="nav-link" data-scroll-target="#optional-derivation-combining-drift-and-noise-rigorously-enough-for-calculus">Optional derivation: combining drift and noise rigorously enough for calculus</a></li>
+  </ul></li>
+  <li><a href="#construct-the-probability-flow-velocity" id="toc-construct-the-probability-flow-velocity" class="nav-link" data-scroll-target="#construct-the-probability-flow-velocity">Construct the probability-flow velocity</a>
+  <ul class="collapse">
+  <li><a href="#derivation-turn-diffusive-flux-into-density-times-velocity" id="toc-derivation-turn-diffusive-flux-into-density-times-velocity" class="nav-link" data-scroll-target="#derivation-turn-diffusive-flux-into-density-times-velocity">Derivation: turn diffusive flux into density times velocity</a></li>
+  <li><a href="#worked-check-the-stationary-gaussian-does-not-collapse" id="toc-worked-check-the-stationary-gaussian-does-not-collapse" class="nav-link" data-scroll-target="#worked-check-the-stationary-gaussian-does-not-collapse">Worked check: the stationary Gaussian does not collapse</a></li>
+  </ul></li>
+  <li><a href="#generate-by-integrating-backward" id="toc-generate-by-integrating-backward" class="nav-link" data-scroll-target="#generate-by-integrating-backward">Generate by integrating backward</a>
+  <ul class="collapse">
+  <li><a href="#backward-integration" id="toc-backward-integration" class="nav-link" data-scroll-target="#backward-integration">What backward integration means</a></li>
+  <li><a href="#a-usable-ode-sampling-recipe" id="toc-a-usable-ode-sampling-recipe" class="nav-link" data-scroll-target="#a-usable-ode-sampling-recipe">A usable ODE sampling recipe</a></li>
+  </ul></li>
+  <li><a href="#work-through-discrete-and-continuous-targets" id="toc-work-through-discrete-and-continuous-targets" class="nav-link" data-scroll-target="#work-through-discrete-and-continuous-targets">Work through discrete and continuous targets</a>
+  <ul class="collapse">
+  <li><a href="#two-point-data-reuse-the-posterior-construct-the-motion" id="toc-two-point-data-reuse-the-posterior-construct-the-motion" class="nav-link" data-scroll-target="#two-point-data-reuse-the-posterior-construct-the-motion">Two-point data: reuse the posterior, construct the motion</a></li>
+  <li><a href="#derivation-one-dimensional-flow-preserves-probability-rank" id="toc-derivation-one-dimensional-flow-preserves-probability-rank" class="nav-link" data-scroll-target="#derivation-one-dimensional-flow-preserves-probability-rank">Derivation: one-dimensional flow preserves probability rank</a></li>
+  <li><a href="#a-continuous-two-gaussian-target-and-the-terminal-prior-approximation" id="toc-a-continuous-two-gaussian-target-and-the-terminal-prior-approximation" class="nav-link" data-scroll-target="#a-continuous-two-gaussian-target-and-the-terminal-prior-approximation">A continuous two-Gaussian target and the terminal-prior approximation</a></li>
+  <li><a href="#a-posterior-denoiser-is-not-a-transport-endpoint" id="toc-a-posterior-denoiser-is-not-a-transport-endpoint" class="nav-link" data-scroll-target="#a-posterior-denoiser-is-not-a-transport-endpoint">A posterior denoiser is not a transport endpoint</a></li>
+  </ul></li>
+  <li><a href="#song-sde-conventions" id="toc-song-sde-conventions" class="nav-link" data-scroll-target="#song-sde-conventions">Reading Song’s forward and reverse SDEs</a></li>
+  <li><a href="#reverse-sde" id="toc-reverse-sde" class="nav-link" data-scroll-target="#reverse-sde">Optional comparison: the stochastic sampler</a>
+  <ul class="collapse">
+  <li><a href="#derivation-check-the-marginals-and-the-factor-of-two" id="toc-derivation-check-the-marginals-and-the-factor-of-two" class="nav-link" data-scroll-target="#derivation-check-the-marginals-and-the-factor-of-two">Derivation: check the marginals and the factor of two</a></li>
+  </ul></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding">Check your understanding</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/18-metropolis-hastings.html">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/26-probability-flow-sampling.html">Probability-Flow Sampling: From Density Evolution to Samples</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</h1>
+<h1 class="title">Probability-Flow Sampling: From Density Evolution to Samples</h1>
 </div>
 
 
@@ -534,194 +556,181 @@ window.Quarto = {
 </header>
 
 
-<p><em>Note 06 ended with a promise and half an algorithm: generation needs <strong>samples</strong>, not a density, and a Markov chain can produce them from a target known only up to its normalising constant. This note makes that precise. One condition — detailed balance — and one acceptance rule turn any proposal you can sample into a chain whose stationary distribution is exactly the one you wanted. Then the honest accounting: what it costs, where it breaks, and the single structural reason it cannot generate an image no matter how long you run it. That reason is the door into <a href="../tutorials/19-generative-adversarial-networks.html">note 09</a>.</em></p>
-<section id="the-problem-stated-exactly" class="level2">
-<h2 class="anchored" data-anchor-id="the-problem-stated-exactly">1. The problem, stated exactly</h2>
-<p>Everything this course does is downstream of one request: <strong>produce a draw from a distribution</strong>. Note 00 argued that generation <em>is</em> sampling; note 06 showed that estimating the density first is hopeless in high dimension. So consider the situation where you are luckier than the image case — you can <em>write down</em> the target, but only up to a constant:</p>
-<p><span class="math display">\[
-\pi(x) \;=\; \frac{\tilde\pi(x)}{Z}, \qquad Z = \int \tilde\pi(x)\,dx ,
-\]</span></p>
-<p>with <span class="math inline">\(\tilde\pi\)</span> cheap to evaluate at any point and <span class="math inline">\(Z\)</span> an integral nobody can do.</p>
-<p>This is not a contrived setup; it is the <em>generic</em> one.</p>
-<p><strong>Bayesian inference.</strong> The posterior over parameters given data is</p>
-<p><span class="math display">\[
-\pi(\theta) \;=\; p(\theta \mid \mathcal{D}) \;=\; \frac{p(\theta)\,L(\mathcal{D}\mid\theta)}{p(\mathcal{D})},
-\qquad
-p(\mathcal{D}) = \int p(\theta)L(\mathcal{D}\mid\theta)\,d\theta .
-\]</span></p>
-<p>The numerator is prior times likelihood — two things you chose and can evaluate in closed form. The denominator, the <strong>evidence</strong>, is an integral over the whole parameter space, and outside conjugate families it has no closed form and no usable quadrature past a handful of dimensions. So <span class="math inline">\(\tilde\pi = p(\theta)L\)</span> is available and <span class="math inline">\(Z = p(\mathcal{D})\)</span> is not.</p>
-<p><strong>Energy-based models.</strong> <span class="math inline">\(\pi(x) \propto e^{-E(x)}\)</span> for an energy <span class="math inline">\(E\)</span> you specify or learn. <span class="math inline">\(Z = \int e^{-E}\)</span> is the partition function, and computing it is as hard as the original problem.</p>
-<p><strong>Conditioning of any kind.</strong> <span class="math inline">\(\pi(x) \propto p(x)\mathbf{1}\{x \in A\}\)</span> — a known distribution restricted to a region. The restricted density is trivial to evaluate and its mass <span class="math inline">\(p(A)\)</span> is not.</p>
 <div class="callout callout-style-simple callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>What note 06 already settled
+<span class="screen-reader-only">Note</span>Tutorial 2 of 4 · Sampling
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Two facts carry over and are not re-derived here.</p>
-<p><strong>Rejection sampling is exact and unusable.</strong> It needs an envelope <span class="math inline">\(\pi \le M q\)</span>, and in <span class="math inline">\(d\)</span> dimensions with a proposal only ten percent too wide the acceptance rate is <span class="math inline">\(1.1^{-d}\)</span> — about <span class="math inline">\(7\times10^{-5}\)</span> at <span class="math inline">\(d=100\)</span>. Every independently drawn candidate is a fresh gamble against the same odds.</p>
-<p><strong>The cure is to stop starting over.</strong> Move from where you already are, so that work already done is not thrown away. That is what a Markov chain buys, and what this note builds.</p>
+<p><strong>Question:</strong> Why does the learned score give a valid sampling velocity?</p>
+<p><strong>Before this:</strong> <a href="../tutorials/25-learning-the-score.html">Learning the Score</a>, including Gaussian increments and the expected Taylor step. No prior PDE course is needed.</p>
+<p><strong>Core route:</strong> particle motion → probability flux → density evolution → probability-flow ODE → backward sampling → examples. The multidimensional notation, integration-by-parts proof, and stochastic-sampler comparison are labelled subsections; the one-dimensional derivation gives the main argument.</p>
+<p><strong>Next:</strong> <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html">Diffusion, Neural ODEs, and Normalizing Flows</a>.</p>
 </div>
 </div>
+<section id="separate-the-particle-question-from-the-density-question" class="level2">
+<h2 class="anchored" data-anchor-id="separate-the-particle-question-from-the-density-question">Separate the particle question from the density question</h2>
+<p>A particle question asks: <strong>where does this starting point go?</strong> A density question asks: <strong>how is the whole population distributed at a given time?</strong> An ODE and an SDE can answer the particle question differently while giving the same density at every time. This tutorial constructs such a pair.</p>
+<p>Write <span class="math inline">\(p_0=p_{\mathrm{data}}\)</span> and let <span class="math inline">\(p_t\)</span> be the forward-noised density from Tutorial 1. Our aim is to move random samples from <span class="math inline">\(p_T\)</span> back to <span class="math inline">\(p_0\)</span>. For VP with enough signal attenuation, <span class="math inline">\(p_T\)</span> is approximately standard Gaussian. Exact arguments use <span class="math inline">\(p_T\)</span>; practical samplers often substitute a Gaussian.</p>
+<section id="recall-fields-trajectories-and-flow-maps" class="level3">
+<h3 class="anchored" data-anchor-id="recall-fields-trajectories-and-flow-maps">Recall: fields, trajectories, and flow maps</h3>
+<p>A vector field <span class="math inline">\(v(x,t)\)</span> assigns a velocity vector to each location and time. The ODE <span class="math inline">\(\dot x_t=v(x_t,t)\)</span> says that a particle follows its current local vector. For <span class="math inline">\(v(x)=-x\)</span>,</p>
+<p><span class="math display">\[\dot x=-x,\qquad x_t=e^{-t}x_0,\qquad
+\Psi_{0\to t}(x_0)=e^{-t}x_0.\]</span></p>
+<p>Separation of variables gives this solution when <span class="math inline">\(x_0\ne0\)</span>, and <span class="math inline">\(x\equiv0\)</span> completes the equilibrium case. The <strong>flow map</strong> <span class="math inline">\(\Psi_{s\to t}\)</span> collects the solutions for every starting state at time <span class="math inline">\(s\)</span>. Existence and uniqueness are needed for this map to be well defined; smooth fields with appropriate growth bounds suffice on the intervals we use. Tutorial 3 examines invertibility.</p>
+<p>A deterministic map can generate random outputs: start it with a random input. But the contraction above takes <span class="math inline">\(\mathcal N(0,1)\)</span> to <span class="math inline">\(\mathcal N(0,e^{-2t})\)</span>, so following the bare Gaussian score <span class="math inline">\(-x\)</span> does not preserve Gaussian samples.</p>
 </section>
-<section id="chains-kernels-and-what-converges-means" class="level2">
-<h2 class="anchored" data-anchor-id="chains-kernels-and-what-converges-means">2. Chains, kernels, and what “converges” means</h2>
-<p>A <strong>Markov chain</strong> on a state space <span class="math inline">\(\mathcal{X}\)</span> is a sequence <span class="math inline">\(x_0, x_1, x_2,
-\dots\)</span> in which the next state depends on the past only through the present:</p>
-<p><span class="math display">\[
-\mathbb{P}(x_{t+1} \in A \mid x_t, x_{t-1}, \dots, x_0) \;=\; \mathbb{P}(x_{t+1} \in A \mid x_t)
-\;=\; \int_A K(x_t, y)\,dy .
-\]</span></p>
-<p>The function <span class="math inline">\(K(x,y)\)</span> is the <strong>transition kernel</strong>: the density of where you go next, given where you are. It is all the chain is.</p>
-<p>Run the kernel forward from an initial law <span class="math inline">\(p_0\)</span> and you get a <em>sequence of distributions</em>, not one distribution:</p>
-<p><span class="math display">\[
-p_{t+1}(y) \;=\; \int p_t(x)\,K(x,y)\,dx .
-\]</span></p>
-<p>This is the same <span class="math inline">\(p_0, p_1, p_2, \dots\)</span> that note 06 exhibited in closed form for Gibbs on a bivariate normal, where <span class="math inline">\(x_t \mid x_0 \sim \mathcal{N}(\rho^{2t}x_0,\,
-1-\rho^{4t})\)</span>. Watching that sequence flow is the whole subject.</p>
-<p>A distribution <span class="math inline">\(\pi\)</span> is <strong>stationary</strong> (or invariant) for <span class="math inline">\(K\)</span> when applying the kernel changes nothing:</p>
-<p><span class="math display">\[
-\boxed{\;\pi(y) \;=\; \int \pi(x)\,K(x,y)\,dx.\;}
-\]</span></p>
-<p>Stationarity says: <em>if</em> you are already distributed as <span class="math inline">\(\pi\)</span>, one more step leaves you distributed as <span class="math inline">\(\pi\)</span>. It says nothing on its own about getting there. Two more conditions supply that.</p>
-<ul>
-<li><strong>Irreducibility</strong>: from any starting point the chain can reach any region of positive <span class="math inline">\(\pi\)</span>-mass. No part of the space is walled off.</li>
-<li><strong>Aperiodicity</strong>: the chain does not cycle through regions on a fixed schedule.</li>
-</ul>
-<p>With those, the fundamental theorem of MCMC applies: the chain is <strong>ergodic</strong>, <span class="math inline">\(p_t \to \pi\)</span> regardless of <span class="math inline">\(p_0\)</span>, and time averages converge to space averages,</p>
-<p><span class="math display">\[
-\frac1T \sum_{t=1}^{T} f(x_t) \;\xrightarrow[T\to\infty]{}\; \mathbb{E}_{\pi}[f(X)] .
-\]</span></p>
-<p>That last line is the working promise: <strong>run one chain long enough and average along it, and you get expectations under <span class="math inline">\(\pi\)</span></strong> — even though no single <span class="math inline">\(x_t\)</span> was drawn from <span class="math inline">\(\pi\)</span> and no two of them are independent.</p>
-<p>So the design problem is now sharp, and it runs backwards from the usual one. Ordinarily you are given a chain and asked for its stationary law. Here you are <strong>given the stationary law and asked to build a chain</strong>. Metropolis–Hastings is a universal answer.</p>
+<section id="recall-stochastic-motion" class="level3">
+<h3 class="anchored" data-anchor-id="recall-stochastic-motion">Recall: stochastic motion</h3>
+<p>The forward SDE is</p>
+<p><span class="math display">\[dX_t=f(X_t,t)\,dt+g(t)\,dW_t.\]</span></p>
+<p>Tutorial 1 explains its Euler–Maruyama approximation:</p>
+<p><span class="math display">\[\widehat X_{k+1}=\widehat X_k+h f(\widehat X_k,t_k)
++g(t_k)\sqrt h\,\xi_k,\qquad h&gt;0.\]</span></p>
+<p>The <span class="math inline">\(\xi_k\sim\mathcal N(0,I)\)</span> are independent. For VP, <span class="math inline">\(f=-\beta(t)x/2\)</span>, <span class="math inline">\(g^2=\beta(t)\)</span>, and the one-time conditional law is <span class="math inline">\(X_t=\alpha_tX_0+\sigma_t\epsilon\)</span> with <span class="math inline">\(\sigma_t^2=1-\alpha_t^2\)</span>. A shared <span class="math inline">\(\epsilon\)</span> across times is not a Brownian path.</p>
 </section>
-<section id="detailed-balance-a-sufficient-condition-you-can-actually-check" class="level2">
-<h2 class="anchored" data-anchor-id="detailed-balance-a-sufficient-condition-you-can-actually-check">3. Detailed balance: a sufficient condition you can actually check</h2>
-<p>Verifying <span class="math inline">\(\pi = \pi K\)</span> directly means doing an integral over the whole space, which is the sort of thing we are trying to avoid. There is a stronger, purely <strong>local</strong> condition that implies it. A chain satisfies <strong>detailed balance</strong> with respect to <span class="math inline">\(\pi\)</span> if for every pair of states,</p>
-<p><span class="math display">\[
-\boxed{\;\pi(x)\,K(x,y) \;=\; \pi(y)\,K(y,x).\;}
-\]</span></p>
-<p>Read it as a flow statement: at equilibrium the probability mass moving from <span class="math inline">\(x\)</span> to <span class="math inline">\(y\)</span> exactly equals the mass moving from <span class="math inline">\(y\)</span> to <span class="math inline">\(x\)</span>. Every pairwise exchange balances — hence <em>reversible</em>: a film of the chain in equilibrium looks the same run backwards.</p>
-<p><strong>Detailed balance implies stationarity.</strong> One line:</p>
-<p><span class="math display">\[
-\int \pi(x)K(x,y)\,dx
-\;=\; \int \pi(y)K(y,x)\,dx
-\;=\; \pi(y)\int K(y,x)\,dx
-\;=\; \pi(y),
-\]</span></p>
-<p>using detailed balance in the first step and <span class="math inline">\(\int K(y,x)dx = 1\)</span> in the last. <span class="math inline">\(\square\)</span></p>
-<p>The converse is false — plenty of useful chains are stationary without being reversible, and some deliberately non-reversible chains mix faster. But detailed balance is a <em>pointwise</em> condition on two states at a time, which means it can be <strong>engineered</strong>, and that is exactly what the next section does.</p>
 </section>
-<section id="the-algorithm" class="level2">
-<h2 class="anchored" data-anchor-id="the-algorithm">4. The algorithm</h2>
-<p>Choose a <strong>proposal</strong> <span class="math inline">\(q(y \mid x)\)</span>: any conditional distribution you can sample from. It need not resemble <span class="math inline">\(\pi\)</span>; it need not be symmetric; it carries no theoretical burden at all. From the current state <span class="math inline">\(x_t\)</span>:</p>
+<section id="describe-motion-of-an-entire-density" class="level2">
+<h2 class="anchored" data-anchor-id="describe-motion-of-an-entire-density">Describe motion of an entire density</h2>
+<section id="derivation-probability-flux-in-one-dimension" class="level3">
+<h3 class="anchored" data-anchor-id="derivation-probability-flux-in-one-dimension">Derivation: probability flux in one dimension</h3>
+<p>Suppose particles move deterministically with velocity <span class="math inline">\(v(x,t)\)</span>. A small interval of width <span class="math inline">\(\Delta x\)</span> contains probability approximately <span class="math inline">\(p_t(x)\Delta x\)</span>. Define <strong>probability flux</strong></p>
+<p><span class="math display">\[J(x,t)=p_t(x)v(x,t).\]</span></p>
+<p>This is signed probability crossing a location per unit time. The interval gains mass from its left boundary and loses mass through its right boundary:</p>
+<p><span class="math display">\[\frac{d}{dt}[p_t(x)\Delta x]=J(x,t)-J(x+\Delta x,t).\]</span></p>
+<p>Expand <span class="math inline">\(J(x+\Delta x,t)=J(x,t)+\partial_xJ(x,t)\Delta x+o(\Delta x)\)</span>. After dividing by <span class="math inline">\(\Delta x\)</span> and taking the limit,</p>
+<p><span class="math display">\[\boxed{\partial_t p_t=-\partial_x(p_t v).}\]</span></p>
+<p>This is the <strong>continuity equation</strong>, expressing conservation of probability. It is a partial differential equation (PDE) because <span class="math inline">\(p\)</span> depends on both <span class="math inline">\(x\)</span> and <span class="math inline">\(t\)</span>. The derivative <span class="math inline">\(\partial_t\)</span> holds location fixed; the derivative <span class="math inline">\(\partial_x\)</span> holds time fixed.</p>
+</section>
+<section id="multidimensional-notation-gradient-divergence-laplacian" class="level3">
+<h3 class="anchored" data-anchor-id="multidimensional-notation-gradient-divergence-laplacian">Multidimensional notation: gradient, divergence, Laplacian</h3>
+<p>For a scalar function <span class="math inline">\(p\)</span>, <span class="math inline">\(\nabla p\)</span> collects its coordinate derivatives. For a vector field <span class="math inline">\(v=(v_1,\ldots,v_d)\)</span>, define</p>
+<p><span class="math display">\[\nabla\cdot v=\sum_{i=1}^d\partial_{x_i}v_i,
+\qquad\Delta p=\sum_{i=1}^d\partial_{x_i}^2p=\nabla\cdot(\nabla p).\]</span></p>
+<p>The first is <strong>divergence</strong>, measuring local expansion; the second is the <strong>Laplacian</strong>, adding the curvature in all coordinate directions. For <span class="math inline">\(v=x\)</span>, <span class="math inline">\(\nabla\cdot v=d&gt;0\)</span>: a small cloud expands. For <span class="math inline">\(v=-x\)</span>, it contracts.</p>
+<p>Apply the one-dimensional flux argument to opposite faces of a small box. The net outward flux in coordinate <span class="math inline">\(i\)</span> is <span class="math inline">\(\partial_{x_i}(p_t v_i)\)</span> times the box volume. Add all directions:</p>
+<p><span class="math display">\[\boxed{\partial_t p_t=-\nabla\cdot(p_t v).}\]</span></p>
+<p>No surface-integral theorem is needed for this box argument.</p>
+</section>
+<section id="fokker-planck" class="level3">
+<h3 class="anchored" data-anchor-id="fokker-planck">Derivation: how Gaussian spreading changes a density</h3>
+<p>Without drift, freeze <span class="math inline">\(g\)</span> during a small positive step <span class="math inline">\(h\)</span>. Adding an independent <span class="math inline">\(\eta=g(t)\sqrt h\,\xi\)</span> averages shifted copies of the old density:</p>
+<p><span class="math display">\[p_{t+h}(x)\approx\mathbb E_\eta[p_t(x-\eta)].\]</span></p>
+<p>This is the density-level version of the Euler–Maruyama step; for constant <span class="math inline">\(g\)</span> and zero drift, that Gaussian increment is exact. Taylor expansion gives</p>
+<p><span class="math display">\[p_t(x-\eta)=p_t(x)-\eta p_t'(x)+\tfrac12\eta^2p_t''(x)+\cdots.\]</span></p>
+<p>The odd Gaussian moments vanish and <span class="math inline">\(\mathbb E\eta^2=g(t)^2h\)</span>. For sufficiently smooth densities, the frozen-step expansion is therefore</p>
+<p><span class="math display">\[\mathbb E[p_t(x-\eta)]
+=p_t(x)+\tfrac12g(t)^2h\,p_t''(x)+O(h^2).\]</span></p>
+<p>Dividing the change by <span class="math inline">\(h\)</span> and taking the limit gives <span class="math inline">\(\partial_t p_t=\tfrac12g(t)^2\partial_x^2p_t\)</span>. The factor one half comes from Taylor’s quadratic term; it is not an arbitrary modeling constant.</p>
+<p><strong>Check at a Gaussian peak:</strong> <span class="math inline">\(p_t''(\mu)&lt;0\)</span>, so the peak height decreases as noise spreads its mass. The same density gains mass farther out in its tails.</p>
+<p>Drift contributes <span class="math inline">\(-\partial_x(fp_t)\)</span> and random spreading contributes the second-derivative term. Together they give <strong>Fokker–Planck</strong>:</p>
+<p><span class="math display">\[\boxed{\partial_t p_t=-\partial_x(fp_t)+\tfrac12g(t)^2\partial_x^2p_t.}\]</span></p>
+<p>The next subsection justifies adding these effects. In <span class="math inline">\(d\)</span> dimensions the independent noise coordinates contribute separate second derivatives, so</p>
+<p><span class="math display">\[\boxed{\partial_t p_t=-\nabla\cdot(fp_t)+\tfrac12g(t)^2\Delta p_t.}\]</span></p>
+<p>These formulas use scalar, spatially constant <span class="math inline">\(g(t)\)</span>. A state-dependent noise matrix requires a different diffusion term.</p>
+</section>
+<section id="optional-derivation-combining-drift-and-noise-rigorously-enough-for-calculus" class="level3">
+<h3 class="anchored" data-anchor-id="optional-derivation-combining-drift-and-noise-rigorously-enough-for-calculus">Optional derivation: combining drift and noise rigorously enough for calculus</h3>
+<p>Take a smooth function <span class="math inline">\(\varphi\)</span> that vanishes outside a bounded interval. Think of it as a smooth probe that measures probability near a chosen region. Tutorial 1’s <a href="../tutorials/25-learning-the-score.html#expected-taylor-step">expected Taylor step</a> says</p>
+<p><span class="math display">\[\frac{d}{dt}\mathbb E[\varphi(X_t)]
+=\mathbb E[f\varphi'+\tfrac12g^2\varphi''].\]</span></p>
+<p>Write averages as integrals against <span class="math inline">\(p_t\)</span>. Integration by parts once on the drift term and twice on the noise term gives</p>
+<p><span class="math display">\[\int\varphi\,\partial_t p_t\,dx
+=\int\varphi[-\partial_x(fp_t)+\tfrac12g^2\partial_x^2p_t],dx.\]</span></p>
+<p>Boundary terms vanish because the probe is zero outside its bounded support. If two continuous expressions have equal integrals against every such probe, they agree pointwise: otherwise a probe around a region where they differ would distinguish them. This proves the displayed Fokker–Planck equation under the assumed differentiability. The same reasoning in each coordinate proves its multidimensional form.</p>
+</section>
+</section>
+<section id="construct-the-probability-flow-velocity" class="level2">
+<h2 class="anchored" data-anchor-id="construct-the-probability-flow-velocity">Construct the probability-flow velocity</h2>
+<section id="derivation-turn-diffusive-flux-into-density-times-velocity" class="level3">
+<h3 class="anchored" data-anchor-id="derivation-turn-diffusive-flux-into-density-times-velocity">Derivation: turn diffusive flux into density times velocity</h3>
+<p>Where <span class="math inline">\(p_t&gt;0\)</span>, the score satisfies <span class="math inline">\(\nabla p_t=p_t\nabla\log p_t=p_t s_t\)</span>. Consequently,</p>
+<p><span class="math display">\[\begin{aligned}
+\partial_t p_t
+&amp;=-\nabla\cdot(fp_t)+\tfrac12g^2\nabla\cdot(p_t s_t)\\
+&amp;=-\nabla\cdot\left[p_t\left(f-\tfrac12g^2s_t\right)\right].
+\end{aligned}\]</span></p>
+<p>Compare this with the continuity equation. A deterministic velocity producing the same density evolution is</p>
+<p><span class="math display">\[\boxed{v(x,t)=f(x,t)-\tfrac12g(t)^2s_t(x).}\]</span></p>
+<p>The score appears because diffusive probability flux involves <span class="math inline">\(\nabla p_t\)</span>, and writing flux as density times velocity divides that gradient by <span class="math inline">\(p_t\)</span>. This yields <span class="math inline">\(\nabla\log p_t\)</span>.</p>
+<p>With the same initial law, and regularity and uniqueness of the density evolution, the SDE and this ODE have the same one-time marginals. This is the probability-flow construction of <a href="https://arxiv.org/abs/2011.13456">Song et al.</a>. It does not identify their trajectories or their start–endpoint pairings.</p>
+<p>The construction supplies <strong>a</strong> velocity, not necessarily the only one. Adding <span class="math inline">\(w\)</span> with <span class="math inline">\(\nabla\cdot(p_t w)=0\)</span> leaves the density equation unchanged.</p>
+</section>
+<section id="worked-check-the-stationary-gaussian-does-not-collapse" class="level3">
+<h3 class="anchored" data-anchor-id="worked-check-the-stationary-gaussian-does-not-collapse">Worked check: the stationary Gaussian does not collapse</h3>
+<p>For VP, <span class="math inline">\(v(x,t)=-\beta(t)[x+s_t(x)]/2\)</span>. If <span class="math inline">\(p_0=\mathcal N(0,I)\)</span>, Tutorial 1’s Gaussian kernel shows that <span class="math inline">\(p_t\)</span> remains <span class="math inline">\(\mathcal N(0,I)\)</span>. Thus <span class="math inline">\(s_t(x)=-x\)</span> and</p>
+<p><span class="math display">\[v(x,t)=-\tfrac12\beta(t)x+\tfrac12\beta(t)x=0.\]</span></p>
+<p>Every probability-flow particle stays still. SDE particles continue moving, but their population remains standard Gaussian. Following the score alone would contract this population; the complete probability-flow field does not.</p>
+</section>
+</section>
+<section id="generate-by-integrating-backward" class="level2">
+<h2 class="anchored" data-anchor-id="generate-by-integrating-backward">Generate by integrating backward</h2>
+<section id="backward-integration" class="level3">
+<h3 class="anchored" data-anchor-id="backward-integration">What backward integration means</h3>
+<p>Forward diffusion time runs from data at <span class="math inline">\(t=0\)</span> to noise at <span class="math inline">\(t=T\)</span>. We know how to sample a terminal state, so specify <span class="math inline">\(x(T)=z\)</span> and solve the <strong>same ODE</strong> in decreasing <span class="math inline">\(t\)</span>. With a positive step magnitude <span class="math inline">\(h\)</span>,</p>
+<p><span class="math display">\[x(t-h)\approx x(t)-h\,v(x(t),t).\]</span></p>
+<p>The minus sign comes from the time increment <span class="math inline">\(-h\)</span>. Alternatively, use an increasing generation clock <span class="math inline">\(\tau=T-t\)</span> and <span class="math inline">\(Y_\tau=X_{T-\tau}\)</span>:</p>
+<p><span class="math display">\[\frac{dY_\tau}{d\tau}=-v(Y_\tau,T-\tau).\]</span></p>
+<p>Neither description requires undoing individual forward Brownian increments.</p>
+</section>
+<section id="a-usable-ode-sampling-recipe" class="level3">
+<h3 class="anchored" data-anchor-id="a-usable-ode-sampling-recipe">A usable ODE sampling recipe</h3>
+<p>Take a descending grid <span class="math inline">\(T=t_N&gt;\cdots&gt;t_0=t_{\min}&gt;0\)</span>.</p>
 <ol type="1">
-<li><strong>Propose</strong> <span class="math inline">\(y \sim q(\cdot \mid x_t)\)</span>.</li>
-<li><strong>Compute the acceptance probability</strong> <span class="math display">\[
-\boxed{\;\alpha(x_t, y) \;=\; \min\!\left\{1,\;
-\frac{\pi(y)\,q(x_t \mid y)}{\pi(x_t)\,q(y \mid x_t)}\right\}.\;}
-\]</span></li>
-<li><strong>Accept or reject</strong>: draw <span class="math inline">\(u \sim \mathrm{Uniform}(0,1)\)</span>; set <span class="math inline">\(x_{t+1} = y\)</span> if <span class="math inline">\(u &lt; \alpha\)</span>, and otherwise <span class="math inline">\(x_{t+1} = x_t\)</span> — <em>stay where you are</em>.</li>
+<li>Draw <span class="math inline">\(x_N\)</span> from <span class="math inline">\(p_T\)</span>, or use its Gaussian approximation in practice.</li>
+<li>For <span class="math inline">\(k=N,\ldots,1\)</span>, let <span class="math inline">\(h_k=t_k-t_{k-1}&gt;0\)</span>.</li>
+<li>Evaluate <span class="math inline">\(v_\theta(x_k,t_k)=f(x_k,t_k)-g(t_k)^2s_\theta(x_k,t_k)/2\)</span>.</li>
+<li>Apply Euler: <span class="math inline">\(x_{k-1}=x_k-h_kv_\theta(x_k,t_k)\)</span>.</li>
 </ol>
-<p>Three observations, in order of importance.</p>
-<p><strong>The normalising constant cancels.</strong> <span class="math inline">\(\pi\)</span> enters only as the ratio <span class="math inline">\(\pi(y)/\pi(x)\)</span>, and</p>
-<p><span class="math display">\[
-\frac{\pi(y)}{\pi(x)} \;=\; \frac{\tilde\pi(y)/Z}{\tilde\pi(x)/Z} \;=\; \frac{\tilde\pi(y)}{\tilde\pi(x)} .
-\]</span></p>
-<p><span class="math inline">\(Z\)</span> never appears. For a Bayesian posterior the rule is literally</p>
-<p><span class="math display">\[
-\alpha \;=\; \min\left\{1,\; \frac{p(\theta')\,L(\mathcal{D}\mid\theta')}{p(\theta)\,L(\mathcal{D}\mid\theta)}
-\cdot \frac{q(\theta \mid \theta')}{q(\theta' \mid \theta)}\right\},
-\]</span></p>
-<p>prior times likelihood at two points, and nothing else. The evidence integral — the reason the posterior was intractable — is gone.</p>
-<p><strong>Rejection is not a wasted draw.</strong> In rejection sampling a rejected candidate disappears and the sampler has nothing to show for it. Here a rejection <strong>emits the current state again</strong>, which is a genuine sample. Staying put is a legal move, and it is how the chain gives extra weight to high-probability regions. Omitting the repeat — recording only accepted states — is the single most common implementation bug, and it silently biases every estimate.</p>
-<p><strong>The correction term <span class="math inline">\(q(x\mid y)/q(y\mid x)\)</span> is Hastings’ contribution.</strong> It compensates for a proposal that is easier to enter a region than to leave it. Metropolis’ original 1953 algorithm assumed a symmetric proposal; Hastings generalised it in 1970 to arbitrary <span class="math inline">\(q\)</span>.</p>
-<section id="why-it-works" class="level3">
-<h3 class="anchored" data-anchor-id="why-it-works">Why it works</h3>
-<p>Take <span class="math inline">\(y \ne x\)</span>. The MH kernel is <span class="math inline">\(K(x,y) = q(y\mid x)\,\alpha(x,y)\)</span>, so</p>
-<p><span class="math display">\[
-\pi(x)K(x,y)
-= \pi(x)\,q(y\mid x)\,\min\!\left\{1, \frac{\pi(y)q(x\mid y)}{\pi(x)q(y\mid x)}\right\}
-= \min\big\{\pi(x)q(y\mid x),\; \pi(y)q(x\mid y)\big\},
-\]</span></p>
-<p>pushing the positive factor <span class="math inline">\(\pi(x)q(y\mid x)\)</span> inside the <span class="math inline">\(\min\)</span>. The right-hand side is <strong>symmetric under <span class="math inline">\(x \leftrightarrow y\)</span></strong> — swapping the labels swaps the two arguments of a <span class="math inline">\(\min\)</span> and changes nothing. Therefore <span class="math inline">\(\pi(x)K(x,y) =
-\pi(y)K(y,x)\)</span>: detailed balance holds, and by §3 so does stationarity. For <span class="math inline">\(x = y\)</span> the condition is trivial, and the rejection atom is exactly what makes <span class="math inline">\(K\)</span> integrate to one. <span class="math inline">\(\square\)</span></p>
-<p>That is the entire theory. The acceptance rule was <em>reverse-engineered</em> to make a <span class="math inline">\(\min\)</span> appear symmetrically — this is the rare algorithm whose correctness proof is shorter than its motivation.</p>
-<div class="callout callout-style-simple callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Where the accept/reject step goes in this course
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Metropolis–Hastings needs the accept/reject correction because the proposal is picked for convenience and is therefore <em>wrong</em>. The step is a patch applied to a mismatch.</p>
-<p>A diffusion model has no such step. Its reverse process is built so that each small step is already almost exactly right — the forward process adds a tiny bit of Gaussian noise, so the reverse conditional is nearly Gaussian and can be matched directly. There is nothing left to accept or reject.</p>
-<p>Keep the contrast in view: <strong>MH corrects a bad proposal; a diffusion model learns a good one.</strong></p>
-</div>
-</div>
+<p>For VP the last update becomes <span class="math inline">\(x_{k-1}=x_k+\beta(t_k)h_k[x_k+s_\theta(x_k,t_k)]/2\)</span>. Exact integration with the exact score and terminal law returns <span class="math inline">\(p_{t_{\min}}\)</span>. Where the flow remains regular to zero, the exact map can reach <span class="math inline">\(p_0\)</span>. For discrete data the endpoint is singular; keep the positive cutoff and interpret the clean law as a limit. Applying a final denoiser is an additional approximation, not an identity equating a posterior mean with a transport endpoint.</p>
+<p>Score estimation, a Gaussian substitute for <span class="math inline">\(p_T\)</span>, finite solver steps, and a positive cutoff introduce different approximation errors. Making the solver more accurate does not remove the other three.</p>
 </section>
 </section>
-<section id="the-three-special-cases-you-will-meet" class="level2">
-<h2 class="anchored" data-anchor-id="the-three-special-cases-you-will-meet">5. The three special cases you will meet</h2>
-<p><strong>Random-walk Metropolis.</strong> Take <span class="math inline">\(q(y\mid x) = \mathcal{N}(y; x, \tau^2 I)\)</span> — a symmetric jump. Then <span class="math inline">\(q(x\mid y) = q(y\mid x)\)</span>, the Hastings ratio is 1, and</p>
-<p><span class="math display">\[
-\alpha \;=\; \min\left\{1, \frac{\pi(y)}{\pi(x)}\right\}.
-\]</span></p>
-<p><em>Always</em> move uphill; move downhill with probability equal to the density ratio. That downhill move is not a defect — it is precisely what separates sampling from optimisation. A hill-climber ends at the mode and reports one point; a sampler must visit the tails in proportion to their mass, so it has to be willing to go down.</p>
-<p><strong>The independence sampler.</strong> <span class="math inline">\(q(y \mid x) = q(y)\)</span>, ignoring the current state. Then <span class="math inline">\(\alpha = \min\{1, w(y)/w(x)\}\)</span> with importance weight <span class="math inline">\(w = \pi/q\)</span>: accept whenever the candidate has a better weight than the incumbent. This is rejection sampling’s cousin and inherits its fragility — a proposal with lighter tails than <span class="math inline">\(\pi\)</span> makes the chain stick for astronomically long stretches.</p>
-<p><strong>Gibbs sampling is MH with <span class="math inline">\(\alpha \equiv 1\)</span>.</strong> Propose by redrawing one coordinate from its exact conditional, <span class="math inline">\(q(y_i \mid x) = \pi(y_i \mid x_{-i})\)</span>, leaving the others fixed. Substituting into the acceptance ratio and using <span class="math inline">\(\pi(x) = \pi(x_i \mid x_{-i})\pi(x_{-i})\)</span>, everything cancels and <span class="math inline">\(\alpha = 1\)</span>. Gibbs never rejects — the price is that you must be able to sample each conditional exactly, which is a strong requirement.</p>
-<div class="callout callout-style-simple callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>MALA: the score walks in
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Nothing forces the proposal to be blind. <strong>Metropolis-adjusted Langevin</strong> proposes</p>
-<p><span class="math display">\[
-y \;=\; x + \tfrac{\tau^2}{2}\,\nabla_x \log \pi(x) + \tau\,z, \qquad z\sim\mathcal{N}(0,I),
-\]</span></p>
-<p>then applies the usual accept/reject step (the proposal is now asymmetric, so the Hastings ratio matters). The drift term pushes candidates toward high density <em>before</em> they are judged, so acceptance stays high with much larger steps.</p>
-<p>And notice what it needs: only <span class="math inline">\(\nabla_x \log \pi\)</span>, the <strong>score</strong>. The normalising constant differentiates away, exactly as in note 06. Drop the accept/reject step and you have unadjusted Langevin dynamics — biased by <span class="math inline">\(O(\tau)\)</span>, but needing nothing except the score.</p>
-<p><strong>This is the closest classical ancestor of a score-based generative model.</strong> Module 4 will learn <span class="math inline">\(\nabla_x\log p\)</span> from data instead of deriving it; the sampler on top is this one.</p>
-</div>
-</div>
+<section id="work-through-discrete-and-continuous-targets" class="level2">
+<h2 class="anchored" data-anchor-id="work-through-discrete-and-continuous-targets">Work through discrete and continuous targets</h2>
+<section id="two-point-data-reuse-the-posterior-construct-the-motion" class="level3">
+<h3 class="anchored" data-anchor-id="two-point-data-reuse-the-posterior-construct-the-motion">Two-point data: reuse the posterior, construct the motion</h3>
+<p>Let <span class="math inline">\(P(X_0=+1)=P(X_0=-1)=1/2\)</span>. This is a distribution with two atoms, not an ordinary density at <span class="math inline">\(t=0\)</span>. At positive noise,</p>
+<p><span class="math display">\[p_t(x)=\tfrac12\mathcal N(x;-\alpha_t,\sigma_t^2)
++\tfrac12\mathcal N(x;\alpha_t,\sigma_t^2).\]</span></p>
+<p>Tutorial 1’s <a href="../tutorials/25-learning-the-score.html#two-point-posterior">two-point calculation</a> and marginal-score identity give</p>
+<p><span class="math display">\[D_t(x)=\mathbb E[X_0\mid X_t=x]=\tanh(\alpha_t x/\sigma_t^2),
+\qquad s_t(x)=\frac{\alpha_tD_t(x)-x}{\sigma_t^2}.\]</span></p>
+<p>Substitute into the VP velocity:</p>
+<p><span class="math display">\[v(x,t)=-\frac{\beta(t)}2
+\left[x+\frac{\alpha_t\tanh(\alpha_t x/\sigma_t^2)-x}{\sigma_t^2}\right].\]</span></p>
+<p>Positive-time trajectories preserve their order and cannot cross zero under uniqueness, since zero is itself an equilibrium trajectory. In the limit <span class="math inline">\(t\downarrow0\)</span>, the exact flow takes positive terminal points to <span class="math inline">\(+1\)</span> and negative points to <span class="math inline">\(-1\)</span>. The endpoint is therefore <span class="math inline">\(\operatorname{sign}(X_T)\)</span> almost surely under a continuous terminal law. The zero trajectory stays zero, a probability-zero exception. The quantile argument below explains this limit.</p>
+<p>Starting with a symmetric Gaussian also gives equal endpoint masses in this special example. That symmetry does not make its intermediate marginals exact, and does not justify replacing <span class="math inline">\(p_T\)</span> arbitrarily for other data distributions. The sign map is a singular limit, not a finite-time diffeomorphism.</p>
 </section>
-<section id="a-worked-example-two-lines-of-arithmetic" class="level2">
-<h2 class="anchored" data-anchor-id="a-worked-example-two-lines-of-arithmetic">6. A worked example: two lines of arithmetic</h2>
-<p>Target: the posterior for a Gaussian mean with a Gaussian prior,</p>
-<p><span class="math display">\[
-\theta \sim \mathcal{N}(0, 10^2), \qquad
-x_1,\dots,x_n \mid \theta \sim \mathcal{N}(\theta, 1),
-\]</span></p>
-<p>so that <span class="math inline">\(\tilde\pi(\theta) = \exp\!\big(-\tfrac{\theta^2}{200}\big)\cdot
-\exp\!\big(-\tfrac12\sum_i (x_i-\theta)^2\big)\)</span>. Work on the log scale — always work on the log scale, or the products underflow to zero by <span class="math inline">\(n \approx 500\)</span>:</p>
-<p><span class="math display">\[
-\log\alpha \;=\; \min\Big\{0,\;\; \log\tilde\pi(\theta') - \log\tilde\pi(\theta)\Big\},
-\]</span></p>
-<p>with <span class="math inline">\(\log\tilde\pi(\theta) = -\tfrac{\theta^2}{200} - \tfrac12\sum_i(x_i-\theta)^2\)</span>. Propose <span class="math inline">\(\theta' = \theta + \tau z\)</span>, accept if <span class="math inline">\(\log u &lt; \log\alpha\)</span>.</p>
-<p>This example is conjugate, so the answer is known — <span class="math inline">\(\mathcal{N}\!\big(\frac{n\bar x}{n + 1/100},\, \frac{1}{n+1/100}\big)\)</span> — which is the point: run the sampler, overlay the histogram on the exact posterior, and confirm that a procedure using only <em>ratios of unnormalised densities</em> reproduces a distribution whose normalising constant it never computed. Then change the prior to a Student-<span class="math inline">\(t\)</span>, destroy conjugacy, and observe that the code does not change at all. That robustness is why MH dominated applied Bayesian statistics for thirty years.</p>
+<section id="derivation-one-dimensional-flow-preserves-probability-rank" class="level3">
+<h3 class="anchored" data-anchor-id="derivation-one-dimensional-flow-preserves-probability-rank">Derivation: one-dimensional flow preserves probability rank</h3>
+<p>Let <span class="math inline">\(F_t(x)=P(X_t\le x)\)</span> be the CDF. A one-dimensional ODE with unique solutions preserves order: trajectories cannot cross at the same time. Thus its map between two smooth positive-density marginals is increasing. For such a map,</p>
+<p><span class="math display">\[F_t(\Psi_{T\to t}(x))=F_T(x),\qquad
+\boxed{\Psi_{T\to t}(x)=F_t^{-1}(F_T(x)).}\]</span></p>
+<p>The first equality says that all particles below <span class="math inline">\(x\)</span> remain below its image; their total probability is unchanged. This derives the map without solving the ODE explicitly. In the symmetric two-point limit, ranks below one half approach <span class="math inline">\(-1\)</span> and ranks above one half approach <span class="math inline">\(+1\)</span>.</p>
 </section>
-<section id="what-it-costs-burn-in-correlation-and-tuning" class="level2">
-<h2 class="anchored" data-anchor-id="what-it-costs-burn-in-correlation-and-tuning">7. What it costs: burn-in, correlation, and tuning</h2>
-<p>The theorem says <span class="math inline">\(p_t \to \pi\)</span>. It does not say when, and everything difficult about MCMC lives in that gap.</p>
-<p><strong>Burn-in.</strong> The chain starts at <span class="math inline">\(p_0\)</span>, which is wherever you put it, and needs time before <span class="math inline">\(p_t\)</span> resembles <span class="math inline">\(\pi\)</span>. Early samples are discarded. How many is a judgement call, informed by trace plots and by running several chains from dispersed starts and checking they agree (the Gelman–Rubin <span class="math inline">\(\hat R\)</span> statistic, which compares between-chain to within-chain variance and should approach 1).</p>
-<p><strong>Autocorrelation.</strong> Consecutive states are dependent by construction. <span class="math inline">\(T\)</span> MCMC draws are worth fewer than <span class="math inline">\(T\)</span> independent ones — the <strong>effective sample size</strong> is</p>
-<p><span class="math display">\[
-\mathrm{ESS} \;=\; \frac{T}{1 + 2\sum_{k\ge1}\rho_k},
-\]</span></p>
-<p>with <span class="math inline">\(\rho_k\)</span> the lag-<span class="math inline">\(k\)</span> autocorrelation. Note 06’s Gibbs example makes this concrete: lag-1 autocorrelation <span class="math inline">\(\rho^2\)</span>, so a target with correlation <span class="math inline">\(0.99\)</span> gives <span class="math inline">\(\rho^2 \approx 0.98\)</span> and an ESS a <em>fiftieth</em> of the chain length. Strongly dependent targets are expensive.</p>
-<p><strong>Step size is a genuine dilemma.</strong> For random-walk Metropolis with scale <span class="math inline">\(\tau\)</span>:</p>
+<section id="a-continuous-two-gaussian-target-and-the-terminal-prior-approximation" class="level3">
+<h3 class="anchored" data-anchor-id="a-continuous-two-gaussian-target-and-the-terminal-prior-approximation">A continuous two-Gaussian target and the terminal-prior approximation</h3>
+<p>Let</p>
+<p><span class="math display">\[p_0=\tfrac12\mathcal N(-1,\varrho^2)+\tfrac12\mathcal N(1,\varrho^2),
+\qquad\varrho&gt;0.\]</span></p>
+<p>Now the endpoint density is smooth and the exact probability-flow map is <span class="math inline">\(F_0^{-1}\circ F_T\)</span>. The actual finite-time terminal density is</p>
+<p><span class="math display">\[p_T=\tfrac12\mathcal N(-\alpha_T,\alpha_T^2\varrho^2+\sigma_T^2)
++\tfrac12\mathcal N(\alpha_T,\alpha_T^2\varrho^2+\sigma_T^2).\]</span></p>
+<p>It is generally only close to standard normal. Let <span class="math inline">\(\Phi\)</span> denote the standard normal CDF and <span class="math inline">\(Z\sim\mathcal N(0,1)\)</span>. The ideal direct Gaussian-to-data map is <span class="math inline">\(F_0^{-1}(\Phi(Z))\)</span>. Feeding <span class="math inline">\(Z\)</span> into the finite-time probability-flow map instead gives <span class="math inline">\(F_0^{-1}(F_T(Z))\)</span>, which need not have density <span class="math inline">\(p_0\)</span>. This makes the terminal-prior approximation visible in a single formula.</p>
+</section>
+<section id="a-posterior-denoiser-is-not-a-transport-endpoint" class="level3">
+<h3 class="anchored" data-anchor-id="a-posterior-denoiser-is-not-a-transport-endpoint">A posterior denoiser is not a transport endpoint</h3>
+<p>Tweedie’s estimate <span class="math inline">\(D_t(x)=(x+\sigma_t^2s_t(x))/\alpha_t\)</span> averages possible clean origins under the <strong>stochastic corruption</strong> model. The ODE map follows one particle through scores at successive times. They solve different problems. For two-point data, a small positive observation can have posterior mean close to zero, whereas its limiting ODE endpoint is <span class="math inline">\(+1\)</span>.</p>
+</section>
+</section>
+<section id="song-sde-conventions" class="level2">
+<h2 class="anchored" data-anchor-id="song-sde-conventions">Reading Song’s forward and reverse SDEs</h2>
+<p><a href="https://yang-song.net/blog/2021/score/#reversing-the-sde-for-sample-generation">Song’s blog, “Reversing the SDE for sample generation”</a> writes the reverse SDE in the original clock with <strong>negative</strong> <span class="math inline">\(dt\)</span>. Our increasing-clock notation describes the same reverse process. Keep the three equations distinct:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -730,160 +739,85 @@ x_1,\dots,x_n \mid \theta \sim \mathcal{N}(\theta, 1),
 </colgroup>
 <thead>
 <tr class="header">
-<th><span class="math inline">\(\tau\)</span></th>
-<th>acceptance</th>
-<th>behaviour</th>
+<th>Dynamics</th>
+<th>Equation</th>
+<th>Time direction</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>too small</td>
-<td><span class="math inline">\(\to 1\)</span></td>
-<td>almost every move accepted, but each is tiny — the chain diffuses, needing <span class="math inline">\(\sim(L/\tau)^2\)</span> steps to cross a region of width <span class="math inline">\(L\)</span></td>
+<td>Forward corruption SDE</td>
+<td><span class="math inline">\(dX_t=f(X_t,t)dt+g(t)dW_t\)</span></td>
+<td><span class="math inline">\(t:0\to T\)</span></td>
 </tr>
 <tr class="even">
-<td>too large</td>
-<td><span class="math inline">\(\to 0\)</span></td>
-<td>proposals land in the tails and are rejected; the chain sticks at one point for hundreds of iterations</td>
+<td>Reverse SDE, original clock</td>
+<td><span class="math inline">\(dX_t=[f(X_t,t)-g(t)^2s_t(X_t)]dt+g(t)d\overline W_t\)</span></td>
+<td><span class="math inline">\(t:T\to0\)</span></td>
 </tr>
 <tr class="odd">
-<td>tuned</td>
-<td><span class="math inline">\(\approx 0.234\)</span></td>
-<td>the asymptotically optimal rate for random-walk Metropolis on product targets (Roberts, Gelman &amp; Gilks, 1997)</td>
+<td>Probability-flow ODE</td>
+<td><span class="math inline">\(dx_t=[f(x_t,t)-\tfrac12g(t)^2s_t(x_t)]dt\)</span></td>
+<td>Either direction</td>
 </tr>
 </tbody>
 </table>
-<p>A first-time user’s instinct — “high acceptance means it is working” — is exactly backwards. An acceptance rate of <span class="math inline">\(0.95\)</span> almost always means the chain is crawling.</p>
-<p><strong>Multimodality is the failure MCMC hides best.</strong> A chain in one mode of a well-separated bimodal target must cross a low-density valley to reach the other, and the probability of proposing across it can be <span class="math inline">\(e^{-100}\)</span>. The chain then looks <em>perfectly healthy</em> — good acceptance, stable trace, tight autocorrelation — while sampling from the wrong distribution. It has converged to a mode, not to <span class="math inline">\(\pi\)</span>. Tempering, parallel chains and mode-hopping proposals exist; none is a general solution.</p>
-<div class="callout callout-style-simple callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Warning</span>And the curse, once more
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Even with none of the above going wrong, the number of steps needed to produce one effectively independent sample grows with dimension. For product-form targets the standard scaling results are</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>sampler</th>
-<th>steps per independent sample</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>random-walk Metropolis</td>
-<td><span class="math inline">\(O(d)\)</span></td>
-</tr>
-<tr class="even">
-<td>MALA (Langevin, adjusted)</td>
-<td><span class="math inline">\(O(d^{1/3})\)</span></td>
-</tr>
-<tr class="odd">
-<td>Hamiltonian Monte Carlo</td>
-<td><span class="math inline">\(O(d^{1/4})\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>Each row is a real improvement, bought with more gradient information per step — and every row still grows. Compare rejection sampling’s <span class="math inline">\(\sigma^{-d}\)</span> and this is a triumph: polynomial instead of exponential. Compare it with the <span class="math inline">\(d \approx
-10^5\)</span> of a modest image and it is still nowhere near enough.</p>
-</div>
-</div>
+<p>Here <span class="math inline">\(\overline W\)</span> denotes Brownian motion in reverse time, not the original forward noise replayed. For a descending step <span class="math inline">\(dt=-h\)</span>, its increment has covariance <span class="math inline">\(hI=|dt|I\)</span>. Never take <span class="math inline">\(\sqrt{dt}\)</span> for negative <span class="math inline">\(dt\)</span>. With <span class="math inline">\(Y_\tau=X_{T-\tau}\)</span>, the reverse SDE becomes</p>
+<p><span class="math display">\[dY_\tau=[-f(Y_\tau,t)+g(t)^2s_t(Y_\tau)]d\tau
++g(t)d\overline W_\tau,\qquad t=T-\tau.\]</span></p>
+<p>Thus Euler–Maruyama gives <span class="math inline">\(x_{\mathrm{next}}=x+h[-f(x,t)+g(t)^2s_\theta(x,t)]+g(t)\sqrt h\,\xi\)</span>, then <span class="math inline">\(t\leftarrow t-h\)</span>. This is the stochastic update used in the next subsection and in Tutorial 4. The ODE uses half the score coefficient and no fresh noise; equal marginals do not imply identical trajectories.</p>
 </section>
-<section id="the-structural-reason-this-is-not-a-generative-model" class="level2">
-<h2 class="anchored" data-anchor-id="the-structural-reason-this-is-not-a-generative-model">8. The structural reason this is not a generative model</h2>
-<p>Suppose every difficulty in §7 were solved: a perfectly tuned sampler, no multimodality, dimension-free mixing. It would <strong>still</strong> not generate an image. The obstruction is not efficiency. It is the input.</p>
-<p>Metropolis–Hastings requires <span class="math inline">\(\tilde\pi\)</span>: a function you can <em>evaluate</em> at any proposed point. It answers</p>
-<blockquote class="blockquote">
-<p><em>“I can write down the target up to a constant. Give me samples.”</em></p>
-</blockquote>
-<p>Generative modelling asks the opposite question:</p>
-<blockquote class="blockquote">
-<p><em>“I cannot write down the target at all. I have 60,000 samples from it. Give me more.”</em></p>
-</blockquote>
-<p>There is no <span class="math inline">\(\tilde\pi(x)\)</span> for natural images. Nobody can supply a function that, given a <span class="math inline">\(256\times256\times3\)</span> array, returns a number proportional to how likely that array is to be a photograph. That function is precisely the thing note 06 proved we cannot estimate. <strong>MH is a machine for converting a density into samples, and we have no density to feed it.</strong></p>
-<p>Notice too that MH never <em>learns</em>. Run it for a million steps, then ask for a sample from a fresh start and you pay the full burn-in again. There is no trained object, nothing amortised, no reuse. A generative model, by contrast, pays a large training cost once and then produces a sample in a single forward pass.</p>
-<div class="callout callout-style-simple callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>The pivot the lecture turns on
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Note 06 already named the shape of the fix. In rejection sampling, in MH, in Gibbs, <strong>a human picks the proposal for convenience and hopes it resembles the target</strong> — and in high dimension it does not.</p>
-<p>So stop picking it. <strong>Learn it.</strong> Learn a map <span class="math inline">\(G\)</span> from easy noise to data, fit it using only samples, and dispense with the density entirely.</p>
-<p>That immediately raises the question that defines the next note: if you never evaluate a density, <em>how do you know your generator is any good?</em> You cannot compute a likelihood, so you cannot maximise one. The answer — train a second network to tell your samples from real ones, and improve until it cannot — is the generative adversarial network, and it is the subject of <a href="../tutorials/19-generative-adversarial-networks.html">note 09</a>.</p>
-</div>
-</div>
+<section id="reverse-sde" class="level2">
+<h2 class="anchored" data-anchor-id="reverse-sde">Optional comparison: the stochastic sampler</h2>
+<p>The generation-clock probability-flow velocity is <span class="math inline">\(-v\)</span>. Suppose we want to add fresh noise while keeping the same density evolution. A noise term with amplitude <span class="math inline">\(g\)</span> adds <span class="math inline">\(g^2\Delta q/2\)</span> to Fokker–Planck, where <span class="math inline">\(q_\tau=p_{T-\tau}\)</span>. Compensate with additional drift <span class="math inline">\(g^2s/2\)</span>:</p>
+<p><span class="math display">\[b=-v+\tfrac12g^2s=-f+g^2s.\]</span></p>
+<section id="derivation-check-the-marginals-and-the-factor-of-two" class="level3">
+<h3 class="anchored" data-anchor-id="derivation-check-the-marginals-and-the-factor-of-two">Derivation: check the marginals and the factor of two</h3>
+<p>All forward quantities below are evaluated at <span class="math inline">\(t=T-\tau\)</span> and the current location. Since <span class="math inline">\(\nabla q=q s\)</span>,</p>
+<p><span class="math display">\[\begin{aligned}
+-\nabla\cdot(qb)+\tfrac12g^2\Delta q
+&amp;=\nabla\cdot(qv)-\tfrac12g^2\nabla\cdot(qs)+\tfrac12g^2\Delta q\\
+&amp;=\nabla\cdot(qv)=\partial_\tau q.
+\end{aligned}\]</span></p>
+<p>Thus the SDE <span class="math inline">\(dY_\tau=b\,d\tau+g(T-\tau)d\overline W_\tau\)</span> has the desired reverse-time marginals under the same regularity assumptions. Identifying it with the reversed stochastic <strong>path law</strong> requires a time-reversal theorem; matching marginals alone does not prove that theorem.</p>
+<p>Euler–Maruyama in increasing <span class="math inline">\(\tau\)</span> uses a positive step <span class="math inline">\(h\)</span>:</p>
+<p><span class="math display">\[y_{j+1}=y_j+h[-f(y_j,t)+g(t)^2s_\theta(y_j,t)]
++g(t)\sqrt h\,\xi_j.\]</span></p>
+<p>The reverse SDE’s score coefficient is one, while the probability-flow ODE’s is one half. Deleting the noise from the reverse SDE retains the extra drift but removes the spreading it compensates for, generally changing the marginals.</p>
+<p><strong>Gaussian check:</strong> for stationary VP, <span class="math inline">\(s=-x\)</span>. Deleting reverse-SDE noise gives <span class="math inline">\(dY/d\tau=-\beta Y/2\)</span>, which incorrectly contracts the cloud. The correct probability-flow velocity is zero.</p>
 </section>
-<section id="where-this-returns" class="level2">
-<h2 class="anchored" data-anchor-id="where-this-returns">9. Where this returns</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>From this note</th>
-<th>Where it reappears</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Detailed balance / reversibility</td>
-<td>the forward and reverse diffusion processes of Module 3</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(p_t \to \pi\)</span> as a flow of distributions</td>
-<td>the Fokker–Planck equation, Module 5</td>
-</tr>
-<tr class="odd">
-<td>Langevin proposal needing only <span class="math inline">\(\nabla\log\pi\)</span></td>
-<td>score matching, Module 4</td>
-</tr>
-<tr class="even">
-<td>Accept/reject as a patch for a bad proposal</td>
-<td>why diffusion needs no accept/reject step</td>
-</tr>
-<tr class="odd">
-<td>Ratio <span class="math inline">\(\pi(y)/\pi(x)\)</span> with <span class="math inline">\(Z\)</span> cancelling</td>
-<td>the discriminator’s logit as a log density ratio, note 09</td>
-</tr>
-<tr class="even">
-<td>Burn-in as an incomplete flow</td>
-<td>the reverse process run for too few steps</td>
-</tr>
-<tr class="odd">
-<td>Multimodality trapping a chain</td>
-<td>mode collapse in a GAN — the same pathology, different mechanism</td>
-</tr>
-</tbody>
-</table>
 </section>
-<section id="exercises" class="level2">
-<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<section id="check-your-understanding" class="level2">
+<h2 class="anchored" data-anchor-id="check-your-understanding">Check your understanding</h2>
 <ol type="1">
-<li>Show that detailed balance implies stationarity, and give an example of a chain that is stationary for <span class="math inline">\(\pi\)</span> but not reversible.</li>
-<li>Verify the symmetry step <span class="math inline">\(\pi(x)q(y\mid x)\alpha(x,y) = \min\{\pi(x)q(y\mid x),
-\pi(y)q(x\mid y)\}\)</span> explicitly in both cases of the <span class="math inline">\(\min\)</span>.</li>
-<li>Show that Gibbs sampling is MH with acceptance probability exactly 1.</li>
-<li>A student records only accepted proposals, discarding the repeats. Show that the resulting sample is biased, and identify which regions are over-represented.</li>
-<li>For target <span class="math inline">\(\mathcal{N}(0,1)\)</span> and proposal <span class="math inline">\(\mathcal{N}(x,\tau^2)\)</span>, compute the expected acceptance probability as a function of <span class="math inline">\(\tau\)</span> and confirm it is monotonically decreasing.</li>
-<li>Implement random-walk Metropolis for the §6 posterior with <span class="math inline">\(n=50\)</span>. Plot the acceptance rate against <span class="math inline">\(\tau \in \{0.01, 0.1, 1, 10\}\)</span> and the ESS against the same grid. Where do the two curves disagree about which <span class="math inline">\(\tau\)</span> is best?</li>
-<li>Take <span class="math inline">\(\pi = \tfrac12\mathcal{N}(-5,1) + \tfrac12\mathcal{N}(5,1)\)</span> with a random-walk proposal of scale <span class="math inline">\(\tau=1\)</span>. Estimate the expected number of iterations before the chain first crosses between modes. Now run for 10,000 steps from <span class="math inline">\(x_0 = -5\)</span> and report the estimated mean of <span class="math inline">\(\pi\)</span>.</li>
-<li>Write the MALA proposal for <span class="math inline">\(\pi = \mathcal{N}(\mu,\sigma^2)\)</span> explicitly and confirm the Hastings ratio is not 1. What goes wrong if you forget it?</li>
-<li>Show that the independence sampler’s acceptance ratio is a ratio of importance weights, and explain why <span class="math inline">\(q\)</span> must have heavier tails than <span class="math inline">\(\pi\)</span>.</li>
-<li>For the Gibbs chain of note 06 with <span class="math inline">\(\rho = 0.9\)</span> and <span class="math inline">\(\rho = 0.99\)</span>, compute the ESS of a chain of length <span class="math inline">\(10^4\)</span>. How much longer must the second chain run to match the first?</li>
-<li>An energy-based model has <span class="math inline">\(\pi(x) \propto e^{-E(x)}\)</span>. Write the Metropolis acceptance rule in terms of <span class="math inline">\(\Delta E\)</span>, and interpret it physically.</li>
-<li>Explain, in three sentences and without using the word “slow”, why a perfectly mixing MH sampler still cannot generate photographs.</li>
+<li>Why does a density obey a PDE even when every particle follows an ODE?</li>
+<li>Where does the one half in the probability-flow formula come from?</li>
+<li>If an exact sampler starts from a Gaussian approximation to <span class="math inline">\(p_T\)</span>, does an exact solver guarantee the correct data distribution?</li>
+<li>What distribution does an exact sampler return when stopped at <span class="math inline">\(t_{\min}&gt;0\)</span>?</li>
 </ol>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Density depends on both location and time; flux determines its local change.</li>
+<li>The quadratic term of the Gaussian-step Taylor expansion.</li>
+<li>No.&nbsp;An exact solver still transports the substituted initial distribution.</li>
+<li><span class="math inline">\(p_{t_{\min}}\)</span>, when both the score and terminal law are exact.</li>
+</ol>
+</div>
+</div>
+</div>
+<p><strong>Training recap:</strong> draw a positive noise level, corrupt a clean example, and regress onto its known conditional-score target. The posterior averaging proof, Tweedie derivation, and time-weighting rule are in <a href="../tutorials/25-learning-the-score.html#training-recipe">Tutorial 1</a>.</p>
+<p><strong>Continue:</strong> <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html">Tutorial 3</a> connects this deterministic transport to neural ODEs, likelihood, and flow matching.</p>
 
 
 </section>
@@ -1296,13 +1230,13 @@ x_1,\dots,x_n \mid \theta \sim \mathcal{N}(\theta, 1),
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/15-comparing-distributions.html" class="pagination-link" aria-label="07 · Comparing Distributions: From CDFs to KL, and the Two Families">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span>
+      <a href="../tutorials/25-learning-the-score.html" class="pagination-link" aria-label="Learning the Score: VP Diffusion from First Principles">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Learning the Score: VP Diffusion from First Principles</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/19-generative-adversarial-networks.html" class="pagination-link" aria-label="09 · Generative Adversarial Networks">
-        <span class="nav-page-text">09 · Generative Adversarial Networks</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" class="pagination-link" aria-label="Diffusion, Neural ODEs, and Normalizing Flows: The Same Density, Different Journeys">
+        <span class="nav-page-text">Diffusion, Neural ODEs, and Normalizing Flows: The Same Density, Different Journeys</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

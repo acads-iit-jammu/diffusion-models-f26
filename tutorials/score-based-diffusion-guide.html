@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser – ID-5-02 (TO)</title>
+<title>Score-Based Diffusion: Reading Guide – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/score-based-diffusion-guide.html" rel="next">
-<link href="../tutorials/24-sampling-with-scores.html" rel="prev">
+<link href="../tutorials/25-learning-the-score.html" rel="next">
+<link href="../tutorials/23-tweedie-bayes-denoising.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/23-tweedie-bayes-denoising.html">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion: Reading Guide</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -182,13 +182,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Lecture Notes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
@@ -263,7 +263,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</span></a>
   </div>
 </li>
@@ -271,16 +271,16 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
  <span class="menu-text">Score-Based Diffusion</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Score-Based Diffusion: Reading Guide</span></a>
   </div>
 </li>
@@ -496,31 +496,18 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#what-does-bayes-optimal-denoiser-mean" id="toc-what-does-bayes-optimal-denoiser-mean" class="nav-link active" data-scroll-target="#what-does-bayes-optimal-denoiser-mean">1. What does “Bayes-optimal denoiser” mean?</a></li>
-  <li><a href="#the-density-we-differentiate-is-the-noisy-marginal" id="toc-the-density-we-differentiate-is-the-noisy-marginal" class="nav-link" data-scroll-target="#the-density-we-differentiate-is-the-noisy-marginal">2. The density we differentiate is the noisy marginal</a></li>
-  <li><a href="#differentiate-the-gaussian-then-use-bayes-rule" id="toc-differentiate-the-gaussian-then-use-bayes-rule" class="nav-link" data-scroll-target="#differentiate-the-gaussian-then-use-bayes-rule">3. Differentiate the Gaussian, then use Bayes’ rule</a></li>
-  <li><a href="#what-the-formula-tells-us-geometrically" id="toc-what-the-formula-tells-us-geometrically" class="nav-link" data-scroll-target="#what-the-formula-tells-us-geometrically">4. What the formula tells us geometrically</a></li>
-  <li><a href="#check-it-on-a-gaussian-prior" id="toc-check-it-on-a-gaussian-prior" class="nav-link" data-scroll-target="#check-it-on-a-gaussian-prior">5. Check it on a Gaussian prior</a></li>
-  <li><a href="#the-vp-diffusion-form" id="toc-the-vp-diffusion-form" class="nav-link" data-scroll-target="#the-vp-diffusion-form">6. The VP diffusion form</a></li>
-  <li><a href="#noise-prediction-is-another-expression-of-the-same-conditional-mean" id="toc-noise-prediction-is-another-expression-of-the-same-conditional-mean" class="nav-link" data-scroll-target="#noise-prediction-is-another-expression-of-the-same-conditional-mean">7. Noise prediction is another expression of the same conditional mean</a></li>
-  <li><a href="#two-possible-clean-values-derive-the-tanh-denoiser" id="toc-two-possible-clean-values-derive-the-tanh-denoiser" class="nav-link" data-scroll-target="#two-possible-clean-values-derive-the-tanh-denoiser">8. Two possible clean values: derive the tanh denoiser</a>
-  <ul class="collapse">
-  <li><a href="#posterior-mean-posterior-mode-and-posterior-sample-differ" id="toc-posterior-mean-posterior-mode-and-posterior-sample-differ" class="nav-link" data-scroll-target="#posterior-mean-posterior-mode-and-posterior-sample-differ">Posterior mean, posterior mode, and posterior sample differ</a></li>
-  <li><a href="#the-small-noise-limit-needs-a-qualification" id="toc-the-small-noise-limit-needs-a-qualification" class="nav-link" data-scroll-target="#the-small-noise-limit-needs-a-qualification">The small-noise limit needs a qualification</a></li>
-  </ul></li>
-  <li><a href="#a-useful-extension-correlated-gaussian-noise" id="toc-a-useful-extension-correlated-gaussian-noise" class="nav-link" data-scroll-target="#a-useful-extension-correlated-gaussian-noise">9. A useful extension: correlated Gaussian noise</a></li>
-  <li><a href="#how-this-fits-into-diffusion-sampling" id="toc-how-this-fits-into-diffusion-sampling" class="nav-link" data-scroll-target="#how-this-fits-into-diffusion-sampling">10. How this fits into diffusion sampling</a></li>
-  <li><a href="#exercises-with-checks" id="toc-exercises-with-checks" class="nav-link" data-scroll-target="#exercises-with-checks">Exercises with checks</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#prerequisite-ladder-and-reading-route" id="toc-prerequisite-ladder-and-reading-route" class="nav-link active" data-scroll-target="#prerequisite-ladder-and-reading-route">Prerequisite ladder and reading route</a></li>
+  <li><a href="#shared-notation" id="toc-shared-notation" class="nav-link" data-scroll-target="#shared-notation">Shared notation</a></li>
+  <li><a href="#relationship-to-the-existing-course-notes" id="toc-relationship-to-the-existing-course-notes" class="nav-link" data-scroll-target="#relationship-to-the-existing-course-notes">Relationship to the existing course notes</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/23-tweedie-bayes-denoising.html">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion: Reading Guide</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</h1>
+<h1 class="title">Score-Based Diffusion: Reading Guide</h1>
 </div>
 
 
@@ -537,168 +524,108 @@ window.Quarto = {
 </header>
 
 
-<p><em>A standalone derivation. Prerequisites: Gaussian densities, Bayes’ rule, conditional expectation, and differentiation. No ODE or SDE theory is needed.</em></p>
-<p><strong>Place in the teaching sequence.</strong> This is the statistical derivation in the three-note sequence: <a href="../tutorials/22-vector-fields-to-score-diffusion.html">geometric introduction</a> → <a href="../tutorials/24-sampling-with-scores.html">worked sampling tutorial</a> → this proof. It can also be read independently. We reserve <span class="math inline">\(\varrho\)</span> for a Gaussian prior’s standard deviation, keeping <span class="math inline">\(\tau\)</span> available for the reverse clock in the companion notes.</p>
-<p>We observe a corrupted signal</p>
-<p><span class="math display">\[\boxed{Y=X+\sigma\varepsilon,\qquad
-\varepsilon\sim\mathcal N(0,I_d),\quad\varepsilon\perp X,\quad\sigma&gt;0.}\]</span></p>
-<p>The clean signal <span class="math inline">\(X\)</span> is random because it represents the population of possible data. Its law <span class="math inline">\(P_X\)</span> is our prior. We observe <span class="math inline">\(Y=y\)</span>, but do not know either <span class="math inline">\(X\)</span> or the particular noise realization. What should we return as a denoised estimate?</p>
-<p>The answer depends on the loss. Under squared Euclidean error, the best answer is the <strong>posterior mean</strong>. Tweedie’s formula expresses that mean using only the score of the noisy marginal density:</p>
-<p><span class="math display">\[\boxed{\mathbb E[X\mid Y=y]=y+\sigma^2\nabla_y\log p_Y(y).}\]</span></p>
-<p>We will prove both statements: why this is Bayes-optimal, and why the score gives exactly that estimate. Open <a href="../materials/score-flow-lab.html#tweedie">Lab 4: Tweedie’s denoiser</a> to explore the two-point example as you read.</p>
-<section id="what-does-bayes-optimal-denoiser-mean" class="level2">
-<h2 class="anchored" data-anchor-id="what-does-bayes-optimal-denoiser-mean">1. What does “Bayes-optimal denoiser” mean?</h2>
-<p>A denoiser is a function <span class="math inline">\(D\)</span> that turns an observation into an estimate <span class="math inline">\(D(Y)\)</span>. Its mean squared error, or Bayes risk, is</p>
-<p><span class="math display">\[R(D)=\mathbb E\|X-D(Y)\|^2.\]</span></p>
-<p>Assume <span class="math inline">\(\mathbb E\|X\|^2&lt;\infty\)</span> and consider denoisers with finite risk. Then <span class="math inline">\(D(Y)\)</span> is square-integrable too, so the cross term below is well defined. Let <span class="math inline">\(m(Y)=\mathbb E[X\mid Y]\)</span>. Add and subtract <span class="math inline">\(m(Y)\)</span> inside the error:</p>
-<p><span class="math display">\[X-D(Y)=[X-m(Y)]+[m(Y)-D(Y)].\]</span></p>
-<p>Expanding the squared norm produces two squared terms and a cross term. Given <span class="math inline">\(Y\)</span>, the second bracket is known and <span class="math inline">\(\mathbb E[X-m(Y)\mid Y]=0\)</span>. Therefore the cross term has expectation zero:</p>
-<p><span class="math display">\[
-\mathbb E\big[(X-m(Y))^\top(m(Y)-D(Y))\big]=0.
-\]</span></p>
-<p>It follows that</p>
-<p><span class="math display">\[\boxed{
-R(D)=\underbrace{\mathbb E\|X-m(Y)\|^2}_{\text{irreducible posterior uncertainty}}
-+\underbrace{\mathbb E\|m(Y)-D(Y)\|^2}_{\text{avoidable estimation error}}.
-}\]</span></p>
-<p>The first term does not depend on <span class="math inline">\(D\)</span>. The second is nonnegative and is zero exactly when <span class="math inline">\(D(Y)=m(Y)\)</span> almost surely. Thus</p>
-<p><span class="math display">\[\boxed{D^*(y)=\mathbb E[X\mid Y=y].}\]</span></p>
-<p>At a particular observation, the same argument reads</p>
-<p><span class="math display">\[\mathbb E[\|X-a\|^2\mid Y=y]
-=\operatorname{tr}\operatorname{Cov}(X\mid Y=y)+\|m(y)-a\|^2.\]</span></p>
-<p>“Optimal” means optimal for this loss and this joint model, not guaranteed to recover the actual hidden signal. The remaining risk is the average posterior variance. With other losses, the optimal estimate can change: absolute error in one dimension gives a posterior median, for example.</p>
+<p>These tutorials are written for undergraduates with no prior SDE background. Read them in order. The numbers below identify the four parts of this series.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Order</th>
+<th>Tutorial</th>
+<th>Teaching question</th>
+<th>Longer derivations, kept as subsections</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td><a href="../tutorials/25-learning-the-score.html">Learning the Score: VP Diffusion from First Principles</a></td>
+<td>How do we learn an unknown marginal score from a known corruption process?</td>
+<td>Gaussian increments and expected Taylor step; VP moments and Gaussian kernel; posterior averaging and MSE proof; optional stochastic-integral derivation</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td><a href="../tutorials/26-probability-flow-sampling.html">Probability-Flow Sampling: From Density Evolution to Samples</a></td>
+<td>Why does the score give a sampling velocity, and how do we use it?</td>
+<td>Probability flux, Gaussian smoothing and Fokker–Planck; probability-flow construction; quantile maps; optional integration-by-parts and reverse-SDE checks</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td><a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html">Diffusion, Neural ODEs, and Normalizing Flows</a></td>
+<td>What connects diffusion sampling to invertible transport and density estimation?</td>
+<td>Continuous change of variables; Gaussian flow and coupling comparison; likelihood identity; conditional velocity regression and its score connection</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td><a href="../tutorials/28-langevin-dynamics.html">Langevin Dynamics</a></td>
+<td>How does fixed-target sampling differ from reverse diffusion?</td>
+<td>Gaussian moments and ULA bias; stationarity; time-scaling ratio; transport-plus-Langevin decomposition</td>
+</tr>
+</tbody>
+</table>
+<p>Each tutorial has a core reading route, worked examples, and derivation subsections. Advanced proofs are labelled optional. Topic ownership is explicit: Tutorial 1 proves the corruption and learning identities; Tutorial 2 derives density evolution and sampling; Tutorial 3 develops transport and likelihood; Tutorial 4 connects fixed-target Langevin sampling to diffusion and annealing.</p>
+<section id="prerequisite-ladder-and-reading-route" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisite-ladder-and-reading-route">Prerequisite ladder and reading route</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Stage</th>
+<th>New material</th>
+<th>Where introduced</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Entry</td>
+<td>Elementary derivatives, Taylor expansion, ODEs, Gaussian algebra, independence, Bayes’ rule</td>
+<td>Assumed; no stochastic calculus or PDE course required</td>
+</tr>
+<tr class="even">
+<td>Random steps</td>
+<td>Random variable versus realization, Gaussian increments, square-root step scaling, Euler–Maruyama</td>
+<td>Tutorial 1: From Gaussian random steps to an SDE</td>
+</tr>
+<tr class="odd">
+<td>Corruption law</td>
+<td>Expected Taylor step, mean/variance equations, Gaussian sums</td>
+<td>Tutorial 1: Construct the variance-preserving corruption law</td>
+</tr>
+<tr class="even">
+<td>Learning</td>
+<td>Conditional expectation, tower property, posterior weights, MSE-optimality proof</td>
+<td>Tutorial 1: Learn an unknown score from known targets</td>
+</tr>
+<tr class="odd">
+<td>Density dynamics</td>
+<td>Particle versus population, flux, partial derivatives, divergence, Laplacian, Fokker–Planck</td>
+<td>Tutorial 2: Describe motion of an entire density</td>
+</tr>
+<tr class="even">
+<td>Sampling</td>
+<td>Probability-flow velocity, backward steps, cutoff and terminal-prior errors</td>
+<td>Tutorial 2: Construct the velocity and generate backward</td>
+</tr>
+<tr class="odd">
+<td>Transport</td>
+<td>Jacobian volume scaling, invertibility, density change, couplings and likelihood</td>
+<td>Tutorial 3</td>
+</tr>
+<tr class="even">
+<td>Equilibrium sampling</td>
+<td>Langevin balance, invariance versus convergence, finite-step bias, annealing</td>
+<td>Tutorial 4</td>
+</tr>
+</tbody>
+</table>
+<p>The published <a href="../tutorials/22-vector-fields-to-score-diffusion.html">From Local Arrows</a> and <a href="../tutorials/24-sampling-with-scores.html">Sampling with Scores</a> are optional geometric background, not substitutes for the SDE introduction here. The <a href="../materials/score-flow-lab.html">score-flow lab</a> accompanies the Gaussian and two-point examples.</p>
+<p><strong>First reading:</strong> follow the four tutorials’ core routes and attempt the understanding checks before opening the answers. In Tutorial 1, skip the stochastic-integral subsection. In Tutorial 2, the Gaussian-smoothing derivation provides the main intuition; the integration-by-parts proof and stochastic sampler can be a second pass. In Tutorial 3, the infinitesimal determinant and flow-matching proofs are enrichment. The remaining main arguments do not require those proofs. Tutorial 4 uses only the SDE and density tools from Tutorials 1–2; it can also be read directly after Tutorial 2. Its density-operator calculation is optional. Its reverse-diffusion comparison uses the <a href="../tutorials/26-probability-flow-sampling.html#reverse-sde">reverse-SDE check in Tutorial 2</a>.</p>
+<p>The complete MSE proof is now inside Tutorial 1. The existing <a href="../tutorials/23-tweedie-bayes-denoising.html">Tweedie tutorial</a> remains a separate statistical treatment for additional practice.</p>
 </section>
-<section id="the-density-we-differentiate-is-the-noisy-marginal" class="level2">
-<h2 class="anchored" data-anchor-id="the-density-we-differentiate-is-the-noisy-marginal">2. The density we differentiate is the noisy marginal</h2>
-<p>Conditional on <span class="math inline">\(X=x\)</span>, the observation is Gaussian:</p>
-<p><span class="math display">\[p(y\mid x)=\frac{1}{(2\pi\sigma^2)^{d/2}}
-\exp\left[-\frac{\|y-x\|^2}{2\sigma^2}\right].\]</span></p>
-<p>Averaging over possible clean signals gives</p>
-<p><span class="math display">\[\boxed{p_Y(y)=\int p(y\mid x)\,P_X(dx).}\]</span></p>
-<p>If <span class="math inline">\(X\)</span> has a density, <span class="math inline">\(P_X(dx)=p_X(x)dx\)</span>. If <span class="math inline">\(X\)</span> takes finitely many values, the integral is a sum. This notation lets the same proof apply to continuous data, discrete data, and data supported on a lower-dimensional set. Gaussian noise with <span class="math inline">\(\sigma&gt;0\)</span> makes <span class="math inline">\(p_Y\)</span> smooth and strictly positive everywhere.</p>
-<p>The score in this tutorial is</p>
-<p><span class="math display">\[s_Y(y)=\nabla_y\log p_Y(y).\]</span></p>
-<p>It is a gradient with respect to the observed data coordinates. It is not a parameter gradient, not the clean-data score, and not the score of one fixed conditional likelihood <span class="math inline">\(p(y\mid x)\)</span>.</p>
-</section>
-<section id="differentiate-the-gaussian-then-use-bayes-rule" class="level2">
-<h2 class="anchored" data-anchor-id="differentiate-the-gaussian-then-use-bayes-rule">3. Differentiate the Gaussian, then use Bayes’ rule</h2>
-<p>The Gaussian kernel has derivative</p>
-<p><span class="math display">\[\nabla_y p(y\mid x)=\frac{x-y}{\sigma^2}p(y\mid x).\]</span></p>
-<p>Differentiate under the integral:</p>
-<p><span class="math display">\[
-\begin{aligned}
-\nabla_y p_Y(y)
-&amp;=\int\nabla_y p(y\mid x)\,P_X(dx)\\
-&amp;=\frac{1}{\sigma^2}\int(x-y)p(y\mid x)\,P_X(dx).
-\end{aligned}
-\]</span></p>
-<p>For fixed positive <span class="math inline">\(\sigma\)</span>, Gaussian kernels and their first derivatives are locally uniformly bounded as functions of <span class="math inline">\(x\)</span> for <span class="math inline">\(y\)</span> in a compact set. This provides a dominating integrable bound against the probability measure <span class="math inline">\(P_X\)</span> and justifies the interchange. The finite-second-moment assumption above also makes the squared-error decision problem well defined.</p>
-<p>Now divide by the positive marginal density:</p>
-<p><span class="math display">\[\frac{\nabla_y p_Y(y)}{p_Y(y)}
-=\frac{1}{\sigma^2}\int(x-y)
-\frac{p(y\mid x)P_X(dx)}{p_Y(y)}.\]</span></p>
-<p>Bayes’ rule identifies the fraction as the posterior measure:</p>
-<p><span class="math display">\[P_{X\mid Y=y}(dx)=\frac{p(y\mid x)P_X(dx)}{p_Y(y)}.\]</span></p>
-<p>Hence</p>
-<p><span class="math display">\[
-\begin{aligned}
-\nabla_y\log p_Y(y)
-&amp;=\frac{1}{\sigma^2}\int(x-y)\,P_{X\mid Y=y}(dx)\\
-&amp;=\frac{\mathbb E[X\mid Y=y]-y}{\sigma^2}.
-\end{aligned}
-\]</span></p>
-<p>Rearranging proves Tweedie’s formula:</p>
-<p><span class="math display">\[\boxed{m(y)=y+\sigma^2s_Y(y).}\]</span></p>
-<p>The whole proof is a Gaussian derivative followed by Bayes’ rule. Bayes optimality comes from the squared-error decomposition in Section 1, not from differentiating the density alone.</p>
-</section>
-<section id="what-the-formula-tells-us-geometrically" class="level2">
-<h2 class="anchored" data-anchor-id="what-the-formula-tells-us-geometrically">4. What the formula tells us geometrically</h2>
-<p>The vector</p>
-<p><span class="math display">\[\boxed{\sigma^2s_Y(y)=m(y)-y}\]</span></p>
-<p>is the displacement from the observed noisy point to its posterior-mean clean estimate. Thus a score is not merely an abstract derivative: it encodes a denoising displacement, measured in units of noise variance.</p>
-<p>This is an exact identity for this Gaussian observation model. It is not an instruction to keep applying a fixed denoiser as a sampling algorithm. A posterior mean averages uncertainty and can lie between plausible clean signals. Likewise, repeated score ascent can concentrate particles at modes instead of reproducing a distribution.</p>
-<p>For additive noise, <span class="math inline">\(s_Y(y)\)</span> points toward <span class="math inline">\(m(y)\)</span>. For scaled corruption, the correct endpoint of that arrow is the <strong>scaled</strong> posterior mean; we will make that distinction explicit below.</p>
-</section>
-<section id="check-it-on-a-gaussian-prior" class="level2">
-<h2 class="anchored" data-anchor-id="check-it-on-a-gaussian-prior">5. Check it on a Gaussian prior</h2>
-<p>Let <span class="math inline">\(X\sim\mathcal N(\mu,\varrho^2)\)</span> in one dimension, with <span class="math inline">\(\varrho&gt;0\)</span>. Then</p>
-<p><span class="math display">\[Y\sim\mathcal N(\mu,\varrho^2+\sigma^2),\qquad
-s_Y(y)=-\frac{y-\mu}{\varrho^2+\sigma^2}.\]</span></p>
-<p>Tweedie gives</p>
-<p><span class="math display">\[
-\begin{aligned}
-m(y)&amp;=y-\frac{\sigma^2}{\varrho^2+\sigma^2}(y-\mu)\\
-&amp;=\boxed{\frac{\varrho^2}{\varrho^2+\sigma^2}y
-+\frac{\sigma^2}{\varrho^2+\sigma^2}\mu}.
-\end{aligned}
-\]</span></p>
-<p>The denoiser balances observation and prior mean. If observation noise is small, it trusts <span class="math inline">\(y\)</span>. If noise is large, it trusts <span class="math inline">\(\mu\)</span>. The posterior variance is <span class="math inline">\(\varrho^2\sigma^2/(\varrho^2+\sigma^2)\)</span>, so even the optimal estimate usually has nonzero error.</p>
-<p>Notice why the marginal matters. The clean score would be <span class="math inline">\(-(y-\mu)/\varrho^2\)</span> and would give the wrong shrinkage. Tweedie requires the score of the <strong>noise-smoothed</strong> density <span class="math inline">\(p_Y\)</span>.</p>
-</section>
-<section id="the-vp-diffusion-form" class="level2">
-<h2 class="anchored" data-anchor-id="the-vp-diffusion-form">6. The VP diffusion form</h2>
-<p>At a fixed time, consider</p>
-<p><span class="math display">\[\boxed{X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
-\varepsilon\perp X_0,\quad\sigma_t&gt;0.}\]</span></p>
-<p>In the usual VP convention, <span class="math inline">\(\alpha_t^2+\sigma_t^2=1\)</span>, but the derivation needs only the linear Gaussian observation model. Set <span class="math inline">\(Z=\alpha_tX_0\)</span> and apply the additive formula to <span class="math inline">\(X_t=Z+\sigma_t\varepsilon\)</span>:</p>
-<p><span class="math display">\[\mathbb E[Z\mid X_t=x]=x+\sigma_t^2s_t(x),\qquad
-s_t(x)=\nabla_x\log p_t(x).\]</span></p>
-<p>Because <span class="math inline">\(\alpha_t\)</span> is known at the fixed time,</p>
-<p><span class="math display">\[\boxed{\alpha_t\mathbb E[X_0\mid X_t=x]
-=x+\sigma_t^2s_t(x).}\]</span></p>
-<p>When <span class="math inline">\(\alpha_t\ne0\)</span> (usually <span class="math inline">\(\alpha_t&gt;0\)</span>), this gives</p>
-<p><span class="math display">\[\boxed{m_t(x)=\mathbb E[X_0\mid X_t=x]
-=\frac{x+\sigma_t^2s_t(x)}{\alpha_t}.}\]</span></p>
-<p>The companion tutorials write this same posterior mean as <span class="math inline">\(\widehat X_0(x,t)=m_t(x)\)</span>. The shorter <span class="math inline">\(m_t\)</span> notation here emphasizes that it is a conditional mean, and is also used in the denoising lab.</p>
-<p>Equivalently,</p>
-<p><span class="math display">\[\boxed{s_t(x)=\frac{\alpha_t m_t(x)-x}{\sigma_t^2}.}\]</span></p>
-<p>The score points from <span class="math inline">\(x\)</span> toward <span class="math inline">\(\alpha_t m_t(x)\)</span>, not generally toward <span class="math inline">\(m_t(x)\)</span> itself. The distinction matters when the clean signal has been attenuated. At <span class="math inline">\(\alpha_t=0\)</span>, the observation contains no information about <span class="math inline">\(X_0\)</span>, so its posterior mean is the prior mean. Dividing by <span class="math inline">\(\alpha_t\)</span> is then invalid. At <span class="math inline">\(\sigma_t=0\)</span>, the smoothed-score formula cannot be used as written.</p>
-</section>
-<section id="noise-prediction-is-another-expression-of-the-same-conditional-mean" class="level2">
-<h2 class="anchored" data-anchor-id="noise-prediction-is-another-expression-of-the-same-conditional-mean">7. Noise prediction is another expression of the same conditional mean</h2>
-<p>Rearrange the corruption equation and take conditional expectations:</p>
-<p><span class="math display">\[
-\begin{aligned}
-\varepsilon&amp;=\frac{X_t-\alpha_tX_0}{\sigma_t},\\
-\mathbb E[\varepsilon\mid X_t=x]
-&amp;=\frac{x-\alpha_t m_t(x)}{\sigma_t}
-=-\sigma_t s_t(x).
-\end{aligned}
-\]</span></p>
-<p>Write <span class="math inline">\(e_t(x)=\mathbb E[\varepsilon\mid X_t=x]\)</span>. This is <span class="math inline">\(\varepsilon^\star(x,t)\)</span> in the companion tutorials; a fitted predictor <span class="math inline">\(e_\theta(x,t)\)</span> here corresponds to their <span class="math inline">\(\varepsilon_\theta(x,t)\)</span>. Then</p>
-<p><span class="math display">\[\boxed{
-s_t=-e_t/\sigma_t,\qquad
-m_t=(x-\sigma_te_t)/\alpha_t,\qquad
-e_t=(x-\alpha_tm_t)/\sigma_t.
-}\]</span></p>
-<p>These are identities between optimal fitted functions, not claims that the particular random noise realization can be recovered. Under squared loss, a noise predictor estimates <span class="math inline">\(e_t\)</span>, a clean-data predictor estimates <span class="math inline">\(m_t\)</span>, and denoising score matching estimates <span class="math inline">\(s_t\)</span>.</p>
-<p>Indeed, the conditional-score target is <span class="math inline">\(-\varepsilon/\sigma_t\)</span>, and</p>
-<p><span class="math display">\[\mathbb E[-\varepsilon/\sigma_t\mid X_t=x]=s_t(x).\]</span></p>
-<p>That is why regression against a known corruption target can recover the unknown marginal score.</p>
-<p>The parameterizations encode the same information at the population optimum when <span class="math inline">\(\alpha_t,\sigma_t\ne0\)</span>. Their training losses are not automatically equivalent under arbitrary time weighting. For example, with <span class="math inline">\(s_\theta=-e_\theta/\sigma_t\)</span>,</p>
-<p><span class="math display">\[\lambda(t)\|s_\theta+\varepsilon/\sigma_t\|^2
-=\frac{\lambda(t)}{\sigma_t^2}\|e_\theta-\varepsilon\|^2.\]</span></p>
-<p>With <span class="math inline">\(s_\theta=(\alpha_tD_\theta-x_t)/\sigma_t^2\)</span>, the same score-target loss equals <span class="math inline">\(\lambda(t)\alpha_t^2\|D_\theta-X_0\|^2/\sigma_t^4\)</span>. Finite networks, optimization, and time weights can therefore make the practical training problems behave differently.</p>
-</section>
-<section id="two-possible-clean-values-derive-the-tanh-denoiser" class="level2">
-<h2 class="anchored" data-anchor-id="two-possible-clean-values-derive-the-tanh-denoiser">8. Two possible clean values: derive the tanh denoiser</h2>
-<p>Suppose <span class="math inline">\(X_0\)</span> takes values <span class="math inline">\(-1\)</span> and <span class="math inline">\(+1\)</span> with <strong>equal probabilities</strong>. Observe</p>
-<p><span class="math display">\[X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad \alpha_t&gt;0,\ \sigma_t&gt;0.\]</span></p>
-<p>The two likelihoods are Gaussians centered at <span class="math inline">\(-\alpha_t\)</span> and <span class="math inline">\(+\alpha_t\)</span>. By Bayes’ rule, the posterior odds are</p>
-<p><span class="math display">\[\frac{P(X_0=+1\mid x)}{P(X_0=-1\mid x)}
-=\exp\left[\frac{(x+\alpha_t)^2-(x-\alpha_t)^2}{2\sigma_t^2}\right]
-=\exp\left(\frac{2\alpha_t x}{\sigma_t^2}\right).\]</span></p>
-<p>Writing <span class="math inline">\(\kappa=\alpha_t x/\sigma_t^2\)</span> gives</p>
-<p><span class="math display">\[w_+(x)=\frac{1}{1+e^{-2\kappa}},\qquad w_-(x)=1-w_+(x).\]</span></p>
-<p>The posterior mean is their signed difference:</p>
-<p><span class="math display">\[\boxed{m_t(x)=w_+(x)-w_-(x)=\tanh\left(\frac{\alpha_t x}{\sigma_t^2}\right).}\]</span></p>
-<p>Substitution into Tweedie yields</p>
-<p><span class="math display">\[\boxed{s_t(x)=\frac{
-\alpha_t\tanh(\alpha_t x/\sigma_t^2)-x}{\sigma_t^2}.}\]</span></p>
-<p>The tanh denoiser and the mixture score are two expressions of the same posterior calculation. An unequal prior would add half the log prior odds inside the tanh; the symmetric formula relies on the equal weights.</p>
-<section id="posterior-mean-posterior-mode-and-posterior-sample-differ" class="level3">
-<h3 class="anchored" data-anchor-id="posterior-mean-posterior-mode-and-posterior-sample-differ">Posterior mean, posterior mode, and posterior sample differ</h3>
-<p>At <span class="math inline">\(x=0\)</span>, the posterior gives probability <span class="math inline">\(1/2\)</span> to each clean value. Consequently:</p>
+<section id="shared-notation" class="level2">
+<h2 class="anchored" data-anchor-id="shared-notation">Shared notation</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -706,75 +633,70 @@ e_t=(x-\alpha_tm_t)/\sigma_t.
 </colgroup>
 <thead>
 <tr class="header">
-<th>Decision or draw</th>
-<th>Result at <span class="math inline">\(x=0\)</span></th>
+<th>Symbol</th>
+<th>Meaning throughout the series</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Posterior mean, optimal under squared error</td>
-<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(X_t\)</span>, <span class="math inline">\(x\)</span></td>
+<td>Random state and a particular observed value, respectively</td>
 </tr>
 <tr class="even">
-<td>Posterior mode (MAP)</td>
-<td>A tie between <span class="math inline">\(-1\)</span> and <span class="math inline">\(+1\)</span></td>
+<td><span class="math inline">\(\epsilon\)</span>, <span class="math inline">\(\xi_k\)</span></td>
+<td>Corruption noise and independent numerical-step noise</td>
 </tr>
 <tr class="odd">
-<td>Posterior sample</td>
-<td>Randomly <span class="math inline">\(-1\)</span> or <span class="math inline">\(+1\)</span>, each with probability <span class="math inline">\(1/2\)</span></td>
+<td><span class="math inline">\(p_t\)</span>, <span class="math inline">\(s_t=\nabla_x\log p_t\)</span></td>
+<td>Forward-noised density and its marginal score</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(s_\theta\)</span></td>
+<td>Learned score approximation</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(f(x,t)\)</span>, <span class="math inline">\(g(t)\)</span></td>
+<td>Forward-SDE drift and scalar, time-dependent noise amplitude</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\alpha_t\)</span>, <span class="math inline">\(\sigma_t\)</span></td>
+<td>Signal coefficient and conditional noise standard deviation</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(v(x,t)=f-\tfrac12g^2s_t\)</span></td>
+<td>Forward-time probability-flow velocity</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\Psi_{s\to t}\)</span></td>
+<td>Flow map between specified times</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\Phi\)</span></td>
+<td>Standard normal CDF, never a flow map</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\tau=T-t\)</span></td>
+<td>Increasing generation clock</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(u\)</span>, <span class="math inline">\(q_u\)</span></td>
+<td>Fixed-target Langevin time and current sampler density</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(p_\sigma\)</span></td>
+<td>Smoothed law indexed by noise standard deviation in Tutorial 4</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\varrho\)</span></td>
+<td>Mixture-component standard deviation</td>
 </tr>
 </tbody>
 </table>
-<p>Zero is not an allowed clean value, but it is the best squared-error estimate. Its conditional risk is <span class="math inline">\(1\)</span>. Always choosing either endpoint has risk <span class="math inline">\(2\)</span>. An independent draw from the posterior also has conditional risk <span class="math inline">\(2\)</span> here. Plausibility as a clean sample and optimality as a point estimate are different criteria.</p>
-<p>For a general observation in this two-point example,</p>
-<p><span class="math display">\[\operatorname{Var}(X_0\mid x)=1-m_t(x)^2,\]</span></p>
-<p>and an estimate <span class="math inline">\(a\)</span> has conditional risk</p>
-<p><span class="math display">\[\boxed{R_x(a)=1-m_t(x)^2+(a-m_t(x))^2.}\]</span></p>
-<p><strong>Lab 4.</strong> Move the observed value, signal scale, and noise level. Read the posterior weights, posterior mean, and the score displacement. Move the candidate estimate away from the mean and watch its squared-error risk increase. At <span class="math inline">\(x=0\)</span>, compare the posterior mean with both possible clean values.</p>
+<p>Every numerical step magnitude is positive. A forward update uses <span class="math inline">\(+h v\)</span>; a backward update uses <span class="math inline">\(-h v\)</span>. On a descending grid, <span class="math inline">\(h_k=t_k-t_{k-1}&gt;0\)</span>. This local convention differs from the signed-step notation in some older notes. The conditional noise variance <span class="math inline">\(\sigma_t^2\)</span> is distinguished from total marginal variance, and exact sampling from <span class="math inline">\(p_T\)</span> from its Gaussian approximation.</p>
 </section>
-<section id="the-small-noise-limit-needs-a-qualification" class="level3">
-<h3 class="anchored" data-anchor-id="the-small-noise-limit-needs-a-qualification">The small-noise limit needs a qualification</h3>
-<p>If <span class="math inline">\(\alpha_t\to1\)</span> and <span class="math inline">\(\sigma_t\to0\)</span>, then for each fixed <span class="math inline">\(x\ne0\)</span>,</p>
-<p><span class="math display">\[m_t(x)=\tanh(\alpha_t x/\sigma_t^2)\longrightarrow\operatorname{sign}(x).\]</span></p>
-<p>At <span class="math inline">\(x=0\)</span>, the posterior mean remains zero by symmetry. This is a pointwise statement away from the decision boundary; it is not uniform near zero. At exactly zero noise the data law is atomic, with no ordinary density score on <span class="math inline">\(\mathbb R\)</span>. The positive-noise score has a different limiting behavior from the posterior mean. For every fixed <span class="math inline">\(x\notin\{-1,0,1\}\)</span>,</p>
-<p><span class="math display">\[\sigma_t^2s_t(x)\longrightarrow\operatorname{sign}(x)-x\ne0,\]</span></p>
-<p>so its magnitude diverges as the noise vanishes. At <span class="math inline">\(x=0\)</span>, the score remains exactly zero by symmetry. At the clean points <span class="math inline">\(x=\pm1\)</span>, the behavior depends on how the signal scale approaches one: with additive corruption (<span class="math inline">\(\alpha_t\equiv1\)</span>) the score tends to zero, whereas with VP corruption (<span class="math inline">\(\alpha_t=\sqrt{1-\sigma_t^2}\)</span>) it tends to <span class="math inline">\(\mp\tfrac12\)</span>. These are limits of smoothed-density scores, not scores of the atomic law itself.</p>
-</section>
-</section>
-<section id="a-useful-extension-correlated-gaussian-noise" class="level2">
-<h2 class="anchored" data-anchor-id="a-useful-extension-correlated-gaussian-noise">9. A useful extension: correlated Gaussian noise</h2>
-<p>If <span class="math inline">\(Y=X+\eta\)</span>, independently, with <span class="math inline">\(\eta\sim\mathcal N(0,\Sigma)\)</span> for known positive-definite <span class="math inline">\(\Sigma\)</span>, then</p>
-<p><span class="math display">\[\nabla_y p(y\mid x)=\Sigma^{-1}(x-y)p(y\mid x).\]</span></p>
-<p>Repeating the proof gives</p>
-<p><span class="math display">\[\boxed{\mathbb E[X\mid Y=y]=y+\Sigma\nabla_y\log p_Y(y).}\]</span></p>
-<p>For non-isotropic noise, the covariance transforms the score into a denoising displacement; they need not point in the same Euclidean direction. The simple <span class="math inline">\(\sigma^2\)</span> multiplier is specific to isotropic Gaussian corruption.</p>
-</section>
-<section id="how-this-fits-into-diffusion-sampling" class="level2">
-<h2 class="anchored" data-anchor-id="how-this-fits-into-diffusion-sampling">10. How this fits into diffusion sampling</h2>
-<p>At each positive noise level, the model estimates a local field that encodes a posterior mean. A diffusion sampler uses that field together with its known drift, noise schedule, and current time to take the next step along a path of distributions. Returning a posterior mean once, or repeatedly applying a fixed-noise denoiser, is not generally equivalent to drawing a clean-data sample.</p>
-<p>The <a href="../tutorials/22-vector-fields-to-score-diffusion.html">vector-fields tutorial</a> explains the reverse-SDE and probability-flow ODE updates. This note supplies their statistical bridge:</p>
-<p><span class="math display">\[
-\text{squared-error optimality}
-\ \longrightarrow\ \text{posterior mean}
-\ \overset{\text{Gaussian corruption}}{\longleftrightarrow}\ \text{score}.
-\]</span></p>
-</section>
-<section id="exercises-with-checks" class="level2">
-<h2 class="anchored" data-anchor-id="exercises-with-checks">Exercises with checks</h2>
-<ol type="1">
-<li>Let <span class="math inline">\(X\sim\mathcal N(0,4)\)</span> and noise variance be <span class="math inline">\(1\)</span>. Find <span class="math inline">\(s_Y(y)\)</span> and <span class="math inline">\(m(y)\)</span>. <strong>Check:</strong> <span class="math inline">\(s_Y=-y/5\)</span>, <span class="math inline">\(m=4y/5\)</span>.</li>
-<li>For equal two-point data, take <span class="math inline">\(\alpha=1\)</span>, <span class="math inline">\(\sigma=1\)</span>, <span class="math inline">\(y=0.5\)</span>. Compute the posterior mean, score, and minimum conditional risk. <strong>Check:</strong> approximately <span class="math inline">\(0.4621\)</span>, <span class="math inline">\(-0.0379\)</span>, and <span class="math inline">\(0.7864\)</span>.</li>
-<li>If <span class="math inline">\(P(X_0=+1)=\pi\in(0,1)\)</span>, derive the mean. <strong>Check:</strong> <span class="math inline">\(\tanh(\alpha x/\sigma^2+\tfrac12\log[\pi/(1-\pi)])\)</span>.</li>
-<li>Why is the sampled target <span class="math inline">\(-\varepsilon/\sigma_t\)</span> usually different from the true score at that input? <strong>Check:</strong> the score is its conditional average over all compatible clean-signal and noise pairs.</li>
-</ol>
-</section>
-<section id="references" class="level2">
-<h2 class="anchored" data-anchor-id="references">References</h2>
-<ul>
-<li>Lai et al., <a href="https://arxiv.org/abs/2510.21890"><em>The Principles of Diffusion Models</em></a>, §3.3.4, Lemma 3.3.2 and Eq. (3.3.6), with the detailed proof in Appendix D.2.3; §3.3.5 connects denoising with Bayes optimality.</li>
-<li>Song et al., <a href="https://arxiv.org/abs/2011.13456"><em>Score-Based Generative Modeling through Stochastic Differential Equations</em></a>, for time-indexed score estimation and sampling.</li>
-<li><a href="../tutorials/21-one-estimator-many-parameterizations.html">One Estimator, Many Parameterizations</a> develops the broader conditional-mean parameterization argument in this course.</li>
-</ul>
+<section id="relationship-to-the-existing-course-notes" class="level2">
+<h2 class="anchored" data-anchor-id="relationship-to-the-existing-course-notes">Relationship to the existing course notes</h2>
+<p>The published notes 22, 24, and 23 provide geometric intuition, introductory worked sampling, and standalone statistical denoising, respectively. This series is the next derivation sequence: learning → sampling → connections → equilibrium sampling. It does not replace those notes. The existing broad <a href="../tutorials/07-probability-flow-ode.html">probability-flow perspective</a> can remain an alternative overview alongside this sequence.</p>
 
 
 </section>
@@ -1187,13 +1109,13 @@ e_t=(x-\alpha_tm_t)/\sigma_t.
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/24-sampling-with-scores.html" class="pagination-link" aria-label="Sampling with Scores: Worked Examples of the Probability-Flow ODE">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Sampling with Scores: Worked Examples of the Probability-Flow ODE</span>
+      <a href="../tutorials/23-tweedie-bayes-denoising.html" class="pagination-link" aria-label="Tweedie's Formula: The Score as a Bayes-Optimal Denoiser">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/score-based-diffusion-guide.html" class="pagination-link" aria-label="Score-Based Diffusion: Reading Guide">
-        <span class="nav-page-text">Score-Based Diffusion: Reading Guide</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/25-learning-the-score.html" class="pagination-link" aria-label="Learning the Score: VP Diffusion from First Principles">
+        <span class="nav-page-text">Learning the Score: VP Diffusion from First Principles</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
