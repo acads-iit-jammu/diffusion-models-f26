@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Langevin Dynamics: Keeping a Density Still, Moving a Density Backward – ID-5-02 (TO)</title>
+<title>From One-Dimensional Transport to Neural ODEs and Higher Dimensions – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,7 +36,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../materials/w01-deck-01-mechanics.html" rel="next">
 <link href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -117,7 +116,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/28-langevin-dynamics.html">Langevin Dynamics: Keeping a Density Still, Moving a Density Backward</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/28-langevin-dynamics.html">From One-Dimensional Transport to Neural ODEs and Higher Dimensions</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -197,12 +196,6 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
   </div>
@@ -251,74 +244,57 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/22-vector-fields-to-score-diffusion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">From Local Arrows to Score-Based Diffusion</span></a>
+  <a href="../tutorials/29-variational-autoencoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · Variational Autoencoders (VAEs)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/24-sampling-with-scores.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Sampling with Scores: Worked Examples of the Probability-Flow ODE</span></a>
+  <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</span></a>
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 · Probability-Flow ODE - Part 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/31-probability-flow-ode-part-2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 · Probability-Flow ODE - Part 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/32-probability-flow-ode-part-3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 · Probability-Flow ODE - Part 3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/33-probability-flow-ode-part-4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 · Probability-Flow ODE - Part 4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/34-probability-flow-ode-part-5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">16 · Probability-Flow ODE - Part 5</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Score-Based Diffusion</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Score-Based Diffusion: Reading Guide</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/25-learning-the-score.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Learning the Score: VP Diffusion from First Principles</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/26-probability-flow-sampling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Probability-Flow Sampling: From Density Evolution to Samples</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Diffusion, Neural ODEs, and Normalizing Flows: The Same Density, Different Journeys</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/28-langevin-dynamics.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Langevin Dynamics: Keeping a Density Still, Moving a Density Backward</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Decks</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
@@ -377,13 +353,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
@@ -400,13 +376,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
  <span class="menu-text">Perspectives</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
@@ -459,23 +435,41 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
  <span class="menu-text">Draft</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Probability-Flow ODE</span></a>
-  </div>
-</li>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/21-one-estimator-many-parameterizations.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">One Estimator, Many Parameterizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/22-vector-fields-to-score-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From Local Arrows to Score-Based Diffusion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/24-sampling-with-scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling with Scores: Worked Examples of the Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</span></a>
   </div>
 </li>
       </ul>
@@ -486,6 +480,47 @@ window.Quarto = {
  <span class="menu-text">Resources</span></a>
   </div>
 </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Score-Based Diffusion</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Score-Based Diffusion: A One-Dimensional Learning Sequence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/25-learning-the-score.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODEs in One Dimension: Particles, Flows, and Densities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/26-probability-flow-sampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SDEs in One Dimension: Brownian Motion, Itô Calculus, and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Score-Based Diffusion in One Dimension: Corruption, Sampling, and Denoising</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/28-langevin-dynamics.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">From One-Dimensional Transport to Neural ODEs and Higher Dimensions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -496,50 +531,40 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#start-with-a-fixed-target-and-a-sampling-update" id="toc-start-with-a-fixed-target-and-a-sampling-update" class="nav-link active" data-scroll-target="#start-with-a-fixed-target-and-a-sampling-update">Start with a fixed target and a sampling update</a>
+  <li><a href="#generation-is-a-map-applied-to-a-random-input" id="toc-generation-is-a-map-applied-to-a-random-input" class="nav-link active" data-scroll-target="#generation-is-a-map-applied-to-a-random-input">Generation is a map applied to a random input</a></li>
+  <li><a href="#continuous-layers-give-an-ode" id="toc-continuous-layers-give-an-ode" class="nav-link" data-scroll-target="#continuous-layers-give-an-ode">Continuous layers give an ODE</a></li>
+  <li><a href="#continuous-density" id="toc-continuous-density" class="nav-link" data-scroll-target="#continuous-density">Track density continuously</a>
   <ul class="collapse">
-  <li><a href="#keep-three-clocks-distinct" id="toc-keep-three-clocks-distinct" class="nav-link" data-scroll-target="#keep-three-clocks-distinct">Keep three clocks distinct</a></li>
-  <li><a href="#energy-interpretation-the-normalizing-constant-disappears" id="toc-energy-interpretation-the-normalizing-constant-disappears" class="nav-link" data-scroll-target="#energy-interpretation-the-normalizing-constant-disappears">Energy interpretation: the normalizing constant disappears</a></li>
+  <li><a href="#derivation-differentiate-the-flow-with-respect-to-its-starting-point" id="toc-derivation-differentiate-the-flow-with-respect-to-its-starting-point" class="nav-link" data-scroll-target="#derivation-differentiate-the-flow-with-respect-to-its-starting-point">Derivation: differentiate the flow with respect to its starting point</a></li>
   </ul></li>
-  <li><a href="#first-solved-problem-a-gaussian-target" id="toc-first-solved-problem-a-gaussian-target" class="nav-link" data-scroll-target="#first-solved-problem-a-gaussian-target">First solved problem: a Gaussian target</a>
+  <li><a href="#diffusions-probability-flow-ode-is-a-cnf" id="toc-diffusions-probability-flow-ode-is-a-cnf" class="nav-link" data-scroll-target="#diffusions-probability-flow-ode-is-a-cnf">Diffusion’s probability-flow ODE is a CNF</a>
   <ul class="collapse">
-  <li><a href="#derivation-the-mean-and-variance-approach-the-target" id="toc-derivation-the-mean-and-variance-approach-the-target" class="nav-link" data-scroll-target="#derivation-the-mean-and-variance-approach-the-target">Derivation: the mean and variance approach the target</a></li>
+  <li><a href="#likelihood" id="toc-likelihood" class="nav-link" data-scroll-target="#likelihood">Derivation: the likelihood identity and its sign</a></li>
   </ul></li>
-  <li><a href="#why-the-target-is-stationary" id="toc-why-the-target-is-stationary" class="nav-link" data-scroll-target="#why-the-target-is-stationary">Why the target is stationary</a>
+  <li><a href="#learn-velocities-directly-flow-matching" id="toc-learn-velocities-directly-flow-matching" class="nav-link" data-scroll-target="#learn-velocities-directly-flow-matching">Learn velocities directly: flow matching</a>
   <ul class="collapse">
-  <li><a href="#derivation-cancellation-in-fokkerplanck" id="toc-derivation-cancellation-in-fokkerplanck" class="nav-link" data-scroll-target="#derivation-cancellation-in-fokkerplanck">Derivation: cancellation in Fokker–Planck</a></li>
-  <li><a href="#stationarity-is-not-a-convergence-proof" id="toc-stationarity-is-not-a-convergence-proof" class="nav-link" data-scroll-target="#stationarity-is-not-a-convergence-proof">Stationarity is not a convergence proof</a></li>
+  <li><a href="#derivation-why-the-averaged-velocity-transports-the-marginal" id="toc-derivation-why-the-averaged-velocity-transports-the-marginal" class="nav-link" data-scroll-target="#derivation-why-the-averaged-velocity-transports-the-marginal">Derivation: why the averaged velocity transports the marginal</a></li>
+  <li><a href="#optional-derivation-recover-probability-flow-from-gaussian-interpolants" id="toc-optional-derivation-recover-probability-flow-from-gaussian-interpolants" class="nav-link" data-scroll-target="#optional-derivation-recover-probability-flow-from-gaussian-interpolants">Optional derivation: recover probability flow from Gaussian interpolants</a></li>
   </ul></li>
-  <li><a href="#the-numerical-sampler-introduces-its-own-error" id="toc-the-numerical-sampler-introduces-its-own-error" class="nav-link" data-scroll-target="#the-numerical-sampler-introduces-its-own-error">The numerical sampler introduces its own error</a>
+  <li><a href="#higher-dimensions" id="toc-higher-dimensions" class="nav-link" data-scroll-target="#higher-dimensions">Only now: extend the picture to d dimensions</a>
   <ul class="collapse">
-  <li><a href="#derivation-finite-step-bias-for-the-gaussian" id="toc-derivation-finite-step-bias-for-the-gaussian" class="nav-link" data-scroll-target="#derivation-finite-step-bias-for-the-gaussian">Derivation: finite-step bias for the Gaussian</a></li>
+  <li><a href="#gradient-divergence-and-laplacian" id="toc-gradient-divergence-and-laplacian" class="nav-link" data-scroll-target="#gradient-divergence-and-laplacian">Gradient, divergence, and Laplacian</a></li>
+  <li><a href="#brownian-motion-and-itôs-lemma" id="toc-brownian-motion-and-itôs-lemma" class="nav-link" data-scroll-target="#brownian-motion-and-itôs-lemma">Brownian motion and Itô’s lemma</a></li>
+  <li><a href="#gaussian-scores-and-langevin" id="toc-gaussian-scores-and-langevin" class="nav-link" data-scroll-target="#gaussian-scores-and-langevin">Gaussian scores and Langevin</a></li>
+  <li><a href="#jacobians-replace-scalar-derivatives-in-normalizing-flows" id="toc-jacobians-replace-scalar-derivatives-in-normalizing-flows" class="nav-link" data-scroll-target="#jacobians-replace-scalar-derivatives-in-normalizing-flows">Jacobians replace scalar derivatives in normalizing flows</a></li>
   </ul></li>
-  <li><a href="#compare-langevin-with-reverse-diffusion" id="toc-compare-langevin-with-reverse-diffusion" class="nav-link" data-scroll-target="#compare-langevin-with-reverse-diffusion">Compare Langevin with reverse diffusion</a>
-  <ul class="collapse">
-  <li><a href="#coefficient-balance" id="toc-coefficient-balance" class="nav-link" data-scroll-target="#coefficient-balance">Derivation: time scaling cannot repair a coefficient mismatch</a></li>
-  <li><a href="#drift-free-diffusion-similar-ingredients-different-balance" id="toc-drift-free-diffusion-similar-ingredients-different-balance" class="nav-link" data-scroll-target="#drift-free-diffusion-similar-ingredients-different-balance">Drift-free diffusion: similar ingredients, different balance</a></li>
-  <li><a href="#vp-diffusion-the-reversed-drift-also-matters" id="toc-vp-diffusion-the-reversed-drift-also-matters" class="nav-link" data-scroll-target="#vp-diffusion-the-reversed-drift-also-matters">VP diffusion: the reversed drift also matters</a></li>
-  </ul></li>
-  <li><a href="#the-precise-bridge-transport-plus-a-langevin-contribution" id="toc-the-precise-bridge-transport-plus-a-langevin-contribution" class="nav-link" data-scroll-target="#the-precise-bridge-transport-plus-a-langevin-contribution">The precise bridge: transport plus a Langevin contribution</a>
-  <ul class="collapse">
-  <li><a href="#optional-derivation-check-the-decomposition-on-densities" id="toc-optional-derivation-check-the-decomposition-on-densities" class="nav-link" data-scroll-target="#optional-derivation-check-the-decomposition-on-densities">Optional derivation: check the decomposition on densities</a></li>
-  </ul></li>
-  <li><a href="#annealing-and-predictorcorrector-sampling" id="toc-annealing-and-predictorcorrector-sampling" class="nav-link" data-scroll-target="#annealing-and-predictorcorrector-sampling">Annealing and predictor–corrector sampling</a>
-  <ul class="collapse">
-  <li><a href="#annealed-langevin-equilibrate-approximately-then-change-the-target" id="toc-annealed-langevin-equilibrate-approximately-then-change-the-target" class="nav-link" data-scroll-target="#annealed-langevin-equilibrate-approximately-then-change-the-target">Annealed Langevin: equilibrate approximately, then change the target</a></li>
-  <li><a href="#predictorcorrector-change-the-noise-level-then-improve-sampling-there" id="toc-predictorcorrector-change-the-noise-level-then-improve-sampling-there" class="nav-link" data-scroll-target="#predictorcorrector-change-the-noise-level-then-improve-sampling-there">Predictor–corrector: change the noise level, then improve sampling there</a></li>
-  <li><a href="#compare-the-objectives" id="toc-compare-the-objectives" class="nav-link" data-scroll-target="#compare-the-objectives">Compare the objectives</a></li>
-  </ul></li>
+  <li><a href="#compare-the-constructions" id="toc-compare-the-constructions" class="nav-link" data-scroll-target="#compare-the-constructions">Compare the constructions</a></li>
   <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding">Check your understanding</a></li>
+  <li><a href="#sources" id="toc-sources" class="nav-link" data-scroll-target="#sources">Sources</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/28-langevin-dynamics.html">Langevin Dynamics: Keeping a Density Still, Moving a Density Backward</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/28-langevin-dynamics.html">From One-Dimensional Transport to Neural ODEs and Higher Dimensions</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Langevin Dynamics: Keeping a Density Still, Moving a Density Backward</h1>
+<h1 class="title">From One-Dimensional Transport to Neural ODEs and Higher Dimensions</h1>
 </div>
 
 
@@ -562,213 +587,146 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Tutorial 4 of 4 · Langevin sampling
+<span class="screen-reader-only">Note</span>Tutorial 4 of 4 · Connections and generalization
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Question:</strong> How does the same score support both equilibrium sampling and reverse diffusion, and why are these different dynamics?</p>
-<p><strong>Before this:</strong> <a href="../tutorials/25-learning-the-score.html">Tutorial 1</a> introduces Gaussian increments and Euler–Maruyama; <a href="../tutorials/26-probability-flow-sampling.html">Tutorial 2</a> derives Fokker–Planck and reverse-time sampling. No additional SDE background is assumed. <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html">Tutorial 3</a> provides the optional transport perspective.</p>
-<p><strong>Core route:</strong> a numerical sampler → Gaussian example → stationary density → comparison with reverse diffusion → annealing and predictor–corrector sampling. Longer calculations sit in derivation subsections; the final density-operator view is optional.</p>
+<p><strong>Before this:</strong> the first three tutorials. We first finish the transport connections in one dimension. Only the final section introduces vectors, Jacobian matrices, divergence, and multidimensional diffusion.</p>
+<p><strong>Reading route:</strong> change of variables → continuous normalizing flows → diffusion likelihood → flow matching → extension to <span class="math inline">\(d\)</span> dimensions. <a href="../tutorials/score-based-diffusion-guide.html">Shared notation</a>.</p>
 </div>
 </div>
-<section id="start-with-a-fixed-target-and-a-sampling-update" class="level2">
-<h2 class="anchored" data-anchor-id="start-with-a-fixed-target-and-a-sampling-update">Start with a fixed target and a sampling update</h2>
-<p>Suppose we want samples from one fixed density <span class="math inline">\(p(x)\)</span> and know its score <span class="math inline">\(s(x)=\nabla_x\log p(x)\)</span>. Use a positive step size <span class="math inline">\(\eta\)</span> and independent <span class="math inline">\(\xi_k\sim\mathcal N(0,I)\)</span>:</p>
-<p><span class="math display">\[\boxed{x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,\xi_k.}\]</span></p>
-<p>The score term draws the particle toward higher density. The random term spreads the cloud and allows exploration. Their relative sizes matter: adding arbitrary noise to gradient ascent does not automatically sample <span class="math inline">\(p\)</span>. The initial point can come from an easy distribution; there is no promise that the first few iterates already have the target law.</p>
-<p>This update is Euler–Maruyama for <strong>overdamped Langevin dynamics</strong>:</p>
-<p><span class="math display">\[\boxed{dZ_u=s(Z_u)\,du+\sqrt2\,dB_u.}\]</span></p>
-<p>“Overdamped” means we model position directly, without a separate momentum variable. <span class="math inline">\(B_u\)</span> is standard Brownian motion, with independent increments of covariance <span class="math inline">\(hI\)</span> over a time interval of length <span class="math inline">\(h\)</span>.</p>
-<section id="keep-three-clocks-distinct" class="level3">
-<h3 class="anchored" data-anchor-id="keep-three-clocks-distinct">Keep three clocks distinct</h3>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Symbol</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(u\)</span></td>
-<td>Algorithmic Langevin time; the target <span class="math inline">\(p\)</span> is fixed</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(t\)</span></td>
-<td>Forward diffusion time; the noisy density <span class="math inline">\(p_t\)</span> changes</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\tau=T-t\)</span></td>
-<td>Increasing reverse-diffusion clock</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(q_u\)</span></td>
-<td>Current Langevin sampler density, which need not yet equal <span class="math inline">\(p\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>We keep <span class="math inline">\(\tau\)</span> reserved for reverse diffusion, as in the earlier tutorials. Langevin runs longer by increasing <span class="math inline">\(u\)</span>; this does not change the target’s noise level. At a fixed diffusion level <span class="math inline">\(t\)</span>, one can run a separate Langevin process in <span class="math inline">\(u\)</span> targeting the frozen density <span class="math inline">\(p_t\)</span>.</p>
+<p><em>Looking for Langevin dynamics? It is now in <a href="../tutorials/26-probability-flow-sampling.html#langevin">Tutorial 2</a>.</em></p>
+<section id="generation-is-a-map-applied-to-a-random-input" class="level2">
+<h2 class="anchored" data-anchor-id="generation-is-a-map-applied-to-a-random-input">Generation is a map applied to a random input</h2>
+<p>Draw <span class="math inline">\(Z\sim\mathcal N(0,1)\)</span> and set <span class="math inline">\(X=\mu+aZ\)</span>, <span class="math inline">\(a&gt;0\)</span>. This deterministic map produces <span class="math inline">\(X\sim\mathcal N(\mu,a^2)\)</span>. An interval expands by <span class="math inline">\(a\)</span>, so its density is divided by <span class="math inline">\(a\)</span>. More generally, for an invertible differentiable scalar map <span class="math inline">\(x=F(z)\)</span> with differentiable inverse,</p>
+<p><span class="math display">\[\boxed{\log p_X(F(z))=\log p_Z(z)-\log|F'(z)|.}\]</span></p>
+<p>Such a smooth invertible map is a <strong>diffeomorphism</strong>. A discrete normalizing flow composes maps <span class="math inline">\(F=F_K\circ\cdots\circ F_1\)</span> whose inverses and derivatives are tractable. The chain rule makes their log-density corrections add. The construction transports probability; it neither creates nor destroys it.</p>
 </section>
-<section id="energy-interpretation-the-normalizing-constant-disappears" class="level3">
-<h3 class="anchored" data-anchor-id="energy-interpretation-the-normalizing-constant-disappears">Energy interpretation: the normalizing constant disappears</h3>
-<p>Suppose <span class="math inline">\(p(x)=e^{-E(x)}/C\)</span>, where <span class="math inline">\(C=\int e^{-E(x)}dx\)</span> is finite. Then</p>
-<p><span class="math display">\[s(x)=-\nabla E(x),\qquad
-x_{k+1}=x_k-\eta\nabla E(x_k)+\sqrt{2\eta}\,\xi_k.\]</span></p>
-<p>The deterministic part resembles gradient descent on energy, but the aim is to sample a distribution of states, rather than return an energy minimizer. We do not need <span class="math inline">\(C\)</span> because its logarithm has zero spatial derivative. For <span class="math inline">\(p(x)\propto e^{-E(x)/\mathcal T}\)</span> at temperature <span class="math inline">\(\mathcal T&gt;0\)</span>, <span class="math inline">\(dZ_u=-\nabla E(Z_u)du+\sqrt{2\mathcal T}\,dB_u\)</span> has the corresponding balance. We use <span class="math inline">\(\mathcal T=1\)</span> below.</p>
+<section id="continuous-layers-give-an-ode" class="level2">
+<h2 class="anchored" data-anchor-id="continuous-layers-give-an-ode">Continuous layers give an ODE</h2>
+<p>Small updates <span class="math inline">\(x_{k+1}=x_k+h v(x_k,t_k)\)</span> are Euler steps. Under suitable regularity and convergence conditions, their small-step limit follows <span class="math inline">\(\dot x_t=v(x_t,t)\)</span>, with flow <span class="math inline">\(\Psi_{r\to t}\)</span>.</p>
+<p>A continuously differentiable field, regular in time, with unique solutions existing forward and backward over the whole interval gives a diffeomorphic flow. A global spatial Lipschitz bound means <span class="math inline">\(|v(x,t)-v(y,t)|\le L|x-y|\)</span> with one finite <span class="math inline">\(L\)</span> across the time interval. Such bounds are one useful sufficient condition for existence and uniqueness. If two trajectories met at the same position and time, uniqueness backward would give the same initial point. Thus distinct initial states cannot merge on such an interval.</p>
+<p>For an intermediate time <span class="math inline">\(r&lt;t_*&lt;t\)</span>, the composition and inverse rules are</p>
+<p><span class="math display">\[\Psi_{r\to t}=\Psi_{t_*\to t}\circ\Psi_{r\to t_*},\qquad
+\Psi_{r\to t}^{-1}=\Psi_{t\to r}.\]</span></p>
+<p>Finite numerical steps need not share the exact flow’s invertibility. For <span class="math inline">\(\dot x=-x\)</span>, the exact step is <span class="math inline">\(e^{-h}x\)</span>, always invertible at finite <span class="math inline">\(h\)</span>. Euler gives <span class="math inline">\((1-h)x\)</span>, which collapses everything at <span class="math inline">\(h=1\)</span>.</p>
+<p>When a neural network supplies <span class="math inline">\(v_\theta\)</span>, we have a <strong>neural ODE</strong>. When we use that ODE to transport a base distribution and track its density, we have a <strong>continuous normalizing flow (CNF)</strong>. A neural ODE used only for hidden-state prediction need not be a generative density model.</p>
+</section>
+<section id="continuous-density" class="level2">
+<h2 class="anchored" data-anchor-id="continuous-density">Track density continuously</h2>
+<p>Tutorial 1 derived</p>
+<p><span class="math display">\[\boxed{\frac{d}{dt}\log q_t(x_t)=-\partial_xv(x_t,t)}\]</span></p>
+<p>from conservation <span class="math inline">\(\partial_tq_t=-\partial_x(vq_t)\)</span>. Thus the scalar derivative of velocity replaces the discrete log-derivative correction per unit time.</p>
+<section id="derivation-differentiate-the-flow-with-respect-to-its-starting-point" class="level3">
+<h3 class="anchored" data-anchor-id="derivation-differentiate-the-flow-with-respect-to-its-starting-point">Derivation: differentiate the flow with respect to its starting point</h3>
+<p>Write <span class="math inline">\(\Psi'_{0\to t}(x_0)=\partial x_t/\partial x_0\)</span> for the flow’s derivative with respect to its initial position. Differentiating the ODE gives</p>
+<p><span class="math display">\[\frac{d}{dt}\Psi'_{0\to t}(x_0)
+=(\partial_xv)(x_t,t)\Psi'_{0\to t}(x_0),\qquad \Psi'_{0\to0}=1.\]</span></p>
+<p>Consequently, <span class="math inline">\(\Psi'_{0\to t}(x_0)=\exp(\int_0^t\partial_xv(x_r,r)dr)&gt;0\)</span>. Scalar change of variables gives <span class="math inline">\(q_t(x_t)=q_0(x_0)/\Psi'_{0\to t}(x_0)\)</span>, reproducing the density identity. In one dimension the exact regular ODE flow is increasing: particle order is preserved. For contraction <span class="math inline">\(v=-x\)</span>, the flow derivative is <span class="math inline">\(e^{-t}\)</span> and <span class="math inline">\(q_t(x_t)=e^tq_0(x_0)\)</span>.</p>
 </section>
 </section>
-<section id="first-solved-problem-a-gaussian-target" class="level2">
-<h2 class="anchored" data-anchor-id="first-solved-problem-a-gaussian-target">First solved problem: a Gaussian target</h2>
-<p>Let <span class="math inline">\(p=\mathcal N(\mu,a^2)\)</span> in one dimension, with <span class="math inline">\(a&gt;0\)</span>. Its score is <span class="math inline">\(s(x)=-(x-\mu)/a^2\)</span>, so</p>
-<p><span class="math display">\[dZ_u=-\frac{Z_u-\mu}{a^2}\,du+\sqrt2\,dB_u.\]</span></p>
-<p>If we deleted the noise, the ODE would give <span class="math inline">\(z_u=\mu+e^{-u/a^2}(z_0-\mu)\)</span>, contracting every point toward the mean. Langevin keeps adding variance while the drift removes it.</p>
-<section id="derivation-the-mean-and-variance-approach-the-target" class="level3">
-<h3 class="anchored" data-anchor-id="derivation-the-mean-and-variance-approach-the-target">Derivation: the mean and variance approach the target</h3>
-<p>The expected Taylor formula from Tutorial 1 is <span class="math inline">\(d\mathbb E[\varphi(Z_u)]/du=\mathbb E[s\varphi'+\varphi'']\)</span>. Setting <span class="math inline">\(\varphi(z)=z\)</span> gives, with <span class="math inline">\(m_u=\mathbb E[Z_u]\)</span>,</p>
-<p><span class="math display">\[\dot m_u=-\frac{m_u-\mu}{a^2},\qquad
-m_u=\mu+e^{-u/a^2}(m_0-\mu).\]</span></p>
-<p>Apply the same formula to <span class="math inline">\((z-\mu)^2\)</span>, then subtract <span class="math inline">\((m_u-\mu)^2\)</span> to obtain</p>
-<p><span class="math display">\[\dot V_u=-\frac{2}{a^2}V_u+2,\qquad
-\boxed{V_u=a^2+e^{-2u/a^2}(V_0-a^2).}\]</span></p>
-<p>This calculation assumes finite second moments. It shows how variance approaches <span class="math inline">\(a^2\)</span>; moment convergence alone would not prove convergence of the full law. Here the linear Gaussian structure gives more: conditional on <span class="math inline">\(Z_0=z_0\)</span>,</p>
-<p><span class="math display">\[\boxed{Z_u\mid Z_0=z_0\sim
-\mathcal N\!\left(\mu+e^{-u/a^2}(z_0-\mu),
-a^2(1-e^{-2u/a^2})\right).}\]</span></p>
-<p>As in Tutorial 1, repeated linear updates are weighted sums of independent Gaussians; their small-step limit explains this conditional Gaussian law. Equivalently, at one time we may write</p>
-<p><span class="math display">\[Z_u=\mu+e^{-u/a^2}(Z_0-\mu)
-+a\sqrt{1-e^{-2u/a^2}}\,\epsilon,\qquad\epsilon\sim\mathcal N(0,1),\quad\epsilon\perp Z_0.\]</span></p>
-<p>The initial contribution vanishes and the noise contribution approaches <span class="math inline">\(\mathcal N(0,a^2)\)</span>. This establishes convergence in distribution to the Gaussian target from any initial probability law; this last distributional argument does not require the finite moments used in the earlier moment calculation. If <span class="math inline">\(Z_0\sim p\)</span> already, the law stays <span class="math inline">\(p\)</span>, although individual particles move.</p>
-<p><strong>Example:</strong> take <span class="math inline">\(\mu=2\)</span>, <span class="math inline">\(a=1\)</span>, and <span class="math inline">\(Z_0=5\)</span>. At <span class="math inline">\(u=1\)</span>, the sampler has mean <span class="math inline">\(2+3e^{-1}\approx3.104\)</span> and variance <span class="math inline">\(1-e^{-2}\approx0.865\)</span>. At long times it approaches <span class="math inline">\(\mathcal N(2,1)\)</span>, not a point mass at 2.</p>
+<section id="diffusions-probability-flow-ode-is-a-cnf" class="level2">
+<h2 class="anchored" data-anchor-id="diffusions-probability-flow-ode-is-a-cnf">Diffusion’s probability-flow ODE is a CNF</h2>
+<p>Tutorial 3 constructs <span class="math inline">\(v=f-g^2s_t/2\)</span>. It therefore provides a continuous normalizing flow whenever the needed regularity and endpoint conditions hold. Its forward SDE and deterministic ODE have the same one-time marginal densities, but different joint couplings of their particles across time.</p>
+<p>For Brownian spreading from <span class="math inline">\(\mathcal N(\mu,a_0^2)\)</span>,</p>
+<p><span class="math display">\[X_t^{\mathrm{SDE}}=X_0+gW_t,\qquad
+X_t^{\mathrm{ODE}}=\mu+\sqrt{\frac{a_0^2+g^2t}{a_0^2}}(X_0-\mu).\]</span></p>
+<p>Both have law <span class="math inline">\(\mathcal N(\mu,a_0^2+g^2t)\)</span>. Yet conditional on <span class="math inline">\(X_0\)</span>, the SDE still has random outcomes while the ODE has one outcome. Their covariances with the starting point are <span class="math inline">\(\operatorname{Cov}(X_0,X_t^{\mathrm{SDE}})=a_0^2\)</span> and <span class="math inline">\(\operatorname{Cov}(X_0,X_t^{\mathrm{ODE}})=a_0\sqrt{a_0^2+g^2t}\)</span>. The ODE’s correlation with <span class="math inline">\(X_0\)</span> is one; for <span class="math inline">\(g&gt;0,t&gt;0\)</span>, the SDE’s is <span class="math inline">\(a_0/\sqrt{a_0^2+g^2t}&lt;1\)</span>. Equal marginals do not specify which particle arrived from which starting point. This is why noisy corruption and invertible deterministic transport can coexist.</p>
+<section id="likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="likelihood">Derivation: the likelihood identity and its sign</h3>
+<p>Use a learned score <span class="math inline">\(s_\theta\)</span> to define <span class="math inline">\(v_\theta=f-g^2s_\theta/2\)</span>. Choose a terminal density <span class="math inline">\(\pi_T\)</span>. Backward integration induces a model density <span class="math inline">\(q_{\theta,0}\)</span>. To evaluate it at <span class="math inline">\(x_0\)</span>, solve forward to <span class="math inline">\(x_T\)</span> and integrate:</p>
+<p><span class="math display">\[\log q_{\theta,T}(x_T)-\log q_{\theta,0}(x_0)
+=-\int_0^T\partial_xv_\theta(x_t,t)dt.\]</span></p>
+<p>Since <span class="math inline">\(q_{\theta,T}=\pi_T\)</span>,</p>
+<p><span class="math display">\[\boxed{\log q_{\theta,0}(x_0)=\log\pi_T(x_T)
++\int_0^T\partial_xv_\theta(x_t,t)dt.}\]</span></p>
+<p>The plus sign comes from rearranging the density identity. For <span class="math inline">\(v=-x\)</span> and <span class="math inline">\(\pi_T=\mathcal N(0,1)\)</span>, backward generation gives variance <span class="math inline">\(e^{2T}\)</span>; the formula is <span class="math inline">\(\log\phi_1(e^{-T}x_0)-T\)</span>, which is exactly that broader Gaussian’s log density.</p>
+<p>This is the learned ODE model’s likelihood, not automatically the true data likelihood. With approximate scores, ODE and reverse-SDE marginals may differ. Numerical integration introduces evaluation error. If sampling stops at <span class="math inline">\(t_{\min}&gt;0\)</span>, use that lower limit: the result is a density at positive noise. A smooth diffeomorphism cannot turn a smooth positive density into discrete atoms; endpoint singularities require a limit, smoothing, or a cutoff.</p>
 </section>
 </section>
-<section id="why-the-target-is-stationary" class="level2">
-<h2 class="anchored" data-anchor-id="why-the-target-is-stationary">Why the target is stationary</h2>
-<section id="derivation-cancellation-in-fokkerplanck" class="level3">
-<h3 class="anchored" data-anchor-id="derivation-cancellation-in-fokkerplanck">Derivation: cancellation in Fokker–Planck</h3>
-<p>Tutorial 2 shows that drift <span class="math inline">\(b\)</span> and scalar noise amplitude <span class="math inline">\(g\)</span> give the density change <span class="math inline">\(-\nabla\cdot(bq)+g^2\Delta q/2\)</span>. For Langevin, <span class="math inline">\(b=s\)</span> and <span class="math inline">\(g=\sqrt2\)</span>:</p>
-<p><span class="math display">\[\partial_u q_u=-\nabla\cdot(q_u\nabla\log p)+\Delta q_u.\]</span></p>
-<p>Substitute <span class="math inline">\(q_u=p\)</span>. Since <span class="math inline">\(p\nabla\log p=\nabla p\)</span>,</p>
-<p><span class="math display">\[-\nabla\cdot(p\nabla\log p)+\Delta p
-=-\Delta p+\Delta p=0.\]</span></p>
-<p>Thus <span class="math inline">\(p\)</span> is <strong>stationary</strong>, or invariant: starting at <span class="math inline">\(p\)</span> keeps the same density. We assume a smooth positive target, a well-defined nonexplosive process, and boundary behavior that conserves probability. The calculation is about the continuous-time SDE, not automatically about a finite-step algorithm.</p>
+<section id="learn-velocities-directly-flow-matching" class="level2">
+<h2 class="anchored" data-anchor-id="learn-velocities-directly-flow-matching">Learn velocities directly: flow matching</h2>
+<p>Score-based diffusion learns <span class="math inline">\(s_\theta\)</span> and constructs a velocity from it. Flow matching instead regresses on tractable velocity targets along chosen conditional paths. Both may use the same CNF architecture; the learning objective and path construction are different choices.</p>
+<p>For example, between a paired random source <span class="math inline">\(Z\)</span> and data value <span class="math inline">\(X_{\mathrm{data}}\)</span>, define <span class="math inline">\(\widetilde X_t=(1-t)Z+tX_{\mathrm{data}}\)</span>, <span class="math inline">\(0\le t\le1\)</span>. Its velocity is <span class="math inline">\(U_t=\partial_t\widetilde X_t=X_{\mathrm{data}}-Z\)</span>, constant along this conditional path. Squared-error regression on <span class="math inline">\((\widetilde X_t,t)\)</span> learns <span class="math inline">\(v(x,t)=\mathbb E[U_t\mid\widetilde X_t=x]\)</span>. This is a conditional average, not a promise that the fitted ODE follows each pair’s straight line.</p>
+<p>Here <span class="math inline">\(t=0\)</span> is the source and <span class="math inline">\(t=1\)</span> is data, opposite to Tutorial 3’s corruption clock. The Gaussian-interpolant subsection below returns to that corruption convention: <span class="math inline">\(t=0\)</span> is data and increasing <span class="math inline">\(t\)</span> adds noise.</p>
+<section id="derivation-why-the-averaged-velocity-transports-the-marginal" class="level3">
+<h3 class="anchored" data-anchor-id="derivation-why-the-averaged-velocity-transports-the-marginal">Derivation: why the averaged velocity transports the marginal</h3>
+<p>For a smooth test function <span class="math inline">\(\varphi\)</span> of compact support, differentiating gives</p>
+<p><span class="math display">\[\frac{d}{dt}\mathbb E\varphi(\widetilde X_t)
+=\mathbb E[\varphi'(\widetilde X_t)U_t]
+=\mathbb E[\varphi'(\widetilde X_t)v(\widetilde X_t,t)].\]</span></p>
+<p>The second equality conditions on the observed position and uses the tower property. If <span class="math inline">\(q_t\)</span> is the interpolant density, integration by parts gives</p>
+<p><span class="math display">\[\int\varphi\partial_tq_tdx=\int\varphi'vq_tdx
+=-\int\varphi\partial_x(vq_t)dx.\]</span></p>
+<p>Thus <span class="math inline">\(\partial_tq_t=-\partial_x(vq_t)\)</span>, in the integrated sense and pointwise when smooth. Appropriate regularity and uniqueness are needed to identify this path with the actual ODE marginals.</p>
 </section>
-<section id="stationarity-is-not-a-convergence-proof" class="level3">
-<h3 class="anchored" data-anchor-id="stationarity-is-not-a-convergence-proof">Stationarity is not a convergence proof</h3>
-<p>Stationarity answers “does the process preserve <span class="math inline">\(p\)</span>?” Convergence asks “does it approach <span class="math inline">\(p\)</span> from another initial law?” Convergence needs further conditions ensuring exploration and return from the tails. For instance, a sufficiently regular strongly convex confining energy gives a useful favorable case. We proved convergence explicitly for the Gaussian rather than assume it from stationarity. With multiple separated modes, a sampler can take a long time to move between them: this is slow <strong>mixing</strong>. Imagine a cloud concentrated around one peak of a two-mode density: local steps may explore that peak well long before any particle crosses the low-density region to the other peak.</p>
-<p>A chain’s successive outputs are also correlated. Many steps do not necessarily mean many nearly independent samples, especially when mixing is slow.</p>
-</section>
-</section>
-<section id="the-numerical-sampler-introduces-its-own-error" class="level2">
-<h2 class="anchored" data-anchor-id="the-numerical-sampler-introduces-its-own-error">The numerical sampler introduces its own error</h2>
-<p>The Euler–Maruyama update is often called the <strong>unadjusted Langevin algorithm (ULA)</strong>. “Unadjusted” means that no accept/reject correction is added. Even with the exact score, ULA’s stationary law, when it exists, generally differs from the target at a fixed positive step.</p>
-<section id="derivation-finite-step-bias-for-the-gaussian" class="level3">
-<h3 class="anchored" data-anchor-id="derivation-finite-step-bias-for-the-gaussian">Derivation: finite-step bias for the Gaussian</h3>
-<p>For our Gaussian, write <span class="math inline">\(\gamma=1-\eta/a^2\)</span>. Then</p>
-<p><span class="math display">\[x_{k+1}-\mu=\gamma(x_k-\mu)+\sqrt{2\eta}\,\xi_k.\]</span></p>
-<p>Independence gives the variance recursion <span class="math inline">\(V_{k+1}=\gamma^2 V_k+2\eta\)</span>. A stationary variance exists when <span class="math inline">\(|\gamma|&lt;1\)</span>, or <span class="math inline">\(0&lt;\eta&lt;2a^2\)</span>. Solving <span class="math inline">\(V_\eta=\gamma^2V_\eta+2\eta\)</span> gives</p>
-<p><span class="math display">\[\boxed{V_\eta=\frac{2\eta}{1-(1-\eta/a^2)^2}
-=\frac{a^2}{1-\eta/(2a^2)}.}\]</span></p>
-<p>It is too large. For a standard normal target and <span class="math inline">\(\eta=0.2\)</span>, the stationary variance is <span class="math inline">\(1/0.9\approx1.111\)</span>, not 1. Running longer removes initialization error but not this discretization bias. At <span class="math inline">\(\eta=2a^2\)</span> no finite stationary variance exists, and larger steps are unstable for this example.</p>
-<p><strong>An exact Gaussian step for comparison:</strong> for any <span class="math inline">\(\eta&gt;0\)</span>,</p>
-<p><span class="math display">\[x_{k+1}=\mu+e^{-\eta/a^2}(x_k-\mu)
-+a\sqrt{1-e^{-2\eta/a^2}}\,\xi_k\]</span></p>
-<p>preserves the correct Gaussian. Its contraction and noise variance come from the exact conditional law above. Non-Gaussian targets usually do not supply such a closed-form transition. Step refinement reduces numerical error under appropriate conditions, but general ULA stability needs more than a valid score.</p>
-</section>
-</section>
-<section id="compare-langevin-with-reverse-diffusion" class="level2">
-<h2 class="anchored" data-anchor-id="compare-langevin-with-reverse-diffusion">Compare Langevin with reverse diffusion</h2>
-<p>The forward/reverse SDE pair and the translation from Song’s negative-<span class="math inline">\(dt\)</span> notation are displayed explicitly in <a href="../tutorials/26-probability-flow-sampling.html#song-sde-conventions">Tutorial 2</a>.</p>
-<p>Use Tutorial 2’s <a href="../tutorials/26-probability-flow-sampling.html#reverse-sde">reverse-SDE check</a> for this comparison. If you skipped it, the density calculation below also verifies the marginal evolution. Write all reverse-diffusion quantities at <span class="math inline">\(t=T-\tau\)</span>:</p>
-<p><span class="math display">\[\text{reverse SDE:}\quad
-dY_\tau=[-f(Y_\tau,t)+g(t)^2s_t(Y_\tau)]d\tau
-+g(t)d\overline W_\tau,\]</span></p>
-<p><span class="math display">\[\text{probability-flow ODE:}\quad
-\frac{dY_\tau}{d\tau}=-f(Y_\tau,t)+\tfrac12g(t)^2s_t(Y_\tau)
-=-v(Y_\tau,t).\]</span></p>
-<p>The reverse SDE evolves through a prescribed sequence <span class="math inline">\(p_{T-\tau}\)</span> when initialized at the exact <span class="math inline">\(p_T\)</span> and supplied the exact score. It does not wait for equilibrium at each time. Ordinary Langevin keeps one target fixed and approaches its equilibrium over algorithmic time <span class="math inline">\(u\)</span>.</p>
-<section id="coefficient-balance" class="level3">
-<h3 class="anchored" data-anchor-id="coefficient-balance">Derivation: time scaling cannot repair a coefficient mismatch</h3>
-<p>Freeze a target <span class="math inline">\(p\)</span> and consider constants <span class="math inline">\(A,D&gt;0\)</span>:</p>
-<p><span class="math display">\[dZ_u=A\,s(Z_u)du+\sqrt{2D}\,dB_u.\]</span></p>
-<p>A density with zero probability flux satisfies <span class="math inline">\(Aq\nabla\log p-D\nabla q=0\)</span>, hence</p>
-<p><span class="math display">\[\nabla\log q=\frac{A}{D}\nabla\log p,
-\qquad q(x)\propto p(x)^{A/D}.\]</span></p>
-<p>When this expression is normalizable and the dynamics are well defined, it provides a stationary density. To target <span class="math inline">\(p\)</span> itself, choose <span class="math inline">\(A=D\)</span>. Changing to <span class="math inline">\(w=cu\)</span>, where <span class="math inline">\(c&gt;0\)</span>, divides both <span class="math inline">\(A\)</span> and <span class="math inline">\(D\)</span> by <span class="math inline">\(c\)</span>. To see why, over a <span class="math inline">\(w\)</span>-interval of length <span class="math inline">\(h\)</span>, the old clock advances by <span class="math inline">\(h/c\)</span>. The drift increment is <span class="math inline">\(A s\,h/c\)</span>. The noise increment has covariance <span class="math inline">\(2D(h/c)I\)</span>, the same as noise amplitude <span class="math inline">\(\sqrt{2D/c}\)</span> over an interval of length <span class="math inline">\(h\)</span> in the new clock. Thus</p>
-<p><span class="math display">\[A\longmapsto A/c,\qquad D\longmapsto D/c,\]</span></p>
-<p>while the noise amplitude scales by <span class="math inline">\(1/\sqrt c\)</span>, not <span class="math inline">\(1/c\)</span>. The ratio <span class="math inline">\(A/D\)</span> is unchanged. This explains the equivalent conventions</p>
-<p><span class="math display">\[dZ=s(Z)du+\sqrt2\,dB_u,
-\qquad dZ=\tfrac12s(Z)dw+d\widetilde B_w,\quad w=2u,\]</span></p>
-<p>where <span class="math inline">\(\widetilde B\)</span> is a standard Brownian motion in the new clock.</p>
-<p>A factor of two in the score alone cannot be absorbed by changing the clock.</p>
-</section>
-<section id="drift-free-diffusion-similar-ingredients-different-balance" class="level3">
-<h3 class="anchored" data-anchor-id="drift-free-diffusion-similar-ingredients-different-balance">Drift-free diffusion: similar ingredients, different balance</h3>
-<p>For <span class="math inline">\(dX_t=g(t)dW_t\)</span>, the reverse SDE is</p>
-<p><span class="math display">\[dY_\tau=g(t)^2s_t(Y_\tau)d\tau+g(t)d\overline W_\tau.\]</span></p>
-<p>At a frozen time with <span class="math inline">\(g(t)&gt;0\)</span>, its constants are <span class="math inline">\(A=g^2\)</span>, <span class="math inline">\(D=g^2/2\)</span>. Their ratio is 2. If we artificially held that score and those coefficients fixed, the zero-flux stationary density would be proportional to <span class="math inline">\(p_t^2\)</span>, when normalizable, rather than <span class="math inline">\(p_t\)</span>.</p>
-<p>For a Gaussian <span class="math inline">\(p_t=\mathcal N(\mu,V_t)\)</span>, this frozen process equilibrates to <span class="math inline">\(\mathcal N(\mu,V_t/2)\)</span>. That is a concrete way to see the mismatch. The genuine reverse process does not freeze <span class="math inline">\(t\)</span>: it changes the score and coefficients while transporting a changing density.</p>
-<p>In particular, define a new reverse-sampling clock <span class="math inline">\(\lambda\)</span> by <span class="math inline">\(d\lambda=g(t)^2d\tau/2\)</span>, on an interval where <span class="math inline">\(g&gt;0\)</span>. Brownian variance scaling then gives</p>
-<p><span class="math display">\[dY=2s_t(Y)\,d\lambda+\sqrt2\,d\widetilde B_\lambda,\]</span></p>
-<p>with <span class="math inline">\(t\)</span> still changing along <span class="math inline">\(\lambda\)</span>. This is a change of the reverse clock, not the fixed-target Langevin clock <span class="math inline">\(u\)</span>. The coefficient 2 remains; it is not ordinary Langevin targeting <span class="math inline">\(p_t\)</span>.</p>
-<p>For this drift-free forward process, the added variance is <span class="math inline">\(\sigma_t^2=\int_0^t g(r)^2dr\)</span> when initial added noise is zero. Increasing noise of this form gives the variance-exploding (VE) construction. It need not make <span class="math inline">\(p_T\)</span> a standard normal: both its variance scale and residual data matter.</p>
-</section>
-<section id="vp-diffusion-the-reversed-drift-also-matters" class="level3">
-<h3 class="anchored" data-anchor-id="vp-diffusion-the-reversed-drift-also-matters">VP diffusion: the reversed drift also matters</h3>
-<p>For VP, <span class="math inline">\(f(x,t)=-\beta(t)x/2\)</span> and <span class="math inline">\(g(t)^2=\beta(t)\)</span>, so</p>
-<p><span class="math display">\[dY_\tau=\left[\tfrac12\beta(t)Y_\tau+\beta(t)s_t(Y_\tau)\right]d\tau
-+\sqrt{\beta(t)}d\overline W_\tau.\]</span></p>
-<p>The <span class="math inline">\(+\beta Y/2\)</span> reverses the forward contraction. Ignoring it changes the sampling process. There is a useful special case: if the data law itself is <span class="math inline">\(\mathcal N(0,I)\)</span>, VP leaves it unchanged, so <span class="math inline">\(p_t=\mathcal N(0,I)\)</span> and <span class="math inline">\(s_t(x)=-x\)</span> at every time. Its complete reverse drift is then <span class="math inline">\(-\beta x/2\)</span>. Together with noise <span class="math inline">\(\sqrt\beta\)</span>, this is correctly balanced Langevin for <span class="math inline">\(\mathcal N(0,I)\)</span>, with a time-dependent rate. Ordinary reverse VP for a changing, non-Gaussian <span class="math inline">\(p_t\)</span> is not fixed-target Langevin.</p>
+<section id="optional-derivation-recover-probability-flow-from-gaussian-interpolants" class="level3">
+<h3 class="anchored" data-anchor-id="optional-derivation-recover-probability-flow-from-gaussian-interpolants">Optional derivation: recover probability flow from Gaussian interpolants</h3>
+<p>Keep a single pair <span class="math inline">\((X_0,\epsilon)\)</span> fixed and set <span class="math inline">\(\widetilde X_t=\alpha_tX_0+\sigma_t\epsilon\)</span>. Its one-time laws are the corruption laws <span class="math inline">\(p_t\)</span>, but its paths are not Brownian paths. On an interior interval with differentiable positive <span class="math inline">\(\alpha_t,\sigma_t\)</span>, its velocity is</p>
+<p><span class="math display">\[U_t=\dot\alpha_tX_0+\dot\sigma_t\epsilon.\]</span></p>
+<p>For linear forward drift <span class="math inline">\(f(x,t)=b(t)x\)</span>, the corruption coefficients satisfy</p>
+<p><span class="math display">\[\dot\alpha_t=b(t)\alpha_t,\qquad
+2\sigma_t\dot\sigma_t=2b(t)\sigma_t^2+g(t)^2.\]</span></p>
+<p>Using Tweedie and <span class="math inline">\(\mathbb E[\epsilon\mid x]=-\sigma_ts_t(x)\)</span>,</p>
+<p><span class="math display">\[\begin{aligned}
+\mathbb E[U_t\mid\widetilde X_t=x]
+&amp;=\frac{\dot\alpha_t}{\alpha_t}[x+\sigma_t^2s_t(x)]
+-\sigma_t\dot\sigma_t s_t(x)\\
+&amp;=b(t)x-\tfrac12g(t)^2s_t(x)=v(x,t).
+\end{aligned}\]</span></p>
+<p>This particular velocity regression recovers probability flow. Other path choices may produce different transports. For VP with <span class="math inline">\(\beta(0)&gt;0\)</span>, <span class="math inline">\(\dot\sigma_t\)</span> grows like <span class="math inline">\(t^{-1/2}\)</span> near zero. Use a positive cutoff or suitable weights to make training losses finite; interior formulas do not guarantee regular endpoints.</p>
 </section>
 </section>
-<section id="the-precise-bridge-transport-plus-a-langevin-contribution" class="level2">
-<h2 class="anchored" data-anchor-id="the-precise-bridge-transport-plus-a-langevin-contribution">The precise bridge: transport plus a Langevin contribution</h2>
-<p>Split the reverse drift algebraically:</p>
-<p><span class="math display">\[\boxed{-f+g^2s_t
-=\underbrace{-f+\tfrac12g^2s_t}_{\text{probability-flow transport }-v}
-+\underbrace{\tfrac12g^2s_t}_{\text{Langevin drift}}.}\]</span></p>
-<p>Pair the second term with the existing Brownian noise <span class="math inline">\(g\,d\overline W\)</span>. At a frozen noise level, drift <span class="math inline">\(g^2s_t/2\)</span> and noise amplitude <span class="math inline">\(g\)</span> have <span class="math inline">\(A=D=g^2/2\)</span>, the correct Langevin balance for <span class="math inline">\(p_t\)</span>.</p>
-<p>So the reverse SDE combines transport that changes the target density with an instantaneous Langevin contribution that leaves that target unchanged. This is a decomposition of drift and density evolution, not a claim that two independent trajectories can be added together.</p>
-<section id="optional-derivation-check-the-decomposition-on-densities" class="level3">
-<h3 class="anchored" data-anchor-id="optional-derivation-check-the-decomposition-on-densities">Optional derivation: check the decomposition on densities</h3>
-<p>At reverse time <span class="math inline">\(\tau\)</span>, let <span class="math inline">\(q\)</span> be an arbitrary current density. Here <span class="math inline">\(s_t\)</span> is the score of the prescribed target <span class="math inline">\(p_t\)</span>, not the score of <span class="math inline">\(q\)</span>. Its evolution under the reverse SDE can be written</p>
-<p><span class="math display">\[\partial_\tau q=\nabla\cdot(qv)
-+\tfrac12g^2\left[\Delta q-\nabla\cdot(qs_t)\right].\]</span></p>
-<p>The first term is the generation-clock ODE’s transport. The bracket is the Langevin contribution. Substituting <span class="math inline">\(q=p_t\)</span> makes the bracket vanish because <span class="math inline">\(\nabla p_t=p_t s_t\)</span>. The remaining term produces the prescribed reverse marginal evolution. If <span class="math inline">\(q\ne p_t\)</span>, the bracket need not vanish.</p>
-<p>This also explains the half-factor: fresh noise adds spreading, which requires an additional half-score drift beyond the deterministic transport. Removing noise while retaining that extra drift generally changes the density path.</p>
+<section id="higher-dimensions" class="level2">
+<h2 class="anchored" data-anchor-id="higher-dimensions">Only now: extend the picture to d dimensions</h2>
+<p>Replace scalar position by a vector <span class="math inline">\(x=(x_1,\ldots,x_d)\)</span>. A particle now carries one velocity component per coordinate. The principles—transport, spreading, and conservation—are unchanged; the notation records contributions from all coordinate directions. Bold type is unnecessary: this section explicitly switches <span class="math inline">\(x,X_t,v,f,s\)</span> from scalars to vectors.</p>
+<section id="gradient-divergence-and-laplacian" class="level3">
+<h3 class="anchored" data-anchor-id="gradient-divergence-and-laplacian">Gradient, divergence, and Laplacian</h3>
+<p>For a scalar function <span class="math inline">\(a(x)\)</span>, the <strong>gradient</strong> collects spatial derivatives: <span class="math inline">\(\nabla a=(\partial_{x_1}a,\ldots,\partial_{x_d}a)\)</span>. For a vector field <span class="math inline">\(v\)</span>, its <strong>divergence</strong> is <span class="math inline">\(\nabla\cdot v=\sum_i\partial_{x_i}v_i\)</span>. It measures local net expansion. The <strong>Laplacian</strong> of a scalar is <span class="math inline">\(\Delta a=\sum_i\partial_{x_i}^2a=\nabla\cdot\nabla a\)</span>.</p>
+<p>Consider a small rectangular box. Opposite faces in direction <span class="math inline">\(i\)</span> contribute net outflow <span class="math inline">\(\partial_{x_i}(q_tv_i)\)</span> per unit volume. Summing over directions extends the interval argument to</p>
+<p><span class="math display">\[\boxed{\partial_tq_t=-\nabla\cdot(q_tv).}\]</span></p>
+<p>For <span class="math inline">\(v(x)=-x\)</span>, divergence is <span class="math inline">\(-d\)</span>. The flow is <span class="math inline">\(e^{-t}x_0\)</span>, volume shrinks by <span class="math inline">\(e^{-dt}\)</span>, and density along a trajectory grows by <span class="math inline">\(e^{dt}\)</span>.</p>
+</section>
+<section id="brownian-motion-and-itôs-lemma" class="level3">
+<h3 class="anchored" data-anchor-id="brownian-motion-and-itôs-lemma">Brownian motion and Itô’s lemma</h3>
+<p>Let <span class="math inline">\(W_t\)</span> contain <span class="math inline">\(d\)</span> independent one-dimensional Brownian motions. Its increment covariance over <span class="math inline">\(h\)</span> is <span class="math inline">\(hI_d\)</span>. Keep scalar, spatially constant noise amplitude <span class="math inline">\(g(t)\)</span>:</p>
+<p><span class="math display">\[dX_t=f(X_t,t)dt+g(t)dW_t.\]</span></p>
+<p>For a scalar test function <span class="math inline">\(F(x,t)\)</span>, the Itô correction sums the coordinate second derivatives:</p>
+<p><span class="math display">\[dF=\left(\partial_tF+f\cdot\nabla F+\tfrac12g^2\Delta F\right)dt
++g\nabla F\cdot dW_t.\]</span></p>
+<p>Independent Brownian coordinates have zero cross quadratic variation; this is why no mixed-derivative terms appear for isotropic noise.</p>
+<p>The corresponding density equation and probability-flow velocity are</p>
+<p><span class="math display">\[\boxed{\partial_tp_t=-\nabla\cdot(fp_t)+\tfrac12g^2\Delta p_t,
+\qquad v=f-\tfrac12g^2\nabla\log p_t.}\]</span></p>
+<p>The same identity <span class="math inline">\(\nabla p_t=p_t\nabla\log p_t\)</span> proves the correspondence. For state-dependent or non-isotropic diffusion, the density equation and velocity require the appropriate diffusion-matrix derivatives; these scalar <span class="math inline">\(g(t)\)</span> formulas should not be reused unchanged.</p>
+</section>
+<section id="gaussian-scores-and-langevin" class="level3">
+<h3 class="anchored" data-anchor-id="gaussian-scores-and-langevin">Gaussian scores and Langevin</h3>
+<p>For <span class="math inline">\(p=\mathcal N(\mu,\Sigma)\)</span> with positive-definite covariance,</p>
+<p><span class="math display">\[s(x)=-\Sigma^{-1}(x-\mu).\]</span></p>
+<p>The score is an inward vector field. The score ODE contracts in covariance eigendirections; Langevin <span class="math inline">\(dX_t=s(X_t)dt+\sqrt2\,dW_t\)</span> balances this with isotropic noise and has target <span class="math inline">\(p\)</span> as its invariant density.</p>
+<p>In several dimensions, stationarity requires zero <strong>divergence</strong> of flux, not necessarily zero flux itself. For a two-dimensional standard normal, one may add the circulating drift <span class="math inline">\(w(x)=(-x_2,x_1)\)</span>: direct differentiation gives <span class="math inline">\(\nabla\cdot(pw)=0\)</span>. The population stays stationary while particles also circulate. The score drift is the zero-flux choice; the one-dimensional uniqueness argument does not apply unchanged in higher dimensions.</p>
+<p>For isotropic Gaussian corruption, the learning and denoising identities become</p>
+<p><span class="math display">\[s_t(x)=\mathbb E[-\epsilon/\sigma_t\mid X_t=x],\qquad
+\mathbb E[X_0\mid X_t=x]=\frac{x+\sigma_t^2s_t(x)}{\alpha_t},\quad
+\epsilon\sim\mathcal N(0,I_d).\]</span></p>
+<p>Replace scalar squared errors with squared Euclidean norms. The conditional mean proof is unchanged, coordinate by coordinate.</p>
+</section>
+<section id="jacobians-replace-scalar-derivatives-in-normalizing-flows" class="level3">
+<h3 class="anchored" data-anchor-id="jacobians-replace-scalar-derivatives-in-normalizing-flows">Jacobians replace scalar derivatives in normalizing flows</h3>
+<p>Write <span class="math inline">\(DF\)</span> for the Jacobian matrix of <span class="math inline">\(F\)</span>, whose entries are <span class="math inline">\((DF)_{ij}=\partial F_i/\partial x_j\)</span>. For a linear map, <span class="math inline">\(|\det DF|\)</span> is the factor by which a small box’s volume changes. A nonlinear differentiable map is locally linear, giving</p>
+<p><span class="math display">\[\log p_X(F(z))=\log p_Z(z)-\log|\det DF(z)|.\]</span></p>
+<p>For a tiny step <span class="math inline">\(F(x)=x+h v(x,t)\)</span>, its Jacobian is <span class="math inline">\(I+hDv\)</span>. To first order,</p>
+<p><span class="math display">\[\log\det(I+hDv)=h\operatorname{tr}Dv+O(h^2)
+=h\nabla\cdot v+O(h^2).\]</span></p>
+<p>Here trace is the sum of diagonal entries. In two dimensions, <span class="math inline">\(\det(I+hA)=1+h(A_{11}+A_{22})+h^2\det A\)</span>, which displays the first-order term explicitly. The continuous density and likelihood identities consequently use</p>
+<p><span class="math display">\[\frac{d}{dt}\log q_t(x_t)=-\nabla\cdot v(x_t,t),\qquad
+\log q_{\theta,0}(x_0)=\log\pi_T(x_T)+\int_0^T\nabla\cdot v_\theta(x_t,t)dt.\]</span></p>
+<p>In high dimensions, stochastic trace estimation can approximate divergence and adds numerical error. The mathematical change-of-variables identity is exact.</p>
 </section>
 </section>
-<section id="annealing-and-predictorcorrector-sampling" class="level2">
-<h2 class="anchored" data-anchor-id="annealing-and-predictorcorrector-sampling">Annealing and predictor–corrector sampling</h2>
-<section id="annealed-langevin-equilibrate-approximately-then-change-the-target" class="level3">
-<h3 class="anchored" data-anchor-id="annealed-langevin-equilibrate-approximately-then-change-the-target">Annealed Langevin: equilibrate approximately, then change the target</h3>
-<p>Construct smoothed data densities using additive noise, <span class="math inline">\(p_{\sigma_i}\)</span> being the law of <span class="math inline">\(X_0+\sigma_i\epsilon\)</span>, with <span class="math inline">\(\sigma_1&gt;\cdots&gt;\sigma_L&gt;0\)</span>. The subscript here is a <strong>noise standard deviation</strong>, not a clock. At level <span class="math inline">\(i\)</span>, hold <span class="math inline">\(\sigma_i\)</span> fixed for <span class="math inline">\(K_i\)</span> iterations:</p>
-<p><span class="math display">\[x\leftarrow x+\eta_i s_\theta(x,\sigma_i)
-+\sqrt{2\eta_i}\,\xi.\]</span></p>
-<p>Then move to <span class="math inline">\(\sigma_{i+1}\)</span> using the current particles as starting states. Large noise can smooth sharp structure and help travel between separated modes; smaller noise gradually restores detail. This is the annealed Langevin approach used by <a href="https://arxiv.org/abs/1907.05600">Song and Ermon</a>.</p>
-<p>It is a sequence of fixed-target sampling problems. Finite iterations, finite steps, and approximate scores need not yield equilibrium at any level. Even perfect equilibration at the last level gives <span class="math inline">\(p_{\sigma_L}\)</span>, a smoothed law, not exactly the clean distribution. The starting distribution at the largest noise level is also a choice or approximation, not automatically exact.</p>
-</section>
-<section id="predictorcorrector-change-the-noise-level-then-improve-sampling-there" class="level3">
-<h3 class="anchored" data-anchor-id="predictorcorrector-change-the-noise-level-then-improve-sampling-there">Predictor–corrector: change the noise level, then improve sampling there</h3>
-<p>A predictor advances from <span class="math inline">\(t_k\)</span> to <span class="math inline">\(t_{k-1}&lt;t_k\)</span> using a reverse-SDE or probability-flow step. A corrector then holds <span class="math inline">\(t_{k-1}\)</span> fixed and runs a few Langevin updates targeting <span class="math inline">\(p_{t_{k-1}}\)</span>. This is the predictor–corrector framework of <a href="https://arxiv.org/abs/2011.13456">Song et al.</a>.</p>
-<p>A schematic ODE-predictor version is</p>
-<pre class="text"><code>start with a terminal sample x
-# v_theta(x,t) = f(x,t) - 0.5*g(t)^2 * s_theta(x,t)
-for each descending pair t_k, t_{k-1}:
-    h = t_k - t_{k-1}                  # h &gt; 0
-    x = x - h * v_theta(x, t_k)        # predictor: change level
-    repeat K times:
-        draw fresh xi ~ N(0, I)
-        x = x + eta * s_theta(x, t_{k-1}) + sqrt(2*eta) * xi
-                                        # corrector: hold level fixed
-return x at a positive minimum noise level</code></pre>
-<p>Exact Langevin transitions preserve the target at the frozen level. Euler corrector steps generally have discretization bias, and a few such steps are not guaranteed to improve every error. The density-level decomposition motivates the method; arbitrary finite predictor/corrector steps are not an exact factorization of the reverse-SDE transition.</p>
-</section>
-<section id="compare-the-objectives" class="level3">
-<h3 class="anchored" data-anchor-id="compare-the-objectives">Compare the objectives</h3>
+<section id="compare-the-constructions" class="level2">
+<h2 class="anchored" data-anchor-id="compare-the-constructions">Compare the constructions</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -777,46 +735,48 @@ return x at a positive minimum noise level</code></pre>
 </colgroup>
 <thead>
 <tr class="header">
-<th>Method</th>
-<th>What is held fixed or changed?</th>
-<th>Ideal density statement</th>
+<th>Construction</th>
+<th>What is specified or learned?</th>
+<th>How are samples produced?</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Ordinary Langevin</td>
-<td>One target <span class="math inline">\(p\)</span>, increasing <span class="math inline">\(u\)</span></td>
-<td>Preserves <span class="math inline">\(p\)</span>; convergence needs additional conditions</td>
+<td>Discrete normalizing flow</td>
+<td>Invertible maps</td>
+<td>Compose maps on a random base sample</td>
 </tr>
 <tr class="even">
-<td>Annealed Langevin</td>
-<td>A sequence of frozen smoothed targets</td>
-<td>Approaches each target with exact dynamics and enough time; ULA adds step bias</td>
+<td>Neural ODE / CNF</td>
+<td>Velocity and, for a CNF, density evolution</td>
+<td>Integrate deterministic transport</td>
 </tr>
 <tr class="odd">
-<td>Reverse diffusion SDE</td>
-<td><span class="math inline">\(t=T-\tau\)</span> changes continuously</td>
-<td>Follows <span class="math inline">\(p_{T-\tau}\)</span> with exact initialization, score, and dynamics</td>
+<td>Score-based diffusion</td>
+<td>Corruption law and its learned marginal scores</td>
+<td>Reverse SDE or probability-flow ODE</td>
 </tr>
 <tr class="even">
-<td>Probability-flow ODE</td>
-<td>The same changing noise level</td>
-<td>Same prescribed marginals with exact initialization, score, and integration; different trajectories</td>
+<td>Flow matching</td>
+<td>Conditional paths and velocity regression targets</td>
+<td>Integrate the learned averaged velocity</td>
+</tr>
+<tr class="odd">
+<td>Langevin</td>
+<td>Score of a fixed target</td>
+<td>Run a balanced stochastic process toward equilibrium</td>
 </tr>
 </tbody>
 </table>
-<p>Langevin uses the score to preserve a density while particles explore it. Reverse diffusion uses the score, the reversed drift, and a changing noise level to move through a prescribed family of densities. Their exact connection is the transport-plus-Langevin decomposition, not a time rescaling that removes the difference in coefficients.</p>
-</section>
+<p>A choice of architecture does not fix a training objective. A probability-flow ODE is a CNF derived from a diffusion density path; a generic CNF need not come from diffusion. Langevin’s equilibrium objective differs from traversing a prescribed path of marginals.</p>
 </section>
 <section id="check-your-understanding" class="level2">
 <h2 class="anchored" data-anchor-id="check-your-understanding">Check your understanding</h2>
 <ol type="1">
-<li>Why is <span class="math inline">\(s(x)\)</span> alone insufficient for sampling a Gaussian target?</li>
-<li>Does proving <span class="math inline">\(p\)</span> stationary show that every initial distribution converges to it?</li>
-<li>For a standard normal target, what stationary variance does ULA with <span class="math inline">\(\eta=0.2\)</span> produce? Does doubling the number of iterations remove that bias?</li>
-<li>Freeze <span class="math inline">\(p_t=\mathcal N(\mu,V_t)\)</span> in drift-free reverse diffusion. What law would its frozen dynamics target, and can changing time alone fix it?</li>
-<li>Which part of reverse diffusion leaves <span class="math inline">\(p_t\)</span> invariant at a frozen time?</li>
-<li>During a Langevin corrector, does diffusion time <span class="math inline">\(t\)</span> change?</li>
+<li>Why can a deterministic flow generate random samples?</li>
+<li>Why can the SDE lose information about its input while a corresponding ODE is invertible?</li>
+<li>Which density does an approximate-score ODE’s likelihood formula evaluate?</li>
+<li>What replaces velocity slope in more than one dimension?</li>
 </ol>
 <div class="callout callout-style-simple callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
@@ -831,16 +791,18 @@ return x at a positive minimum noise level</code></pre>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li>Its deterministic flow contracts the cloud to the mean; balanced noise maintains the target variance.</li>
-<li>No.&nbsp;Invariance and convergence are different claims; mixing also controls how long sampling takes.</li>
-<li><span class="math inline">\(1/0.9\approx1.111\)</span>. Longer runs do not remove fixed-step bias.</li>
-<li><span class="math inline">\(\mathcal N(\mu,V_t/2)\)</span>. Time scaling preserves the drift-to-diffusion ratio.</li>
-<li>Drift <span class="math inline">\(g^2s_t/2\)</span> paired with Brownian amplitude <span class="math inline">\(g\)</span>.</li>
-<li>No.&nbsp;The corrector evolves in algorithmic time at one frozen noise level.</li>
+<li>It transports a random initial state.</li>
+<li>They share one-time marginals but define different joint couplings of endpoints.</li>
+<li>The density induced by the chosen terminal law and learned ODE, not automatically the data density.</li>
+<li>Divergence, the sum of coordinatewise velocity slopes.</li>
 </ol>
 </div>
 </div>
 </div>
+</section>
+<section id="sources" class="level2">
+<h2 class="anchored" data-anchor-id="sources">Sources</h2>
+<p><a href="https://arxiv.org/abs/1806.07366">Chen et al., Neural Ordinary Differential Equations</a> introduce neural ODE models and continuous density tracking. <a href="https://arxiv.org/abs/2011.13456">Song et al.</a> develop the score-SDE framework and probability-flow construction. <a href="https://arxiv.org/abs/2210.02747">Lipman et al., Flow Matching for Generative Modeling</a> develop direct velocity regression along conditional probability paths.</p>
 
 
 </section>
@@ -1253,14 +1215,11 @@ return x at a positive minimum noise level</code></pre>
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" class="pagination-link" aria-label="Diffusion, Neural ODEs, and Normalizing Flows: The Same Density, Different Journeys">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Diffusion, Neural ODEs, and Normalizing Flows: The Same Density, Different Journeys</span>
+      <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" class="pagination-link" aria-label="Score-Based Diffusion in One Dimension: Corruption, Sampling, and Denoising">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Score-Based Diffusion in One Dimension: Corruption, Sampling, and Denoising</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../materials/w01-deck-01-mechanics.html" class="pagination-link" aria-label="01 · Course Mechanics">
-        <span class="nav-page-text">01 · Course Mechanics</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->

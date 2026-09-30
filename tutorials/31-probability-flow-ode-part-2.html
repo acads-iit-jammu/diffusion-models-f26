@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>13 · Probability-Flow ODE - Part 2 – ID-5-02 (TO)</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/32-probability-flow-ode-part-3.html" rel="next">
+<link href="../tutorials/07-probability-flow-ode.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-970586c648819a176f05aa782ae30df3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-4e42ae105fa35cf935172ecd058ec8f7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/31-probability-flow-ode-part-2.html">13 · Probability-Flow ODE - Part 2</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">ID-5-02 (TO)</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Syllabus</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../curriculum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Curriculum</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assignments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lecture Notes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">00 · Introduction and Motivation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/17-density-estimation-many-dimensions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Estimating a Density in Many Dimensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/19-generative-adversarial-networks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/29-variational-autoencoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · Variational Autoencoders (VAEs)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 · Probability-Flow ODE - Part 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/31-probability-flow-ode-part-2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">13 · Probability-Flow ODE - Part 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/32-probability-flow-ode-part-3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 · Probability-Flow ODE - Part 3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/33-probability-flow-ode-part-4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 · Probability-Flow ODE - Part 4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/34-probability-flow-ode-part-5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">16 · Probability-Flow ODE - Part 5</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Decks</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Course Mechanics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-02-motivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Why Diffusion Models?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-03-toy-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-00-probability-joints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-01-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-02-genai-maps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w03-deck-01-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · The Multivariate Gaussian</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-01-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-02-gans.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inequalities Worth Knowing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/20-random-walk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Random Walk: Forward, and Backward</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Perspectives</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Deterministic Map, Proved</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/09-discrete-transport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-03-map-limit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deck · The Map, Proved</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Draft</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/21-one-estimator-many-parameterizations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">One Estimator, Many Parameterizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/22-vector-fields-to-score-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From Local Arrows to Score-Based Diffusion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/24-sampling-with-scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling with Scores: Worked Examples of the Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resources</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Score-Based Diffusion</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Score-Based Diffusion: A One-Dimensional Learning Sequence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/25-learning-the-score.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODEs in One Dimension: Particles, Flows, and Densities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/26-probability-flow-sampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SDEs in One Dimension: Brownian Motion, Itô Calculus, and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Score-Based Diffusion in One Dimension: Corruption, Sampling, and Denoising</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/28-langevin-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From One-Dimensional Transport to Neural ODEs and Higher Dimensions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sampling-in-more-than-one-dimension" id="toc-sampling-in-more-than-one-dimension" class="nav-link active" data-scroll-target="#sampling-in-more-than-one-dimension">1. Sampling in more than one dimension</a></li>
+  <li><a href="#notation-and-differential-operators" id="toc-notation-and-differential-operators" class="nav-link" data-scroll-target="#notation-and-differential-operators">2. Notation and differential operators</a></li>
+  <li><a href="#ode-trajectories-flows-and-the-continuity-equation" id="toc-ode-trajectories-flows-and-the-continuity-equation" class="nav-link" data-scroll-target="#ode-trajectories-flows-and-the-continuity-equation">3. ODE trajectories, flows, and the continuity equation</a></li>
+  <li><a href="#forward-diffusion-defines-the-density-path" id="toc-forward-diffusion-defines-the-density-path" class="nav-link" data-scroll-target="#forward-diffusion-defines-the-density-path">4. Forward diffusion defines the density path</a>
+  <ul class="collapse">
+  <li><a href="#variance-preserving-diffusion" id="toc-variance-preserving-diffusion" class="nav-link" data-scroll-target="#variance-preserving-diffusion">Variance-preserving diffusion</a></li>
+  </ul></li>
+  <li><a href="#the-score-and-the-probability-flow-vector-field" id="toc-the-score-and-the-probability-flow-vector-field" class="nav-link" data-scroll-target="#the-score-and-the-probability-flow-vector-field">5. The score and the probability-flow vector field</a></li>
+  <li><a href="#sampling-with-the-ode" id="toc-sampling-with-the-ode" class="nav-link" data-scroll-target="#sampling-with-the-ode">6. Sampling with the ODE</a></li>
+  <li><a href="#the-reverse-sde-is-a-different-sampler" id="toc-the-reverse-sde-is-a-different-sampler" class="nav-link" data-scroll-target="#the-reverse-sde-is-a-different-sampler">7. The reverse SDE is a different sampler</a></li>
+  <li><a href="#what-the-neural-network-must-estimate" id="toc-what-the-neural-network-must-estimate" class="nav-link" data-scroll-target="#what-the-neural-network-must-estimate">8. What the neural network must estimate</a></li>
+  <li><a href="#a-correlated-gaussian-example" id="toc-a-correlated-gaussian-example" class="nav-link" data-scroll-target="#a-correlated-gaussian-example">9. A correlated Gaussian example</a></li>
+  <li><a href="#connection-to-neural-odes-and-normalizing-flows" id="toc-connection-to-neural-odes-and-normalizing-flows" class="nav-link" data-scroll-target="#connection-to-neural-odes-and-normalizing-flows">10. Connection to neural ODEs and normalizing flows</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/31-probability-flow-ode-part-2.html">13 · Probability-Flow ODE - Part 2</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">13 · Probability-Flow ODE - Part 2</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Draft — Part 2: scope
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>These lecture notes are in development and may be revised.</p>
+<p><a href="../tutorials/07-probability-flow-ode.html">Part 1</a> developed the sampling problem and the probability-flow construction in one dimension. Here we extend the notation and state the main results for data in <span class="math inline">\(\mathbb R^d\)</span>, without repeating the derivations. Time remains normalized to <span class="math inline">\(0\le t\le1\)</span>: data at zero, terminal prior at one, and generation from one to zero.</p>
+</div>
+</div>
+<section id="sampling-in-more-than-one-dimension" class="level2">
+<h2 class="anchored" data-anchor-id="sampling-in-more-than-one-dimension">1. Sampling in more than one dimension</h2>
+<p>A data sample now has <span class="math inline">\(d\)</span> coordinates, collected in a vector <span class="math inline">\(\mathbf x=(x_1,\ldots,x_d)^\mathsf T\in\mathbb R^d\)</span>. For example, an image can be represented by a vector containing all its pixel values. One sample is one particle in this <span class="math inline">\(d\)</span>-dimensional space; its coordinates are not separate data particles.</p>
+<p>Our goal is still to generate samples from <span class="math inline">\(p_{\mathrm{data}}\)</span>. We can draw from the prior <span class="math inline">\(\mathcal N(\mathbf0,I_d)\)</span> and numerically integrate an ODE backward. The construction problem is to find a vector field whose induced densities satisfy the desired endpoints:</p>
+<p><span class="math display">\[\boxed{p_0=p_{\mathrm{data}},\qquad
+p_1=p_{\mathrm{prior}}=\mathcal N(\mathbf0,I_d).}\]</span></p>
+<p>These specify population distributions, not an endpoint for each individual particle. The finite-rate diffusion construction below generally achieves an approximate Gaussian terminal law. Exact distributional recovery assumes the actual terminal law, exact dynamics, and exact integration.</p>
+<p>Multivariate CDFs exist, but a single cumulative probability does not uniquely identify a position in <span class="math inline">\(\mathbb R^d\)</span>. Applying a separate CDF transform to each coordinate does not generally remove dependence between coordinates. The scalar percentile construction in Part 1 therefore has no direct coordinatewise extension. The continuity equation and score-based probability-flow construction do extend to <span class="math inline">\(d\)</span> dimensions.</p>
+</section>
+<section id="notation-and-differential-operators" class="level2">
+<h2 class="anchored" data-anchor-id="notation-and-differential-operators">2. Notation and differential operators</h2>
+<p>Bold symbols denote vectors. A subscript <span class="math inline">\(t\)</span> denotes time; a subscript <span class="math inline">\(i\)</span> on a vector component denotes a coordinate.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf x\in\mathbb R^d\)</span></td>
+<td>A position in data space</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf X_t\in\mathbb R^d\)</span></td>
+<td>A random particle position at time <span class="math inline">\(t\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(p_t(\mathbf x)\)</span></td>
+<td>Scalar probability density with respect to <span class="math inline">\(d\)</span>-dimensional volume</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf v(\mathbf x,t)\in\mathbb R^d\)</span></td>
+<td>Deterministic velocity field</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf f(\mathbf x,t)\in\mathbb R^d\)</span></td>
+<td>Drift of the forward SDE</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(g(t)\ge0\)</span></td>
+<td>Scalar noise coefficient, independent of position</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf W_t\in\mathbb R^d\)</span></td>
+<td>Brownian motion with independent standard Brownian coordinates</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\boldsymbol\varepsilon\sim\mathcal N(\mathbf0,I_d)\)</span></td>
+<td>A fresh Gaussian noise vector; use <span class="math inline">\(\varepsilon\)</span> in one dimension</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(I_d\)</span></td>
+<td>The <span class="math inline">\(d\times d\)</span> identity matrix</td>
+</tr>
+</tbody>
+</table>
+<p>For a scalar function <span class="math inline">\(u(\mathbf x)\)</span>, its <strong>gradient</strong> is a vector:</p>
+<p><span class="math display">\[\nabla_{\mathbf x}u=
+\begin{bmatrix}\partial_{x_1}u&amp;\cdots&amp;\partial_{x_d}u\end{bmatrix}^{\mathsf T}.\]</span></p>
+<p>For a vector field <span class="math inline">\(\mathbf a=(a_1,\ldots,a_d)^\mathsf T\)</span>, its <strong>divergence</strong> is a scalar:</p>
+<p><span class="math display">\[\nabla_{\mathbf x}\!\cdot\mathbf a
+=\sum_{i=1}^d\partial_{x_i}a_i.\]</span></p>
+<p>Divergence measures local net outward flux per unit volume. The <strong>Laplacian</strong> of a scalar function is</p>
+<p><span class="math display">\[\Delta_{\mathbf x}u=\sum_{i=1}^d\partial_{x_i}^2u.\]</span></p>
+<p>These reduce to the first derivative, first derivative, and second derivative, respectively, when <span class="math inline">\(d=1\)</span>.</p>
+</section>
+<section id="ode-trajectories-flows-and-the-continuity-equation" class="level2">
+<h2 class="anchored" data-anchor-id="ode-trajectories-flows-and-the-continuity-equation">3. ODE trajectories, flows, and the continuity equation</h2>
+<p>A vector field assigns all <span class="math inline">\(d\)</span> velocity components at each position and time:</p>
+<p><span class="math display">\[\boxed{\frac{d\mathbf x(t)}{dt}=\mathbf v(\mathbf x(t),t).}\]</span></p>
+<p>Given an initial position, its solution defines a trajectory. Collecting the solutions defines the flow map <span class="math inline">\(\Psi_{0\to t}\)</span>, with <span class="math inline">\(\mathbf X_t=\Psi_{0\to t}(\mathbf X_0)\)</span>. Assume sufficient regularity for unique trajectories in both time directions over the interval of interest. The resulting flow is invertible.</p>
+<p>The transported density obeys the <strong>continuity equation</strong>:</p>
+<p><span class="math display">\[\boxed{\partial_t p_t(\mathbf x)
+=-\nabla_{\mathbf x}\!\cdot
+\left[p_t(\mathbf x)\mathbf v(\mathbf x,t)\right].}\]</span></p>
+<p>The vector <span class="math inline">\(p_t\mathbf v\)</span> is the probability flux. In any fixed region, probability changes through net flux across its boundary. With suitable vanishing boundary flux, total probability stays one.</p>
+<p>In higher dimensions a prescribed density path need not determine a unique velocity. Adding a field <span class="math inline">\(\mathbf u\)</span> satisfying <span class="math inline">\(\nabla\cdot(p_t\mathbf u)=0\)</span> leaves the continuity equation unchanged. The probability-flow construction below supplies one compatible field.</p>
+</section>
+<section id="forward-diffusion-defines-the-density-path" class="level2">
+<h2 class="anchored" data-anchor-id="forward-diffusion-defines-the-density-path">4. Forward diffusion defines the density path</h2>
+<p>Consider the Itô SDE</p>
+<p><span class="math display">\[\boxed{d\mathbf X_t=\mathbf f(\mathbf X_t,t)\,dt
++g(t)\,d\mathbf W_t,\qquad \mathbf X_0\sim p_{\mathrm{data}}.}\]</span></p>
+<p>Brownian increments satisfy</p>
+<p><span class="math display">\[\mathbf W_{t+h}-\mathbf W_t\sim\mathcal N(\mathbf0,hI_d),\]</span></p>
+<p>independently over disjoint time intervals. We restrict the noise coefficient to a scalar function of time. Matrix-valued or position-dependent noise requires a more general formula than the one stated here.</p>
+<p>The density satisfies the <strong>Fokker–Planck equation</strong>:</p>
+<p><span class="math display">\[\boxed{\partial_t p_t
+=-\nabla_{\mathbf x}\!\cdot(\mathbf f p_t)
++\frac12g(t)^2\Delta_{\mathbf x}p_t.}\]</span></p>
+<p>The first term is drift transport; the second is diffusion due to noise. Together with the initial distribution, this equation specifies the density path under the usual well-posedness assumptions.</p>
+<section id="variance-preserving-diffusion" class="level3">
+<h3 class="anchored" data-anchor-id="variance-preserving-diffusion">Variance-preserving diffusion</h3>
+<p>The constant-rate example from Part 1 becomes</p>
+<p><span class="math display">\[\boxed{d\mathbf X_t=-\frac\beta2\mathbf X_t\,dt
++\sqrt\beta\,d\mathbf W_t,\qquad \beta&gt;0.}\]</span></p>
+<p>Its cumulative conditional law is</p>
+<p><span class="math display">\[\boxed{\mathbf X_t\mid\mathbf X_0=\mathbf x_0
+\sim\mathcal N\!\left(\alpha_t\mathbf x_0,
+(1-\alpha_t^2)I_d\right),\qquad
+\alpha_t=e^{-\beta t/2}.}\]</span></p>
+<p>Thus a draw at a chosen time is obtained by</p>
+<p><span class="math display">\[\mathbf x_t=\alpha_t\mathbf x_0+
+\sqrt{1-\alpha_t^2}\,\boldsymbol\varepsilon,
+\qquad\boldsymbol\varepsilon\sim\mathcal N(\mathbf0,I_d).\]</span></p>
+<p>The noise is independent of the clean sample. This describes a conditional Gaussian; the marginal <span class="math inline">\(p_t\)</span> is generally not Gaussian because the clean sample follows the data distribution. At <span class="math inline">\(t=1\)</span>, the law approaches standard normal as <span class="math inline">\(\alpha_1\)</span> becomes small. Positive finite <span class="math inline">\(\beta\)</span> generally gives an approximate terminal match.</p>
+<p>A time-dependent nonnegative rate <span class="math inline">\(\beta(t)\)</span> uses the same formulas with</p>
+<p><span class="math display">\[\alpha_t=\exp\left[-\frac12\int_0^t\beta(u)\,du\right].\]</span></p>
+<p>Replace the constant <span class="math inline">\(\beta\)</span> in the drift, noise coefficient, and sampling updates by its value at the current time. This schedule generalization is used in the later training and image-model notes.</p>
+</section>
+</section>
+<section id="the-score-and-the-probability-flow-vector-field" class="level2">
+<h2 class="anchored" data-anchor-id="the-score-and-the-probability-flow-vector-field">5. The score and the probability-flow vector field</h2>
+<p>For a smooth positive density, define its <strong>score</strong> by</p>
+<p><span class="math display">\[\boxed{\mathbf s_t(\mathbf x)=\nabla_{\mathbf x}\log p_t(\mathbf x).}\]</span></p>
+<p>The score has <span class="math inline">\(d\)</span> components, one derivative for each coordinate. It is the gradient of the <strong>joint</strong> log density, so each component can depend on all coordinates. Learning it does not assume independent data coordinates.</p>
+<p>The probability-flow field associated with the forward SDE is</p>
+<p><span class="math display">\[\boxed{\mathbf v(\mathbf x,t)
+=\mathbf f(\mathbf x,t)-\frac12g(t)^2\mathbf s_t(\mathbf x).}\]</span></p>
+<p>With the exact score, the same initial law, and suitable regularity and uniqueness assumptions, its ODE reproduces the forward SDE’s marginal density <span class="math inline">\(p_t\)</span> at every time. It generally pairs initial and final particles differently from the SDE. Reversing its ODE does not undo a particular stochastic trajectory. This is the probability-flow result of <a href="https://arxiv.org/abs/2011.13456">Song et al.</a>.</p>
+<p>For VP diffusion, the field simplifies to</p>
+<p><span class="math display">\[\boxed{\mathbf v(\mathbf x,t)
+=-\frac\beta2\left[\mathbf x+\mathbf s_t(\mathbf x)\right].}\]</span></p>
+<p>As a check, if the data are already standard normal, then <span class="math inline">\(\mathbf s_t(\mathbf x)=-\mathbf x\)</span> and the probability-flow velocity is zero. The ODE particles stay fixed while the forward SDE particles continue to move; both populations remain standard normal.</p>
+</section>
+<section id="sampling-with-the-ode" class="level2">
+<h2 class="anchored" data-anchor-id="sampling-with-the-ode">6. Sampling with the ODE</h2>
+<p>Draw <span class="math inline">\(\mathbf x\)</span> from the terminal law at <span class="math inline">\(t=1\)</span> and integrate toward zero. With a trained score network, use</p>
+<p><span class="math display">\[\mathbf v_\theta(\mathbf x,t)
+=\mathbf f(\mathbf x,t)-\frac12g(t)^2\mathbf s_\theta(\mathbf x,t).\]</span></p>
+<p>For a positive step magnitude <span class="math inline">\(h\)</span>, explicit Euler integration backward in time gives</p>
+<p><span class="math display">\[\boxed{\mathbf x(t-h)\approx
+\mathbf x(t)-h\,\mathbf v_\theta(\mathbf x(t),t).}\]</span></p>
+<p>For VP diffusion this is</p>
+<p><span class="math display">\[\mathbf x(t-h)\approx\mathbf x(t)
++\frac{\beta h}{2}\left[\mathbf x(t)+
+\mathbf s_\theta(\mathbf x(t),t)\right].\]</span></p>
+<p>Each update acts on the whole data vector. There is no additional noise injection in this ODE sampler. With the exact terminal law and exact flow, the output has density <span class="math inline">\(p_{\mathrm{data}}\)</span>. Gaussian prior substitution, score estimation, and numerical integration introduce the same three approximations described in Part 1.</p>
+</section>
+<section id="the-reverse-sde-is-a-different-sampler" class="level2">
+<h2 class="anchored" data-anchor-id="the-reverse-sde-is-a-different-sampler">7. The reverse SDE is a different sampler</h2>
+<p>For comparison, the same forward process admits a stochastic reverse sampler. Use an increasing generation clock <span class="math inline">\(\tau=1-t\)</span> and define <span class="math inline">\(\mathbf Y_\tau\)</span> to have density <span class="math inline">\(p_{1-\tau}\)</span>. Its reverse SDE is</p>
+<p><span class="math display">\[\boxed{d\mathbf Y_\tau=
+\left[-\mathbf f(\mathbf Y_\tau,1-\tau)
++g(1-\tau)^2\mathbf s_{1-\tau}(\mathbf Y_\tau)\right]d\tau
++g(1-\tau)\,d\overline{\mathbf W}_\tau.}\]</span></p>
+<p>Here <span class="math inline">\(\overline{\mathbf W}_\tau\)</span> is Brownian motion in the generation clock, and <span class="math inline">\(\mathbf Y_0\sim p_1\)</span>. This is a statement of the reverse-time result; its derivation is not included here. See <a href="https://yang-song.net/blog/2021/score/">Song’s discussion of reverse SDEs</a>.</p>
+<p>In terms of a positive step magnitude <span class="math inline">\(h\)</span> and decreasing original time <span class="math inline">\(t\)</span>, the Euler–Maruyama update is</p>
+<p><span class="math display">\[\boxed{\mathbf x_{t-h}\approx\mathbf x_t+
+h\left[-\mathbf f(\mathbf x_t,t)+g(t)^2\mathbf s_\theta(\mathbf x_t,t)\right]
++g(t)\sqrt h\,\boldsymbol\varepsilon,\qquad
+\boldsymbol\varepsilon\sim\mathcal N(\mathbf0,I_d).}\]</span></p>
+<p>Each step uses a fresh independent Gaussian draw. This uses the derived reverse drift; it is not obtained by applying a negative time step to the forward SDE. Compared with the ODE sampler, the score coefficient is doubled and stochastic noise remains. With exact scores and initialization, both samplers have the same time marginals, but different trajectories.</p>
+</section>
+<section id="what-the-neural-network-must-estimate" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-neural-network-must-estimate">8. What the neural network must estimate</h2>
+<p>The network is a vector-valued function</p>
+<p><span class="math display">\[\mathbf s_\theta:\mathbb R^d\times(0,1]\longrightarrow\mathbb R^d.\]</span></p>
+<p>Training aims to estimate <span class="math inline">\(\mathbf s_t(\mathbf x)\)</span> at noisy data positions and different times. Gaussian corruption supplies the conditional-score target</p>
+<p><span class="math display">\[\nabla_{\mathbf x_t}\log p(\mathbf x_t\mid\mathbf x_0)
+=-\frac{\boldsymbol\varepsilon}{\sqrt{1-\alpha_t^2}}.\]</span></p>
+<p>Its conditional expectation given <span class="math inline">\((\mathbf X_t,t)\)</span> is the marginal score; squared-error regression targets that conditional mean. This states the training principle without deriving its loss or the associated denoising identities. Inference fixes the learned network and uses one of the sampling updates above.</p>
+<p>At positive noise levels the density is smooth and positive. Reaching a regular invertible flow at time zero requires appropriate assumptions on the data density; a discrete or lower-dimensional data law can give a singular endpoint. The main results above apply on intervals where the required regularity holds.</p>
+<p><a href="../tutorials/32-probability-flow-ode-part-3.html">Part 3</a> develops score estimation, noise prediction, and Tweedie’s formula.</p>
+</section>
+<section id="a-correlated-gaussian-example" class="level2">
+<h2 class="anchored" data-anchor-id="a-correlated-gaussian-example">9. A correlated Gaussian example</h2>
+<p>Let <span class="math inline">\(\mathbf X_0\sim\mathcal N(\boldsymbol\mu,\Sigma_0)\)</span> with positive-definite covariance. The VP marginals and their scores are</p>
+<p><span class="math display">\[\boldsymbol m_t=\alpha_t\boldsymbol\mu,\qquad
+\Sigma_t=\alpha_t^2\Sigma_0+(1-\alpha_t^2)I_d,\]</span></p>
+<p><span class="math display">\[\mathbf s_t(\mathbf x)=-\Sigma_t^{-1}(\mathbf x-\boldsymbol m_t).\]</span></p>
+<p>A probability-flow trajectory for this family is</p>
+<p><span class="math display">\[\mathbf x(t)=\boldsymbol m_t+
+\Sigma_t^{1/2}\Sigma_0^{-1/2}(\mathbf x_0-\boldsymbol\mu).\]</span></p>
+<p>The covariance matrices here have common eigenvectors, which makes the displayed symmetric-square-root formula valid. In those eigenvector coordinates, each centered component follows the one-dimensional Gaussian scaling from Part 1. In the original coordinates the score generally couples coordinates through <span class="math inline">\(\Sigma_t^{-1}\)</span>.</p>
+<p>For <span class="math inline">\(\Sigma_0=I_d\)</span> and <span class="math inline">\(\boldsymbol\mu=\mathbf0\)</span>, the velocity is zero. A nonzero mean with <span class="math inline">\(\Sigma_0=I_d\)</span> instead gives a translation of the mean toward zero; it does not collapse the population variance.</p>
+</section>
+<section id="connection-to-neural-odes-and-normalizing-flows" class="level2">
+<h2 class="anchored" data-anchor-id="connection-to-neural-odes-and-normalizing-flows">10. Connection to neural ODEs and normalizing flows</h2>
+<p>A neural ODE parameterizes a velocity with a network. When its flow transports a density and we track its change of volume, it defines a continuous normalizing flow. Along a trajectory,</p>
+<p><span class="math display">\[\frac{d}{dt}\log p_t(\mathbf x(t))
+=-\nabla\cdot\mathbf v(\mathbf x(t),t).\]</span></p>
+<p>This is the continuous counterpart of subtracting a log absolute Jacobian determinant in a discrete invertible normalizing-flow layer. For a smooth invertible flow it implies</p>
+<p><span class="math display">\[\log p_0(\mathbf x_0)
+=\log p_1(\mathbf x_1)+\int_0^1\nabla\cdot\mathbf v(\mathbf x(t),t)\,dt.\]</span></p>
+<p>The probability-flow ODE uses this same mathematics. Its distinguishing construction is to specify a stochastic corruption path, estimate the path’s scores, and obtain the velocity from those scores. A generic continuous normalizing flow may instead parameterize and learn its velocity directly. A finite Euler step is a numerical approximation and need not itself be invertible for an arbitrary step size.</p>
+<p>With an approximate learned score, the ODE still transports its own model density under suitable regularity. That density need not equal the true corruption marginal <span class="math inline">\(p_t\)</span>. The likelihood formula applies to the transported model density, with additional numerical error in practical integration. Neither exact data likelihood nor exact marginal agreement follows merely from using a neural vector field.</p>
+<p>These relationships are discussed in <a href="https://arxiv.org/abs/2011.13456">Song et al.’s probability-flow construction</a>. Detailed divergence and continuity derivations are kept in Part 1’s appendix.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/acads-iit-jammu\.github\.io\/diffusion-models-f26");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../tutorials/07-probability-flow-ode.html" class="pagination-link" aria-label="12 · Probability-Flow ODE - Part 1">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">12 · Probability-Flow ODE - Part 1</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../tutorials/32-probability-flow-ode-part-3.html" class="pagination-link" aria-label="14 · Probability-Flow ODE - Part 3">
+        <span class="nav-page-text">14 · Probability-Flow ODE - Part 3</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
