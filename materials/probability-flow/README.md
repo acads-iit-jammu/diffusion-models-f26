@@ -6,7 +6,7 @@ Companion to Lecture Notes 15–16. Data time is 0; terminal time is 1.
 
 Create a Python 3.12 environment and install `requirements.txt`. Open the
 notebooks with that environment as the kernel in a Jupyter-compatible editor.
-The notebooks are self-contained and include executed outputs. No GPU or
+The notebooks are self-contained mini-tutorials with LaTeX derivations, explanations before the code, interpretations of results, exercises, and executed outputs. No GPU or
 external data is needed for the scalar experiments.
 
 Run notebooks 01–04 in order. Notebook 03 optionally writes `toy-noise.pt`;
