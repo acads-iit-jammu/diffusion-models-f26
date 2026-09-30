@@ -104,7 +104,7 @@ Throughout, $X \sim \mathcal{N}(\mu, \Sigma)$ in $\mathbb{R}^d$.
 | **Independent sum** | $X \perp Y$, $Y \sim \mathcal{N}(\nu, T)$ $\Rightarrow$ $X + Y \sim \mathcal{N}(\mu+\nu,\; \Sigma + T)$ |
 | **Uncorrelated blocks** | $\Sigma_{12} = 0$ $\Rightarrow$ $X_1 \perp X_2$ (needs joint normality) |
 | **Whitening** | $\Sigma = LL^{\!\top}$ $\Rightarrow$ $L^{-1}(X - \mu) \sim \mathcal{N}(0, I)$ |
-| **Sampling** | $\mu + Lz$ with $z \sim \mathcal{N}(0,I)$ has law $\mathcal{N}(\mu,\Sigma)$ |
+| **Sampling** | $\mu + L\boldsymbol\varepsilon$ with $\boldsymbol\varepsilon \sim \mathcal{N}(0,I)$ has law $\mathcal{N}(\mu,\Sigma)$ |
 | **Mahalanobis** | $(X-\mu)^{\!\top}\Sigma^{-1}(X-\mu) \sim \chi^2_d$ |
 | **Entropy** | $h(X) = \tfrac12 \log\!\big((2\pi e)^d \det\Sigma\big)$ nats |
 | **MGF** | $\mathbb{E}[e^{t^{\!\top}X}] = \exp\!\big(t^{\!\top}\mu + \tfrac12 t^{\!\top}\Sigma t\big)$ |
@@ -202,12 +202,12 @@ $$
 Note the shape: **the exponent is a quadratic in $t$.** Everything that follows is
 a consequence of that one fact.
 
-Now $d$ dimensions. For $Z \sim \mathcal{N}(0, I_d)$ the coordinates are
+Now $d$ dimensions. For $\boldsymbol\varepsilon \sim \mathcal{N}(0, I_d)$ the coordinates are
 independent standard normals, so the expectation factorises:
 
 $$
-M_Z(t) = \mathbb{E}\Big[\textstyle\prod_i e^{t_i Z_i}\Big]
-= \prod_i \mathbb{E}\big[e^{t_i Z_i}\big]
+M_{\boldsymbol\varepsilon}(t) = \mathbb{E}\Big[\textstyle\prod_i e^{t_i \varepsilon_i}\Big]
+= \prod_i \mathbb{E}\big[e^{t_i \varepsilon_i}\big]
 = \prod_i e^{t_i^2/2}
 = e^{\frac12 t^{\!\top}t} .
 $$
@@ -219,7 +219,7 @@ normalising constant, and the quadratic form becomes $u^{\!\top}u$. What remains
 is the standard-normal integral evaluated at $L^{\!\top}t$:
 
 $$
-M_X(t) = e^{t^{\!\top}\mu}\, M_Z\big(L^{\!\top}t\big)
+M_X(t) = e^{t^{\!\top}\mu}\, M_{\boldsymbol\varepsilon}\big(L^{\!\top}t\big)
 = e^{t^{\!\top}\mu}\, e^{\frac12 (L^{\!\top}t)^{\!\top}(L^{\!\top}t)}
 = \exp\!\Big(t^{\!\top}\mu + \tfrac12 t^{\!\top}LL^{\!\top}t\Big),
 $$
@@ -293,7 +293,7 @@ its log-MGF is quadratic.
 $\Sigma = LL^{\!\top}$ (Cholesky, or $\Sigma^{1/2}$ from the eigendecomposition).
 Then
 
-- *forward*, $z \sim \mathcal{N}(0,I) \Rightarrow \mu + Lz \sim \mathcal{N}(\mu, LL^{\!\top}) = \mathcal{N}(\mu,\Sigma)$ — this is how you sample any Gaussian from standard noise;
+- *forward*, $\boldsymbol\varepsilon \sim \mathcal{N}(0,I) \Rightarrow \mu + L\boldsymbol\varepsilon \sim \mathcal{N}(\mu, LL^{\!\top}) = \mathcal{N}(\mu,\Sigma)$ — this is how you sample any Gaussian from standard noise;
 - *backward*, $X \sim \mathcal{N}(\mu,\Sigma) \Rightarrow L^{-1}(X-\mu) \sim \mathcal{N}(0,I)$ — this is **whitening**, and it is why one can always assume $\mathcal{N}(0,I)$ without loss of generality.
 
 ::: {.callout-tip}
@@ -360,10 +360,10 @@ covariances add. (Independence is essential — without it the covariance of the
 picks up cross terms, $\Sigma + T + \operatorname{Cov}(X,Y) + \operatorname{Cov}(Y,X)$.)
 
 This is the whole of the course's forward process. With $x_0$ fixed and
-$z \sim \mathcal{N}(0,I)$,
+$\boldsymbol\varepsilon \sim \mathcal{N}(0,I)$,
 
 $$
-x_\sigma = x_0 + \sigma z \;\sim\; \mathcal{N}(x_0,\ \sigma^2 I),
+x_\sigma = x_0 + \sigma \boldsymbol\varepsilon \;\sim\; \mathcal{N}(x_0,\ \sigma^2 I),
 $$
 
 and composing two such steps gives $\mathcal{N}(x_0, (\sigma_1^2 + \sigma_2^2)I)$:
@@ -375,7 +375,7 @@ $\sqrt{\sigma_1^2 + \sigma_2^2}$, which is the $\sqrt{t}$ envelope of W01.
 | Result | Where it appears |
 |---|---|
 | $\Sigma = I$ factorises | isotropic noise; per-pixel independence in high dimension |
-| $\mu + Lz$ sampling | drawing from any Gaussian given standard noise |
+| $\mu + L\boldsymbol\varepsilon$ sampling | drawing from any Gaussian given standard noise |
 | Affine closure | every step of the forward process stays Gaussian |
 | Variances add | the $\sqrt{t}$ noise envelope; the VE schedule |
 | Marginals are Gaussian | $p(x_t \mid x_0)$ in closed form at any $t$ |

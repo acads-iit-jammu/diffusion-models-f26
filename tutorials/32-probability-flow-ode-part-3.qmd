@@ -1,0 +1,247 @@
+# 14 · Probability-Flow ODE - Part 3 {.unnumbered}
+
+::: {.callout-note}
+## Draft — Learning the score
+
+These lecture notes are in development and may be revised. [Part 2](./31-probability-flow-ode-part-2.qmd) specified sampling dynamics given a score. We now construct training targets from clean data and Gaussian noise. We first use scalars to make the conditional expectations explicit, then state the vector formulas.
+:::
+
+## 1. What remains unknown?
+
+Generation requires evaluating a vector field at the current sample and time. For VP diffusion, the probability-flow field in one dimension is
+
+$$v(x,t)=-\frac{\beta(t)}2[x+s_t(x)],\qquad
+s_t(x)=\frac{d}{dx}\log p_t(x).$$
+
+The schedule is chosen by us; the marginal score is unknown. Our dataset contains observations $X_0\sim p_{\mathrm{data}}$, not values of $p_t$ or its derivative. We therefore need a regression problem that can be constructed from those observations and whose population solution is the score.
+
+Throughout this lecture,
+
+$$X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,\qquad \varepsilon\sim\mathcal N(0,1),$$
+
+with independent $X_0,\varepsilon$. Data are at $t=0$ and the terminal prior is at $t=1$. For a VP rate schedule,
+
+$$\alpha_t=\exp\left(-\frac12\int_0^t\beta(u)\,du\right).$$
+
+A constant rate gives the expression $e^{-\beta t/2}$ used in Part 1. The training identities depend on $\alpha_t$, and do not require a constant rate. We work at times with $0<\alpha_t<1$.
+
+## 2. Forward corruption supplies supervised examples
+
+For each minibatch, select a clean observation $x_0$, a time $t$, and independent standard-normal noise $\varepsilon$. Construct
+
+$$x_t=\alpha_tx_0+\sqrt{1-\alpha_t^2}\,\varepsilon.$$
+
+The conditional Gaussian density is known, so its score is known:
+
+$$\frac{\partial}{\partial x}\log p_t(x\mid x_0)
+=-\frac{x-\alpha_tx_0}{1-\alpha_t^2}.$$
+
+At the generated observation, this becomes
+
+$$U=-\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}.$$
+
+The network sees $(x_t,t)$ as input and $U$ as a target. It does not see $x_0$ as an input. Individual training targets are noisy: several $(x_0,\varepsilon)$ pairs can produce similar $x_t$.
+
+## 3. Why conditional targets recover the marginal score
+
+The key identity is
+
+$$\boxed{s_t(x)=\mathbb E\left[
+\left.\frac{\partial}{\partial x}\log p_t(x\mid X_0)
+\right|X_t=x\right]
+=-\frac{\mathbb E[\varepsilon\mid X_t=x]}{\sqrt{1-\alpha_t^2}}.}$$
+
+To see why, differentiate the marginal mixture and divide by its density:
+
+$$\begin{aligned}
+\frac{p_t'(x)}{p_t(x)}
+&=\int \frac{\partial_xp_t(x\mid x_0)}{p_t(x)}p_{\mathrm{data}}(x_0)\,dx_0\\
+&=\int \partial_x\log p_t(x\mid x_0)\,p(x_0\mid x)\,dx_0.
+\end{aligned}$$
+
+The second line uses Bayes' rule. The integral notation assumes a data density; an expectation with respect to the data distribution gives the same identity for discrete data after positive Gaussian corruption. Differentiation under the integral requires the usual integrability conditions.
+
+Squared-error regression estimates conditional means. Therefore the **denoising score-matching** loss
+
+$$\boxed{\mathcal J_s(\theta)=\mathbb E\left[
+\lambda(t)\left(s_\theta(X_t,t)+\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}\right)^2\right]}$$
+
+has the desired population solution $s_\theta(x,t)=s_t(x)$, for positive weights on the times being trained and sufficient model capacity. Finite datasets, restricted networks, and optimization error make practical estimates approximate. This training construction is used in [Song et al., *Score-Based Generative Modeling through Stochastic Differential Equations*](https://arxiv.org/abs/2011.13456).
+
+The loss can also be decomposed as
+
+$$\mathcal J_s(\theta)
+=\mathbb E\left[\lambda(t)(s_\theta(X_t,t)-s_t(X_t))^2\right]
++\mathbb E\left[\lambda(t)\operatorname{Var}(U\mid X_t,t)\right].$$
+
+The second term does not depend on the network. Training against conditional targets minimizes the same parameter-dependent error as training against the unavailable marginal score.
+
+## 4. Predicting noise instead
+
+A numerically convenient network output is $\varepsilon_\theta(x,t)$, trained with
+
+$$\mathcal J_\varepsilon(\theta)
+=\mathbb E[(\varepsilon-\varepsilon_\theta(X_t,t))^2].$$
+
+At the population optimum, $\varepsilon_*(x,t)=\mathbb E[\varepsilon\mid X_t=x]$. Convert any noise predictor to a score estimate using
+
+$$\boxed{s_\theta(x,t)=-\frac{\varepsilon_\theta(x,t)}{\sqrt{1-\alpha_t^2}}.}$$
+
+You can also construct a clean-data predictor:
+
+$$\boxed{\widehat x_{0,\theta}(x,t)
+=\frac{x-\sqrt{1-\alpha_t^2}\,\varepsilon_\theta(x,t)}{\alpha_t}.}$$
+
+These are exact algebraic conversions of predictions. They do not imply that three unweighted training losses emphasize the same times. For predictions related by these conversions, the samplewise errors satisfy
+
+$$\begin{aligned}
+(\varepsilon-\varepsilon_\theta)^2
+&=(1-\alpha_t^2)(U-s_\theta)^2,\\
+(X_0-\widehat x_{0,\theta})^2
+&=\frac{1-\alpha_t^2}{\alpha_t^2}(\varepsilon-\varepsilon_\theta)^2.
+\end{aligned}$$
+
+Thus uniform-time noise prediction is a particular time weighting of score matching. Near zero noise, dividing prediction error by $\sqrt{1-\alpha_t^2}$ amplifies score error. Near the terminal time, a small $\alpha_t$ amplifies errors in clean-data prediction.
+
+## 5. Tweedie's formula: the posterior mean denoiser
+
+First consider the standalone additive-noise model
+
+$$Y=X+\sigma \varepsilon,\qquad \varepsilon\sim\mathcal N(0,1),\quad \sigma>0.$$
+
+Among all functions $D(y)$, the one minimizing expected squared denoising error is
+
+$$D_*(y)=\mathbb E[X\mid Y=y].$$
+
+Tweedie's formula expresses this optimal estimator through the noisy density:
+
+$$\boxed{D_*(y)=y+\sigma^2\frac{d}{dy}\log p_Y(y).}$$
+
+Equivalently, the score is the displacement from the observed value toward its posterior mean, divided by the noise variance. It describes the noisy **marginal** density, not the conditional likelihood for one particular clean observation. The complete Bayes-optimality argument and differentiation are in Appendix A.
+
+Apply this formula to $Z=\alpha_tX_0$, with noise variance $1-\alpha_t^2$:
+
+$$\boxed{\mathbb E[X_0\mid X_t=x]
+=\frac{x+(1-\alpha_t^2)s_t(x)}{\alpha_t}.}$$
+
+This also follows directly by taking conditional expectations in the forward corruption equation and using the noise–score identity. It connects the same three quantities: posterior mean clean data, conditional mean noise, and marginal score.
+
+## 6. Two solved denoising examples
+
+### A Gaussian prior
+
+Let $X\sim\mathcal N(\mu,V)$ and $Y=X+\sigma \varepsilon$. Then
+
+$$p_Y=\mathcal N(\mu,V+\sigma^2),\qquad
+\frac{d}{dy}\log p_Y(y)=-\frac{y-\mu}{V+\sigma^2}.$$
+
+Tweedie's formula gives
+
+$$\mathbb E[X\mid Y=y]
+=\mu+\frac{V}{V+\sigma^2}(y-\mu).$$
+
+At small noise, the posterior mean stays close to $y$. At large noise, it stays close to the prior mean. The posterior variance is $V\sigma^2/(V+\sigma^2)$; the mean alone does not represent this remaining uncertainty.
+
+### Two equally likely clean values
+
+Let $P(X_0=1)=P(X_0=-1)=1/2$. At a positive diffusion time, Bayes' rule gives posterior log odds
+
+$$\log\frac{P(X_0=1\mid X_t=x)}{P(X_0=-1\mid X_t=x)}
+=\frac{2\alpha_tx}{1-\alpha_t^2}.$$
+
+Consequently,
+
+$$\mathbb E[X_0\mid X_t=x]
+=\tanh\left(\frac{\alpha_tx}{1-\alpha_t^2}\right),$$
+
+$$s_t(x)=\frac{\alpha_t\tanh(\alpha_tx/(1-\alpha_t^2))-x}{1-\alpha_t^2}.$$
+
+At $x=0$, the posterior mean is zero, although clean observations are only $-1$ or $+1$. A posterior sample is one of those two values. This is why a single posterior-mean denoising operation generally does not generate the clean-data distribution.
+
+For each fixed nonzero $x$, the posterior mean tends to $\operatorname{sign}(x)$ as noise vanishes. At $x=0$, it remains zero by symmetry. This discrete clean distribution also illustrates why smooth invertible flow statements are made at positive noise or under appropriate endpoint regularity.
+
+## 7. The vector formulas and an implementable training loop
+
+For $\mathbf X_0\in\mathbb R^d$, use independent Gaussian noise $\boldsymbol\varepsilon\sim\mathcal N(\mathbf0,I_d)$. Replace scalar derivatives by gradients and scalar squared errors by squared Euclidean norms. In particular,
+
+$$\mathbf s_t(\mathbf x)
+=-\frac{\mathbb E[\boldsymbol\varepsilon\mid\mathbf X_t=\mathbf x]}{\sqrt{1-\alpha_t^2}},\qquad
+\mathbb E[\mathbf X_0\mid\mathbf X_t=\mathbf x]
+=\frac{\mathbf x+(1-\alpha_t^2)\mathbf s_t(\mathbf x)}{\alpha_t}.$$
+
+A continuous-time training loop can use:
+
+```text
+repeat:
+    draw a minibatch x0 from the data
+    draw t in [t_min, 1], independently for each observation
+    draw independent standard-normal noise eps
+    xt = alpha(t) * x0 + sqrt(1 - alpha(t)^2) * eps
+    predict eps_hat = network(xt, t)
+    minimize mean squared error between eps_hat and eps
+```
+
+Time is an input because the density and its score change with noise level. A small positive $t_{\min}$ avoids evaluating a score conversion at zero noise. Its value is an implementation choice, not a universal constant. The notebook uses $t_{\min}=0.01$ and reports sampling at that time.
+
+The conditional score target $\mathbf U=-\boldsymbol\varepsilon/\sqrt{1-\alpha_t^2}$ has second moment $d/(1-\alpha_t^2)$ at a fixed time. The noise target $\boldsymbol\varepsilon$ instead has second moment $d$. It can become large near zero noise, even when the marginal score is well behaved. This is another reason to state the output parameterization, time sampling, and loss weighting explicitly.
+
+## 8. Using the trained model for generation
+
+Freeze the network. At every solver evaluation, convert its output to a score and evaluate
+
+$$\mathbf v_\theta(\mathbf x,t)
+=-\frac{\beta(t)}2\left[\mathbf x-
+\frac{\boldsymbol\varepsilon_\theta(\mathbf x,t)}{\sqrt{1-\alpha_t^2}}\right].$$
+
+Start with a standard-normal sample at $t=1$ and integrate toward smaller $t$. An ODE step uses no fresh randomness. A reverse-SDE step adds the appropriate Gaussian increment, as specified in Part 2.
+
+If sampling stops at $t_{\min}$, its intended output law is $p_{t_{\min}}$, not exactly $p_0$. Applying a final posterior mean changes the output law again; it is not an exact substitute for the missing evolution. Evaluate separately:
+
+- terminal prior error: standard normal versus the actual $p_1$;
+- numerical error: solver resolution at a fixed field;
+- estimation error: the learned field versus the exact field;
+- endpoint choice: $p_{t_{\min}}$ versus clean data.
+
+[Part 4](./33-probability-flow-ode-part-4.qmd) implements these comparisons on a Gaussian mixture where the reference score is known.
+
+## Appendix A. Bayes optimality and a standalone derivation of Tweedie's formula
+
+Assume $X$ has a finite second moment. Let $m(y)=\mathbb E[X\mid Y=y]$. For any proposed estimate $d$,
+
+$$\begin{aligned}
+\mathbb E[(X-d)^2\mid Y=y]
+&=\mathbb E[(X-m(y)+m(y)-d)^2\mid Y=y]\\
+&=\operatorname{Var}(X\mid Y=y)+(m(y)-d)^2.
+\end{aligned}$$
+
+The cross term vanishes because $\mathbb E[X-m(y)\mid Y=y]=0$. Hence $d=m(y)$ minimizes conditional risk, and choosing this value at each $y$ minimizes overall risk. This is Bayes optimality **for squared error**; other losses can give other estimators.
+
+Now write the Gaussian likelihood and marginal:
+
+$$p(y\mid x)=\frac{1}{\sqrt{2\pi\sigma^2}}
+\exp\left[-\frac{(y-x)^2}{2\sigma^2}\right],\qquad
+p_Y(y)=\int p(y\mid x)p_X(x)\,dx.$$
+
+Differentiate the likelihood:
+
+$$\partial_y p(y\mid x)=\frac{x-y}{\sigma^2}p(y\mid x).$$
+
+Differentiate the marginal and separate terms:
+
+$$p_Y'(y)=\frac{1}{\sigma^2}
+\left[\int x\,p(y\mid x)p_X(x)\,dx-y\,p_Y(y)\right].$$
+
+Bayes' rule identifies the first integral as $p_Y(y)\mathbb E[X\mid Y=y]$. Dividing by the positive noisy marginal gives
+
+$$\partial_y\log p_Y(y)=\frac{\mathbb E[X\mid Y=y]-y}{\sigma^2}.$$
+
+Rearrange to obtain the stated formula. For data without a density, replace $p_X(x)dx$ by the probability measure of $X$. For vectors and isotropic Gaussian noise, the same calculation uses a gradient and gives $\mathbb E[\mathbf X\mid\mathbf Y=\mathbf y]=\mathbf y+\sigma^2\nabla\log p_{\mathbf Y}(\mathbf y)$.
+
+## Appendix B. The regression decomposition
+
+For a target $U$ and input $A=(X_t,t)$, let $m(A)=\mathbb E[U\mid A]$. Conditional expansion gives
+
+$$\mathbb E[(h(A)-U)^2\mid A]
+=(h(A)-m(A))^2+\operatorname{Var}(U\mid A).$$
+
+Multiply by a time-dependent weight and average. Taking $U$ to be the conditional corruption score makes $m(A)$ the marginal score, which proves the loss decomposition in Section 3. The irreducible conditional variance is nonnegative; it need not be strictly positive for every possible data distribution.

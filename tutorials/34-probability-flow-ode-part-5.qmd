@@ -1,0 +1,171 @@
+# 16 · Probability-Flow ODE - Part 5 {.unnumbered}
+
+::: {.callout-note}
+## Draft — An annotated image-model recipe
+
+These lecture notes are in development and may be revised. This part provides a small unconditional DDPM implementation for MNIST, with an annotated training loop and two discrete samplers. It connects the mathematics to image tensors. The implementation checks below have been run; full MNIST training and image-quality evaluation have not been run for this draft.
+:::
+
+## 1. What changes when a sample is an image?
+
+An image is one high-dimensional observation. A minibatch of grayscale MNIST images has tensor shape `[B, 1, 28, 28]`: batch, channel, height, width. We normalize pixel values from $[0,1]$ to $[-1,1]$ before applying corruption.
+
+The forward conditional remains Gaussian:
+
+$$\mathbf X_n=\sqrt{\bar a_n}\mathbf X_0+
+\sqrt{1-\bar a_n}\,\boldsymbol\varepsilon,\qquad
+\boldsymbol\varepsilon\sim\mathcal N(\mathbf0,I).$$
+
+Noise coordinates are independent. Data coordinates are not assumed independent: the neural network examines neighboring pixels and predicts a whole noise tensor.
+
+Download the [source code](../materials/probability-flow/image-model/ddpm_mnist.py) or the [complete teaching bundle](../materials/probability-flow/probability-flow-code.zip). This is a compact implementation for tracing the mathematics. It is not a reproduction of a large image-generation benchmark.
+
+## 2. Fix the conventions before training
+
+The implementation uses the discrete notation from [Lecture 11](./30-ddpm.qmd):
+
+$$a_n=1-\beta_n,\qquad \bar a_n=\prod_{j=1}^n a_j,
+\qquad \alpha_{t_n}=\sqrt{\bar a_n},\qquad t_n=n/N.$$
+
+| Choice | Implementation |
+|---|---|
+| Prediction target | Gaussian noise $\boldsymbol\varepsilon$ |
+| Default corruption schedule | $N=1000$, linearly spaced $\beta_n$ from $10^{-4}$ to $0.02$ |
+| Stored array index | `i = n - 1`, so mathematical step 1 is array index 0 |
+| Network time input | `(i + 1) / N` |
+| Training loss | MSE averaged over batch and image coordinates |
+| Reverse DDPM variance | $\widetilde\beta_n=\beta_n(1-\bar a_{n-1})/(1-\bar a_n)$ |
+| Generation parameters | Exponential moving average (EMA) of network weights |
+| Data endpoint | $t=0$; the network is evaluated at positive trained steps |
+
+For this schedule, $\bar a_N$ is small, so a standard-normal terminal prior is a useful approximation. Reducing `--steps` while retaining the same beta endpoints changes the cumulative corruption. A short schedule used for a software check is not an equivalent accelerated training recipe.
+
+## 3. The network and its inputs
+
+`TinyUNet` uses two spatial resolutions. At the original resolution an encoder block computes features. Average pooling reduces the resolution to $14\times14$; a middle block processes broader spatial information. Upsampling returns to $28\times28$, and concatenating the earlier features supplies a spatial skip connection. The output has the same shape as the input image.
+
+Time is represented by sine and cosine features followed by a small multilayer network. Each convolutional block receives a projection of these time features. Without the time input, the network would have to use a single prediction rule for all noise levels.
+
+The architecture is deliberately small. The mathematical requirement is a function
+
+$$\boldsymbol\varepsilon_\theta(\mathbf x_n,t_n)
+\in\mathbb R^{1\times28\times28};$$
+
+there is no requirement that different output pixels be computed independently.
+
+## 4. Read the training update
+
+The function `noise_loss` implements the whole statistical training problem:
+
+```python
+# x0: [B, 1, 28, 28], normalized to [-1, 1]
+i = torch.randint(N, (len(x0),), device=x0.device)
+eps = torch.randn_like(x0)
+bar = schedule['bar'][i][:, None, None, None]
+xt = bar.sqrt() * x0 + (1 - bar).sqrt() * eps
+eps_hat = model(xt, (i.float() + 1) / N)
+loss = F.mse_loss(eps_hat, eps)
+```
+
+The extra singleton dimensions broadcast each observation's scalar schedule value across all its pixels. Each observation gets its own time and independent noise. The clean image is used to construct the training pair, but is not a network input.
+
+Backpropagation updates the U-Net parameters. After each update, the code maintains EMA parameters with
+
+$$\theta_{\mathrm{EMA}}\leftarrow0.999\theta_{\mathrm{EMA}}+0.001\theta.$$
+
+The checkpoint stores the raw and EMA weights, optimizer state, actual schedule tensors, prediction type, time convention, normalization, update count, and seed. The supplied training command starts a new run; optimizer state is saved for future resume support, but automatic training resumption is not implemented.
+
+The MNIST loader uses the official [Torchvision dataset interface](https://docs.pytorch.org/vision/stable/generated/torchvision.datasets.MNIST.html). Labels are ignored because this example is unconditional. The first training run downloads the dataset if it is absent.
+
+## 5. Generate with the discrete DDPM sampler
+
+At mathematical step $n$, evaluate the network and form
+
+$$\mathbf m_\theta(\mathbf x_n,n)
+=\frac{1}{\sqrt{a_n}}\left[
+\mathbf x_n-\frac{\beta_n}{\sqrt{1-\bar a_n}}
+\boldsymbol\varepsilon_\theta(\mathbf x_n,t_n)\right].$$
+
+Then update
+
+$$\mathbf x_{n-1}=\mathbf m_\theta(\mathbf x_n,n)
++\sqrt{\widetilde\beta_n}\,\boldsymbol\varepsilon_n.$$
+
+Here $\boldsymbol\varepsilon_n$ is fresh reverse-step noise, independent of the forward corruption draws. Start with a standard-normal tensor and loop from `i=N-1` down to `i=0`. At the final step the chosen variance is zero, so no fresh noise is drawn. The code uses the stored training schedule and EMA weights; it does not reconstruct a new schedule from command-line defaults when sampling.
+
+This sampler models finite reverse transitions by Gaussians. Even an exact conditional mean predictor does not make every finite Gaussian reverse transition exact for arbitrary data. Lecture 11's normal-data example makes the variance issue explicit.
+
+## 6. A deterministic alternative: DDIM
+
+The same noise predictor supports a deterministic DDIM update. For selected trained times $t_n>t_m$, first compute
+
+$$\widehat{\mathbf x}_0
+=\frac{\mathbf x_n-\sqrt{1-\bar a_n}\,
+\boldsymbol\varepsilon_\theta(\mathbf x_n,t_n)}{\sqrt{\bar a_n}}.$$
+
+Then set
+
+$$\boxed{\mathbf x_m=\sqrt{\bar a_m}\,\widehat{\mathbf x}_0
++\sqrt{1-\bar a_m}\,
+\boldsymbol\varepsilon_\theta(\mathbf x_n,t_n).}$$
+
+At the data endpoint use $\bar a_0=1$. No extra noise is added. Conditional on the initial Gaussian tensor, generation is deterministic. This is the zero-stochasticity DDIM update described by [Song, Meng, and Ermon](https://arxiv.org/abs/2010.02502).
+
+DDIM is related to probability-flow integration under a suitable continuous parameterization. A finite DDIM update is not an exact probability-flow ODE solution, nor is it generally the explicit Euler update in our original time coordinate. The code evaluates only selected trained indices; it does not assume an unspecified interpolation of a discretely trained network to arbitrary times.
+
+## 7. How this relates to Parts 1–4
+
+At a trained time, convert the noise output to a score using
+
+$$\mathbf s_\theta(\mathbf x,t_n)
+=-\frac{\boldsymbol\varepsilon_\theta(\mathbf x,t_n)}{\sqrt{1-\bar a_n}}.$$
+
+For a continuous VP schedule this would give
+
+$$\mathbf v_\theta(\mathbf x,t)
+=-\frac{\beta(t)}2[\mathbf x+\mathbf s_\theta(\mathbf x,t)].$$
+
+A continuous-time implementation must specify $\beta(t)$, its cumulative amplitude, network time conditioning, and behavior between training times. The scalar notebooks do this directly using a constant-rate schedule. The image example instead implements a discrete DDPM and a discrete DDIM sampler. Keeping those choices explicit prevents accidentally combining one method's drift with another method's variance.
+
+| Sampler | What is supplied at each step? | Fresh noise? |
+|---|---|---|
+| Probability-flow ODE | Continuous velocity $\mathbf f-\tfrac12g^2\mathbf s$ | No |
+| Reverse SDE, increasing generation time | Drift $-\mathbf f+g^2\mathbf s$ and noise coefficient $g$ | Yes |
+| Ancestral DDPM | Discrete reverse mean and chosen reverse variance | Yes, except final step here |
+| Deterministic DDIM | Noise prediction and two cumulative amplitude values | No |
+
+## 8. Run and inspect the code
+
+After installing the bundle's requirements, run from its extracted directory:
+
+```bash
+# No download: check gradients, schedule algebra, checkpointing and sampling.
+python image-model/ddpm_mnist.py smoke --checkpoint runs/smoke.pt
+
+# Train on MNIST. A CUDA GPU is optional; use --device cpu for CPU training.
+python image-model/ddpm_mnist.py train --device cuda \
+  --updates 10000 --checkpoint runs/mnist-ddpm.pt
+
+# Generate with the checkpoint's stored schedule and EMA weights.
+python image-model/ddpm_mnist.py sample --checkpoint runs/mnist-ddpm.pt \
+  --method ddpm --output runs/ddpm.png
+python image-model/ddpm_mnist.py sample --checkpoint runs/mnist-ddpm.pt \
+  --method ddim --ddim-steps 50 --output runs/ddim.png
+```
+
+Ten thousand updates is a starting recipe, not a promise of a particular sample quality. CPU image training takes substantially more work than the scalar experiments. Before a longer run, `--updates 10 --subset 128 --batch-size 8` exercises the data and training pipeline. A tiny subset is a debugging setting, not evidence of generalization.
+
+Sampling writes both raw tensors (`.pt`) and a display grid (`.png`). For display, values are first rescaled using $(\mathbf x+1)/2$ and then clamped to $[0,1]$; it does not alter intermediate sampler dynamics. Inspect unclipped ranges as well as images, because clipping can hide numerical or modeling problems.
+
+## 9. Verification and remaining empirical work
+
+The local CPU smoke check passed:
+
+- finite loss and gradients through the complete image network;
+- decreasing cumulative retention and zero final posterior variance;
+- agreement of the two algebraic reverse-mean formulas;
+- checkpoint save/load agreement;
+- finite, correctly shaped outputs from DDPM and DDIM;
+- repeatable samples for a fixed seed in the tested environment.
+
+This is a software and algebra check with synthetic inputs. It does not establish that the model produces recognizable digits. Full training, a held-out noise-loss curve, image grids across checkpoints, and comparisons of generation quality versus sampling cost remain empirical work for this draft. When reporting those experiments, retain the schedule, seed, update count, EMA convention, and sampler settings alongside the images.

@@ -1,0 +1,452 @@
+# 10 · Variational Autoencoders (VAEs) {.unnumbered}
+
+::: {.callout-note}
+## Draft
+
+These lecture notes are in development and may be revised. We assume familiarity with conditional probability, Gaussian distributions, expectations, and gradient descent. We begin in one dimension before giving the vector implementation.
+:::
+
+## 1. The sampling problem
+
+We observe samples from $p_{\mathrm{data}}$ and want to generate new observations with a similar distribution. A latent-variable model introduces an unobserved variable $Z$ with a distribution we can sample easily:
+
+$$Z\sim p(z)=\mathcal N(0,1),\qquad X\mid Z=z\sim p_\theta(x\mid z).$$
+
+The decoder specifies the conditional distribution $p_\theta(x\mid z)$. For example,
+
+$$p_\theta(x\mid z)=\mathcal N\bigl(\mu_\theta(z),\sigma_{\mathrm{dec}}^2\bigr),\qquad
+X=\mu_\theta(Z)+\sigma_{\mathrm{dec}} \varepsilon,\quad \varepsilon\sim\mathcal N(0,1).$$
+
+Here $\sigma_{\mathrm{dec}}>0$ is a decoder standard deviation. It is distinct from the diffusion noise introduced in later lectures. We use $\varepsilon$ for scalar Gaussian noise, $\boldsymbol\varepsilon$ for vector noise, and $\mathbb E$ for expectation throughout the lecture sequence. The latent variable is $Z$; its value is written $z$. The decoder noise is independent of $Z$. The encoder and decoder use independent noise draws when both are sampled.
+
+The distribution produced by this procedure is
+
+$$p_\theta(x)=\int p_\theta(x\mid z)p(z)\,dz.$$
+
+**Generation is easy once the decoder is trained:** draw $z$ from the prior, evaluate the decoder, then draw $x$ from its output distribution. Returning only $\mu_\theta(z)$ omits the decoder's conditional randomness and generally produces a different distribution.
+
+Training is harder because the integral for $p_\theta(x)$ is usually not tractable. We would like to maximize its log likelihood on the observed data.
+
+## 2. Why introduce an encoder?
+
+For a given observation $x$, Bayes' rule defines the model's posterior:
+
+$$p_\theta(z\mid x)=\frac{p_\theta(x\mid z)p(z)}{p_\theta(x)}.$$
+
+It answers a different question from generation: which latent values could have produced this observation? Computing it requires the same difficult normalizing integral.
+
+Introduce a tractable approximation, the **encoder**:
+
+$$q_\phi(z\mid x)=\mathcal N\bigl(\mu_\phi(x),\sigma_\phi(x)^2\bigr).$$
+
+The encoder outputs a mean $\mu_\phi(x)$ and a positive standard deviation $\sigma_\phi(x)$. It does not identify a unique latent explanation. Several values of $z$ can plausibly explain the same $x$.
+
+The symbol $q_\phi$ is used here for an approximate posterior, not for the evolving density $p_t$ of the later diffusion lectures. In VAE terminology, *inference* often means posterior estimation. In our diffusion lectures, *sampling at inference time* means generating data with an already trained model.
+
+## 3. A computable training objective
+
+The evidence lower bound, or ELBO, is derived step by step in
+[Appendix A](#sec-vae-elbo-derivation):
+
+$$\boxed{\mathcal L(\theta,\phi;x)
+=\mathbb E_{q_\phi(\cdot\mid x)}[\log p_\theta(x\mid Z)]
+-D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\Vert p(z)\bigr).}$$
+
+The first term rewards latent explanations that assign high conditional probability to the observation. The second term penalizes disagreement between the encoder distribution and the prior. Its role matters for generation: new latent variables will be drawn from the prior, without using the encoder.
+
+The exact identity is
+
+$$\log p_\theta(x)=\mathcal L(\theta,\phi;x)
++D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\Vert p_\theta(z\mid x)\bigr).$$
+
+Since KL divergence is nonnegative, maximizing the ELBO maximizes a lower bound on log likelihood. Equality holds when the encoder equals the model posterior almost everywhere. The construction and reparameterized estimator are developed in [Kingma and Welling, *Auto-Encoding Variational Bayes*](https://arxiv.org/abs/1312.6114).
+
+For the scalar Gaussian encoder and standard-normal prior,
+
+$$D_{\mathrm{KL}}(q_\phi\Vert p)
+=\frac12\left[\mu_\phi(x)^2+\sigma_\phi(x)^2-1-\log \sigma_\phi(x)^2\right].$$
+
+For the fixed-variance Gaussian decoder, minimizing the negative ELBO is, up to constants,
+
+$$\mathbb E_{q_\phi(\cdot\mid x)}\left[\frac{(x-\mu_\theta(Z))^2}{2\sigma_{\mathrm{dec}}^2}\right]
++\frac12\left[\mu_\phi(x)^2+\sigma_\phi(x)^2-1-\log \sigma_\phi(x)^2\right].$$
+
+The reconstruction weight follows from the chosen observation variance. Changing it arbitrarily changes the objective; a reconstruction loss alone is not the VAE objective.
+
+## 4. Differentiating through a random latent variable
+
+Write a sample from the encoder as
+
+$$\varepsilon\sim\mathcal N(0,1),\qquad Z=\mu_\phi(x)+\sigma_\phi(x)\varepsilon.$$
+
+The random variable $\varepsilon$ has a distribution independent of the parameters. For a fixed sampled $\varepsilon$, the computation from $\phi$ to $Z$ to the decoder loss is differentiable. This is the reparameterization used for training.
+
+A minibatch update is:
+
+1. Select observed data $x_1,\ldots,x_B$.
+2. Compute encoder means and log variances.
+3. Draw independent standard-normal $\varepsilon_i$ and construct $Z_i$.
+4. Compute the decoder negative log likelihood and the analytic KL term.
+5. Average their sum and update both networks by gradient descent.
+
+The encoder is needed during training. To generate an unconditional observation, use only the prior and decoder.
+
+## 5. Solved example: a linear Gaussian model
+
+Let
+
+$$Z\sim\mathcal N(0,1),\qquad X=b+aZ+\sigma_{\mathrm{dec}} \varepsilon,$$
+
+with independent $Z,\varepsilon$. Then
+
+$$X\sim\mathcal N(b,a^2+\sigma_{\mathrm{dec}}^2).$$
+
+Completing the square in the posterior gives
+
+$$Z\mid X=x\sim\mathcal N\left(
+\frac{a(x-b)}{a^2+\sigma_{\mathrm{dec}}^2},\frac{\sigma_{\mathrm{dec}}^2}{a^2+\sigma_{\mathrm{dec}}^2}\right).$$
+
+For $b=2$, $a=\sqrt3$, and $\sigma_{\mathrm{dec}}=1$, the generated distribution is $\mathcal N(2,4)$. The posterior mean is $\sqrt3(x-2)/4$, and its variance is $1/4$. An encoder with these outputs equals the exact posterior and makes the ELBO tight.
+
+This example separates three distributions: the prior of $Z$, the conditional distribution of $X$ given $Z$, and the posterior of $Z$ given $X$. A posterior mean summarizes possible latent explanations; it is not a draw from their posterior.
+
+## 6. The vector version
+
+For $\mathbf z\in\mathbb R^k$, choose $p(\mathbf z)=\mathcal N(\mathbf0,I_k)$ and a diagonal encoder covariance. If $\ell_j=\log\sigma_{\phi,j}(\mathbf x)^2$ denotes its log variance, sample
+
+$$Z_j=\mu_{\phi,j}(\mathbf x)+\exp(\ell_j/2)\varepsilon_j.$$
+
+The analytic KL is
+
+$$\frac12\sum_{j=1}^k\left(\mu_{\phi,j}(\mathbf x)^2+\exp(\ell_j)-1-\ell_j\right).$$
+
+The decoder output must describe a probability distribution appropriate for the data. For continuous observations, a Gaussian likelihood is one choice. For binary observations, a Bernoulli likelihood gives binary cross-entropy. Summing likelihood terms over coordinates and averaging over examples keeps the loss definition explicit.
+
+## 7. Connection to diffusion
+
+A VAE learns a latent generative model and an approximate posterior. A DDPM instead fixes a sequence of Gaussian corruption steps and learns a sequence of reverse transitions. Both can be analyzed using latent-variable likelihood bounds, but their latent structures and training procedures differ.
+
+In [Lecture 11](./30-ddpm.qmd), we construct that finite sequence without requiring SDEs. In [Lecture 12](./07-probability-flow-ode.qmd), we ask how a continuously evolving vector field can produce samples.
+
+## Appendix A. Complete derivation of the ELBO {#sec-vae-elbo-derivation}
+
+We derive the bound for **one fixed observed value $x$**. The latent variable $Z$ remains random. All expectations in this derivation integrate over the latent variable, with $x$ held fixed. Averaging the resulting objective over the dataset gives the training objective.
+
+### A.1. Start with the generative model and its evidence
+
+The prior and decoder define the joint density:
+
+$$p_\theta(x,z)=p_\theta(x\mid z)p(z).$$
+
+Integrating out the latent variable gives the marginal density of the observation:
+
+$$p_\theta(x)
+=\int_{\mathbb R}p_\theta(x,z)\,dz
+=\int_{\mathbb R}p_\theta(x\mid z)p(z)\,dz.$$
+
+This marginal is also called the **evidence**. Its logarithm is the log likelihood of this observation:
+
+$$\log p_\theta(x)
+=\log\left[\int_{\mathbb R}p_\theta(x\mid z)p(z)\,dz\right].$$
+
+We would like to maximize this quantity over $\theta$. The difficulty is the integral inside the logarithm. For a nonlinear neural decoder, it usually cannot be evaluated analytically.
+
+Introduce the normalized encoder density $q_\phi(z\mid x)$, so that
+
+$$\int_{\mathbb R}q_\phi(z\mid x)\,dz=1.$$
+
+For the following steps, assume $0<p_\theta(x)<\infty$, positive densities on the relevant latent support, and finite expectations. In particular, $q_\phi(z\mid x)$ must cover the support of $p_\theta(x,z)$ for the importance-ratio equality below. The nondegenerate Gaussian prior, encoder, and decoder in this lecture satisfy these positivity conditions; we also assume their log-density expectations are integrable.
+
+### A.2. Rewrite the evidence as an expectation under the encoder
+
+Multiply and divide the integrand by $q_\phi(z\mid x)$:
+
+$$\begin{aligned}
+p_\theta(x)
+&=\int_{\mathbb R}p_\theta(x,z)\,dz\\[2mm]
+&=\int_{\mathbb R}
+q_\phi(z\mid x)\frac{p_\theta(x,z)}{q_\phi(z\mid x)}\,dz\\[2mm]
+&=\mathbb E_{q_\phi(\cdot\mid x)}
+\left[\frac{p_\theta(x,Z)}{q_\phi(Z\mid x)}\right].
+\end{aligned}$$
+
+The last equality is the definition of expectation: integrate a function of $z$ against its density $q_\phi(z\mid x)$. Thus
+
+$$\log p_\theta(x)
+=\log\mathbb E_{q_\phi(\cdot\mid x)}
+\left[\frac{p_\theta(x,Z)}{q_\phi(Z\mid x)}\right].$$
+
+Introducing $q_\phi$ has not changed the evidence. At this stage, every line is an equality.
+
+### A.3. Apply Jensen's inequality to obtain a lower bound
+
+The logarithm is concave: for $u>0$,
+
+$$\frac{d^2}{du^2}\log u=-\frac1{u^2}<0.$$
+
+Jensen's inequality therefore says that for a positive random variable $U$ with the required expectations,
+
+$$\mathbb E[\log U]\le\log\mathbb E[U].$$
+
+Apply it to
+
+$$U=\frac{p_\theta(x,Z)}{q_\phi(Z\mid x)},
+\qquad Z\sim q_\phi(\cdot\mid x).$$
+
+We obtain
+
+$$\begin{aligned}
+\log p_\theta(x)
+&=\log\mathbb E_{q_\phi(\cdot\mid x)}
+\left[\frac{p_\theta(x,Z)}{q_\phi(Z\mid x)}\right]\\[2mm]
+&\ge\mathbb E_{q_\phi(\cdot\mid x)}
+\left[\log\frac{p_\theta(x,Z)}{q_\phi(Z\mid x)}\right].
+\end{aligned}$$
+
+Define the right-hand side to be the **evidence lower bound**:
+
+$$\boxed{\mathcal L(\theta,\phi;x)
+:=\mathbb E_{q_\phi(\cdot\mid x)}
+\left[\log\frac{p_\theta(x,Z)}{q_\phi(Z\mid x)}\right]
+\le\log p_\theta(x).}$$
+
+The inequality enters only when we move the logarithm inside the expectation. A logarithm of an expectation and an expectation of a logarithm are generally different quantities.
+
+### A.4. Separate the reconstruction term and the prior KL
+
+Use the joint factorization inside the logarithm:
+
+$$\begin{aligned}
+\log\frac{p_\theta(x,z)}{q_\phi(z\mid x)}
+&=\log\frac{p_\theta(x\mid z)p(z)}{q_\phi(z\mid x)}\\[2mm]
+&=\log p_\theta(x\mid z)+\log p(z)-\log q_\phi(z\mid x).
+\end{aligned}$$
+
+Substitute this expression into the ELBO and use linearity of integration:
+
+$$\begin{aligned}
+\mathcal L(\theta,\phi;x)
+&=\int q_\phi(z\mid x)
+\left[\log p_\theta(x\mid z)+\log p(z)-\log q_\phi(z\mid x)\right]dz\\[2mm]
+&=\int q_\phi(z\mid x)\log p_\theta(x\mid z)\,dz\\
+&\quad+\int q_\phi(z\mid x)\log p(z)\,dz
+-\int q_\phi(z\mid x)\log q_\phi(z\mid x)\,dz\\[2mm]
+&=\int q_\phi(z\mid x)\log p_\theta(x\mid z)\,dz\\
+&\quad-\int q_\phi(z\mid x)
+\left[\log q_\phi(z\mid x)-\log p(z)\right]dz\\[2mm]
+&=\int q_\phi(z\mid x)\log p_\theta(x\mid z)\,dz
+-\int q_\phi(z\mid x)\log\frac{q_\phi(z\mid x)}{p(z)}\,dz.
+\end{aligned}$$
+
+By definition, the second integral is
+
+$$D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\Vert p(z)\bigr)
+=\int q_\phi(z\mid x)\log\frac{q_\phi(z\mid x)}{p(z)}\,dz.$$
+
+Hence
+
+$$\boxed{\mathcal L(\theta,\phi;x)
+=\mathbb E_{q_\phi(\cdot\mid x)}[\log p_\theta(x\mid Z)]
+-D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\Vert p(z)\bigr).}$$
+
+The expected conditional log likelihood is often called the **reconstruction term**: it evaluates how well latent values drawn from the encoder explain the observed $x$. The subtracted KL compares the encoder with the **prior**. Both terms can be estimated or evaluated without computing the unknown evidence $p_\theta(x)$.
+
+### A.5. Derive the exact gap between the evidence and the ELBO
+
+The previous steps establish a lower bound. We can also determine exactly how far it is below the log evidence.
+
+Bayes' rule gives the model posterior:
+
+$$p_\theta(z\mid x)=\frac{p_\theta(x,z)}{p_\theta(x)}.$$
+
+Take its logarithm:
+
+$$\log p_\theta(z\mid x)=\log p_\theta(x,z)-\log p_\theta(x).$$
+
+Now start from the definition of the encoder-to-posterior KL and substitute this expression:
+
+$$\begin{aligned}
+D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\Vert p_\theta(z\mid x)\bigr)
+&=\int q_\phi(z\mid x)
+\left[\log q_\phi(z\mid x)-\log p_\theta(z\mid x)\right]dz\\[2mm]
+&=\int q_\phi(z\mid x)
+\left[\log q_\phi(z\mid x)-\log p_\theta(x,z)+\log p_\theta(x)\right]dz\\[2mm]
+&=\int q_\phi(z\mid x)
+\left[\log q_\phi(z\mid x)-\log p_\theta(x,z)\right]dz\\
+&\quad+\log p_\theta(x)\int q_\phi(z\mid x)\,dz\\[2mm]
+&=-\int q_\phi(z\mid x)
+\log\frac{p_\theta(x,z)}{q_\phi(z\mid x)}\,dz+\log p_\theta(x)\\[2mm]
+&=-\mathcal L(\theta,\phi;x)+\log p_\theta(x).
+\end{aligned}$$
+
+In the third line, $\log p_\theta(x)$ comes outside the integral because $x$ is fixed and this term does not depend on $z$. In the fourth line, the encoder integrates to one.
+
+Rearranging gives the exact identity
+
+$$\boxed{\log p_\theta(x)
+=\mathcal L(\theta,\phi;x)
++D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\Vert p_\theta(z\mid x)\bigr).}$$
+
+There are **two different KL divergences** in this derivation:
+
+| KL divergence | What it compares | Where it appears |
+|---|---|---|
+| $D_{\mathrm{KL}}(q_\phi(z\mid x)\Vert p(z))$ | Encoder and prior | Subtracted inside the ELBO |
+| $D_{\mathrm{KL}}(q_\phi(z\mid x)\Vert p_\theta(z\mid x))$ | Encoder and model posterior | Gap between log evidence and ELBO |
+
+The second KL determines whether the bound is tight. It is not the prior KL used in the computable training objective.
+
+### A.6. Why the gap is nonnegative, and when it vanishes
+
+For positive normalized densities $q$ and $r$, the elementary inequality $\log u\le u-1$ implies
+
+$$\begin{aligned}
+D_{\mathrm{KL}}(q\Vert r)
+&=-\int q(z)\log\frac{r(z)}{q(z)}\,dz\\[2mm]
+&\ge-\int q(z)\left[\frac{r(z)}{q(z)}-1\right]dz\\[2mm]
+&=-\int r(z)\,dz+\int q(z)\,dz\\[2mm]
+&=-1+1=0.
+\end{aligned}$$
+
+Equality in $\log u\le u-1$ occurs only at $u=1$. Consequently, the posterior KL is zero precisely when the encoder and model posterior agree almost everywhere:
+
+$$q_\phi(z\mid x)=p_\theta(z\mid x).$$
+
+At this equality,
+
+$$\frac{p_\theta(x,z)}{q_\phi(z\mid x)}
+=\frac{p_\theta(x,z)}{p_\theta(z\mid x)}
+=p_\theta(x),$$
+
+which is constant in $z$. This also explains equality in the Jensen step: its positive random variable $U$ is then constant.
+
+For fixed $\theta$, improving the encoder's ELBO is exactly equivalent to reducing its KL divergence to the model posterior, since $\log p_\theta(x)$ does not depend on $\phi$. When both networks change, the evidence and the gap can both change. An increase in the ELBO is an increase in a lower bound; it does not by itself guarantee an increase in the exact log likelihood at every training update.
+
+### A.7. Evaluate the prior KL for our Gaussian encoder
+
+For this lecture's scalar model,
+
+$$q_\phi(z\mid x)
+=\frac{1}{\sqrt{2\pi}\,\sigma_\phi(x)}
+\exp\left[-\frac{(z-\mu_\phi(x))^2}{2\sigma_\phi(x)^2}\right],
+\qquad p(z)=\frac{1}{\sqrt{2\pi}}e^{-z^2/2}.$$
+
+Their log densities are
+
+$$\log q_\phi(z\mid x)
+=-\frac12\log(2\pi)-\log\sigma_\phi(x)
+-\frac{(z-\mu_\phi(x))^2}{2\sigma_\phi(x)^2},$$
+
+$$\log p(z)=-\frac12\log(2\pi)-\frac{z^2}{2}.$$
+
+Subtract them; the $\log(2\pi)$ terms cancel:
+
+$$\log\frac{q_\phi(z\mid x)}{p(z)}
+=-\log\sigma_\phi(x)
+-\frac{(z-\mu_\phi(x))^2}{2\sigma_\phi(x)^2}
++\frac{z^2}{2}.$$
+
+Under the encoder,
+
+$$\mathbb E_{q_\phi(\cdot\mid x)}[(Z-\mu_\phi(x))^2]=\sigma_\phi(x)^2,$$
+
+$$\mathbb E_{q_\phi(\cdot\mid x)}[Z^2]
+=\operatorname{Var}_{q_\phi(\cdot\mid x)}(Z)
++\bigl(\mathbb E_{q_\phi(\cdot\mid x)}[Z]\bigr)^2
+=\sigma_\phi(x)^2+\mu_\phi(x)^2.$$
+
+Taking expectations of the log ratio gives
+
+$$\begin{aligned}
+D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\Vert p(z)\bigr)
+&=-\log\sigma_\phi(x)
+-\frac{\sigma_\phi(x)^2}{2\sigma_\phi(x)^2}
++\frac{\sigma_\phi(x)^2+\mu_\phi(x)^2}{2}\\[2mm]
+&=-\log\sigma_\phi(x)-\frac12
++\frac{\sigma_\phi(x)^2+\mu_\phi(x)^2}{2}\\[2mm]
+&=\frac12\left[\mu_\phi(x)^2+\sigma_\phi(x)^2
+-1-\log\sigma_\phi(x)^2\right].
+\end{aligned}$$
+
+The final line uses $2\log\sigma_\phi(x)=\log\sigma_\phi(x)^2$, valid because the standard deviation is positive.
+
+For a diagonal vector encoder and an independent standard-normal prior, both densities factor over coordinates. The log of their ratio is therefore a sum; linearity of expectation gives
+
+$$D_{\mathrm{KL}}\bigl(q_\phi(\mathbf z\mid\mathbf x)\Vert p(\mathbf z)\bigr)
+=\frac12\sum_{j=1}^k
+\left[\mu_{\phi,j}(\mathbf x)^2+\sigma_{\phi,j}(\mathbf x)^2
+-1-\log\sigma_{\phi,j}(\mathbf x)^2\right].$$
+
+Setting $\ell_j=\log\sigma_{\phi,j}(\mathbf x)^2$ recovers the log-variance form in Section 6.
+
+### A.8. Expand the decoder term and obtain the training loss
+
+For the fixed-variance scalar Gaussian decoder,
+
+$$p_\theta(x\mid z)
+=\frac{1}{\sqrt{2\pi\sigma_{\mathrm{dec}}^2}}
+\exp\left[-\frac{(x-\mu_\theta(z))^2}{2\sigma_{\mathrm{dec}}^2}\right].$$
+
+Taking its logarithm gives
+
+$$\log p_\theta(x\mid z)
+=-\frac12\log(2\pi\sigma_{\mathrm{dec}}^2)
+-\frac{(x-\mu_\theta(z))^2}{2\sigma_{\mathrm{dec}}^2}.$$
+
+Average over the encoder, noting that the first term is independent of $z$:
+
+$$\mathbb E_{q_\phi(\cdot\mid x)}[\log p_\theta(x\mid Z)]
+=-\frac12\log(2\pi\sigma_{\mathrm{dec}}^2)
+-\frac{1}{2\sigma_{\mathrm{dec}}^2}
+\mathbb E_{q_\phi(\cdot\mid x)}[(x-\mu_\theta(Z))^2].$$
+
+Substitute this expression and the Gaussian prior KL into the ELBO, then negate:
+
+$$\boxed{\begin{aligned}
+-\mathcal L(\theta,\phi;x)
+&=\frac12\log(2\pi\sigma_{\mathrm{dec}}^2)\\
+&\quad+\frac{1}{2\sigma_{\mathrm{dec}}^2}
+\mathbb E_{q_\phi(\cdot\mid x)}[(x-\mu_\theta(Z))^2]\\
+&\quad+\frac12\left[\mu_\phi(x)^2+\sigma_\phi(x)^2
+-1-\log\sigma_\phi(x)^2\right].
+\end{aligned}}$$
+
+The first term can be omitted during optimization **only because $\sigma_{\mathrm{dec}}$ is fixed**. If decoder variance is learned, its logarithmic term must be retained. The remaining two terms are the weighted reconstruction error and the prior KL used in Section 3.
+
+The reconstruction expectation is still an integral. Reparameterize the encoder draw as
+
+$$Z=\mu_\phi(x)+\sigma_\phi(x)\varepsilon,
+\qquad\varepsilon\sim\mathcal N(0,1).$$
+
+Then the expectation can be written exactly as
+
+$$\begin{aligned}
+&\mathbb E_{q_\phi(\cdot\mid x)}[(x-\mu_\theta(Z))^2]\\
+&\qquad=\mathbb E_{\varepsilon\sim\mathcal N(0,1)}
+\left[\left(x-\mu_\theta\bigl(\mu_\phi(x)+\sigma_\phi(x)\varepsilon\bigr)\right)^2\right].
+\end{aligned}$$
+
+To estimate it, draw $K$ independent noises $\varepsilon^{(1)},\ldots,\varepsilon^{(K)}$, construct
+
+$$z^{(k)}=\mu_\phi(x)+\sigma_\phi(x)\varepsilon^{(k)},$$
+
+and replace the expectation by
+
+$$\frac1K\sum_{k=1}^K\bigl(x-\mu_\theta(z^{(k)})\bigr)^2.$$
+
+This Monte Carlo average is an unbiased estimator of the reconstruction expectation. The ELBO bound applies to the expectation-defined $\mathcal L$; a particular sampled estimate of the ELBO need not itself lie below $\log p_\theta(x)$.
+
+For observations $x_1,\ldots,x_M$, the complete dataset objective is
+
+$$\max_{\theta,\phi}\frac1M\sum_{i=1}^M\mathcal L(\theta,\phi;x_i),
+\qquad\text{equivalently}\qquad
+\min_{\theta,\phi}\frac1M\sum_{i=1}^M[-\mathcal L(\theta,\phi;x_i)].$$
+
+Minibatch training estimates this average over observations and the reconstruction expectation over encoder noise. The prior KL remains analytic for the Gaussian encoder used here.
+
+
+## Check your understanding
+
+1. In the linear example, what distribution results if generation returns the decoder mean and omits $\sigma_{\mathrm{dec}} \varepsilon$?
+2. Why is a deterministic reconstruction network insufficient to specify this VAE's generative distribution?
+3. If the encoder equals the posterior, which KL vanishes? Does the encoder-to-prior KL necessarily vanish too?

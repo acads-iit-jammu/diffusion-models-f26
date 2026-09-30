@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-30",
+  "device": "CPU",
+  "seed": 20260930,
+  "notebooks": {
+    "01-transport-and-conservation.ipynb": {
+      "executed": true,
+      "figures": 2,
+      "results": "contraction: steps=10, |Euler(1)-exp(-1)|=0.019201\ncontraction: steps=50, |Euler(1)-exp(-1)|=0.003710\ncontraction: steps=200, |Euler(1)-exp(-1)|=0.000922\nRuntime: 0.3 s\n"
+    },
+    "02-exact-score-sampling.ipynb": {
+      "executed": true,
+      "figures": 2,
+      "results": "ODE ECDF error vs p(t_min): 0.0053\nreverse SDE ECDF error vs p(t_min): 0.0059\nsteps=50 mean quantile-position error=0.073474\nsteps=100 mean quantile-position error=0.035981\nsteps=200 mean quantile-position error=0.017771\nsteps=400 mean quantile-position error=0.008827\nMean output difference caused by Gaussian prior: 0.0003598121425229904\nGaussian mean trajectory error: 0.0072098052677378914\nRuntime: 1.4 s\n"
+    },
+    "03-learn-a-score.ipynb": {
+      "executed": true,
+      "figures": 3,
+      "results": "t=0.01: marginal-weighted score MSE=0.3956\nt=0.1: marginal-weighted score MSE=0.0038\nt=0.5: marginal-weighted score MSE=0.0002\nExact-score ECDF error: 0.01225543204322821\nLearned-score ECDF error: 0.03224285818810235\nPaired mean output difference: 0.06356608082392023\nRuntime: 2.0 s\n"
+    },
+    "04-tweedie-and-denoising.ipynb": {
+      "executed": true,
+      "figures": 2,
+      "results": "Tweedie identity and loss conversions verified.\nRuntime: 0.4 s\n"
+    }
+  },
+  "image_smoke": "passed: gradients, schedule, reverse-mean identity, checkpoint round trip, both samplers and repeatability",
+  "full_mnist_training": "not run",
+  "notebook_4_without_checkpoint": "passed: trained independently and checked identities"
+}

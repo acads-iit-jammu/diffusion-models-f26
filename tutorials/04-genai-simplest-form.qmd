@@ -178,15 +178,15 @@ maps is its own subject — optimal transport — which we will brush against la
 | GAN | $z \sim \mathcal{N}(0, I)$ | $G_\theta(z)$, a network | adversarial objective |
 | VAE | $z$, plus decoder noise $\varepsilon$ | sample $p_\theta(x \mid z)$, i.e. $T_\theta(z, \varepsilon)$ | ELBO / variational learning |
 | Normalizing flow | $z \sim \mathcal{N}(0, I)$ | invertible $f_\theta(z)$ | exact likelihood (change of variables) |
-| **Diffusion** | $x_T \sim \mathcal{N}$; step noise if stochastic | **probability-flow ODE** (deterministic) or reverse SDE | **score/denoising objectives, ELBO** |
+| **Diffusion** | $x_1 \sim \mathcal{N}$; step noise if stochastic | **probability-flow ODE** (deterministic) or reverse SDE | **score/denoising objectives, ELBO** |
 
 : {tbl-colwidths="[18,24,32,26]"}
 
 The outer skeleton is shared — simple randomness, a sampling mechanism, data — while
 the learned object, the structural constraints, and the sampler differ. For diffusion
 in particular, determinism is a *sampler choice*: the probability-flow ODE is a
-deterministic map from $x_T$; the reverse SDE consumes fresh noise at every step and
-is a deterministic function only of $(x_T, \text{all step noises})$.
+deterministic map from $x_1$; the reverse SDE consumes fresh noise at every step and
+is a deterministic function only of $(x_1, \text{all step noises})$.
 
 In one dimension with a known CDF, the map is a formula. For images, the population
 law is unknown and no tractable multivariate inverse-CDF construction exists — so deep

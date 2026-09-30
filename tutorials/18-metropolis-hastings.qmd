@@ -267,17 +267,17 @@ conditional exactly, which is a strong requirement.
 Nothing forces the proposal to be blind. **Metropolis-adjusted Langevin** proposes
 
 $$
-y \;=\; x + \tfrac{\tau^2}{2}\,\nabla_x \log \pi(x) + \tau\,z, \qquad z\sim\mathcal{N}(0,I),
+y \;=\; x + \tfrac{h}{2}\,\nabla_x \log \pi(x) + \sqrt h\,\boldsymbol\varepsilon, \qquad\boldsymbol\varepsilon\sim\mathcal{N}(0,I),
 $$
 
-then applies the usual accept/reject step (the proposal is now asymmetric, so the
+with step size $h>0$, then applies the usual accept/reject step (the proposal is now asymmetric, so the
 Hastings ratio matters). The drift term pushes candidates toward high density
 *before* they are judged, so acceptance stays high with much larger steps.
 
 And notice what it needs: only $\nabla_x \log \pi$, the **score**. The normalising
 constant differentiates away, exactly as in note 06. Drop the accept/reject step
-and you have unadjusted Langevin dynamics — biased by $O(\tau)$, but needing
-nothing except the score.
+and you have unadjusted Langevin dynamics, whose finite step size generally
+biases its stationary distribution.
 
 **This is the closest classical ancestor of a score-based generative model.**
 Module 4 will learn $\nabla_x\log p$ from data instead of deriving it; the sampler

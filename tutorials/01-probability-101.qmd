@@ -264,7 +264,7 @@ the real line.
 |---|---|
 | Sample space $\Omega$, outcome $\omega$ | the randomness underlying every "sample" |
 | $P$: events $\to [0,1]$ | the data distribution $p_{\text{data}}$ |
-| Random variable $X: \Omega \to \mathbb{R}$ | data $x$, noise $z$, latent $z$ |
+| Random variable $X: \Omega \to \mathbb{R}$ | data $x$, noise $\varepsilon$, latent $z$ |
 | pmf / pdf | every curve in the Distribution Playground |
 | Joint $p(x, z)$ | mixture model: latent variable and observation |
 | Marginalization $\sum_z p(x, z)$ | the mixture density; later, the ELBO (M3) |

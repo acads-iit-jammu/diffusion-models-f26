@@ -1,0 +1,315 @@
+# 13 · Probability-Flow ODE - Part 2 {.unnumbered}
+
+::: {.callout-note}
+## Draft — Part 2: scope
+
+These lecture notes are in development and may be revised.
+
+[Part 1](./07-probability-flow-ode.qmd) developed the sampling problem and the
+probability-flow construction in one dimension. Here we extend the notation
+and state the main results for data in $\mathbb R^d$, without repeating the
+derivations. Time remains normalized to $0\le t\le1$: data at zero,
+terminal prior at one, and generation from one to zero.
+:::
+
+## 1. Sampling in more than one dimension
+
+A data sample now has $d$ coordinates, collected in a vector
+$\mathbf x=(x_1,\ldots,x_d)^\mathsf T\in\mathbb R^d$. For example, an image
+can be represented by a vector containing all its pixel values. One sample
+is one particle in this $d$-dimensional space; its coordinates are not
+separate data particles.
+
+Our goal is still to generate samples from $p_{\mathrm{data}}$. We can draw
+from the prior $\mathcal N(\mathbf0,I_d)$ and numerically integrate an ODE
+backward. The construction problem is to find a vector field whose induced
+densities satisfy the desired endpoints:
+
+$$\boxed{p_0=p_{\mathrm{data}},\qquad
+p_1=p_{\mathrm{prior}}=\mathcal N(\mathbf0,I_d).}$$
+
+These specify population distributions, not an endpoint for each individual
+particle. The finite-rate diffusion construction below generally achieves
+an approximate Gaussian terminal law. Exact distributional recovery assumes
+the actual terminal law, exact dynamics, and exact integration.
+
+Multivariate CDFs exist, but a single cumulative probability does not uniquely
+identify a position in $\mathbb R^d$. Applying a separate CDF transform to
+each coordinate does not generally remove dependence between coordinates.
+The scalar percentile construction in Part 1 therefore has no direct
+coordinatewise extension. The continuity equation and score-based
+probability-flow construction do extend to $d$ dimensions.
+
+## 2. Notation and differential operators
+
+Bold symbols denote vectors. A subscript $t$ denotes time; a subscript $i$
+on a vector component denotes a coordinate.
+
+| Symbol | Meaning |
+|---|---|
+| $\mathbf x\in\mathbb R^d$ | A position in data space |
+| $\mathbf X_t\in\mathbb R^d$ | A random particle position at time $t$ |
+| $p_t(\mathbf x)$ | Scalar probability density with respect to $d$-dimensional volume |
+| $\mathbf v(\mathbf x,t)\in\mathbb R^d$ | Deterministic velocity field |
+| $\mathbf f(\mathbf x,t)\in\mathbb R^d$ | Drift of the forward SDE |
+| $g(t)\ge0$ | Scalar noise coefficient, independent of position |
+| $\mathbf W_t\in\mathbb R^d$ | Brownian motion with independent standard Brownian coordinates |
+| $\boldsymbol\varepsilon\sim\mathcal N(\mathbf0,I_d)$ | A fresh Gaussian noise vector; use $\varepsilon$ in one dimension |
+| $I_d$ | The $d\times d$ identity matrix |
+
+For a scalar function $u(\mathbf x)$, its **gradient** is a vector:
+
+$$\nabla_{\mathbf x}u=
+\begin{bmatrix}\partial_{x_1}u&\cdots&\partial_{x_d}u\end{bmatrix}^{\mathsf T}.$$
+
+For a vector field $\mathbf a=(a_1,\ldots,a_d)^\mathsf T$, its
+**divergence** is a scalar:
+
+$$\nabla_{\mathbf x}\!\cdot\mathbf a
+=\sum_{i=1}^d\partial_{x_i}a_i.$$
+
+Divergence measures local net outward flux per unit volume. The
+**Laplacian** of a scalar function is
+
+$$\Delta_{\mathbf x}u=\sum_{i=1}^d\partial_{x_i}^2u.$$
+
+These reduce to the first derivative, first derivative, and second derivative,
+respectively, when $d=1$.
+
+## 3. ODE trajectories, flows, and the continuity equation
+
+A vector field assigns all $d$ velocity components at each position and time:
+
+$$\boxed{\frac{d\mathbf x(t)}{dt}=\mathbf v(\mathbf x(t),t).}$$
+
+Given an initial position, its solution defines a trajectory. Collecting the
+solutions defines the flow map $\Psi_{0\to t}$, with
+$\mathbf X_t=\Psi_{0\to t}(\mathbf X_0)$. Assume sufficient regularity for
+unique trajectories in both time directions over the interval of interest.
+The resulting flow is invertible.
+
+The transported density obeys the **continuity equation**:
+
+$$\boxed{\partial_t p_t(\mathbf x)
+=-\nabla_{\mathbf x}\!\cdot
+\left[p_t(\mathbf x)\mathbf v(\mathbf x,t)\right].}$$
+
+The vector $p_t\mathbf v$ is the probability flux. In any fixed region,
+probability changes through net flux across its boundary. With suitable
+vanishing boundary flux, total probability stays one.
+
+In higher dimensions a prescribed density path need not determine a unique
+velocity. Adding a field $\mathbf u$ satisfying
+$\nabla\cdot(p_t\mathbf u)=0$ leaves the continuity equation unchanged.
+The probability-flow construction below supplies one compatible field.
+
+## 4. Forward diffusion defines the density path
+
+Consider the Itô SDE
+
+$$\boxed{d\mathbf X_t=\mathbf f(\mathbf X_t,t)\,dt
++g(t)\,d\mathbf W_t,\qquad \mathbf X_0\sim p_{\mathrm{data}}.}$$
+
+Brownian increments satisfy
+
+$$\mathbf W_{t+h}-\mathbf W_t\sim\mathcal N(\mathbf0,hI_d),$$
+
+independently over disjoint time intervals. We restrict the noise coefficient
+to a scalar function of time. Matrix-valued or position-dependent noise
+requires a more general formula than the one stated here.
+
+The density satisfies the **Fokker–Planck equation**:
+
+$$\boxed{\partial_t p_t
+=-\nabla_{\mathbf x}\!\cdot(\mathbf f p_t)
++\frac12g(t)^2\Delta_{\mathbf x}p_t.}$$
+
+The first term is drift transport; the second is diffusion due to noise.
+Together with the initial distribution, this equation specifies the density
+path under the usual well-posedness assumptions.
+
+### Variance-preserving diffusion
+
+The constant-rate example from Part 1 becomes
+
+$$\boxed{d\mathbf X_t=-\frac\beta2\mathbf X_t\,dt
++\sqrt\beta\,d\mathbf W_t,\qquad \beta>0.}$$
+
+Its cumulative conditional law is
+
+$$\boxed{\mathbf X_t\mid\mathbf X_0=\mathbf x_0
+\sim\mathcal N\!\left(\alpha_t\mathbf x_0,
+(1-\alpha_t^2)I_d\right),\qquad
+\alpha_t=e^{-\beta t/2}.}$$
+
+Thus a draw at a chosen time is obtained by
+
+$$\mathbf x_t=\alpha_t\mathbf x_0+
+\sqrt{1-\alpha_t^2}\,\boldsymbol\varepsilon,
+\qquad\boldsymbol\varepsilon\sim\mathcal N(\mathbf0,I_d).$$
+
+The noise is independent of the clean sample. This describes a conditional
+Gaussian; the marginal $p_t$ is generally not Gaussian because the clean
+sample follows the data distribution. At $t=1$, the law approaches standard
+normal as $\alpha_1$ becomes small. Positive finite $\beta$ generally gives
+an approximate terminal match.
+
+A time-dependent nonnegative rate $\beta(t)$ uses the same formulas with
+
+$$\alpha_t=\exp\left[-\frac12\int_0^t\beta(u)\,du\right].$$
+
+Replace the constant $\beta$ in the drift, noise coefficient, and sampling
+updates by its value at the current time. This schedule generalization is
+used in the later training and image-model notes.
+
+## 5. The score and the probability-flow vector field
+
+For a smooth positive density, define its **score** by
+
+$$\boxed{\mathbf s_t(\mathbf x)=\nabla_{\mathbf x}\log p_t(\mathbf x).}$$
+
+The score has $d$ components, one derivative for each coordinate. It is the
+gradient of the **joint** log density, so each component can depend on all
+coordinates. Learning it does not assume independent data coordinates.
+
+The probability-flow field associated with the forward SDE is
+
+$$\boxed{\mathbf v(\mathbf x,t)
+=\mathbf f(\mathbf x,t)-\frac12g(t)^2\mathbf s_t(\mathbf x).}$$
+
+With the exact score, the same initial law, and suitable regularity and
+uniqueness assumptions, its ODE reproduces the forward SDE's marginal
+density $p_t$ at every time. It generally pairs initial and final particles
+differently from the SDE. Reversing its ODE does not undo a particular
+stochastic trajectory. This is the probability-flow result of
+[Song et al.](https://arxiv.org/abs/2011.13456).
+
+For VP diffusion, the field simplifies to
+
+$$\boxed{\mathbf v(\mathbf x,t)
+=-\frac\beta2\left[\mathbf x+\mathbf s_t(\mathbf x)\right].}$$
+
+As a check, if the data are already standard normal, then
+$\mathbf s_t(\mathbf x)=-\mathbf x$ and the probability-flow velocity is zero.
+The ODE particles stay fixed while the forward SDE particles continue to
+move; both populations remain standard normal.
+
+## 6. Sampling with the ODE
+
+Draw $\mathbf x$ from the terminal law at $t=1$ and integrate toward zero.
+With a trained score network, use
+
+$$\mathbf v_\theta(\mathbf x,t)
+=\mathbf f(\mathbf x,t)-\frac12g(t)^2\mathbf s_\theta(\mathbf x,t).$$
+
+For a positive step magnitude $h$, explicit Euler integration backward in
+time gives
+
+$$\boxed{\mathbf x(t-h)\approx
+\mathbf x(t)-h\,\mathbf v_\theta(\mathbf x(t),t).}$$
+
+For VP diffusion this is
+
+$$\mathbf x(t-h)\approx\mathbf x(t)
++\frac{\beta h}{2}\left[\mathbf x(t)+
+\mathbf s_\theta(\mathbf x(t),t)\right].$$
+
+Each update acts on the whole data vector. There is no additional noise
+injection in this ODE sampler. With the exact terminal law and exact flow,
+the output has density $p_{\mathrm{data}}$. Gaussian prior substitution,
+score estimation, and numerical integration introduce the same three
+approximations described in Part 1.
+
+## 7. The reverse SDE is a different sampler
+
+For comparison, the same forward process admits a stochastic reverse sampler.
+Use an increasing generation clock $\tau=1-t$ and define
+$\mathbf Y_\tau$ to have density $p_{1-\tau}$. Its reverse SDE is
+
+$$\boxed{d\mathbf Y_\tau=
+\left[-\mathbf f(\mathbf Y_\tau,1-\tau)
++g(1-\tau)^2\mathbf s_{1-\tau}(\mathbf Y_\tau)\right]d\tau
++g(1-\tau)\,d\overline{\mathbf W}_\tau.}$$
+
+Here $\overline{\mathbf W}_\tau$ is Brownian motion in the generation clock,
+and $\mathbf Y_0\sim p_1$. This is a statement of the reverse-time result;
+its derivation is not included here. See
+[Song's discussion of reverse SDEs](https://yang-song.net/blog/2021/score/).
+
+In terms of a positive step magnitude $h$ and decreasing original time $t$,
+the Euler–Maruyama update is
+
+$$\boxed{\mathbf x_{t-h}\approx\mathbf x_t+
+ h\left[-\mathbf f(\mathbf x_t,t)+g(t)^2\mathbf s_\theta(\mathbf x_t,t)\right]
++g(t)\sqrt h\,\boldsymbol\varepsilon,\qquad
+\boldsymbol\varepsilon\sim\mathcal N(\mathbf0,I_d).}$$
+
+Each step uses a fresh independent Gaussian draw. This uses the derived
+reverse drift; it is not obtained by applying a negative time step to the
+forward SDE. Compared with the ODE sampler, the score coefficient is doubled
+and stochastic noise remains. With exact scores and initialization, both
+samplers have the same time marginals, but different trajectories.
+
+## 8. What the neural network must estimate
+
+The network is a vector-valued function
+
+$$\mathbf s_\theta:\mathbb R^d\times(0,1]\longrightarrow\mathbb R^d.$$
+
+Training aims to estimate $\mathbf s_t(\mathbf x)$ at noisy data positions
+and different times. Gaussian corruption supplies the conditional-score target
+
+$$\nabla_{\mathbf x_t}\log p(\mathbf x_t\mid\mathbf x_0)
+=-\frac{\boldsymbol\varepsilon}{\sqrt{1-\alpha_t^2}}.$$
+
+Its conditional expectation given $(\mathbf X_t,t)$ is the marginal score;
+squared-error regression targets that conditional mean. This states the
+training principle without deriving its loss or the associated denoising
+identities. Inference fixes the learned network and uses one of the sampling
+updates above.
+
+At positive noise levels the density is smooth and positive. Reaching a
+regular invertible flow at time zero requires appropriate assumptions on the
+data density; a discrete or lower-dimensional data law can give a singular
+endpoint. The main results above apply on intervals where the required
+regularity holds.
+
+[Part 3](./32-probability-flow-ode-part-3.qmd) develops score estimation, noise
+prediction, and Tweedie’s formula.
+
+
+## 9. A correlated Gaussian example
+
+Let $\mathbf X_0\sim\mathcal N(\boldsymbol\mu,\Sigma_0)$ with positive-definite covariance. The VP marginals and their scores are
+
+$$\boldsymbol m_t=\alpha_t\boldsymbol\mu,\qquad
+\Sigma_t=\alpha_t^2\Sigma_0+(1-\alpha_t^2)I_d,$$
+
+$$\mathbf s_t(\mathbf x)=-\Sigma_t^{-1}(\mathbf x-\boldsymbol m_t).$$
+
+A probability-flow trajectory for this family is
+
+$$\mathbf x(t)=\boldsymbol m_t+
+\Sigma_t^{1/2}\Sigma_0^{-1/2}(\mathbf x_0-\boldsymbol\mu).$$
+
+The covariance matrices here have common eigenvectors, which makes the displayed symmetric-square-root formula valid. In those eigenvector coordinates, each centered component follows the one-dimensional Gaussian scaling from Part 1. In the original coordinates the score generally couples coordinates through $\Sigma_t^{-1}$.
+
+For $\Sigma_0=I_d$ and $\boldsymbol\mu=\mathbf0$, the velocity is zero. A nonzero mean with $\Sigma_0=I_d$ instead gives a translation of the mean toward zero; it does not collapse the population variance.
+
+## 10. Connection to neural ODEs and normalizing flows
+
+A neural ODE parameterizes a velocity with a network. When its flow transports a density and we track its change of volume, it defines a continuous normalizing flow. Along a trajectory,
+
+$$\frac{d}{dt}\log p_t(\mathbf x(t))
+=-\nabla\cdot\mathbf v(\mathbf x(t),t).$$
+
+This is the continuous counterpart of subtracting a log absolute Jacobian determinant in a discrete invertible normalizing-flow layer. For a smooth invertible flow it implies
+
+$$\log p_0(\mathbf x_0)
+=\log p_1(\mathbf x_1)+\int_0^1\nabla\cdot\mathbf v(\mathbf x(t),t)\,dt.$$
+
+The probability-flow ODE uses this same mathematics. Its distinguishing construction is to specify a stochastic corruption path, estimate the path's scores, and obtain the velocity from those scores. A generic continuous normalizing flow may instead parameterize and learn its velocity directly. A finite Euler step is a numerical approximation and need not itself be invertible for an arbitrary step size.
+
+With an approximate learned score, the ODE still transports its own model density under suitable regularity. That density need not equal the true corruption marginal $p_t$. The likelihood formula applies to the transported model density, with additional numerical error in practical integration. Neither exact data likelihood nor exact marginal agreement follows merely from using a neural vector field.
+
+These relationships are discussed in [Song et al.'s probability-flow construction](https://arxiv.org/abs/2011.13456). Detailed divergence and continuity derivations are kept in Part 1's appendix.

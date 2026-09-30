@@ -1,0 +1,165 @@
+# 11 · Denoising Diffusion Probabilistic Models (DDPM) {.unnumbered}
+
+::: {.callout-note}
+## Draft
+
+These lecture notes are in development and may be revised. This lecture uses finite Gaussian transitions; no knowledge of Brownian motion or SDEs is required. The aim is to understand what is trained and how the trained model generates samples.
+:::
+
+## 1. Generation by reversing a corruption sequence
+
+Start with a data observation $X_0$. Repeatedly contract its current value and add independent Gaussian noise. With enough corruption, its distribution is close to a standard normal. We then train a model to generate observations by traversing a learned reverse sequence, starting from a normal sample.
+
+Use $N$ steps and normalized times $t_n=n/N$. Data are at $t_0=0$; the terminal prior is at $t_N=1$. For now every observation is scalar. The same formulas later apply coordinatewise to vectors and images with independent Gaussian corruption noise.
+
+## 2. One step and its cumulative form
+
+Choose a discrete noise variance $0<\beta_n<1$ and set $a_n=1-\beta_n$. One step is
+
+$$X_n=\sqrt{a_n}X_{n-1}+\sqrt{\beta_n}\varepsilon_n,
+\qquad \varepsilon_n\overset{\mathrm{iid}}\sim\mathcal N(0,1).$$
+
+Here $X_n$ means $X_{t_n}$. With $\bar a_n=\prod_{j=1}^n a_j$, the conditional law after $n$ steps is
+
+$$\boxed{X_n\mid X_0=x_0\sim
+\mathcal N\left(\sqrt{\bar a_n}x_0,1-\bar a_n\right).}$$
+
+Consequently, a training example at step $n$ can be drawn directly:
+
+$$X_n=\sqrt{\bar a_n}X_0+\sqrt{1-\bar a_n}\,\varepsilon.$$
+
+This equality constructs the conditional distribution at one chosen time. Using a single shared $\varepsilon$ at every time does not simulate the forward Markov chain's joint trajectories.
+
+::: {.callout-note}
+## Notation across the lectures
+
+| Quantity | Discrete DDPM notation here | Continuous lectures |
+|---|---|---|
+| One-step noise variance | $\beta_n$ | Approximately $\beta(t_n)\Delta t$ |
+| One-step variance retention | $a_n=1-\beta_n$ | One-step amplitude squared |
+| Cumulative amplitude | $\sqrt{\bar a_n}$ | $\alpha_{t_n}$ |
+| Cumulative noise variance | $1-\bar a_n$ | $1-\alpha_{t_n}^2$ |
+
+Many DDPM sources call our $a_n$ “$\alpha_n$.” We use $a_n$ here to reserve $\alpha_t$ for the cumulative **amplitude** used throughout Parts 1–5. A discrete $\beta_n$ is a variance, whereas a continuous $\beta(t)$ is a rate.
+:::
+
+If $\bar a_N$ is small, the terminal distribution is approximately normal. It is not exactly normal for arbitrary data at finite nonzero $\bar a_N$. For example, its mean is $\sqrt{\bar a_N}\mathbb E[X_0]$ and its variance is $\bar a_N\operatorname{Var}(X_0)+1-\bar a_N$.
+
+## 3. What is known about a reverse step?
+
+If the clean observation is also known, the forward process gives an exactly computable conditional distribution:
+
+$$p(x_{n-1}\mid x_n,x_0)=\mathcal N(\widetilde m_n,\widetilde\beta_n),\qquad n\ge2,$$
+
+where
+
+$$\widetilde\beta_n=\beta_n\frac{1-\bar a_{n-1}}{1-\bar a_n},$$
+
+$$\widetilde m_n=
+\frac{\sqrt{\bar a_{n-1}}\beta_n}{1-\bar a_n}x_0
++\frac{\sqrt{a_n}(1-\bar a_{n-1})}{1-\bar a_n}x_n.$$
+
+At $n=1$, conditioning on $x_0$ gives a point mass at $x_0$, and the variance formula is zero.
+
+During generation we do **not** know $x_0$. The actual conditional $p(x_{n-1}\mid x_n)$ averages over the posterior possibilities for $x_0$ and generally is not Gaussian. A DDPM models it with a learned Gaussian transition. Inserting an estimate of $x_0$ into the displayed Gaussian is a model choice, not an exact finite-step inversion of arbitrary data corruption.
+
+## 4. Learn a noise predictor
+
+Train a network $\varepsilon_\theta(x_n,t_n)$ using pairs constructed from data and newly sampled noise:
+
+$$\boxed{\mathcal J(\theta)=
+\mathbb E_{X_0,n,\varepsilon}\left[
+\left(\varepsilon-\varepsilon_\theta(\sqrt{\bar a_n}X_0+
+\sqrt{1-\bar a_n}\varepsilon,t_n)\right)^2\right].}$$
+
+Here $n$ is commonly sampled uniformly from $1,\ldots,N$. For vectors, use squared Euclidean error, with an explicitly chosen sum or coordinate average.
+
+Squared-error regression estimates
+
+$$\varepsilon_\theta(x,t_n)\approx\mathbb E[\varepsilon\mid X_n=x].$$
+
+An observed $x_n$ can arise from several clean observations and noise draws. The optimal network predicts their conditional mean noise, not the particular realized noise with certainty.
+
+Convert the output into a clean-data estimate:
+
+$$\widehat x_0(x_n,n)=
+\frac{x_n-\sqrt{1-\bar a_n}\,\varepsilon_\theta(x_n,t_n)}{\sqrt{\bar a_n}}.$$
+
+The simple noise loss is a standard DDPM training choice. It is related to, but is not the full weighted variational likelihood objective. See [Ho et al., *Denoising Diffusion Probabilistic Models*](https://arxiv.org/abs/2006.11239).
+
+## 5. The ancestral sampler
+
+Substituting the estimate into the posterior-mean expression yields the learned reverse mean
+
+$$m_\theta(x_n,n)=\frac{1}{\sqrt{a_n}}
+\left(x_n-\frac{\beta_n}{\sqrt{1-\bar a_n}}
+\varepsilon_\theta(x_n,t_n)\right).$$
+
+One common sampler uses the fixed posterior variance $\widetilde\beta_n$:
+
+$$\boxed{x_{n-1}=m_\theta(x_n,n)+\sqrt{\widetilde\beta_n}\,\varepsilon_n,
+\qquad \varepsilon_n\sim\mathcal N(0,1).}$$
+
+The $\varepsilon_n$ in this reverse update are fresh draws, unrelated to the forward-step noises. Start with $x_N\sim\mathcal N(0,1)$ and repeat for $n=N,\ldots,1$. At the final step, $\widetilde\beta_1=0$, so no fresh noise is added. Other DDPM variants use different variance choices; training and sampling must specify which one is used.
+
+This finite Gaussian chain is an **ancestral DDPM sampler**. It is not automatically the same algorithm as Euler–Maruyama for a continuous reverse SDE. Their connection requires an appropriate small-step limit.
+
+## 6. A normal-data check
+
+Suppose $X_0\sim\mathcal N(0,1)$. Every forward marginal is then $\mathcal N(0,1)$ and
+
+$$\mathbb E[\varepsilon\mid X_n=x]=\sqrt{1-\bar a_n}\,x.$$
+
+The learned reverse mean at the population optimum becomes $\sqrt{a_n}x_n$. The **exact** reverse conditional for this stationary normal chain has variance $\beta_n$. The fixed posterior variance $\widetilde\beta_n$ above is smaller: it conditions additionally on $x_0$.
+
+This provides a useful diagnostic. Even a perfect noise predictor does not make a finite-step Gaussian sampler with an arbitrary variance choice exact. Increasing resolution, changing the variance convention, and improving score estimation are different changes.
+
+## 7. From discrete denoising to a vector field
+
+At a positive noise level, the marginal score satisfies
+
+$$s_{t_n}(x)=\frac{d}{dx}\log p_{t_n}(x)
+=-\frac{\mathbb E[\varepsilon\mid X_n=x]}{\sqrt{1-\bar a_n}}.$$
+
+The network therefore provides a score estimate. [Part 3](./32-probability-flow-ode-part-3.qmd) derives this identity and its relationship to the posterior mean denoiser.
+
+With a continuous corruption schedule, that score determines a probability-flow velocity. For a VP process,
+
+$$v(x,t)=-\frac{\beta(t)}2\bigl[x+s_t(x)\bigr].$$
+
+[Part 1](./07-probability-flow-ode.qmd) develops why this velocity transports the required densities. Generation follows its ODE from $t=1$ toward $t=0$. This deterministic sampler and the stochastic reverse sampler share marginal densities under exact continuous-time conditions; their individual trajectories differ.
+
+## Appendix A. The cumulative corruption law
+
+Suppose the accumulated signal coefficient after $n-1$ steps is $\sqrt{\bar a_{n-1}}$ and the conditional noise variance is $1-\bar a_{n-1}$. The next step multiplies that variance by $a_n$ and adds independent variance $\beta_n$:
+
+$$a_n(1-\bar a_{n-1})+\beta_n=1-\bar a_n.$$
+
+The mean becomes $\sqrt{a_n\bar a_{n-1}}x_0$. Induction establishes the formula without simulating intermediate states.
+
+## Appendix B. The conditional reverse Gaussian
+
+For $n\ge2$, Bayes' rule gives
+
+$$p(x_{n-1}\mid x_n,x_0)\propto
+p(x_n\mid x_{n-1})p(x_{n-1}\mid x_0).$$
+
+As a function of $u=x_{n-1}$, the negative log density, up to constants, is
+
+$$\frac{(x_n-\sqrt{a_n}u)^2}{2\beta_n}
++\frac{(u-\sqrt{\bar a_{n-1}}x_0)^2}{2(1-\bar a_{n-1})}.$$
+
+The coefficient of $u^2/2$ is
+
+$$\frac{a_n}{\beta_n}+\frac{1}{1-\bar a_{n-1}}
+=\frac{1-\bar a_n}{\beta_n(1-\bar a_{n-1})}.$$
+
+Its reciprocal is $\widetilde\beta_n$. Multiplying that reciprocal by the linear coefficient
+$\sqrt{a_n}x_n/\beta_n+\sqrt{\bar a_{n-1}}x_0/(1-\bar a_{n-1})$
+gives $\widetilde m_n$.
+
+## Check your understanding
+
+1. Why can training draw $X_n$ in one operation, even though generation uses many steps?
+2. Which conditional distribution is exactly Gaussian: $p(x_{n-1}\mid x_n,x_0)$ or $p(x_{n-1}\mid x_n)$?
+3. Explain the difference between prediction error, discretization error, and a terminal prior that only approximates $p_1$.

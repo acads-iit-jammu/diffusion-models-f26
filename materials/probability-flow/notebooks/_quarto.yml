@@ -1,0 +1,18 @@
+project:
+  type: default
+  render:
+    - '*.ipynb'
+
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    toc: true
+    code-copy: true
+    code-overflow: wrap
+    include-before-body:
+      text: |
+        <nav aria-label="Return to lecture"><a href="../../../tutorials/33-probability-flow-ode-part-4.html">← Lecture 15: CPU notebooks</a></nav>
+
+execute:
+  enabled: false

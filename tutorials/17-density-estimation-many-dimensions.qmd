@@ -404,11 +404,11 @@ normalising constant** — which is precisely the obstacle that makes density
 estimation hard. One such sampler, **Langevin dynamics**, updates
 
 $$
-x \;\leftarrow\; x + \tfrac{\varepsilon}{2}\,\nabla_x \log p(x) + \sqrt{\varepsilon}\, z,
-\qquad z \sim \mathcal{N}(0,I),
+x \;\leftarrow\; x + \tfrac{h}{2}\,\nabla_x \log p(x) + \sqrt h\,\boldsymbol\varepsilon,
+\qquad \boldsymbol\varepsilon \sim \mathcal{N}(0,I),
 $$
 
-and notice what it needs: only $\nabla_x \log p(x)$, the **score**. The
+Here $h>0$ is the step size. Notice what the update needs: only $\nabla_x \log p(x)$, the **score**. The
 normalising constant differentiates away. This is the same score that appeared in
 note 01 via Tweedie's formula, and the same object Module 4 will learn from data.
 
