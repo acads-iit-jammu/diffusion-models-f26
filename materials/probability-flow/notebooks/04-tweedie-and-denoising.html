@@ -2344,8 +2344,28 @@ window.Quarto = {
 <body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-  
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-question" id="toc-the-question" class="nav-link active" data-scroll-target="#the-question">The question</a></li>
+  <li><a href="#define-the-clean-and-noisy-distributions" id="toc-define-the-clean-and-noisy-distributions" class="nav-link" data-scroll-target="#define-the-clean-and-noisy-distributions">1. Define the clean and noisy distributions</a></li>
+  <li><a href="#what-does-bayes-optimal-denoising-mean" id="toc-what-does-bayes-optimal-denoising-mean" class="nav-link" data-scroll-target="#what-does-bayes-optimal-denoising-mean">2. What does “Bayes-optimal denoising” mean?</a></li>
+  <li><a href="#derive-tweedies-formula" id="toc-derive-tweedies-formula" class="nav-link" data-scroll-target="#derive-tweedies-formula">3. Derive Tweedie’s formula</a></li>
+  <li><a href="#obtain-a-learned-comparison" id="toc-obtain-a-learned-comparison" class="nav-link" data-scroll-target="#obtain-a-learned-comparison">4. Obtain a learned comparison</a></li>
+  <li><a href="#compute-the-mixture-posterior-directly" id="toc-compute-the-mixture-posterior-directly" class="nav-link" data-scroll-target="#compute-the-mixture-posterior-directly">5. Compute the mixture posterior directly</a>
+  <ul class="collapse">
+  <li><a href="#reading-the-denoising-curves" id="toc-reading-the-denoising-curves" class="nav-link" data-scroll-target="#reading-the-denoising-curves">Reading the denoising curves</a></li>
+  </ul></li>
+  <li><a href="#an-ambiguous-observation-mean-versus-posterior-sample" id="toc-an-ambiguous-observation-mean-versus-posterior-sample" class="nav-link" data-scroll-target="#an-ambiguous-observation-mean-versus-posterior-sample">6. An ambiguous observation: mean versus posterior sample</a></li>
+  <li><a href="#check-how-the-three-prediction-losses-are-related" id="toc-check-how-the-three-prediction-losses-are-related" class="nav-link" data-scroll-target="#check-how-the-three-prediction-losses-are-related">7. Check how the three prediction losses are related</a>
+  <ul class="collapse">
+  <li><a href="#reading-the-posterior-plot" id="toc-reading-the-posterior-plot" class="nav-link" data-scroll-target="#reading-the-posterior-plot">Reading the posterior plot</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  </ul>
+</nav>
 </div>
 <main class="content" id="quarto-document-content">
 <nav aria-label="Return to lecture"><a href="../../../tutorials/33-probability-flow-ode-part-4.html">← Lecture 15: CPU notebooks</a></nav>
@@ -2369,9 +2389,25 @@ window.Quarto = {
 </header>
 
 
-<p>Use the same smooth mixture as Notebooks 2–3. Compare its exact posterior mean with Tweedie’s formula and a learned noise predictor. If the local checkpoint from Notebook 3 is absent, this notebook trains its own predictor. All computations run on a CPU.</p>
-<p>Given a component with prior mean <span class="math inline">\(m_j\)</span> and variance <span class="math inline">\(V_0\)</span>, its posterior mean is <span class="math inline">\(m_j+\alpha_t V_0(x-\alpha_t m_j)/V_t\)</span>. Its posterior variance is <span class="math inline">\(V_0(1-\alpha_t^2)/V_t\)</span>. Posterior component probabilities are the noisy mixture responsibilities.</p>
-<div id="f424720f" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:41.137155Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:41.137029Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:41.363938Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:41.363535Z&quot;}}" data-execution_count="1">
+<section id="the-question" class="level2">
+<h2 class="anchored" data-anchor-id="the-question">The question</h2>
+<p>What does a score tell us about the clean value hidden behind a noisy observation? Does an optimal denoised estimate count as a sample from the clean distribution?</p>
+<p>We will derive the posterior-mean connection, verify it analytically for a Gaussian mixture, and visualize the uncertainty that the posterior mean does not represent. We will also compare an exact score with a learned noise predictor.</p>
+<p><strong>Background:</strong> Bayes’ rule, conditional expectation, Gaussian densities, and squared-error regression. <strong>Setup:</strong> NumPy, SciPy, Matplotlib, and PyTorch on a CPU. Run all cells in order. If Notebook 3’s <code>toy-noise.pt</code> is present, this notebook reuses it; otherwise it trains its own small network. No external dataset is needed.</p>
+</section>
+<section id="define-the-clean-and-noisy-distributions" class="level2">
+<h2 class="anchored" data-anchor-id="define-the-clean-and-noisy-distributions">1. Define the clean and noisy distributions</h2>
+<p>Use the equally weighted mixture</p>
+<p><span class="math display">\[p_0(x)=\tfrac12\mathcal N(x;-2,0.25)+\tfrac12\mathcal N(x;2,0.25).\]</span></p>
+<p>Let <span class="math inline">\(m_1=-2\)</span>, <span class="math inline">\(m_2=2\)</span>, and <span class="math inline">\(V_0=0.25\)</span>. With <span class="math inline">\(\beta=8\)</span>, <span class="math inline">\(\alpha_t=e^{-\beta t/2}\)</span>, and independent <span class="math inline">\(\varepsilon\sim\mathcal N(0,1)\)</span>,</p>
+<p><span class="math display">\[X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon.\]</span></p>
+<p>Data time is 0 and terminal time is 1. Each noisy mixture component has mean <span class="math inline">\(\alpha_t m_j\)</span> and variance</p>
+<p><span class="math display">\[V_t=\alpha_t^2V_0+1-\alpha_t^2.\]</span></p>
+<p>The following helper cell defines the exact mixture density, responsibilities <span class="math inline">\(w_j(x,t)\)</span>, and score</p>
+<p><span class="math display">\[s_t(x)=\sum_jw_j(x,t)\frac{\alpha_tm_j-x}{V_t},\qquad
+w_j(x,t)=\frac{\tfrac12\mathcal N(x;\alpha_tm_j,V_t)}{p_t(x)}.\]</span></p>
+<p>These helpers also include the ODE sampler used elsewhere in the series, although the experiments below concern conditional denoising rather than trajectory generation.</p>
+<div id="76144554" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:32.172673Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:32.172568Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:32.397331Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:32.396907Z&quot;}}" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2434,7 +2470,40 @@ window.Quarto = {
 <span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        traces.append(x[:keep].copy())</span>
 <span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x, times, np.asarray(traces)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="1b65a34b" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:41.365068Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:41.365004Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:41.700190Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:41.699690Z&quot;}}" data-execution_count="2">
+</section>
+<section id="what-does-bayes-optimal-denoising-mean" class="level2">
+<h2 class="anchored" data-anchor-id="what-does-bayes-optimal-denoising-mean">2. What does “Bayes-optimal denoising” mean?</h2>
+<p>For a fixed noisy observation <span class="math inline">\(X_t=x\)</span>, choose a clean-value estimate <span class="math inline">\(d\)</span>. Its conditional squared-error risk decomposes as</p>
+<p><span class="math display">\[\mathbb E[(X_0-d)^2\mid X_t=x]
+=\operatorname{Var}(X_0\mid X_t=x)
++\left(\mathbb E[X_0\mid X_t=x]-d\right)^2.\]</span></p>
+<p>The cross term vanishes because the centered clean variable has conditional mean zero. Therefore the optimal estimate for squared error is</p>
+<p><span class="math display">\[D_*(x,t)=\mathbb E[X_0\mid X_t=x].\]</span></p>
+<p>This is a statement about a loss function. It does not say that the posterior is concentrated at this estimate or that the estimate must lie near one of its modes.</p>
+</section>
+<section id="derive-tweedies-formula" class="level2">
+<h2 class="anchored" data-anchor-id="derive-tweedies-formula">3. Derive Tweedie’s formula</h2>
+<p>First consider additive Gaussian noise <span class="math inline">\(Y=X+\sigma\varepsilon\)</span>. The likelihood derivative is</p>
+<p><span class="math display">\[\partial_y p(y\mid x)=\frac{x-y}{\sigma^2}p(y\mid x).\]</span></p>
+<p>Differentiate the marginal density and divide by it:</p>
+<p><span class="math display">\[\begin{aligned}
+\partial_y\log p_Y(y)
+&amp;=\frac{1}{p_Y(y)}\int\frac{x-y}{\sigma^2}p(y\mid x)p_X(x)\,dx\\
+&amp;=\frac1{\sigma^2}\int(x-y)p(x\mid y)\,dx\\
+&amp;=\frac{\mathbb E[X\mid Y=y]-y}{\sigma^2}.
+\end{aligned}\]</span></p>
+<p>The second line is Bayes’ rule. Under the usual integrability conditions, rearranging gives</p>
+<p><span class="math display">\[\mathbb E[X\mid Y=y]=y+\sigma^2\partial_y\log p_Y(y).\]</span></p>
+<p>For diffusion corruption, apply this identity to the clean quantity <span class="math inline">\(\alpha_tX_0\)</span>, with noise variance <span class="math inline">\(1-\alpha_t^2\)</span>. When <span class="math inline">\(\alpha_t&gt;0\)</span>,</p>
+<p><span class="math display">\[\boxed{D_*(x,t)=\frac{x+(1-\alpha_t^2)s_t(x)}{\alpha_t}.}\]</span></p>
+<p>The score of the noisy marginal therefore determines the Bayes-optimal clean posterior mean.</p>
+</section>
+<section id="obtain-a-learned-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="obtain-a-learned-comparison">4. Obtain a learned comparison</h2>
+<p>A noise predictor trained with mean squared error estimates <span class="math inline">\(\mathbb E[\varepsilon\mid X_t=x]\)</span>. The identity</p>
+<p><span class="math display">\[s_t(x)=-\frac{\mathbb E[\varepsilon\mid X_t=x]}{\sqrt{1-\alpha_t^2}}\]</span></p>
+<p>converts it into a score. The next cell defines the same small CPU network and regression procedure used in Notebook 3. The training loss uses actual simulated noise draws; the exact score is only a reference for evaluation.</p>
+<div id="69a35464" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:32.398462Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:32.398396Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:32.745310Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:32.744847Z&quot;}}" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>torch.set_num_threads(<span class="dv">2</span>)</span>
@@ -2474,7 +2543,18 @@ window.Quarto = {
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>model(xx,tt).numpy()<span class="op">/</span>np.sqrt(<span class="dv">1</span><span class="op">-</span>alpha(t)<span class="op">**</span><span class="dv">2</span>)</span>
 <span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> learned_score</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="8d1d4f12" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:41.701194Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:41.701135Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:41.740854Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:41.740479Z&quot;}}" data-execution_count="3">
+</section>
+<section id="compute-the-mixture-posterior-directly" class="level2">
+<h2 class="anchored" data-anchor-id="compute-the-mixture-posterior-directly">5. Compute the mixture posterior directly</h2>
+<p>To check Tweedie’s formula independently, condition each Gaussian component. Given component <span class="math inline">\(j\)</span>, the posterior has mean</p>
+<p><span class="math display">\[\mu_{j\mid x,t}=m_j+
+\frac{\alpha_tV_0}{V_t}(x-\alpha_tm_j)\]</span></p>
+<p>and variance</p>
+<p><span class="math display">\[V_{\mathrm{post},t}=\frac{V_0(1-\alpha_t^2)}{V_t}.\]</span></p>
+<p>These follow from conditioning the jointly Gaussian pair <span class="math inline">\((X_0,X_t)\)</span> within that component: their covariance is <span class="math inline">\(\alpha_tV_0\)</span>. Bayes’ rule gives the posterior component weights <span class="math inline">\(w_j(x,t)\)</span> already defined above. Hence</p>
+<p><span class="math display">\[D_*(x,t)=\sum_jw_j(x,t)\mu_{j\mid x,t}.\]</span></p>
+<p>At <span class="math inline">\(t=0.15\)</span>, compare three curves: this direct posterior mean, Tweedie’s formula with the exact score, and Tweedie’s formula with the learned score. The first two should agree up to numerical precision; the third reveals model error.</p>
+<div id="5717459a" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:32.746299Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:32.746246Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:32.788819Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:32.788406Z&quot;}}" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> Path(<span class="st">&quot;toy-noise.pt&quot;</span>).exists():</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    checkpoint<span class="op">=</span>torch.load(<span class="st">&quot;toy-noise.pt&quot;</span>,map_location<span class="op">=</span><span class="st">&quot;cpu&quot;</span>,weights_only<span class="op">=</span><span class="va">True</span>)</span>
@@ -2502,7 +2582,36 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div id="9982194b" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:41.741793Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:41.741745Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:41.786046Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:41.785733Z&quot;}}" data-execution_count="4">
+<section id="reading-the-denoising-curves" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-denoising-curves">Reading the denoising curves</h3>
+<p>The analytic posterior mean and the exact-score Tweedie curve coincide; the code checks a maximum difference below <span class="math inline">\(10^{-12}\)</span>. Their agreement connects a calculation based on posterior conditioning with one based on a local derivative of the noisy marginal. The learned curve approximates them but need not coincide.</p>
+</section>
+</section>
+<section id="an-ambiguous-observation-mean-versus-posterior-sample" class="level2">
+<h2 class="anchored" data-anchor-id="an-ambiguous-observation-mean-versus-posterior-sample">6. An ambiguous observation: mean versus posterior sample</h2>
+<p>Set <span class="math inline">\(x_t=0\)</span> at the same time <span class="math inline">\(t=0.15\)</span>. Symmetry makes the component weights equal and the posterior mean zero. The component posterior means, however, remain separated. Most posterior samples are near one of those components, rather than at zero.</p>
+<p>To sample the posterior correctly for this known mixture:</p>
+<ol type="1">
+<li>Draw a component index <span class="math inline">\(J\)</span> with probabilities <span class="math inline">\(w_1(0,t),w_2(0,t)\)</span>.</li>
+<li>Draw fresh independent noise <span class="math inline">\(\varepsilon\sim\mathcal N(0,1)\)</span>.</li>
+<li>Return <span class="math inline">\(\mu_{J\mid0,t}+\sqrt{V_{\mathrm{post},t}}\,\varepsilon\)</span>.</li>
+</ol>
+<p>A single deterministic posterior-mean output omits both component uncertainty and within-component uncertainty.</p>
+</section>
+<section id="check-how-the-three-prediction-losses-are-related" class="level2">
+<h2 class="anchored" data-anchor-id="check-how-the-three-prediction-losses-are-related">7. Check how the three prediction losses are related</h2>
+<p>For any noise prediction <span class="math inline">\(\widehat\varepsilon\)</span>, define</p>
+<p><span class="math display">\[\widehat s=-\frac{\widehat\varepsilon}{\sqrt{1-\alpha_t^2}},
+\qquad\widehat x_0=\frac{x_t-\sqrt{1-\alpha_t^2}\widehat\varepsilon}{\alpha_t}.\]</span></p>
+<p>Because the simulated pair satisfies <span class="math inline">\(x_t=\alpha_tx_0+\sqrt{1-\alpha_t^2}\varepsilon\)</span>, the errors obey</p>
+<p><span class="math display">\[\begin{aligned}
+(\varepsilon-\widehat\varepsilon)^2
+&amp;=(1-\alpha_t^2)\left(-\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}-\widehat s\right)^2,\\
+(x_0-\widehat x_0)^2
+&amp;=\frac{1-\alpha_t^2}{\alpha_t^2}(\varepsilon-\widehat\varepsilon)^2.
+\end{aligned}\]</span></p>
+<p>The next cell plots the conditional posterior samples and then verifies these identities on generated training pairs. The score target in the first identity is the <strong>conditional corruption score</strong>, not the exact marginal score. These are samplewise algebraic identities; they do not imply identical unweighted objectives across different noise levels.</p>
+<div id="b2e0bcd0" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:32.789646Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:32.789599Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:32.832633Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:32.832202Z&quot;}}" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Condition on an ambiguous observation x=0. The posterior mean is zero.</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>observation<span class="op">=</span><span class="fl">0.</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>weights<span class="op">=</span>component_weights(observation,t)</span>
@@ -2534,7 +2643,25 @@ window.Quarto = {
 Runtime: 0.4 s</code></pre>
 </div>
 </div>
-<p><strong>Exercises.</strong> Increase the noise level. How do posterior means and posterior variances change? Generate many noisy observations and return only their posterior means. Why is the resulting distribution generally different from the clean prior?</p>
+<section id="reading-the-posterior-plot" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-posterior-plot">Reading the posterior plot</h3>
+<p>The vertical line at zero is the squared-error optimal estimate. The histogram shows the two regions where the clean value is plausible given the noisy observation. Neither description contradicts the other: an estimate summarizes the posterior according to a loss, whereas a sample preserves its uncertainty.</p>
+<p>There is a useful population check. If we first draw <span class="math inline">\(X_t\)</span> from its marginal and then draw <span class="math inline">\(X_0\)</span> from the <strong>full conditional posterior</strong>, the resulting clean values have law <span class="math inline">\(p_0\)</span> by the law of total probability. Replacing that posterior draw by its mean generally changes the output law. The law of total variance shows why:</p>
+<p><span class="math display">\[\operatorname{Var}(X_0)
+=\operatorname{Var}\bigl(\mathbb E[X_0\mid X_t]\bigr)
++\mathbb E\bigl[\operatorname{Var}(X_0\mid X_t)\bigr].\]</span></p>
+<p>Whenever posterior uncertainty remains, the distribution of posterior means has less variance than the clean distribution. One denoising estimate therefore does not replace the generative sampling process.</p>
+</section>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Increase <span class="math inline">\(t\)</span>. How do component responsibilities, posterior means, and posterior variances change?</li>
+<li>Use <span class="math inline">\(x_t=2\)</span> instead of zero. Which component becomes more probable, and why?</li>
+<li>Generate many noisy observations and compare the distribution of their posterior means with the clean density. Relate the variance difference to the displayed identity.</li>
+<li>Why can noise prediction and clean-data prediction be converted algebraically while their unweighted training losses emphasize different times?</li>
+</ol>
+</section>
 
 </main>
 <!-- /main column -->

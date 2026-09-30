@@ -2344,8 +2344,31 @@ window.Quarto = {
 <body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-  
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-question" id="toc-the-question" class="nav-link active" data-scroll-target="#the-question">The question</a></li>
+  <li><a href="#specify-data-and-a-forward-density-path" id="toc-specify-data-and-a-forward-density-path" class="nav-link" data-scroll-target="#specify-data-and-a-forward-density-path">1. Specify data and a forward density path</a></li>
+  <li><a href="#derive-the-mixture-score" id="toc-derive-the-mixture-score" class="nav-link" data-scroll-target="#derive-the-mixture-score">2. Derive the mixture score</a></li>
+  <li><a href="#inspect-the-density-path-and-check-the-score" id="toc-inspect-the-density-path-and-check-the-score" class="nav-link" data-scroll-target="#inspect-the-density-path-and-check-the-score">3. Inspect the density path and check the score</a>
+  <ul class="collapse">
+  <li><a href="#reading-the-plots" id="toc-reading-the-plots" class="nav-link" data-scroll-target="#reading-the-plots">Reading the plots</a></li>
+  </ul></li>
+  <li><a href="#construct-the-deterministic-and-stochastic-samplers" id="toc-construct-the-deterministic-and-stochastic-samplers" class="nav-link" data-scroll-target="#construct-the-deterministic-and-stochastic-samplers">4. Construct the deterministic and stochastic samplers</a></li>
+  <li><a href="#compare-generated-distributions-and-trajectories" id="toc-compare-generated-distributions-and-trajectories" class="nav-link" data-scroll-target="#compare-generated-distributions-and-trajectories">5. Compare generated distributions and trajectories</a>
+  <ul class="collapse">
+  <li><a href="#reading-the-sampling-results" id="toc-reading-the-sampling-results" class="nav-link" data-scroll-target="#reading-the-sampling-results">Reading the sampling results</a></li>
+  </ul></li>
+  <li><a href="#isolate-numerical-error-using-quantiles" id="toc-isolate-numerical-error-using-quantiles" class="nav-link" data-scroll-target="#isolate-numerical-error-using-quantiles">6. Isolate numerical error using quantiles</a>
+  <ul class="collapse">
+  <li><a href="#reading-the-error-comparison" id="toc-reading-the-error-comparison" class="nav-link" data-scroll-target="#reading-the-error-comparison">Reading the error comparison</a></li>
+  </ul></li>
+  <li><a href="#an-additional-solved-gaussian-check" id="toc-an-additional-solved-gaussian-check" class="nav-link" data-scroll-target="#an-additional-solved-gaussian-check">7. An additional solved Gaussian check</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  </ul>
+</nav>
 </div>
 <main class="content" id="quarto-document-content">
 <nav aria-label="Return to lecture"><a href="../../../tutorials/33-probability-flow-ode-part-4.html">← Lecture 15: CPU notebooks</a></nav>
@@ -2369,9 +2392,34 @@ window.Quarto = {
 </header>
 
 
-<p>We use <span class="math inline">\(p_0=\tfrac12N(-2,0.25)+\tfrac12N(2,0.25)\)</span>, <span class="math inline">\(\beta=8\)</span>, and <span class="math inline">\(\alpha_t=e^{-4t}\)</span>. Each component at time <span class="math inline">\(t\)</span> has mean <span class="math inline">\(\alpha_t(\pm2)\)</span> and variance <span class="math inline">\(V_t=\alpha_t^2/4+1-\alpha_t^2\)</span>. Its exact score is the posterior-weighted mean of the component scores.</p>
-<p>Compare explicit Euler for the probability-flow ODE and Euler–Maruyama for the reverse SDE. Outputs stop at <span class="math inline">\(t_{\min}=0.01\)</span> and are compared with <strong>that</strong> marginal. A normal terminal initialization only approximates <span class="math inline">\(p_1\)</span>. No network is used.</p>
-<div id="ab5b96cc" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:36.132108Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:36.132041Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:36.360209Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:36.359706Z&quot;}}" data-execution_count="1">
+<section id="the-question" class="level2">
+<h2 class="anchored" data-anchor-id="the-question">The question</h2>
+<p>If the score of every intermediate density is known, can we construct a vector field and generate samples by solving its ODE? What changes if we use a stochastic reverse process instead?</p>
+<p>We answer these questions for a one-dimensional Gaussian mixture with an analytic score. This removes neural-network estimation error and lets us examine the mathematical construction and numerical solver separately.</p>
+<p><strong>Background:</strong> Gaussian densities, conditional probabilities, and Euler’s method. Brownian increments are explained below. <strong>Setup:</strong> NumPy, SciPy, and Matplotlib on a CPU; no data download. Run all cells in order.</p>
+</section>
+<section id="specify-data-and-a-forward-density-path" class="level2">
+<h2 class="anchored" data-anchor-id="specify-data-and-a-forward-density-path">1. Specify data and a forward density path</h2>
+<p>Our clean data density is</p>
+<p><span class="math display">\[p_0(x)=\tfrac12\mathcal N(x;-2,0.25)+\tfrac12\mathcal N(x;2,0.25).\]</span></p>
+<p>Write the component means as <span class="math inline">\(m_1=-2\)</span>, <span class="math inline">\(m_2=2\)</span>, with common variance <span class="math inline">\(V_0=0.25\)</span>. Data time is <span class="math inline">\(t=0\)</span>, terminal time is <span class="math inline">\(t=1\)</span>, and generation runs from 1 toward 0.</p>
+<p>Choose <span class="math inline">\(\beta=8\)</span> and <span class="math inline">\(\alpha_t=e^{-\beta t/2}\)</span>. A draw from the forward marginal is obtained from</p>
+<p><span class="math display">\[X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,
+\qquad\varepsilon\sim\mathcal N(0,1),\]</span></p>
+<p>independently of <span class="math inline">\(X_0\)</span>. Each mixture component therefore has mean <span class="math inline">\(\alpha_t m_j\)</span> and variance</p>
+<p><span class="math display">\[V_t=\alpha_t^2V_0+1-\alpha_t^2.\]</span></p>
+<p>Thus <span class="math inline">\(p_t\)</span> is known explicitly at every time. At <span class="math inline">\(t=1\)</span> it is close to, but not exactly, standard normal.</p>
+</section>
+<section id="derive-the-mixture-score" class="level2">
+<h2 class="anchored" data-anchor-id="derive-the-mixture-score">2. Derive the mixture score</h2>
+<p>Define the noisy component densities <span class="math inline">\(p_{t,j}(x)=\mathcal N(x;\alpha_t m_j,V_t)\)</span> and their responsibilities</p>
+<p><span class="math display">\[w_j(x,t)=\frac{\tfrac12p_{t,j}(x)}{p_t(x)}.\]</span></p>
+<p>Differentiate the mixture and divide by its density:</p>
+<p><span class="math display">\[s_t(x)=\frac{\partial_xp_t(x)}{p_t(x)}
+=\sum_{j=1}^2w_j(x,t)\frac{\partial_xp_{t,j}(x)}{p_{t,j}(x)}
+=\sum_{j=1}^2w_j(x,t)\frac{\alpha_tm_j-x}{V_t}.\]</span></p>
+<p>The mixture score is a position-dependent weighted average of component scores, not an unweighted average. The next cell implements these densities, CDFs, and scores. Log-sum-exp normalization keeps the responsibility calculation stable in the tails.</p>
+<div id="9f2e331d" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:26.773414Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:26.773251Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:26.997966Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:26.997506Z&quot;}}" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2419,22 +2467,15 @@ window.Quarto = {
 <span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    F <span class="op">=</span> cdf(x,t)</span>
 <span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(x)</span>
 <span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">max</span>(np.<span class="bu">max</span>(np.arange(<span class="dv">1</span>,n<span class="op">+</span><span class="dv">1</span>)<span class="op">/</span>n<span class="op">-</span>F), np.<span class="bu">max</span>(F<span class="op">-</span>np.arange(n)<span class="op">/</span>n))</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sample_reverse(x1, steps<span class="op">=</span><span class="dv">400</span>, stochastic<span class="op">=</span><span class="va">False</span>, score_fn<span class="op">=</span>score, end<span class="op">=</span>t_min, keep<span class="op">=</span><span class="dv">8</span>):</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.asarray(x1).copy()</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    times <span class="op">=</span> np.linspace(<span class="fl">1.</span>,end,steps<span class="op">+</span><span class="dv">1</span>)</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> [x[:keep].copy()]</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t, next_t <span class="kw">in</span> <span class="bu">zip</span>(times[:<span class="op">-</span><span class="dv">1</span>],times[<span class="dv">1</span>:]):</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>        h <span class="op">=</span> t<span class="op">-</span>next_t</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> score_fn(x,t)</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Increasing reverse clock: -f + g^2*s for SDE; half score for ODE.</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>        x <span class="op">+=</span> h<span class="op">*</span>beta<span class="op">*</span>(<span class="fl">0.5</span><span class="op">*</span>x<span class="op">+</span>(<span class="fl">1.</span> <span class="cf">if</span> stochastic <span class="cf">else</span> <span class="fl">0.5</span>)<span class="op">*</span>s)</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> stochastic:</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>            x <span class="op">+=</span> np.sqrt(beta<span class="op">*</span>h)<span class="op">*</span>rng.normal(size<span class="op">=</span>x.shape)</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        traces.append(x[:keep].copy())</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x, times, np.asarray(traces)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="bf9cf547" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:36.361283Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:36.361206Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:36.429768Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:36.429317Z&quot;}}" data-execution_count="2">
+</section>
+<section id="inspect-the-density-path-and-check-the-score" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-the-density-path-and-check-the-score">3. Inspect the density path and check the score</h2>
+<p>The following cell plots <span class="math inline">\(p_t(x)\)</span> and <span class="math inline">\(s_t(x)\)</span> at several times. It also checks the score against a finite difference of <span class="math inline">\(\log p_t(x)\)</span>:</p>
+<p><span class="math display">\[s_t(x)\approx\frac{\log p_t(x+\delta)-\log p_t(x-\delta)}{2\delta}.\]</span></p>
+<p>Here <span class="math inline">\(\delta\)</span> is only a small numerical differentiation increment, not a diffusion noise level. The check is independent of the analytic mixture-score calculation.</p>
+<div id="fb9d6d09" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:26.999037Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:26.998963Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:27.059624Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:27.059178Z&quot;}}" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>grid<span class="op">=</span>np.linspace(<span class="op">-</span><span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">600</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>fig,axes<span class="op">=</span>plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">11</span>,<span class="dv">4</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> [<span class="fl">0.</span>,<span class="fl">.1</span>,<span class="fl">.3</span>,<span class="fl">1.</span>]:</span>
@@ -2454,19 +2495,64 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div id="54968534" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:36.430915Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:36.430819Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:37.269963Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:37.269532Z&quot;}}" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x1<span class="op">=</span>sample_marginal(<span class="dv">12000</span>,<span class="fl">1.</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ode,times,ode_paths<span class="op">=</span>sample_reverse(x1)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>sde,_,sde_paths<span class="op">=</span>sample_reverse(x1,stochastic<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>fig,axes<span class="op">=</span>plt.subplots(<span class="dv">1</span>,<span class="dv">3</span>,figsize<span class="op">=</span>(<span class="dv">14</span>,<span class="dv">4</span>))</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x,label <span class="kw">in</span> [(ode,<span class="st">&quot;ODE&quot;</span>),(sde,<span class="st">&quot;reverse SDE&quot;</span>)]:</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].hist(x,bins<span class="op">=</span><span class="dv">90</span>,density<span class="op">=</span><span class="va">True</span>,alpha<span class="op">=</span><span class="fl">.35</span>,label<span class="op">=</span>label)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(label,<span class="st">&quot;ECDF error vs p(t_min):&quot;</span>,<span class="bu">round</span>(ecdf_error(x,t_min),<span class="dv">4</span>))</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(grid,density(grid,t_min),<span class="st">&#39;k&#39;</span>,label<span class="op">=</span><span class="st">&quot;exact marginal&quot;</span>)<span class="op">;</span> axes[<span class="dv">0</span>].legend()</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">&quot;position&quot;</span>,ylabel<span class="op">=</span><span class="st">&quot;density&quot;</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax,paths,title <span class="kw">in</span> <span class="bu">zip</span>(axes[<span class="dv">1</span>:],[ode_paths,sde_paths],[<span class="st">&quot;ODE trajectories&quot;</span>,<span class="st">&quot;reverse SDE trajectories&quot;</span>]):</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    ax.plot(times,paths)<span class="op">;</span> ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">&quot;diffusion time (generation runs right to left)&quot;</span>,ylabel<span class="op">=</span><span class="st">&quot;position&quot;</span>,title<span class="op">=</span>title)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()<span class="op">;</span> plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="reading-the-plots" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-plots">Reading the plots</h3>
+<p>At low noise, the density has two separated modes. At high noise, they overlap and the score approaches the standard-normal score <span class="math inline">\(-x\)</span>. A positive score means density locally increases toward larger <span class="math inline">\(x\)</span>; it does not alone specify the probability-flow velocity.</p>
+</section>
+</section>
+<section id="construct-the-deterministic-and-stochastic-samplers" class="level2">
+<h2 class="anchored" data-anchor-id="construct-the-deterministic-and-stochastic-samplers">4. Construct the deterministic and stochastic samplers</h2>
+<p>The forward VP SDE is</p>
+<p><span class="math display">\[dX_t=-\frac\beta2X_t\,dt+\sqrt\beta\,dW_t.\]</span></p>
+<p>For this notebook, the essential fact about Brownian motion is that an increment over duration <span class="math inline">\(h\)</span> is independent of past increments and has law <span class="math inline">\(\mathcal N(0,h)\)</span>. It can be simulated as <span class="math inline">\(\sqrt h\,\varepsilon\)</span>. The square root is necessary because variances of independent increments add.</p>
+<p>The deterministic probability-flow field is</p>
+<p><span class="math display">\[v(x,t)=-\frac\beta2[x+s_t(x)].\]</span></p>
+<p>For a positive reverse step <span class="math inline">\(h\)</span>, explicit Euler gives</p>
+<p><span class="math display">\[x_{t-h}=x_t+\frac{\beta h}{2}[x_t+s_t(x_t)].\]</span></p>
+<p>The reverse SDE, written with increasing generation time <span class="math inline">\(\tau=1-t\)</span>, has drift <span class="math inline">\(\beta x/2+\beta s_t(x)\)</span> and noise coefficient <span class="math inline">\(\sqrt\beta\)</span>. Euler–Maruyama therefore gives</p>
+<p><span class="math display">\[x_{t-h}=x_t+h\left[\frac\beta2x_t+\beta s_t(x_t)\right]
++\sqrt{\beta h}\,\varepsilon_k,\]</span></p>
+<p>using fresh independent Gaussian noise at each step. Notice the different score coefficients. Dropping the stochastic term from this SDE would not produce the probability-flow ODE.</p>
+<p>The construction is justified by density evolution. The forward SDE has Fokker–Planck equation</p>
+<p><span class="math display">\[\partial_t p_t=\frac\beta2\partial_x(xp_t)+\frac\beta2\partial_{xx}p_t
+=-\partial_x(p_tv),\]</span></p>
+<p>where <span class="math inline">\(\partial_xp_t=p_ts_t\)</span> gives the displayed velocity. Thus the exact ODE and SDE share marginal densities under the usual regularity assumptions. Their individual trajectories do not agree.</p>
+<p>We stop at <span class="math inline">\(t_{\min}=0.01\)</span>. The reference output law is therefore <span class="math inline">\(p_{0.01}\)</span>, not <span class="math inline">\(p_0\)</span>. The helper below implements both numerical samplers with this endpoint.</p>
+<div id="c9fce7a9" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:27.060542Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:27.060473Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:27.062280Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:27.061971Z&quot;}}" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sample_reverse(x1, steps<span class="op">=</span><span class="dv">400</span>, stochastic<span class="op">=</span><span class="va">False</span>, score_fn<span class="op">=</span>score, end<span class="op">=</span>t_min, keep<span class="op">=</span><span class="dv">8</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.asarray(x1).copy()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    times <span class="op">=</span> np.linspace(<span class="fl">1.</span>,end,steps<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> [x[:keep].copy()]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t, next_t <span class="kw">in</span> <span class="bu">zip</span>(times[:<span class="op">-</span><span class="dv">1</span>],times[<span class="dv">1</span>:]):</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        h <span class="op">=</span> t<span class="op">-</span>next_t</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> score_fn(x,t)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Increasing reverse clock: -f + g^2*s for SDE; half score for ODE.</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        x <span class="op">+=</span> h<span class="op">*</span>beta<span class="op">*</span>(<span class="fl">0.5</span><span class="op">*</span>x<span class="op">+</span>(<span class="fl">1.</span> <span class="cf">if</span> stochastic <span class="cf">else</span> <span class="fl">0.5</span>)<span class="op">*</span>s)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> stochastic:</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>            x <span class="op">+=</span> np.sqrt(beta<span class="op">*</span>h)<span class="op">*</span>rng.normal(size<span class="op">=</span>x.shape)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        traces.append(x[:keep].copy())</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x, times, np.asarray(traces)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="compare-generated-distributions-and-trajectories" class="level2">
+<h2 class="anchored" data-anchor-id="compare-generated-distributions-and-trajectories">5. Compare generated distributions and trajectories</h2>
+<p>Initialize from the <strong>exact terminal mixture</strong> <span class="math inline">\(p_1\)</span> in this first experiment. That removes the error caused by substituting a standard-normal prior. Use the same initial particles for both samplers and compare their output histograms with the analytic <span class="math inline">\(p_{0.01}\)</span>.</p>
+<p>We report the empirical CDF discrepancy</p>
+<p><span class="math display">\[D=\sup_x\left|\widehat F(x)-F_{0.01}(x)\right|,\]</span></p>
+<p>where <span class="math inline">\(\widehat F\)</span> is the empirical CDF of the generated sample. It includes finite-sample fluctuation and numerical error. It is not a pure measure of solver error.</p>
+<div id="3faaa370" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:27.063103Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:27.063053Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:27.877898Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:27.877428Z&quot;}}" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x1<span class="op">=</span>sample_marginal(<span class="dv">12000</span>,<span class="fl">1.</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ode,times,ode_paths<span class="op">=</span>sample_reverse(x1)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>sde,_,sde_paths<span class="op">=</span>sample_reverse(x1,stochastic<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>fig,axes<span class="op">=</span>plt.subplots(<span class="dv">1</span>,<span class="dv">3</span>,figsize<span class="op">=</span>(<span class="dv">14</span>,<span class="dv">4</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x,label <span class="kw">in</span> [(ode,<span class="st">&quot;ODE&quot;</span>),(sde,<span class="st">&quot;reverse SDE&quot;</span>)]:</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].hist(x,bins<span class="op">=</span><span class="dv">90</span>,density<span class="op">=</span><span class="va">True</span>,alpha<span class="op">=</span><span class="fl">.35</span>,label<span class="op">=</span>label)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(label,<span class="st">&quot;ECDF error vs p(t_min):&quot;</span>,<span class="bu">round</span>(ecdf_error(x,t_min),<span class="dv">4</span>))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(grid,density(grid,t_min),<span class="st">&#39;k&#39;</span>,label<span class="op">=</span><span class="st">&quot;exact marginal&quot;</span>)<span class="op">;</span> axes[<span class="dv">0</span>].legend()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">&quot;position&quot;</span>,ylabel<span class="op">=</span><span class="st">&quot;density&quot;</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax,paths,title <span class="kw">in</span> <span class="bu">zip</span>(axes[<span class="dv">1</span>:],[ode_paths,sde_paths],[<span class="st">&quot;ODE trajectories&quot;</span>,<span class="st">&quot;reverse SDE trajectories&quot;</span>]):</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    ax.plot(times,paths)<span class="op">;</span> ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">&quot;diffusion time (generation runs right to left)&quot;</span>,ylabel<span class="op">=</span><span class="st">&quot;position&quot;</span>,title<span class="op">=</span>title)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()<span class="op">;</span> plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ODE ECDF error vs p(t_min): 0.0053
 reverse SDE ECDF error vs p(t_min): 0.0059</code></pre>
@@ -2479,46 +2565,84 @@ reverse SDE ECDF error vs p(t_min): 0.0059</code></pre>
 </div>
 </div>
 </div>
-<div id="eea337d4" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:37.270910Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:37.270862Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:37.712772Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:37.712415Z&quot;}}" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Deterministic quantiles remove Monte Carlo noise from the ODE convergence check.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> brentq</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>u<span class="op">=</span>(np.arange(<span class="dv">1500</span>)<span class="op">+</span><span class="fl">.5</span>)<span class="op">/</span><span class="dv">1500</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>initial<span class="op">=</span>np.array([brentq(<span class="kw">lambda</span> x: cdf(x,<span class="fl">1.</span>)<span class="op">-</span>v,<span class="op">-</span><span class="dv">10</span>,<span class="dv">10</span>) <span class="cf">for</span> v <span class="kw">in</span> u])</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>reference<span class="op">=</span>np.array([brentq(<span class="kw">lambda</span> x: cdf(x,t_min)<span class="op">-</span>v,<span class="op">-</span><span class="dv">10</span>,<span class="dv">10</span>) <span class="cf">for</span> v <span class="kw">in</span> u])</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>errors<span class="op">=</span>[]</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> steps <span class="kw">in</span> [<span class="dv">50</span>,<span class="dv">100</span>,<span class="dv">200</span>,<span class="dv">400</span>]:</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    out,_,_<span class="op">=</span>sample_reverse(initial,steps<span class="op">=</span>steps)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    err<span class="op">=</span>np.mean(np.<span class="bu">abs</span>(out<span class="op">-</span>reference))<span class="op">;</span> errors.append(err)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>steps<span class="op">=</span><span class="sc">}</span><span class="ss"> mean quantile-position error=</span><span class="sc">{</span>err<span class="sc">:.6f}</span><span class="ss">&quot;</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> errors[<span class="op">-</span><span class="dv">1</span>]<span class="op">&lt;</span>errors[<span class="dv">0</span>]<span class="op">/</span><span class="dv">4</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Same numerical solver, different terminal law. Matched quantiles isolate initialization.</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> ndtri</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>normal_out,_,_<span class="op">=</span>sample_reverse(ndtri(u),steps<span class="op">=</span><span class="dv">400</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>exact_out,_,_<span class="op">=</span>sample_reverse(initial,steps<span class="op">=</span><span class="dv">400</span>)</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Mean output difference caused by Gaussian prior:&quot;</span>,np.mean(<span class="bu">abs</span>(normal_out<span class="op">-</span>exact_out)))</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Gaussian-data check: p0=N(2,4), analytic deterministic transport.</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>m0,V_gauss<span class="op">=</span><span class="fl">2.</span>,<span class="fl">4.</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gaussian_score(x,t):</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    a<span class="op">=</span>alpha(t)<span class="op">;</span> <span class="cf">return</span> <span class="op">-</span>(x<span class="op">-</span>a<span class="op">*</span>m0)<span class="op">/</span>(a<span class="op">*</span>a<span class="op">*</span>V_gauss<span class="op">+</span><span class="dv">1</span><span class="op">-</span>a<span class="op">*</span>a)</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>z<span class="op">=</span>rng.normal(size<span class="op">=</span><span class="dv">4000</span>)</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>a1,ae<span class="op">=</span>alpha(<span class="fl">1.</span>),alpha(t_min)</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>x1g<span class="op">=</span>a1<span class="op">*</span>m0<span class="op">+</span>np.sqrt(a1<span class="op">*</span>a1<span class="op">*</span>V_gauss<span class="op">+</span><span class="dv">1</span><span class="op">-</span>a1<span class="op">*</span>a1)<span class="op">*</span>z</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>exactg<span class="op">=</span>ae<span class="op">*</span>m0<span class="op">+</span>np.sqrt(ae<span class="op">*</span>ae<span class="op">*</span>V_gauss<span class="op">+</span><span class="dv">1</span><span class="op">-</span>ae<span class="op">*</span>ae)<span class="op">*</span>z</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>numericg,_,_<span class="op">=</span>sample_reverse(x1g,steps<span class="op">=</span><span class="dv">800</span>,score_fn<span class="op">=</span>gaussian_score)</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.mean(<span class="bu">abs</span>(numericg<span class="op">-</span>exactg))<span class="op">&lt;</span><span class="fl">0.02</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Gaussian mean trajectory error:&quot;</span>,np.mean(<span class="bu">abs</span>(numericg<span class="op">-</span>exactg)))</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Runtime: </span><span class="sc">{</span>time<span class="sc">.</span>perf_counter()<span class="op">-</span>started<span class="sc">:.1f}</span><span class="ss"> s&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="reading-the-sampling-results" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-sampling-results">Reading the sampling results</h3>
+<p>In the recorded run, the discrepancies are about 0.0053 for the ODE and 0.0059 for the reverse SDE, with 12,000 particles. The histograms are close to the reference density. The smooth ODE paths and fluctuating SDE paths illustrate that matching marginal distributions does not mean matching trajectories. Read the trajectory plots from right to left, because their horizontal axis is forward diffusion time.</p>
+</section>
+</section>
+<section id="isolate-numerical-error-using-quantiles" class="level2">
+<h2 class="anchored" data-anchor-id="isolate-numerical-error-using-quantiles">6. Isolate numerical error using quantiles</h2>
+<p>In one dimension, a smooth order-preserving probability flow preserves percentile ranks:</p>
+<p><span class="math display">\[F_t(x_t)=u,\qquad x_t=F_t^{-1}(u).\]</span></p>
+<p>Choose evenly spaced ranks <span class="math inline">\(u_i=(i+1/2)/M\)</span>. The exact initial positions are <span class="math inline">\(F_1^{-1}(u_i)\)</span> and their exact target positions are <span class="math inline">\(F_{0.01}^{-1}(u_i)\)</span>. Numerical root finding supplies these reference quantiles. Comparing Euler outputs with them avoids random histogram fluctuations.</p>
+<p>We then repeat with standard-normal initial quantiles <span class="math inline">\(\Phi^{-1}(u_i)\)</span>, holding the solver fixed. Comparing these outputs with the exact-terminal outputs isolates the consequence of the Gaussian-prior substitution.</p>
+<div id="5ab7c111" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:27.878768Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:27.878716Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:28.323868Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:28.323538Z&quot;}}" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Deterministic quantiles remove Monte Carlo noise from the ODE convergence check.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> brentq</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>u<span class="op">=</span>(np.arange(<span class="dv">1500</span>)<span class="op">+</span><span class="fl">.5</span>)<span class="op">/</span><span class="dv">1500</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>initial<span class="op">=</span>np.array([brentq(<span class="kw">lambda</span> x: cdf(x,<span class="fl">1.</span>)<span class="op">-</span>v,<span class="op">-</span><span class="dv">10</span>,<span class="dv">10</span>) <span class="cf">for</span> v <span class="kw">in</span> u])</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>reference<span class="op">=</span>np.array([brentq(<span class="kw">lambda</span> x: cdf(x,t_min)<span class="op">-</span>v,<span class="op">-</span><span class="dv">10</span>,<span class="dv">10</span>) <span class="cf">for</span> v <span class="kw">in</span> u])</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>errors<span class="op">=</span>[]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> steps <span class="kw">in</span> [<span class="dv">50</span>,<span class="dv">100</span>,<span class="dv">200</span>,<span class="dv">400</span>]:</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    out,_,_<span class="op">=</span>sample_reverse(initial,steps<span class="op">=</span>steps)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    err<span class="op">=</span>np.mean(np.<span class="bu">abs</span>(out<span class="op">-</span>reference))<span class="op">;</span> errors.append(err)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>steps<span class="op">=</span><span class="sc">}</span><span class="ss"> mean quantile-position error=</span><span class="sc">{</span>err<span class="sc">:.6f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> errors[<span class="op">-</span><span class="dv">1</span>]<span class="op">&lt;</span>errors[<span class="dv">0</span>]<span class="op">/</span><span class="dv">4</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Same numerical solver, different terminal law. Matched quantiles isolate initialization.</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> ndtri</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>normal_out,_,_<span class="op">=</span>sample_reverse(ndtri(u),steps<span class="op">=</span><span class="dv">400</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>exact_out,_,_<span class="op">=</span>sample_reverse(initial,steps<span class="op">=</span><span class="dv">400</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Mean output difference caused by Gaussian prior:&quot;</span>,np.mean(<span class="bu">abs</span>(normal_out<span class="op">-</span>exact_out)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>steps=50 mean quantile-position error=0.073474
 steps=100 mean quantile-position error=0.035981
 steps=200 mean quantile-position error=0.017771
 steps=400 mean quantile-position error=0.008827
-Mean output difference caused by Gaussian prior: 0.0003598121425229904
-Gaussian mean trajectory error: 0.0072098052677378914
-Runtime: 1.4 s</code></pre>
+Mean output difference caused by Gaussian prior: 0.0003598121425229904</code></pre>
 </div>
 </div>
-<p><strong>Exercises.</strong> Lower beta to make terminal-prior error visible. Lower the stopping time and compare with clean data. Why do ODE and SDE paths differ despite similar endpoint histograms? A finite histogram cannot prove equality of their underlying laws.</p>
+<section id="reading-the-error-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-error-comparison">Reading the error comparison</h3>
+<p>The mean position error decreases from roughly 0.0735 at 50 steps to 0.00883 at 400 steps. This is the expected first-order convergence pattern for Euler in this experiment. The separate terminal-prior comparison is much smaller here because <span class="math inline">\(\alpha_1=e^{-4}\)</span> is already small. A weaker corruption rate makes that approximation less accurate.</p>
+</section>
+</section>
+<section id="an-additional-solved-gaussian-check" class="level2">
+<h2 class="anchored" data-anchor-id="an-additional-solved-gaussian-check">7. An additional solved Gaussian check</h2>
+<p>For clean data <span class="math inline">\(X_0\sim\mathcal N(m_0,V_0)\)</span>,</p>
+<p><span class="math display">\[m_t=\alpha_tm_0,\qquad V_t=\alpha_t^2V_0+1-\alpha_t^2,
+\qquad s_t(x)=-\frac{x-m_t}{V_t}.\]</span></p>
+<p>A fixed standard-normal draw <span class="math inline">\(\varepsilon\)</span> defines the exact probability-flow trajectory</p>
+<p><span class="math display">\[x(t)=m_t+\sqrt{V_t}\,\varepsilon.\]</span></p>
+<p>The final check starts at its exact terminal position and compares numerical reverse integration with this known trajectory endpoint for <span class="math inline">\(m_0=2\)</span>, <span class="math inline">\(V_0=4\)</span>.</p>
+<div id="775b5095" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:28.324966Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:28.324907Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:28.333122Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:28.332652Z&quot;}}" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gaussian-data check: p0=N(2,4), analytic deterministic transport.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>m0,V_gauss<span class="op">=</span><span class="fl">2.</span>,<span class="fl">4.</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gaussian_score(x,t):</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    a<span class="op">=</span>alpha(t)<span class="op">;</span> <span class="cf">return</span> <span class="op">-</span>(x<span class="op">-</span>a<span class="op">*</span>m0)<span class="op">/</span>(a<span class="op">*</span>a<span class="op">*</span>V_gauss<span class="op">+</span><span class="dv">1</span><span class="op">-</span>a<span class="op">*</span>a)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>z<span class="op">=</span>rng.normal(size<span class="op">=</span><span class="dv">4000</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>a1,ae<span class="op">=</span>alpha(<span class="fl">1.</span>),alpha(t_min)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>x1g<span class="op">=</span>a1<span class="op">*</span>m0<span class="op">+</span>np.sqrt(a1<span class="op">*</span>a1<span class="op">*</span>V_gauss<span class="op">+</span><span class="dv">1</span><span class="op">-</span>a1<span class="op">*</span>a1)<span class="op">*</span>z</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>exactg<span class="op">=</span>ae<span class="op">*</span>m0<span class="op">+</span>np.sqrt(ae<span class="op">*</span>ae<span class="op">*</span>V_gauss<span class="op">+</span><span class="dv">1</span><span class="op">-</span>ae<span class="op">*</span>ae)<span class="op">*</span>z</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>numericg,_,_<span class="op">=</span>sample_reverse(x1g,steps<span class="op">=</span><span class="dv">800</span>,score_fn<span class="op">=</span>gaussian_score)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.mean(<span class="bu">abs</span>(numericg<span class="op">-</span>exactg))<span class="op">&lt;</span><span class="fl">0.02</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Gaussian mean trajectory error:&quot;</span>,np.mean(<span class="bu">abs</span>(numericg<span class="op">-</span>exactg)))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Runtime: </span><span class="sc">{</span>time<span class="sc">.</span>perf_counter()<span class="op">-</span>started<span class="sc">:.1f}</span><span class="ss"> s&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Gaussian mean trajectory error: 0.0072098052677378914
+Runtime: 1.3 s</code></pre>
+</div>
+</div>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Lower <span class="math inline">\(\beta\)</span> while keeping all other settings fixed. Which comparison reveals a larger terminal-prior error?</li>
+<li>Halve the step size. Which experiment most cleanly reveals the improvement in numerical accuracy?</li>
+<li>Change the stopping time. Why must the reference density change too?</li>
+<li>Explain why following the score field <span class="math inline">\(\dot x=s_t(x)\)</span> is a different algorithm from the probability-flow ODE above.</li>
+</ol>
+<p>This notebook supplied an analytic score. The next one keeps the same data and sampling algorithm but estimates the score through noise prediction.</p>
+</section>
 
 </main>
 <!-- /main column -->

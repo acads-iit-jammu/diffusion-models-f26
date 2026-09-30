@@ -2344,8 +2344,27 @@ window.Quarto = {
 <body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-  
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-question" id="toc-the-question" class="nav-link active" data-scroll-target="#the-question">The question</a></li>
+  <li><a href="#fix-the-data-distribution-and-notation" id="toc-fix-the-data-distribution-and-notation" class="nav-link" data-scroll-target="#fix-the-data-distribution-and-notation">1. Fix the data distribution and notation</a></li>
+  <li><a href="#construct-a-regression-problem-from-forward-corruption" id="toc-construct-a-regression-problem-from-forward-corruption" class="nav-link" data-scroll-target="#construct-a-regression-problem-from-forward-corruption">2. Construct a regression problem from forward corruption</a></li>
+  <li><a href="#why-this-estimates-the-score" id="toc-why-this-estimates-the-score" class="nav-link" data-scroll-target="#why-this-estimates-the-score">3. Why this estimates the score</a></li>
+  <li><a href="#implement-the-network-and-optimizer" id="toc-implement-the-network-and-optimizer" class="nav-link" data-scroll-target="#implement-the-network-and-optimizer">4. Implement the network and optimizer</a></li>
+  <li><a href="#train-and-evaluate-at-several-times" id="toc-train-and-evaluate-at-several-times" class="nav-link" data-scroll-target="#train-and-evaluate-at-several-times">5. Train and evaluate at several times</a>
+  <ul class="collapse">
+  <li><a href="#reading-the-training-results" id="toc-reading-the-training-results" class="nav-link" data-scroll-target="#reading-the-training-results">Reading the training results</a></li>
+  </ul></li>
+  <li><a href="#use-the-estimate-in-the-sampling-field" id="toc-use-the-estimate-in-the-sampling-field" class="nav-link" data-scroll-target="#use-the-estimate-in-the-sampling-field">6. Use the estimate in the sampling field</a>
+  <ul class="collapse">
+  <li><a href="#reading-the-generated-samples" id="toc-reading-the-generated-samples" class="nav-link" data-scroll-target="#reading-the-generated-samples">Reading the generated samples</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  </ul>
+</nav>
 </div>
 <main class="content" id="quarto-document-content">
 <nav aria-label="Return to lecture"><a href="../../../tutorials/33-probability-flow-ode-part-4.html">← Lecture 15: CPU notebooks</a></nav>
@@ -2369,9 +2388,29 @@ window.Quarto = {
 </header>
 
 
-<p>A small CPU network receives <span class="math inline">\((x_t,t)\)</span> and predicts noise. Training uses fresh synthetic mixture data, so there is no dataset download. The population target is the <strong>conditional mean</strong> noise. The score conversion is <span class="math inline">\(s_\theta=-\varepsilon_\theta/\sqrt{1-\alpha_t^2}\)</span>.</p>
-<p>Run all cells. The seed and small model make this a reproducible teaching experiment, not an optimized density estimator.</p>
-<div id="b73e5569" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:38.220544Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:38.220423Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:38.443830Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:38.443435Z&quot;}}" data-execution_count="1">
+<section id="the-question" class="level2">
+<h2 class="anchored" data-anchor-id="the-question">The question</h2>
+<p>The previous notebook sampled successfully with an analytic score. Real datasets do not provide a density or its derivatives. Can ordinary regression on corrupted data estimate the score needed by the sampler?</p>
+<p>We will train a small neural network, compare its predictions with a known reference, and then generate samples. The data remain synthetic so that learning error can be measured directly.</p>
+<p><strong>Background:</strong> Gaussian corruption, conditional expectation, and gradient descent. The required sampling formulas are restated below. <strong>Setup:</strong> NumPy, SciPy, Matplotlib, and PyTorch on a CPU. No dataset download or GPU is needed. Run all cells in order.</p>
+</section>
+<section id="fix-the-data-distribution-and-notation" class="level2">
+<h2 class="anchored" data-anchor-id="fix-the-data-distribution-and-notation">1. Fix the data distribution and notation</h2>
+<p>Use</p>
+<p><span class="math display">\[p_0(x)=\tfrac12\mathcal N(x;-2,0.25)+\tfrac12\mathcal N(x;2,0.25),
+\qquad \beta=8,\qquad \alpha_t=e^{-\beta t/2}.\]</span></p>
+<p>Draw noisy observations by</p>
+<p><span class="math display">\[X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,
+\qquad \varepsilon\sim\mathcal N(0,1),\]</span></p>
+<p>with independent data and noise. Data time is 0, terminal time is 1, and generation runs backward. Training uses <span class="math inline">\(t\in[t_{\min},1]\)</span> with <span class="math inline">\(t_{\min}=0.01\)</span>.</p>
+<p>The exact noisy density is a Gaussian mixture with component means <span class="math inline">\(\alpha_t m_j\)</span>, where <span class="math inline">\(m_1=-2\)</span>, <span class="math inline">\(m_2=2\)</span>, and variance <span class="math inline">\(V_t=0.25\alpha_t^2+1-\alpha_t^2\)</span>. Its reference score is</p>
+<p><span class="math display">\[s_t(x)=\sum_jw_j(x,t)\frac{\alpha_tm_j-x}{V_t},\qquad
+w_j(x,t)=\frac{\tfrac12\mathcal N(x;\alpha_tm_j,V_t)}{p_t(x)}.\]</span></p>
+<p>The first cell supplies the reference density, score, CDF, and sampler helpers. The exact score is used for evaluation and the baseline sampler, <strong>not as a training target</strong>.</p>
+<p>The ODE helper uses the backward explicit-Euler update</p>
+<p><span class="math display">\[x_{t-h}=x_t+\frac{\beta h}{2}[x_t+s_t(x_t)].\]</span></p>
+<p>Replacing <span class="math inline">\(s_t\)</span> by a learned estimate will be the only change in the final comparison.</p>
+<div id="9a857c74" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:28.841094Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:28.840919Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:29.060891Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:29.060499Z&quot;}}" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2434,7 +2473,39 @@ window.Quarto = {
 <span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        traces.append(x[:keep].copy())</span>
 <span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x, times, np.asarray(traces)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="11ba42e2" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:38.444942Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:38.444876Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:38.782546Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:38.782162Z&quot;}}" data-execution_count="2">
+</section>
+<section id="construct-a-regression-problem-from-forward-corruption" class="level2">
+<h2 class="anchored" data-anchor-id="construct-a-regression-problem-from-forward-corruption">2. Construct a regression problem from forward corruption</h2>
+<p>For every update, draw clean data <span class="math inline">\(x_0\)</span>, a time <span class="math inline">\(t\)</span>, and noise <span class="math inline">\(\varepsilon\)</span>. Compute <span class="math inline">\(x_t\)</span> using the forward formula. The network receives <span class="math inline">\((x_t,t)\)</span> and predicts the added noise:</p>
+<p><span class="math display">\[\varepsilon_\theta:\mathbb R\times[t_{\min},1]\to\mathbb R.\]</span></p>
+<p>Its population training objective is</p>
+<p><span class="math display">\[\mathcal J(\theta)=\mathbb E\left[
+(\varepsilon-\varepsilon_\theta(X_t,t))^2\right].\]</span></p>
+<p>Several clean-data/noise pairs can produce the same noisy observation. Consequently, the best possible squared-error predictor is the conditional mean</p>
+<p><span class="math display">\[\varepsilon_*(x,t)=\mathbb E[\varepsilon\mid X_t=x,t],\]</span></p>
+<p>not a guaranteed recovery of the particular noise draw used to create each example. To verify this, let <span class="math inline">\(m(X_t,t)=\mathbb E[\varepsilon\mid X_t,t]\)</span> and expand conditionally:</p>
+<p><span class="math display">\[\mathbb E[(\varepsilon-h(X_t,t))^2\mid X_t,t]
+=\operatorname{Var}(\varepsilon\mid X_t,t)+(m(X_t,t)-h(X_t,t))^2.\]</span></p>
+<p>The first term does not depend on the predictor, so the second is minimized at <span class="math inline">\(h=m\)</span>.</p>
+</section>
+<section id="why-this-estimates-the-score" class="level2">
+<h2 class="anchored" data-anchor-id="why-this-estimates-the-score">3. Why this estimates the score</h2>
+<p>The known conditional corruption score is</p>
+<p><span class="math display">\[\partial_x\log p_t(x\mid x_0)
+=-\frac{x-\alpha_tx_0}{1-\alpha_t^2}.\]</span></p>
+<p>Differentiating the marginal mixture and using Bayes’ rule gives</p>
+<p><span class="math display">\[s_t(x)=\mathbb E[\partial_x\log p_t(x\mid X_0)\mid X_t=x]
+=-\frac{\mathbb E[\varepsilon\mid X_t=x]}{\sqrt{1-\alpha_t^2}}.\]</span></p>
+<p>Thus a noise predictor defines a score estimate through</p>
+<p><span class="math display">\[s_\theta(x,t)=-\frac{\varepsilon_\theta(x,t)}{\sqrt{1-\alpha_t^2}}.\]</span></p>
+<p>The conversion explains why noise regression is useful for sampling. It also exposes a numerical issue: at small noise, score error is noise-prediction error divided by a small number. We avoid <span class="math inline">\(t=0\)</span>, where this conversion is undefined, and evaluate errors separately at several positive times.</p>
+</section>
+<section id="implement-the-network-and-optimizer" class="level2">
+<h2 class="anchored" data-anchor-id="implement-the-network-and-optimizer">4. Implement the network and optimizer</h2>
+<p>The small network uses two hidden layers of 64 units with smooth SiLU activations. Its inputs are position, time, and four sinusoidal time features. Time must be an input because the required prediction changes with the noise level.</p>
+<p>The code below defines, but does not yet run, 2,500 training updates. Each update uses 512 freshly generated data points, independent noise, and uniformly sampled times. Adam updates the network using the mean squared error. <code>make_learned_score</code> implements the displayed conversion.</p>
+<p>All code runs on the CPU. A fixed seed makes the comparison reproducible in the tested environment.</p>
+<div id="58dcff17" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:29.062004Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:29.061933Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:29.665980Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:29.665563Z&quot;}}" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>torch.set_num_threads(<span class="dv">2</span>)</span>
@@ -2474,7 +2545,14 @@ window.Quarto = {
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>model(xx,tt).numpy()<span class="op">/</span>np.sqrt(<span class="dv">1</span><span class="op">-</span>alpha(t)<span class="op">**</span><span class="dv">2</span>)</span>
 <span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> learned_score</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="c86e0a22" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:38.783618Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:38.783565Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:39.985926Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:39.985572Z&quot;}}" data-execution_count="3">
+</section>
+<section id="train-and-evaluate-at-several-times" class="level2">
+<h2 class="anchored" data-anchor-id="train-and-evaluate-at-several-times">5. Train and evaluate at several times</h2>
+<p>The next cell trains the model and plots a 50-update moving average of the noise loss. It then compares exact and learned score curves at <span class="math inline">\(t=0.01,0.1,0.5\)</span>.</p>
+<p>We also report a marginal-weighted score error,</p>
+<p><span class="math display">\[\mathbb E_{X_t\sim p_t}[(s_\theta(X_t,t)-s_t(X_t))^2],\]</span></p>
+<p>estimated on new samples. This weights positions according to the distribution encountered at that time. Uniform error across a wide spatial grid would answer a different question by assigning substantial importance to rarely visited tails.</p>
+<div id="e1771d69" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:29.666969Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:29.666911Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:31.018097Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:31.017703Z&quot;}}" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>model,losses<span class="op">=</span>train_noise()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>learned_score<span class="op">=</span>make_learned_score(model)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.plot(np.arange(<span class="dv">49</span>,<span class="bu">len</span>(losses)),np.convolve(losses,np.ones(<span class="dv">50</span>)<span class="op">/</span><span class="dv">50</span>,mode<span class="op">=</span><span class="st">&quot;valid&quot;</span>))</span>
@@ -2509,7 +2587,21 @@ t=0.5: marginal-weighted score MSE=0.0002</code></pre>
 </div>
 </div>
 </div>
-<div id="c10bb511" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:16:39.986869Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:16:39.986782Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:16:40.439888Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:16:40.439582Z&quot;}}" data-execution_count="4">
+<section id="reading-the-training-results" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-training-results">Reading the training results</h3>
+<p>The recorded score MSEs are approximately 0.396, 0.0038, and 0.0002 at the three displayed times. The low-noise score is noticeably less accurate. This is compatible with a reasonable overall noise loss: the conversion amplifies noise-prediction error near <span class="math inline">\(t=0\)</span>, and a single average loss does not report accuracy uniformly across times.</p>
+<p>The loss is not expected to reach zero even for an ideal predictor, because the realized noise is uncertain given the network input. Increasing training updates may reduce approximation or optimization error; it cannot remove that conditional uncertainty from the targets.</p>
+</section>
+</section>
+<section id="use-the-estimate-in-the-sampling-field" class="level2">
+<h2 class="anchored" data-anchor-id="use-the-estimate-in-the-sampling-field">6. Use the estimate in the sampling field</h2>
+<p>The learned probability-flow field is</p>
+<p><span class="math display">\[v_\theta(x,t)=-\frac\beta2\left[x-
+\frac{\varepsilon_\theta(x,t)}{\sqrt{1-\alpha_t^2}}\right].\]</span></p>
+<p>Once the model is trained, its parameters stay fixed during sampling. Start from the exact terminal law <span class="math inline">\(p_1\)</span>, and run 400 Euler steps to <span class="math inline">\(t_{\min}\)</span>. Using the exact terminal mixture here intentionally removes Gaussian-prior approximation from the comparison.</p>
+<p>We use the same initial particles and the same solver settings for two runs: one with the exact score and one with the learned score. This controls the initialization and discretization procedure while changing the field estimate. The target density is <span class="math inline">\(p_{0.01}\)</span>, since the sampler stops there.</p>
+<p>The next cell reports each output’s empirical CDF discrepancy from that target and the mean distance between paired outputs. It saves the trained model for optional reuse in Notebook 4.</p>
+<div id="75fbd0c9" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-30T15:49:31.019135Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-30T15:49:31.019044Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-30T15:49:31.479786Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-30T15:49:31.479360Z&quot;}}" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x1<span class="op">=</span>sample_marginal(<span class="dv">6000</span>,<span class="fl">1.</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>exact,_,_<span class="op">=</span>sample_reverse(x1,steps<span class="op">=</span><span class="dv">400</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>learned,_,_<span class="op">=</span>sample_reverse(x1,steps<span class="op">=</span><span class="dv">400</span>,score_fn<span class="op">=</span>learned_score)</span>
@@ -2535,10 +2627,25 @@ t=0.5: marginal-weighted score MSE=0.0002</code></pre>
 <pre><code>Exact-score ECDF error: 0.01225543204322821
 Learned-score ECDF error: 0.03224285818810235
 Paired mean output difference: 0.06356608082392023
-Runtime: 2.0 s</code></pre>
+Runtime: 2.4 s</code></pre>
 </div>
 </div>
-<p><strong>Exercises.</strong> Repeat with half the training updates, then with twice as many solver steps. Which error does each change address? Does a decreasing noise loss guarantee an accurate score at the smallest trained time?</p>
+<section id="reading-the-generated-samples" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-generated-samples">Reading the generated samples</h3>
+<p>In the recorded run, the empirical CDF discrepancy is about 0.0123 for the exact-score sampler and 0.0322 for the learned-score sampler on 6,000 matched initial particles. Their paired mean output difference is about 0.0636. These values describe this small teaching experiment, not a universal performance level.</p>
+<p>An empirical CDF discrepancy includes finite-sample and numerical effects. The matched setup makes the difference between the two runs informative about score estimation, but neither single discrepancy is pure estimation error.</p>
+</section>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<ol type="1">
+<li>Halve the training updates while keeping the initial sampling particles fixed. Which plots and metrics reveal the change?</li>
+<li>Double the solver steps without retraining. Explain why this cannot correct a systematically wrong learned field.</li>
+<li>Why does an excellent average noise loss not guarantee a small score error near <span class="math inline">\(t_{\min}\)</span>?</li>
+<li>If you initialize from a standard normal instead of exact <span class="math inline">\(p_1\)</span>, what additional approximation have you introduced?</li>
+</ol>
+<p>The next notebook uses the same learned score for posterior-mean denoising and compares that estimate with posterior samples.</p>
+</section>
 
 </main>
 <!-- /main column -->
