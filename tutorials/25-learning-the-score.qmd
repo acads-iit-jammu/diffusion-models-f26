@@ -1,455 +1,343 @@
-# Learning the Score: VP Diffusion from First Principles {.unnumbered}
+# ODEs in One Dimension: Particles, Flows, and Densities {.unnumbered}
 
 ::: {.callout-note}
-## Tutorial 1 of 4 · Learning
+## Tutorial 1 of 4 · Deterministic transport
 
-**Question:** How can adding noise give us training targets for an unknown density?
+**Start here.** This is a stand-alone introduction using derivatives, integrals,
+and Gaussian distributions. No SDEs, stochastic calculus, or fluid mechanics
+are assumed. All states in this tutorial are real numbers.
 
-**Prerequisites:** derivatives, second-order Taylor expansion, elementary ODEs,
-Gaussian distributions, independence, and Bayes' rule. No SDE or stochastic
-calculus background is assumed. Conditional expectation is introduced below.
-
-**Core route:** random steps → VP corruption → conditional averaging → score
-learning → denoising. The stochastic-integral subsection is optional.
-
-**Next:** [Probability-Flow Sampling](./26-probability-flow-sampling.qmd).
-The [series guide](./score-based-diffusion-guide.qmd) lists the full reading sequence.
+**Reading route:** local arrows → trajectories → flow maps → conservation of
+probability → scores → mode seeking → distribution transport.
+Longer calculations sit in derivation subsections.
+[Series guide and notation](./score-based-diffusion-guide.qmd).
 :::
 
-## What are we trying to learn?
+*Looking for the earlier score-learning material? It is now in
+[Tutorial 3](./27-diffusion-neural-odes-normalizing-flows.qmd#learn-the-score-only-after-understanding-its-use).*
 
-### The score is a derivative in data space
+## A data point as a particle
 
-A density $p(x)$ describes a population. Its **score** is
+Imagine a collection of data values placed on a line. Regard each value as the
+position of a particle. To transform the data, move the particles. This analogy
+lets us borrow two questions from mechanics and fluids:
 
-$$s(x)=\nabla_x\log p(x).$$
+1. Where does each particle go?
+2. How much of the population lies in each interval as time passes?
 
-In one dimension this is an ordinary derivative. In several dimensions,
-$\nabla_x$ collects one partial derivative for each coordinate, so the score
-is a vector. It points in the direction of fastest increase of log density.
-For $p=\mathcal N(\mu,a^2)$,
+The first question concerns a **trajectory**; the second concerns a **density**.
+A finite collection has an empirical distribution, a set of point masses. Its
+histogram approximates an underlying population density. When differentiating
+a density below, we mean that smooth population model, not the raw histogram.
 
-$$\log p(x)=C-\frac{(x-\mu)^2}{2a^2},\qquad
-s(x)=-\frac{x-\mu}{a^2}.$$
+Write $x_t$ for the position of one particle. Write $X_t$ when its position is
+random because the starting particle was selected randomly. Its density is
+$q_t(x)$: $q_t(x)\,dx$ approximates the probability in a short interval of width
+$dx$. Density can exceed one; the integral over the whole line must equal one.
 
-We want a network $s_\theta(x,t)$ that approximates the score $s_t(x)$ of a
-noisy-data density $p_t$. The derivative is with respect to the **data
-coordinate** $x$. It is different from the training gradient
-$\nabla_\theta\mathcal L$ and from a particle's velocity $dx/dt$.
+## Local arrows define an ODE
 
-### A convention for random quantities
+A **vector field** in one dimension is a signed velocity $v(x,t)$ at each
+position and time. Positive means right, negative means left, and magnitude
+means speed. The ordinary differential equation is
 
-$X_t$ denotes a random variable: the possible outcomes at time $t$. A lowercase
-$x$ is a particular value. One run gives a trajectory $x_t$; many independent
-runs give a cloud whose histogram approximates $p_t$.
+$$\boxed{\frac{dx_t}{dt}=v(x_t,t),\qquad x_0\text{ given}.}$$
 
-Forward time $t$ runs from data to noise. We use $\epsilon$ for the noise in a
-single corruption observation, and fresh $\xi_k$ for successive simulation
-steps. Every step size $h$ is positive; the direction of time is stated separately.
+It says to follow the arrow at the particle's current position. Euler's method
+makes the instruction computational. For a positive step $h$,
 
-## From Gaussian random steps to an SDE
+$$x_{k+1}=x_k+h\,v(x_k,t_k),\qquad t_{k+1}=t_k+h.$$
 
-### Why the random step has size square root of h
+The subscript $k$ indexes numerical steps; $t$ is continuous time. An exact
+trajectory solves the differential equation; Euler is generally an approximation.
 
-Draw independent $\xi_k\sim\mathcal N(0,1)$ and form
+### First example: constant motion
 
-$$W^{(h)}_{kh}=\sqrt h\sum_{j=0}^{k-1}\xi_j.$$
+If $v(x,t)=c$, integration gives $x_t=x_0+ct$. Every particle translates by the
+same amount. Distances between particles stay fixed. The map from a starting
+position at time $r$ to its position at time $t$ is
 
-Since independent variances add, at $t=kh$ this random walk has variance
-$kh=t$. Halving the step size doubles the number of steps and halves each
-increment's variance, preserving the total spread. If we used $h\xi_j$
-instead, the total variance would be $kh^2=th$, which vanishes as $h\to0$.
+$$\Psi_{r\to t}(x)=x+c(t-r).$$
 
-**Brownian motion** $W_t$ is the continuous-time random-motion model obtained
-in the appropriate limit. It starts at zero, has continuous paths, and has
-independent Gaussian increments:
+This map is the **flow map**. It collects all starting points' solutions.
 
-$$W_{t+h}-W_t\sim\mathcal N(0,h).$$
+### Solved example: contraction toward zero
 
-In $d$ dimensions, use independent copies in each coordinate; the increment
-covariance is $hI$. Brownian paths are not differentiable like ODE trajectories.
-We describe their increments rather than assign them an ordinary velocity.
+If $v(x)=-x$, then positive positions move left and negative positions move
+right. The origin is an equilibrium. For $x_0\ne0$, separation gives
 
-### Euler–Maruyama gives an SDE computational meaning
+$$\frac{dx}{x}=-dt,\qquad \log|x_t|-\log|x_0|=-t,
+\qquad \boxed{x_t=e^{-t}x_0.}$$
 
-An ODE $\dot x=f(x,t)$ can be approximated by Euler:
-$x_{k+1}=x_k+h f(x_k,t_k)$. Add a random step to obtain
+The solution $x_t=0$ covers $x_0=0$, where dividing by $x$ was not valid.
+A particle starting at $5$ has positions $5$, $5e^{-1}$, $5e^{-2}$ at times
+$0,1,2$. It approaches zero without reaching it in finite time.
 
-$$\boxed{\widehat X_{k+1}=\widehat X_k+h f(\widehat X_k,t_k)
-+g(t_k)\sqrt h\,\xi_k.}$$
+The flow is $\Psi_{r\to t}(x)=e^{-(t-r)}x$. For finite times it is invertible:
+$\Psi_{t\to r}(x)=e^{t-r}x$. A shrinking cloud does not collapse to a point
+until the infinite-time limit.
 
-This is **Euler–Maruyama**. The hat distinguishes the numerical approximation
-from the continuous-time process. Draw a new independent $\xi_k$ at every step.
-The corresponding **stochastic differential equation (SDE)** is written
+### Time-dependent fields need two time labels
 
-$$\boxed{dX_t=f(X_t,t)\,dt+g(t)\,dW_t.}$$
+For $r<t_*<t$, following the flow first to $t_*$ and then to $t$ gives
 
-Under suitable regularity, smaller numerical steps approximate that process.
-The SDE notation records deterministic drift $f$ and random spreading with
-amplitude $g$. It is not an instruction to differentiate $W_t$ ordinarily.
-We use scalar $g(t)$ depending only on time throughout this series.
+$$\Psi_{r\to t}=\Psi_{t_*\to t}\circ\Psi_{r\to t_*}.$$
 
-**One step you can calculate.** From $x=2$, let $f(x)=-x/2$, $g=1$, and
-$h=0.01$. Euler–Maruyama gives $1.99+0.1\xi$, a Gaussian with mean $1.99$ and
-variance $0.01$. The drift is fixed given the current position; the noise changes
-from run to run. A finite Euler–Maruyama step is generally not the exact SDE transition.
+For a time-dependent field, the starting time matters; an arrow tomorrow need
+not equal today's arrow at the same location. Under suitable existence and
+uniqueness conditions, trajectories cannot meet at the same position at the
+same time and then have different histories. We assume smooth fields with
+solutions existing in both directions on the finite intervals used here.
 
-### Derivation: the expected Taylor step {#expected-taylor-step}
+## From moving particles to a moving density
 
-We can calculate how averages change using ordinary Taylor expansion. In one
-dimension, condition on $X_t=x$ and use the small-step increment
-$\Delta X=hf(x,t)+g(t)\sqrt h\,\xi$. For a smooth function $\varphi$,
+A flow tells us where each particle goes. To find the new density, preserve
+the probability in corresponding intervals. One-dimensional regular ODE flows
+are increasing because trajectories cannot cross. Thus $X_t\le x$ exactly when
+$X_0\le\Psi_{t\to0}(x)$, and
 
-$$\varphi(x+\Delta X)=\varphi(x)+\varphi'(x)\Delta X
-+\tfrac12\varphi''(x)(\Delta X)^2+\text{higher-order terms}.$$
+$$P(X_t\le x)=P(X_0\le\Psi_{t\to0}(x)).$$
 
-Because $\mathbb E\xi=0$ and $\mathbb E\xi^2=1$,
+Differentiating in $x$ gives the change-of-variables formula:
 
-$$\mathbb E[\Delta X\mid X_t=x]=hf,
-\qquad\mathbb E[(\Delta X)^2\mid X_t=x]=g^2h+f^2h^2.$$
+$$\boxed{q_t(x)=q_0(\Psi_{t\to0}(x))\,\partial_x\Psi_{t\to0}(x).}$$
 
-Divide the expected change by $h$ and let $h\to0$. Under smoothness and moment
-conditions that justify the limit and averaging, this gives
+The inverse flow's derivative is positive. This is a precise version of
+$q_t(x)dx=q_0(x_0)dx_0$: the same probability occupies corresponding intervals.
 
-$$\boxed{\frac{d}{dt}\mathbb E[\varphi(X_t)]
-=\mathbb E\left[f(X_t,t)\varphi'(X_t)
-+\tfrac12g(t)^2\varphi''(X_t)\right].}$$
+An interval that shrinks contains the same probability in less space, so its
+density rises. This is the fluid picture: particles mark portions of a moving
+population; compression changes concentration, not total mass.
 
-The last term is the **Itô correction**. A deterministic increment is of size
-$h$, whose square is negligible after dividing by $h$. A random increment is
-of size $\sqrt h$, whose square contributes at order $h$. That is why ordinary
-first-order chain-rule reasoning misses the change in variance.
+For translation, $q_t(x)=q_0(x-ct)$. For contraction,
 
-**Check:** if $f=0$, $g=1$, and $\varphi(x)=x^2$, the formula gives
-$d\mathbb E[X_t^2]/dt=1$. Starting from zero, $\mathbb E[X_t^2]=t$, exactly as
-in the Gaussian random walk.
+$$\boxed{q_t(x)=e^t q_0(e^t x).}$$
 
-## Construct the variance-preserving corruption law
+If $X_0\sim\mathcal N(m_0,a_0^2)$, then
 
-### Choose a balanced drift and noise rate
+$$X_t=e^{-t}X_0\sim\mathcal N(e^{-t}m_0,e^{-2t}a_0^2).$$
 
-Choose a nonnegative schedule $\beta(t)$ and set
+Notice both changes: particle positions shrink and the density peak becomes taller.
 
-$$f(x,t)=-\tfrac12\beta(t)x,\qquad g(t)=\sqrt{\beta(t)}.$$
+![Contraction: arrows, exact trajectories, and the narrowing Gaussian population.](./figs/one-dimensional-ode.svg)
 
-This defines **variance-preserving (VP) diffusion**:
+## Conservation of probability: the continuity equation {#continuity}
 
-$$dX_t=-\tfrac12\beta(t)X_t\,dt+\sqrt{\beta(t)}\,dW_t.$$
+The probability in an interval $[x_L,x_R]$ is $\int_{x_L}^{x_R} q_t(x)\,dx$. It changes only
+when particles cross the endpoints. Define the **probability flux**
 
-The drift shrinks the cloud; the random steps spread it. We will show that this
-particular balance preserves unit variance. It is a design choice, not a rule
-that every diffusion must follow. Assume $X_0$ has finite second moment and is
-independent of the Brownian increments.
+$$J(x,t)=q_t(x)v(x,t).$$
 
-### Derivation: the mean determines the signal coefficient
+Why this product? Over a small time $h$, rightward velocity $v$ carries the
+particles in a strip of width approximately $vh$ across the boundary. Their
+probability is approximately $q_tvh$. A negative $v$ reverses the direction.
+Thus flux measures signed probability crossing per unit time.
 
-Set $\varphi(x)=x$ in the expected Taylor formula. With $m_t=\mathbb E[X_t]$,
+### Derivation: inflow minus outflow
 
-$$\dot m_t=-\tfrac12\beta(t)m_t,\qquad
-m_t=\alpha_t m_0,\qquad
-\boxed{\alpha_t=\exp\left[-\tfrac12\int_0^t\beta(r)\,dr\right].}$$
+At the left boundary rightward flux enters; at the right boundary it leaves:
 
-Thus $\dot\alpha_t/\alpha_t=-\beta(t)/2$. The same contraction factor applies
-to a fixed initial point before accounting for the added noise.
+$$\frac{d}{dt}\int_{x_L}^{x_R} q_t(x)\,dx=J(x_L,t)-J(x_R,t)
+=-\int_{x_L}^{x_R}\partial_xJ(x,t)\,dx.$$
 
-For constant $\beta$, $\alpha_t=e^{-\beta t/2}$. For a linear schedule on
-$0\le t\le1$,
+Since this holds for arbitrary intervals, smooth densities satisfy
 
-$$\beta(t)=\beta_{\min}+t(\beta_{\max}-\beta_{\min}),\qquad
-\log\alpha_t=-\tfrac12\beta_{\min}t
--\tfrac14(\beta_{\max}-\beta_{\min})t^2.$$
+$$\boxed{\partial_tq_t(x)=-\partial_x\big(q_t(x)v(x,t)\big).}$$
 
-The logarithm of the signal coefficient is quadratic in time. For example,
-$\beta_{\min}=0.1$, $\beta_{\max}=20$ gives $\alpha_1=e^{-5.025}\approx0.00657$:
-only about $4.32\times10^{-5}$ of the original signal variance coefficient remains.
+This is the **continuity equation**, conservation of probability. It is also
+the zero-noise case of the Fokker–Planck equation introduced in Tutorial 2.
+We have derived it without stochastic calculus.
 
-### Derivation: second moment and variance are different
+Here $\partial_t$ changes time while holding $x$ fixed; $\partial_x$ changes
+position while holding time fixed. The equation describes the whole density,
+not an individual trajectory. Given the velocity, initial density, and suitable
+boundary conditions, it determines the density evolution. On the whole line
+we assume flux vanishes at infinity so total probability stays one.
 
-Let $M_2(t)=\mathbb E[X_t^2]$. Set $\varphi(x)=x^2$ in the expected Taylor formula:
+### Worked checks: translation and contraction
 
-$$\dot M_2(t)=\mathbb E[-\beta(t)X_t^2+\beta(t)]
-=\beta(t)[1-M_2(t)].$$
+For translation, differentiating $q_t(x)=q_0(x-ct)$ gives
+$\partial_tq_t=-c q_0'(x-ct)=-\partial_x(cq_t)$.
 
-Variance is $V_t=M_2(t)-m_t^2$. Differentiating and substituting $\dot m_t$ gives
+For contraction, $q_t(x)=e^tq_0(e^tx)$ gives
 
-$$\dot V_t=\beta(t)(1-V_t),\qquad
-\boxed{V_t=\alpha_t^2V_0+(1-\alpha_t^2).}$$
+$$\partial_tq_t=q_t+x\partial_xq_t
+=\partial_x(xq_t)=-\partial_x((-x)q_t).$$
 
-One way to solve is to set $R_t=V_t-1$; then $\dot R_t=-\beta(t)R_t$.
-Unit initial variance stays one, even when the mean is nonzero. Other initial
-variances move toward one as the signal coefficient decays.
+Thus the flow calculation and conservation equation give the same answer.
+For $q_0=\mathcal N(0,1)$, writing the density explicitly yields
 
-**Worked check:** if $X_0\sim\mathcal N(3,1)$, then
+$$q_t(x)=\frac{e^t}{\sqrt{2\pi}}\exp[-e^{2t}x^2/2].$$
 
-$$\mathbb E[X_t]=3\alpha_t,\qquad V_t=1,
-\qquad\mathbb E[X_t^2]=1+9\alpha_t^2.$$
+Its integral is one at every finite time, even though its height at zero grows.
 
-Only the variance is preserved; neither the mean nor the second moment is constant.
+### Derivation: follow the density along one particle {#along-density}
 
-### Derivation: why the conditional distribution is Gaussian {#gaussian-kernel}
+Expanding conservation gives $\partial_tq=-v\partial_xq-q\partial_xv$.
+Where $q>0$, apply the chain rule along $\dot x_t=v(x_t,t)$:
 
-Fix $X_0=x_0$. The VP numerical update is linear:
+$$\frac{d}{dt}\log q_t(x_t)
+=\frac{\partial_tq_t}{q_t}+v\frac{\partial_xq_t}{q_t}
+=\boxed{-\partial_xv(x_t,t)}.$$
 
-$$\widehat X_{k+1}=a_k\widehat X_k+b_k\xi_k,
-\qquad a_k=1-\tfrac12\beta(t_k)h,\quad b_k=\sqrt{\beta(t_k)h}.$$
+A negative velocity slope compresses nearby particles and raises their density.
+For $v=-x$, the slope is $-1$, so log density along each trajectory grows at
+rate one. A fixed observer and a moving particle measure different derivatives.
 
-After two steps,
+## The score supplies a particular vector field {#score}
 
-$$\widehat X_2=a_1a_0x_0+a_1b_0\xi_0+b_1\xi_1.$$
+Suppose we know a smooth positive **target density** $p(x)$. Keep this symbol
+separate from $q_t(x)$, the density of our current particle population. Define
 
-After any number of steps it remains a fixed multiple of $x_0$ plus a weighted
-sum of independent Gaussians. The weights are deterministic because $\beta$
-is prescribed. It is therefore Gaussian at every grid time. As $h\to0$, the
-mean tends to $\alpha_t x_0$; the variance tends to the solution above with
-$V_0=0$, since we fixed the initial value. Define
+$$\boxed{s(x)=\partial_x\log p(x)=\frac{p'(x)}{p(x)}.}$$
 
-$$\boxed{\sigma_t^2=1-\alpha_t^2.}$$
+This is a derivative with respect to the data coordinate, not a model parameter.
+It assigns one signed number to each position, so it is a vector field on the
+line. Its local meaning follows from Taylor expansion:
 
-The limiting Gaussian has that mean and variance. Coordinatewise in $d$ dimensions,
+$$\log p(x+\delta)\approx\log p(x)+s(x)\delta.$$
 
-$$\boxed{X_t\mid X_0=x_0\sim\mathcal N(\alpha_t x_0,\sigma_t^2I).}$$
+Taking $\delta=h s(x)$ increases log density by approximately $h s(x)^2$.
+For the exact score ODE $\dot x=s(x)$,
 
-We can therefore sample a noisy observation directly, without simulating a path:
+$$\frac{d}{dt}\log p(x_t)=s(x_t)^2\ge0.$$
 
-$$\boxed{X_t=\alpha_tX_0+\sigma_t\epsilon,
-\qquad\epsilon\sim\mathcal N(0,I),\quad\epsilon\perp X_0.}$$
+The score therefore points uphill in log density. Conservation alone does
+**not** force the velocity to be the score. We are now studying one plausible
+choice of velocity and asking what population it produces.
 
-This identity describes a **one-time conditional law**. It does not say that
-one fixed $\epsilon$ generates a Brownian trajectory across all times. For
-$s<t$, the actual transition instead has the representation
+### The energy interpretation
 
-$$X_t=\frac{\alpha_t}{\alpha_s}X_s+
-\sqrt{1-\frac{\alpha_t^2}{\alpha_s^2}}\,\epsilon',
-\qquad\epsilon'\perp X_s.$$
+If $p(x)=e^{-E(x)}/Z$ with $Z=\int e^{-E(x)}dx<\infty$, then
 
-There is new randomness between times $s$ and $t$.
+$$s(x)=-E'(x).$$
 
-### Conditional variance versus marginal variance
+Following the score is gradient descent on energy. The unknown normalizing
+constant disappears on differentiation. This makes a score accessible even
+when evaluating the normalized density is difficult. Energy descent alone
+finds low-energy locations; sampling requires the correct spread as well.
 
-The conditional variance, with the starting point fixed, is $\sigma_t^2$.
-When the starting point is random, independence gives
+## Three solved score ODEs {#gaussian-score}
 
-$$\operatorname{Var}(X_t)=
-\underbrace{\alpha_t^2\operatorname{Var}(X_0)}_{\text{remaining signal variance}}
-+\underbrace{\sigma_t^2}_{\text{added noise variance}}.$$
+### Target 1: standard normal
 
-In several dimensions the same statement is
-$\operatorname{Cov}(X_t)=\alpha_t^2\operatorname{Cov}(X_0)+\sigma_t^2I$.
-Preserving covariance $I$ does not make a non-Gaussian distribution Gaussian
-at every time. The shape changes as the signal is suppressed.
+For $p=\mathcal N(0,1)$, $s(x)=-x$. We already solved its trajectories, flow,
+density, and continuity equation. Starting even from the target itself gives
+$q_t=\mathcal N(0,e^{-2t})$, which immediately differs from $p$.
 
-For example, if $X_0\sim\mathcal N(0,c)$ then
-$p_T=\mathcal N(0,1+\alpha_T^2(c-1))$. A finite terminal time usually gives a
-**near-Gaussian** law, not exactly $\mathcal N(0,1)$.
+### Target 2: normal with mean mu and unit variance
 
-### Optional derivation: stochastic-integral notation
+For $p=\mathcal N(\mu,1)$, $s(x)=-(x-\mu)$. Set $y_t=x_t-\mu$. Then
+$\dot y_t=-y_t$, so
 
-*Skip this subsection on a first reading; the Gaussian kernel is already established.*
+$$x_t=\mu+e^{-t}(x_0-\mu),\qquad
+\Psi_{0\to t}(x)=\mu+e^{-t}(x-\mu).$$
 
-For deterministic $c(s)$, the notation $\int_0^t c(s)\,dW_s$ denotes the
-mean-square limit of weighted increment sums
-$\sum_k c(t_k)(W_{t_{k+1}}-W_{t_k})$. Independence gives
+If $X_0\sim\mathcal N(m_0,a_0^2)$, then
+$q_t=\mathcal N(\mu+e^{-t}(m_0-\mu),e^{-2t}a_0^2)$.
 
-$$\mathbb E\left[\left(\int_0^t c(s)\,dW_s\right)^2\right]
-=\int_0^t c(s)^2\,ds.$$
+### Target 3: normal with mean mu and variance a squared
 
-This rule is the deterministic-integrand case of **Itô isometry**; it is the
-continuous version of adding squared weights to compute a Gaussian sum's variance.
+For $p=\mathcal N(\mu,a^2)$, $a>0$,
 
-Multiplying the VP equation by the integrating factor $1/\alpha_t$ cancels its
-drift, since $d(1/\alpha_t)/dt=\beta(t)/(2\alpha_t)$. The factor is deterministic,
-so the ordinary product rule with this factor gives
+$$s(x)=-\frac{x-\mu}{a^2},\qquad
+x_t=\mu+e^{-t/a^2}(x_0-\mu),$$
 
-$$d(X_t/\alpha_t)=\frac{\sqrt{\beta(t)}}{\alpha_t}\,dW_t,
-\qquad
-X_t=\alpha_tX_0+\alpha_t\int_0^t
-\frac{\sqrt{\beta(s)}}{\alpha_s}\,dW_s.$$
+$$\boxed{q_t(x)=e^{t/a^2}q_0\!\left(\mu+e^{t/a^2}(x-\mu)\right).}$$
 
-The added term has variance
+For Gaussian $q_0$, its mean is $\mu+e^{-t/a^2}(m_0-\mu)$ and variance is
+$e^{-2t/a^2}a_0^2$. Smaller target variance means faster contraction.
 
-$$\alpha_t^2\int_0^t\frac{\beta(s)}{\alpha_s^2}\,ds
-=\alpha_t^2[\alpha_t^{-2}-1]=1-\alpha_t^2,$$
+**Density-equation check.** Differentiating the displayed $q_t$ gives
 
-because $d(\alpha_s^{-2})/ds=\beta(s)\alpha_s^{-2}$.
-This confirms the elementary Gaussian-step derivation.
+$$\partial_tq_t=\frac1{a^2}\left[q_t+(x-\mu)\partial_xq_t\right]
+=-\partial_x(sq_t).$$
 
-## Learn an unknown score from known targets
+At $q_t=p$, the right side is $-p''$, generally nonzero. The desired target is
+not stationary under its own score ODE.
 
-### Conditional and marginal densities
+## Why score ascent is mode seeking {#mode-seeking}
 
-The **conditional density** $p(x\mid x_0)$ describes noise around one fixed
-clean point. The **marginal density** averages these conditional densities over
-all possible clean origins:
+For the Gaussian every particle approaches the mode $\mu$. A sampler for
+$\mathcal N(\mu,a^2)$ must instead return values with variance $a^2$. Higher
+pointwise density and correct population density are different objectives.
 
-$$p_t(x)=\int p(x\mid x_0)p_{\mathrm{data}}(x_0)\,dx_0.$$
+For a smooth mixture, let $p(x)=\tfrac12\phi_a(x-m)+\tfrac12\phi_a(x+m)$,
+where $\phi_a$ is the centered Gaussian density with standard deviation $a$.
+Direct differentiation gives
 
-For a discrete distribution replace the integral by a weighted sum. For the
-empirical distribution on $N$ training points, it is $N^{-1}\sum_i p(x\mid x_0^{(i)})$.
-Gaussian corruption gives a smooth positive marginal at $\sigma_t>0$ even
-when the clean distribution is discrete.
+$$s(x)=\frac{m\tanh(mx/a^2)-x}{a^2}.$$
 
-The conditional Gaussian score is known:
+When $m>a$, $s'(0)=(m^2-a^2)/a^4>0$: the middle equilibrium repels, while the
+two modes attract. Their locations solve $x=m\tanh(mx/a^2)$; they are not
+exactly $\pm m$. A smooth unique ODE flow cannot cross the equilibrium at zero.
+The limiting proportions in each attraction region depend on the initial
+population, and within-region spread disappears. There is usually no useful
+closed-form trajectory; Euler computes it numerically.
 
-$$\nabla_x\log p(x\mid x_0)=-\frac{x-\alpha_t x_0}{\sigma_t^2}.$$
+![A two-Gaussian target and its score: arrows attract particles to modes.](./figs/one-dimensional-mixture.svg)
 
-Evaluated at a random training pair, this target is
+## Deterministic transport can still generate samples {#gaussian-transport}
 
-$$\left.\nabla_x\log p(x\mid X_0)\right|_{x=X_t}
-=-\frac{\epsilon}{\sigma_t}.$$
+Randomness may enter through the initial position. A deterministic map applied
+to a random input still gives a random output. We need a velocity chosen for
+the desired **density path**, rather than unmodified ascent of one fixed target.
 
-We generated $\epsilon$, so we know the target. But the sampler needs the
-**marginal score** $s_t(x)=\nabla_x\log p_t(x)$, which need not equal this
-single pair's conditional score.
+Choose differentiable $m_t$ and positive $a_t$. If $X_0\sim\mathcal N(m_0,a_0^2)$,
+set
 
-### Worked example: conditional expectation as a posterior average {#two-point-posterior}
+$$x_t=m_t+\frac{a_t}{a_0}(x_0-m_0).$$
 
-Let $X_0$ be $+1$ or $-1$, each with probability one half. Observing $X_t=x$
-does not reveal its clean origin. Bayes' rule assigns relative weights using
+This flow gives $q_t=\mathcal N(m_t,a_t^2)$. Differentiating and eliminating
+$x_0$ identifies its velocity:
 
-$$\frac{p(x\mid X_0=+1)}{p(x\mid X_0=-1)}
-=\exp\left[\frac{(x+\alpha_t)^2-(x-\alpha_t)^2}{2\sigma_t^2}\right]
-=e^{2\alpha_t x/\sigma_t^2}.$$
+$$\boxed{v(x,t)=\dot m_t+\frac{\dot a_t}{a_t}(x-m_t).}$$
 
-Thus, with $w(x)=P(X_0=+1\mid X_t=x)$,
+For example, from standard normal to $\mathcal N(2,4)$ over $0\le t\le1$, use
+$m_t=2t$, $a_t=1+t$. Then $x_t=2t+(1+t)x_0$ and
+$v(x,t)=2+(x-2t)/(1+t)$. At $t=1$, $X_1=2+2X_0$ has exactly the target law.
 
-$$w(x)=\frac1{1+e^{-2\alpha_t x/\sigma_t^2}},\qquad
-\mathbb E[X_0\mid X_t=x]=w(x)-(1-w(x))
-=\tanh\left(\frac{\alpha_t x}{\sigma_t^2}\right).$$
+### Derivation: check the density equation
 
-The notation $\mathbb E[A\mid X_t=x]$ means the average of $A$ under the
-posterior distribution associated with the observed value $x$. For a continuous
-observation, we compute that posterior using densities, rather than divide by
-$P(X_t=x)$, which is zero. A useful identity is the **tower property**:
-averaging these conditional averages over the observations gives the original
-average, $\mathbb E[\mathbb E[A\mid X_t]]=\mathbb E[A]$.
+Write $y=(x-m_t)/a_t$ and $q_t=a_t^{-1}\phi_1(y)$. Then
 
-At $x=0$ both origins have weight one half. Their conditional-score targets are
-$+\alpha_t/\sigma_t^2$ and $-\alpha_t/\sigma_t^2$. The appropriate average is zero.
+$$\partial_x\log q_t=-\frac{y}{a_t},\qquad
+\partial_t\log q_t=-\frac{\dot a_t}{a_t}
++\frac{\dot m_t}{a_t}y+\frac{\dot a_t}{a_t}y^2.$$
 
-### Derivation: averaging conditional scores gives the marginal score {#marginal-score}
+Meanwhile,
 
-Differentiate the mixture, using Gaussian smoothness to justify the operation:
+$$-\partial_xv-v\partial_x\log q_t
+=-\frac{\dot a_t}{a_t}+(\dot m_t+\dot a_t y)\frac{y}{a_t},$$
 
-$$\begin{aligned}
-\nabla_xp_t(x)
-&=\int p(x\mid x_0)\nabla_x\log p(x\mid x_0)
-                  p_{\mathrm{data}}(x_0)\,dx_0,\\
-\nabla_x\log p_t(x)
-&=\int p(x_0\mid x)\nabla_x\log p(x\mid x_0)\,dx_0.
-\end{aligned}$$
+which is the same expression.
+Multiplication by $q_t$ verifies conservation. All probability moves into the
+new Gaussian without collapsing its variance.
 
-The second line follows by dividing by $p_t(x)>0$ and applying Bayes' rule.
-The same algebra holds with sums for a discrete prior. Consequently,
+## The next question: can noise balance score contraction?
 
-$$\boxed{s_t(x)=\mathbb E[-\epsilon/\sigma_t\mid X_t=x].}$$
+A preview of Langevin sampling is
 
-For the two-point example, averaging the two targets gives
+$$x_{k+1}=x_k+h s(x_k)+\sqrt{2h}\,\xi_k,\qquad
+\xi_k\sim\mathcal N(0,1)\text{ independently}.$$
 
-$$s_t(x)=\frac{\alpha_t\tanh(\alpha_t x/\sigma_t^2)-x}{\sigma_t^2}.$$
+The drift pulls inward; fresh noise spreads the cloud. The relative coefficients
+matter. [Tutorial 2](./26-probability-flow-sampling.qmd) develops Brownian motion,
+the SDE, and Fokker–Planck before deriving this balance. Later, Tutorial 3
+constructs an ODE velocity that reproduces a diffusion's density evolution.
 
-### Derivation: why squared-error regression learns this average {#mse-lemma}
+## Check your understanding
 
-Let $Y$ be a square-integrable target, $Z$ an input, and
-$m(Z)=\mathbb E[Y\mid Z]$. For a predictor $a(Z)$, write
-
-$$a(Z)-Y=[a(Z)-m(Z)]+[m(Z)-Y].$$
-
-On squaring and averaging, the cross term is zero: conditional on $Z$,
-$\mathbb E[m(Z)-Y\mid Z]=0$. The tower property therefore gives
-
-$$\boxed{\mathbb E\|a(Z)-Y\|^2
-=\mathbb E\|a(Z)-m(Z)\|^2+\mathbb E\|Y-m(Z)\|^2.}$$
-
-Only the first term depends on the predictor, and it is minimized by $a=m$.
-At fixed $t>0$ with $\sigma_t>0$, use $Z=X_t$, $Y=-\epsilon/\sigma_t$:
-
-$$\mathcal L_t(\theta)=\mathbb E\|s_\theta(X_t,t)+\epsilon/\sigma_t\|^2,
-\qquad s^*(x,t)=s_t(x).$$
-
-This is **denoising score matching (DSM)**. Its minimum is generally positive:
-a single noisy observation does not determine its training target. At $x=0$
-in the two-point example, even the ideal output zero leaves conditional loss
-$\alpha_t^2/\sigma_t^4$.
-
-### Train across noise levels without a singular target {#training-recipe}
-
-A concrete training loop is:
-
-1. Draw $X_0$ from the data and $t$ from $[t_{\min},T]$, where $t_{\min}>0$.
-2. Draw independent $\epsilon\sim\mathcal N(0,I)$.
-3. Construct $X_t=\alpha_tX_0+\sigma_t\epsilon$ directly.
-4. Minimize $\lambda(t)\|s_\theta(X_t,t)+\epsilon/\sigma_t\|^2$.
-
-Choose an interval where $\sigma_t$ is bounded away from zero. This avoids the
-singular endpoint target. For a smooth schedule with $\beta(0)>0$,
-$\sigma_t^2\approx\beta(0)t$, so
-$\mathbb E\|\epsilon/\sigma_t\|^2=d/\sigma_t^2$ grows like $1/t$.
-With smooth clean densities, even the irreducible unweighted DSM loss can
-have a divergent time integral at zero. Endpoint behavior depends on the data
-and schedule; positive-time training is the simple prescription used here.
-
-### Noise prediction and time weighting
-
-Define $\epsilon_\theta(x,t)=-\sigma_t s_\theta(x,t)$. Then pointwise,
-
-$$\boxed{\sigma_t^2\|s_\theta(X_t,t)+\epsilon/\sigma_t\|^2
-=\|\epsilon_\theta(X_t,t)-\epsilon\|^2.}$$
-
-Thus choosing $\lambda(t)=\sigma_t^2$ gives the noise-prediction loss. This
-removes the explicit inverse-noise scaling; finite expected loss still requires
-finite second moments of the predictions. At the population optimum,
-$\epsilon^*(x,t)=\mathbb E[\epsilon\mid X_t=x]=-\sigma_t s_t(x)$.
-The targets contain equivalent information, but different time weights and
-finite-capacity parameterizations can produce different learned fits.
-
-## Interpret the score as a denoiser
-
-### Derivation: Tweedie's formula
-
-Average the conditional Gaussian score over the clean posterior:
-
-$$s_t(x)=\frac{\alpha_t\mathbb E[X_0\mid X_t=x]-x}{\sigma_t^2}.$$
-
-For $\alpha_t>0$ this rearranges to
-
-$$\boxed{\mathbb E[X_0\mid X_t=x]
-=\frac{x+\sigma_t^2s_t(x)}{\alpha_t}.}$$
-
-The MSE lemma above, now with target $X_0$, proves that this posterior mean is
-the Bayes-optimal squared-error denoiser. For unscaled additive noise
-$Y=X+\sigma\epsilon$, set $\alpha=1$ to get
-$\mathbb E[X\mid Y=y]=y+\sigma^2\nabla_y\log p_Y(y)$.
-A denoised posterior mean need not itself be a data sample: for the two-point
-prior and observation zero it equals zero, although the clean values are $\pm1$.
-
-## What comes next?
-
-We chose a VP corruption law, derived its Gaussian conditional distribution,
-and proved why regression on known noisy targets recovers the marginal score.
-[Tutorial 2](./26-probability-flow-sampling.qmd) will derive the sampling velocity
-
-$$v(x,t)=f(x,t)-\tfrac12g(t)^2s_t(x).$$
-
-For now this is a preview: a spatial score must be combined with drift and
-noise scaling before it becomes a temporal velocity. Learning the score and
-using it to transport a population are separate steps.
-
-### Check your understanding
-
-1. If the random increment were $h\xi$ instead of $\sqrt h\xi$, what would
-   happen to the variance over a fixed time as $h\to0$?
-2. For VP starting from $\mathcal N(3,1)$, which of mean, variance, and second
-   moment stays constant?
-3. At $X_t=0$ for the two-point prior, why are the individual training targets
-   nonzero while the ideal score prediction is zero?
-4. Does one fixed $\epsilon$ in the corruption formula specify a Brownian path?
+1. What distinguishes a trajectory, a flow map, and a density?
+2. Why does contraction raise density without creating probability?
+3. Does $\dot x=\partial_x\log p$ preserve $p=\mathcal N(\mu,1)$?
+4. What randomness remains in deterministic generation?
 
 ::: {.callout-tip collapse="true"}
 ## Answers
 
-1. The variance tends to zero, so the random spreading disappears.
-2. Variance stays one; the mean is $3\alpha_t$ and second moment $1+9\alpha_t^2$.
-3. The conditional targets have opposite signs and equal posterior weights.
-4. No. The formula specifies a one-time law; a path requires the correct fresh
-   randomness between times.
+1. One particle's history; a map of all starting positions; probability per unit length.
+2. The same probability occupies a shorter interval; the change-of-variables factor compensates.
+3. No. Even starting at $p$, its variance becomes $e^{-2t}$.
+4. The random initial position. An appropriate flow transports its full distribution.
 :::

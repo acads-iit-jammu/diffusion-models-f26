@@ -1,412 +1,393 @@
-# Probability-Flow Sampling: From Density Evolution to Samples {.unnumbered}
+# SDEs in One Dimension: Brownian Motion, Itô Calculus, and Langevin Sampling {.unnumbered}
 
 ::: {.callout-note}
-## Tutorial 2 of 4 · Sampling
+## Tutorial 2 of 4 · Random motion and density evolution
 
-**Question:** Why does the learned score give a valid sampling velocity?
+**Stand-alone prerequisites:** elementary calculus, Taylor expansion, means,
+variances, and Gaussian distributions. No prior stochastic calculus is needed.
+The deterministic transport recap below supplies the needed ODE background.
+All states here are real numbers.
 
-**Before this:** [Learning the Score](./25-learning-the-score.qmd), including
-Gaussian increments and the expected Taylor step. No prior PDE course is needed.
-
-**Core route:** particle motion → probability flux → density evolution →
-probability-flow ODE → backward sampling → examples. The multidimensional
-notation, integration-by-parts proof, and stochastic-sampler comparison are
-labelled subsections; the one-dimensional derivation gives the main argument.
-
-**Next:** [Diffusion, Neural ODEs, and Normalizing Flows](./27-diffusion-neural-odes-normalizing-flows.qmd).
+**Reading route:** random walks → Brownian motion → Euler–Maruyama → Itô
+integral and lemma → Fokker–Planck → Gaussian Langevin sampling.
+[Shared notation](./score-based-diffusion-guide.qmd).
 :::
 
-## Separate the particle question from the density question
+*Looking for probability-flow sampling? It is now in
+[Tutorial 3](./27-diffusion-neural-odes-normalizing-flows.qmd#probability-flow).*
 
-A particle question asks: **where does this starting point go?** A density
-question asks: **how is the whole population distributed at a given time?**
-An ODE and an SDE can answer the particle question differently while giving
-the same density at every time. This tutorial constructs such a pair.
+## Recap: velocity, particles, and conservation
 
-Write $p_0=p_{\mathrm{data}}$ and let $p_t$ be the forward-noised density from
-Tutorial 1. Our aim is to move random samples from $p_T$ back to $p_0$. For VP
-with enough signal attenuation, $p_T$ is approximately standard Gaussian.
-Exact arguments use $p_T$; practical samplers often substitute a Gaussian.
+A particle follows $\dot x_t=v(x_t,t)$. A random initial position makes a
+population with density $q_t(x)$. Its signed probability flux is $vq_t$, and
+conservation gives $\partial_tq_t=-\partial_x(vq_t)$. The derivative in time
+holds position fixed. For $v=-x$, trajectories contract as $e^{-t}x_0$ and a
+standard normal population becomes $\mathcal N(0,e^{-2t})$.
 
-### Recall: fields, trajectories, and flow maps
+For a fixed target density $p$, its score is $s(x)=\partial_x\log p(x)$.
+For $p=\mathcal N(\mu,a^2)$ it equals $-(x-\mu)/a^2$. Following that score
+alone collapses particles toward the mean. We now introduce a spreading
+mechanism and ask how to balance it with this contraction.
 
-A vector field $v(x,t)$ assigns a velocity vector to each location and time.
-The ODE $\dot x_t=v(x_t,t)$ says that a particle follows its current local
-vector. For $v(x)=-x$,
+## Random walks: many small independent kicks
 
-$$\dot x=-x,\qquad x_t=e^{-t}x_0,\qquad
-\Psi_{0\to t}(x_0)=e^{-t}x_0.$$
+At times $t_k=kh$, draw independent $\xi_k\sim\mathcal N(0,1)$ and define
 
-Separation of variables gives this solution when $x_0\ne0$, and $x\equiv0$
-completes the equilibrium case. The **flow map** $\Psi_{s\to t}$ collects the
-solutions for every starting state at time $s$. Existence and uniqueness are
-needed for this map to be well defined; smooth fields with appropriate growth
-bounds suffice on the intervals we use. Tutorial 3 examines invertibility.
+$$W^{(h)}_{kh}=\sqrt h\sum_{j=0}^{k-1}\xi_j.$$
 
-A deterministic map can generate random outputs: start it with a random input.
-But the contraction above takes $\mathcal N(0,1)$ to $\mathcal N(0,e^{-2t})$,
-so following the bare Gaussian score $-x$ does not preserve Gaussian samples.
+The mean is zero. Independence makes variances add, so
+$\operatorname{Var}(W^{(h)}_{kh})=kh=t_k$. Halving $h$ doubles the number of
+steps but halves each step's variance; the spread at a fixed time is unchanged.
+Using $h\xi_j$ instead would give variance $t_kh\to0$.
 
-### Recall: stochastic motion
+**Brownian motion** $W_t$ is the continuous-path random process modeled by
+this limiting construction. It satisfies $W_0=0$, has independent increments,
+and
 
-The forward SDE is
+$$W_{t+h}-W_t\sim\mathcal N(0,h).$$
 
-$$dX_t=f(X_t,t)\,dt+g(t)\,dW_t.$$
+Its paths are continuous but almost surely (with probability one) nowhere differentiable. A typical
+increment is of size $\sqrt h$; dividing it by $h$ does not produce an ordinary
+finite velocity as $h\to0$. Brownian motion is specified by increments and
+joint laws, not by a conventional derivative.
 
-Tutorial 1 explains its Euler–Maruyama approximation:
+Piecewise interpolation of finer random walks motivates this limit. A rigorous
+construction is beyond the prerequisite level; the increment properties above
+are what our calculations use.
 
-$$\widehat X_{k+1}=\widehat X_k+h f(\widehat X_k,t_k)
-+g(t_k)\sqrt h\,\xi_k,\qquad h>0.$$
+## From Euler to Euler–Maruyama {#euler-maruyama}
 
-The $\xi_k\sim\mathcal N(0,I)$ are independent. For VP,
-$f=-\beta(t)x/2$, $g^2=\beta(t)$, and the one-time conditional law is
-$X_t=\alpha_tX_0+\sigma_t\epsilon$ with
-$\sigma_t^2=1-\alpha_t^2$. A shared $\epsilon$ across times is not a Brownian path.
+For a positive step $h$, Euler uses $x_{k+1}=x_k+h f(x_k,t_k)$. Add fresh
+Gaussian kicks:
 
-## Describe motion of an entire density
+$$\boxed{\widehat X_{k+1}=\widehat X_k+h f(\widehat X_k,t_k)
++g(t_k)\sqrt h\,\xi_k.}$$
 
-### Derivation: probability flux in one dimension
+This is **Euler–Maruyama** for the stochastic differential equation
 
-Suppose particles move deterministically with velocity $v(x,t)$. A small
-interval of width $\Delta x$ contains probability approximately
-$p_t(x)\Delta x$. Define **probability flux**
+$$\boxed{dX_t=f(X_t,t)\,dt+g(t)\,dW_t.}$$
 
-$$J(x,t)=p_t(x)v(x,t).$$
+$f$ is the drift, the deterministic part of the infinitesimal change. It is
+not the derivative of a rough sample path. $g(t)$ is the noise amplitude;
+we restrict it to depend only on time. Throughout, $X_0$ is independent of the
+Brownian motion $W$. In numerical schemes, $\xi_k$ is independent of
+$\widehat X_0,\xi_0,\ldots,\xi_{k-1}$. The next section gives the $dW$ notation
+its integral meaning. A hat denotes a numerical approximation.
+Smaller steps approximate the SDE under suitable regularity and moment bounds.
 
-This is signed probability crossing a location per unit time. The interval
-gains mass from its left boundary and loses mass through its right boundary:
+From $x=2$, with $f=-x/2$, $g=1$, $h=0.01$, the next numerical state is
+$1.99+0.1\xi$. Its conditional mean is $1.99$ and conditional variance is $0.01$.
+A finite Euler–Maruyama step is generally not the exact SDE transition.
 
-$$\frac{d}{dt}[p_t(x)\Delta x]=J(x,t)-J(x+\Delta x,t).$$
+## What the Itô integral means {#ito-integral}
 
-Expand $J(x+\Delta x,t)=J(x,t)+\partial_xJ(x,t)\Delta x+o(\Delta x)$.
-After dividing by $\Delta x$ and taking the limit,
+An SDE is shorthand for an integral equation:
 
-$$\boxed{\partial_t p_t=-\partial_x(p_t v).}$$
+$$X_t=X_0+\int_0^t f(X_r,r)\,dr+\int_0^t g(r)\,dW_r.$$
 
-This is the **continuity equation**, expressing conservation of probability.
-It is a partial differential equation (PDE) because $p$ depends on both $x$
-and $t$. The derivative $\partial_t$ holds location fixed; the derivative
-$\partial_x$ holds time fixed.
+The first integral accumulates drift. The second accumulates weighted random
+increments. For a continuous deterministic function $c$ on a finite interval,
 
-### Multidimensional notation: gradient, divergence, Laplacian
+$$\int_0^t c(r)\,dW_r
+=\lim_{\max\Delta t_k\to0}\sum_k c(t_k)
+       (W_{t_{k+1}}-W_{t_k}),$$
 
-For a scalar function $p$, $\nabla p$ collects its coordinate derivatives.
-For a vector field $v=(v_1,\ldots,v_d)$, define
+where the limit is in **mean square**: the expected squared error tends to zero.
+Independence of disjoint Brownian increments gives zero mean and
 
-$$\nabla\cdot v=\sum_{i=1}^d\partial_{x_i}v_i,
-\qquad\Delta p=\sum_{i=1}^d\partial_{x_i}^2p=\nabla\cdot(\nabla p).$$
+$$\boxed{\mathbb E\left[\left(\int_0^t c(r)\,dW_r\right)^2\right]
+=\int_0^t c(r)^2\,dr.}$$
 
-The first is **divergence**, measuring local expansion; the second is the
-**Laplacian**, adding the curvature in all coordinate directions. For $v=x$,
-$\nabla\cdot v=d>0$: a small cloud expands. For $v=-x$, it contracts.
+This is Itô isometry for deterministic integrands. General square-integrable
+integrands are defined by approximation by step functions; arbitrary pointwise
+left-endpoint samples need not converge for such functions. A deterministic
+integrand gives a Gaussian integral,
+because its approximating sums are weighted sums of independent Gaussians.
 
-Apply the one-dimensional flux argument to opposite faces of a small box.
-The net outward flux in coordinate $i$ is
-$\partial_{x_i}(p_t v_i)$ times the box volume. Add all directions:
+### Random integrands and the left endpoint
 
-$$\boxed{\partial_t p_t=-\nabla\cdot(p_t v).}$$
+Itô integrals also allow random $H_r$ determined by information available by
+time $r$, with $\mathbb E\int_0^t H_r^2dr<\infty$. The left-endpoint sums use
+$H_{t_k}$ before seeing the next Brownian increment. This is the non-anticipating
+rule. More precisely, one first defines these sums for such step processes and
+extends by mean-square limits. The isometry becomes
 
-No surface-integral theorem is needed for this box argument.
+$$\mathbb E\left[\left(\int_0^t H_r\,dW_r\right)^2\right]
+=\mathbb E\int_0^t H_r^2\,dr.$$
 
-### Derivation: how Gaussian spreading changes a density {#fokker-planck}
+The integral still has mean zero, but need not be Gaussian for a random integrand.
+The endpoint convention matters; ordinary Riemann integration rules cannot be
+applied to a Brownian path as though it had finite variation.
 
-Without drift, freeze $g$ during a small positive step $h$. Adding an independent
-$\eta=g(t)\sqrt h\,\xi$ averages shifted copies of the old density:
+## Why the chain rule changes: Itô's lemma {#expected-taylor-step}
 
-$$p_{t+h}(x)\approx\mathbb E_\eta[p_t(x-\eta)].$$
+Condition on $X_t=x$ and examine a small Euler–Maruyama increment
+$\Delta X=hf+g\sqrt h\xi$. For a smooth function $\varphi(x)$,
 
-This is the density-level version of the Euler–Maruyama step; for constant $g$
-and zero drift, that Gaussian increment is exact. Taylor expansion gives
+$$\varphi(x+\Delta X)-\varphi(x)
+=\varphi'(x)\Delta X+\tfrac12\varphi''(x)(\Delta X)^2+\cdots.$$
 
-$$p_t(x-\eta)=p_t(x)-\eta p_t'(x)+\tfrac12\eta^2p_t''(x)+\cdots.$$
+Here $\mathbb E\Delta X=hf$ and
+$\mathbb E(\Delta X)^2=g^2h+f^2h^2$. The squared random increment survives
+at order $h$. With bounded coefficients and bounded third derivative locally,
+$\mathbb E|\Delta X|^3=O(h^{3/2})$, so the Taylor remainder vanishes after
+dividing by $h$. Under conditions justifying passage to the continuous process,
 
-The odd Gaussian moments vanish and $\mathbb E\eta^2=g(t)^2h$. For sufficiently
-smooth densities, the frozen-step expansion is therefore
+$$\boxed{\frac{d}{dt}\mathbb E[\varphi(X_t)]
+=\mathbb E[f\varphi'+\tfrac12g^2\varphi''].}$$
 
-$$\mathbb E[p_t(x-\eta)]
-=p_t(x)+\tfrac12g(t)^2h\,p_t''(x)+O(h^2).$$
+To follow paths rather than averages, retain the random parts. The sum of
+$\varphi'(x)g\sqrt h\xi_k$ builds an Itô integral. The quadratic contribution
+contains $h\xi_k^2$. Over a uniform grid, the differences between
+$\tfrac12\varphi''g^2h\xi_k^2$ and $\tfrac12\varphi''g^2h$ have conditional mean
+zero. With bounded, non-anticipating coefficients, cross terms have zero
+expectation and the total variance is $O(h)$. Their sum vanishes in mean square.
+Localization and remainder estimates extend this reasoning beyond bounded
+coefficients; the following explanation is the mechanism, not a full proof.
 
-Dividing the change by $h$ and taking the limit gives
-$\partial_t p_t=\tfrac12g(t)^2\partial_x^2p_t$. The factor one half comes from
-Taylor's quadratic term; it is not an arbitrary modeling constant.
+For Brownian motion itself, $\sum_k(\Delta W_k)^2\to t$ in mean square: its
+mean is $t$ and variance is $2\sum_k(\Delta t_k)^2\to0$. This accumulated squared
+motion is **quadratic variation**. It explains the mnemonic $(dW)^2=dt$, which
+refers to a limit of sums rather than ordinary algebra of differentials.
 
-**Check at a Gaussian peak:** $p_t''(\mu)<0$, so the peak height decreases as
-noise spreads its mass. The same density gains mass farther out in its tails.
+The full **Itô lemma**, for a function $F(x,t)$ once differentiable in time
+and twice in space, is
 
-Drift contributes $-\partial_x(fp_t)$ and random spreading contributes the
-second-derivative term. Together they give **Fokker–Planck**:
+$$\boxed{dF(X_t,t)=
+\left(\partial_tF+f\partial_xF+\tfrac12g^2\partial_{xx}F\right)dt
++g\partial_xF\,dW_t.}$$
 
-$$\boxed{\partial_t p_t=-\partial_x(fp_t)+\tfrac12g(t)^2\partial_x^2p_t.}$$
+All coefficients are evaluated at $(X_t,t)$. The extra second-derivative term
+is the Itô correction. The Taylor calculation motivates it; making the
+remainder estimates rigorous requires stochastic-calculus results.
 
-The next subsection justifies adding these effects. In $d$ dimensions the
-independent noise coordinates contribute separate second derivatives, so
+### Worked example: the square of Brownian motion
 
-$$\boxed{\partial_t p_t=-\nabla\cdot(fp_t)+\tfrac12g(t)^2\Delta p_t.}$$
+For $F(x)=x^2$ and $X_t=W_t$,
 
-These formulas use scalar, spatially constant $g(t)$. A state-dependent noise
-matrix requires a different diffusion term.
+$$d(W_t^2)=2W_t\,dW_t+dt.$$
 
-### Optional derivation: combining drift and noise rigorously enough for calculus
+Therefore $\mathbb E W_t^2=t$ and
 
-Take a smooth function $\varphi$ that vanishes outside a bounded interval.
-Think of it as a smooth probe that measures probability near a chosen region.
-Tutorial 1's [expected Taylor step](./25-learning-the-score.qmd#expected-taylor-step) says
+$$\int_0^t W_r\,dW_r=\tfrac12(W_t^2-t).$$
 
-$$\frac{d}{dt}\mathbb E[\varphi(X_t)]
-=\mathbb E[f\varphi'+\tfrac12g^2\varphi''].$$
+The $-t$ is exactly what the ordinary chain rule would miss. The quadratic
+variation calculation explains why the correction remains even as steps shrink.
 
-Write averages as integrals against $p_t$. Integration by parts once on the
-drift term and twice on the noise term gives
+## Fokker–Planck: the density of stochastic particles {#fokker-planck}
 
-$$\int\varphi\,\partial_t p_t\,dx
-=\int\varphi[-\partial_x(fp_t)+\tfrac12g^2\partial_x^2p_t],dx.$$
+Individual paths are random, but their population density has a deterministic
+evolution equation:
 
-Boundary terms vanish because the probe is zero outside its bounded support.
-If two continuous expressions have equal integrals against every such probe,
-they agree pointwise: otherwise a probe around a region where they differ
-would distinguish them. This proves the displayed Fokker–Planck equation
-under the assumed differentiability. The same reasoning in each coordinate
-proves its multidimensional form.
+$$\boxed{\partial_tq_t=-\partial_x(fq_t)
++\tfrac12g(t)^2\partial_{xx}q_t.}$$
 
-## Construct the probability-flow velocity
+This is the **Fokker–Planck equation**. Drift moves mass; noise spreads it.
+At $g=0$ it reduces to the ODE's continuity equation.
 
-### Derivation: turn diffusive flux into density times velocity
+### Derivation: use a smooth probe of the density
 
-Where $p_t>0$, the score satisfies $\nabla p_t=p_t\nabla\log p_t=p_t s_t$.
-Consequently,
+Take a smooth $\varphi$ vanishing outside a bounded interval. Since
+$\mathbb E\varphi(X_t)=\int\varphi(x)q_t(x)dx$, Itô's expectation formula gives
 
-$$\begin{aligned}
-\partial_t p_t
-&=-\nabla\cdot(fp_t)+\tfrac12g^2\nabla\cdot(p_t s_t)\\
-&=-\nabla\cdot\left[p_t\left(f-\tfrac12g^2s_t\right)\right].
-\end{aligned}$$
+$$\int\varphi\,\partial_tq_t\,dx
+=\int f q_t\varphi'\,dx+\tfrac12g^2\int q_t\varphi''\,dx.$$
 
-Compare this with the continuity equation. A deterministic velocity producing
-the same density evolution is
+Integrate the first term by parts once and the second twice. Boundary terms
+vanish because of the probe's support. The result is
 
-$$\boxed{v(x,t)=f(x,t)-\tfrac12g(t)^2s_t(x).}$$
+$$\int\varphi\,\partial_tq_t\,dx
+=\int\varphi[-\partial_x(fq_t)+\tfrac12g^2\partial_{xx}q_t]dx.$$
 
-The score appears because diffusive probability flux involves $\nabla p_t$,
-and writing flux as density times velocity divides that gradient by $p_t$.
-This yields $\nabla\log p_t$.
+Equality for all such probes identifies the density equation when the density
+is smooth. This is a derivation of the PDE, not an assumption about it.
 
-With the same initial law, and regularity and uniqueness of the density
-evolution, the SDE and this ODE have the same one-time marginals. This is the
-probability-flow construction of [Song et al.](https://arxiv.org/abs/2011.13456).
-It does not identify their trajectories or their start–endpoint pairings.
+### Probability flux explains the two terms
 
-The construction supplies **a** velocity, not necessarily the only one.
-Adding $w$ with $\nabla\cdot(p_t w)=0$ leaves the density equation unchanged.
+Write the equation again as conservation, $\partial_tq_t=-\partial_xJ$, with
 
-### Worked check: the stationary Gaussian does not collapse
+$$\boxed{J=fq_t-\tfrac12g^2\partial_xq_t.}$$
 
-For VP, $v(x,t)=-\beta(t)[x+s_t(x)]/2$. If $p_0=\mathcal N(0,I)$, Tutorial 1's
-Gaussian kernel shows that $p_t$ remains $\mathcal N(0,I)$. Thus $s_t(x)=-x$ and
+The first flux transports particles with the drift. The second goes down the
+density gradient: random motion has more particles available to leave a dense
+region than to enter it from a sparse neighbor. On the whole line, vanishing
+flux at both infinities ensures conservation of total probability.
 
-$$v(x,t)=-\tfrac12\beta(t)x+\tfrac12\beta(t)x=0.$$
+## Solved example: pure Brownian spreading
 
-Every probability-flow particle stays still. SDE particles continue moving,
-but their population remains standard Gaussian. Following the score alone
-would contract this population; the complete probability-flow field does not.
+For $dX_t=g\,dW_t$ with constant $g$, and independent
+$X_0\sim\mathcal N(m_0,a_0^2)$,
 
-## Generate by integrating backward
+$$X_t=X_0+gW_t,\qquad q_t=\mathcal N(m_0,a_0^2+g^2t).$$
 
-### What backward integration means {#backward-integration}
+The mean stays fixed, while variance grows. Set $V_t=a_0^2+g^2t$.
+Direct differentiation of the Gaussian gives
 
-Forward diffusion time runs from data at $t=0$ to noise at $t=T$. We know how
-to sample a terminal state, so specify $x(T)=z$ and solve the **same ODE** in
-decreasing $t$. With a positive step magnitude $h$,
+$$\partial_tq_t=\frac{g^2}{2}
+\left[\frac{(x-m_0)^2}{V_t^2}-\frac1{V_t}\right]q_t
+=\frac{g^2}{2}\partial_{xx}q_t.$$
 
-$$x(t-h)\approx x(t)-h\,v(x(t),t).$$
+This checks Fokker–Planck. At the peak, $q_t''<0$ so density falls; farther
+into the tails it rises. Spreading redistributes probability rather than
+creating it.
 
-The minus sign comes from the time increment $-h$. Alternatively, use an
-increasing generation clock $\tau=T-t$ and $Y_\tau=X_{T-\tau}$:
+## Derive Langevin dynamics from a desired stationary density {#langevin}
 
-$$\frac{dY_\tau}{d\tau}=-v(Y_\tau,T-\tau).$$
+Let $p(x)$ be a fixed smooth positive target. We want a drift that balances
+constant noise amplitude $g>0$. At stationarity,
+$\partial_tq=-\partial_xJ=0$, so flux $J$ must be constant in space.
+Vanishing boundary flux at $\pm\infty$ forces that constant to be zero:
 
-Neither description requires undoing individual forward Brownian increments.
+$$J=fp-\tfrac12g^2p'=0,\qquad
+\boxed{f=\tfrac12g^2\frac{p'}p=\tfrac12g^2s.}$$
 
-### A usable ODE sampling recipe
+In one dimension, this is the only drift making $p$ stationary for this noise
+amplitude with vanishing boundary flux. The conventional choice $g=\sqrt2$
+makes the drift exactly the score:
 
-Take a descending grid $T=t_N>\cdots>t_0=t_{\min}>0$.
+$$\boxed{dX_t=s(X_t)\,dt+\sqrt2\,dW_t.}$$
 
-1. Draw $x_N$ from $p_T$, or use its Gaussian approximation in practice.
-2. For $k=N,\ldots,1$, let $h_k=t_k-t_{k-1}>0$.
-3. Evaluate $v_\theta(x_k,t_k)=f(x_k,t_k)-g(t_k)^2s_\theta(x_k,t_k)/2$.
-4. Apply Euler: $x_{k-1}=x_k-h_kv_\theta(x_k,t_k)$.
+This is overdamped **Langevin dynamics**. The score appears because it is the
+drift that exactly balances spreading at the target density. No normalization
+constant is needed if $p\propto e^{-E}$: the drift is $-E'$.
 
-For VP the last update becomes
-$x_{k-1}=x_k+\beta(t_k)h_k[x_k+s_\theta(x_k,t_k)]/2$.
-Exact integration with the exact score and terminal law returns $p_{t_{\min}}$.
-Where the flow remains regular to zero, the exact map can reach $p_0$.
-For discrete data the endpoint is singular; keep the positive cutoff and
-interpret the clean law as a limit. Applying a final denoiser is an additional
-approximation, not an identity equating a posterior mean with a transport endpoint.
+Its Euler–Maruyama sampler is
 
-Score estimation, a Gaussian substitute for $p_T$, finite solver steps, and a
-positive cutoff introduce different approximation errors. Making the solver
-more accurate does not remove the other three.
+$$x_{k+1}=x_k+h s(x_k)+\sqrt{2h}\xi_k.$$
 
-## Work through discrete and continuous targets
+In this tutorial $t$ is algorithmic time and $p$ is fixed. In Tutorial 3,
+$t$ will parameterize a prescribed corruption path $p_t$; that different
+sampling objective will always be stated explicitly.
 
-### Two-point data: reuse the posterior, construct the motion
+### Derivation: verify stationarity in Fokker–Planck
 
-Let $P(X_0=+1)=P(X_0=-1)=1/2$. This is a distribution with two atoms, not an
-ordinary density at $t=0$. At positive noise,
+Substitute $q_t=p$ into $\partial_tq_t=-\partial_x(sq_t)+q_t''$:
 
-$$p_t(x)=\tfrac12\mathcal N(x;-\alpha_t,\sigma_t^2)
-+\tfrac12\mathcal N(x;\alpha_t,\sigma_t^2).$$
+$$-\partial_x(sp)+p''=-\partial_x(p')+p''=0.$$
 
-Tutorial 1's [two-point calculation](./25-learning-the-score.qmd#two-point-posterior)
-and marginal-score identity give
+If initialized at $p$, the density stays at $p$ under appropriate well-posedness
+and boundary conditions. Individual particles still move. **Stationarity does
+not by itself prove convergence from another initial law.** Convergence needs
+conditions ensuring confinement and exploration. Separated modes can mix slowly.
 
-$$D_t(x)=\mathbb E[X_0\mid X_t=x]=\tanh(\alpha_t x/\sigma_t^2),
-\qquad s_t(x)=\frac{\alpha_tD_t(x)-x}{\sigma_t^2}.$$
+## Solve Langevin for Gaussian targets {#gaussian-langevin}
 
-Substitute into the VP velocity:
+For $p=\mathcal N(\mu,a^2)$,
 
-$$v(x,t)=-\frac{\beta(t)}2
-\left[x+\frac{\alpha_t\tanh(\alpha_t x/\sigma_t^2)-x}{\sigma_t^2}\right].$$
+$$dX_t=-\frac{X_t-\mu}{a^2}dt+\sqrt2\,dW_t.$$
 
-Positive-time trajectories preserve their order and cannot cross zero under
-uniqueness, since zero is itself an equilibrium trajectory. In the limit
-$t\downarrow0$, the exact flow takes positive terminal points to $+1$ and
-negative points to $-1$. The endpoint is therefore $\operatorname{sign}(X_T)$
-almost surely under a continuous terminal law. The zero trajectory stays zero,
-a probability-zero exception. The quantile argument below explains this limit.
+This linear Gaussian process is an Ornstein–Uhlenbeck process. Standard normal
+uses $\mu=0,a=1$; shifted unit normal uses the same relaxation rate toward $\mu$.
 
-Starting with a symmetric Gaussian also gives equal endpoint masses in this
-special example. That symmetry does not make its intermediate marginals exact,
-and does not justify replacing $p_T$ arbitrarily for other data distributions.
-The sign map is a singular limit, not a finite-time diffeomorphism.
+### Derivation: exact process using an integrating factor
 
-### Derivation: one-dimensional flow preserves probability rank
+Apply Itô's lemma to $F(x,t)=e^{t/a^2}(x-\mu)$. Its derivatives are
+$\partial_tF=F/a^2$, $\partial_xF=e^{t/a^2}$, and $\partial_{xx}F=0$.
+Thus the drift cancels and there is no Itô correction:
+$dF(X_t,t)=\sqrt2 e^{t/a^2}dW_t$. Integrate and multiply by $e^{-t/a^2}$:
 
-Let $F_t(x)=P(X_t\le x)$ be the CDF. A one-dimensional ODE with unique solutions
-preserves order: trajectories cannot cross at the same time. Thus its map
-between two smooth positive-density marginals is increasing. For such a map,
+$$\boxed{X_t=\mu+e^{-t/a^2}(X_0-\mu)
++\sqrt2\int_0^t e^{-(t-r)/a^2}\,dW_r.}$$
 
-$$F_t(\Psi_{T\to t}(x))=F_T(x),\qquad
-\boxed{\Psi_{T\to t}(x)=F_t^{-1}(F_T(x)).}$$
+The integral is independent of $X_0$ and Gaussian, with variance
 
-The first equality says that all particles below $x$ remain below its image;
-their total probability is unchanged. This derives the map without solving
-the ODE explicitly. In the symmetric two-point limit, ranks below one half
-approach $-1$ and ranks above one half approach $+1$.
+$$2\int_0^t e^{-2(t-r)/a^2}dr=a^2(1-e^{-2t/a^2}).$$
 
-### A continuous two-Gaussian target and the terminal-prior approximation
+Thus, for $X_0\sim\mathcal N(m_0,a_0^2)$,
 
-Let
+$$\boxed{q_t=\mathcal N\!\left(
+\mu+e^{-t/a^2}(m_0-\mu),\;
+ a^2+(a_0^2-a^2)e^{-2t/a^2}\right).}$$
 
-$$p_0=\tfrac12\mathcal N(-1,\varrho^2)+\tfrac12\mathcal N(1,\varrho^2),
-\qquad\varrho>0.$$
+The mean approaches $\mu$ and the variance approaches $a^2$. Without noise, the stochastic integral—the source of the limiting variance
+$a^2$—is absent, and variance $a_0^2e^{-2t/a^2}$ collapses to zero. For any
+initial probability law, the decaying initial contribution and the independent
+Gaussian term also establish convergence in distribution to this target: the CDFs converge at every
+continuity point of the target CDF.
 
-Now the endpoint density is smooth and the exact probability-flow map is
-$F_0^{-1}\circ F_T$. The actual finite-time terminal density is
+![Gaussian contraction versus Langevin balance: exact variance and Gaussian density evolution.](./figs/one-dimensional-langevin.svg)
 
-$$p_T=\tfrac12\mathcal N(-\alpha_T,\alpha_T^2\varrho^2+\sigma_T^2)
-+\tfrac12\mathcal N(\alpha_T,\alpha_T^2\varrho^2+\sigma_T^2).$$
+### Derivation: moments and the density equation agree
 
-It is generally only close to standard normal. Let $\Phi$ denote the standard
-normal CDF and $Z\sim\mathcal N(0,1)$. The ideal direct Gaussian-to-data map is
-$F_0^{-1}(\Phi(Z))$. Feeding $Z$ into the finite-time probability-flow map
-instead gives $F_0^{-1}(F_T(Z))$, which need not have density $p_0$.
-This makes the terminal-prior approximation visible in a single formula.
+Itô applied to $X_t$ and $X_t^2$ gives, with $m_t=\mathbb E X_t$ and
+$V_t=\operatorname{Var}(X_t)$,
 
-### A posterior denoiser is not a transport endpoint
+$$\dot m_t=-\frac{m_t-\mu}{a^2},\qquad
+\dot V_t=-\frac{2V_t}{a^2}+2.$$
 
-Tweedie's estimate $D_t(x)=(x+\sigma_t^2s_t(x))/\alpha_t$ averages possible clean
-origins under the **stochastic corruption** model. The ODE map follows one
-particle through scores at successive times. They solve different problems.
-For two-point data, a small positive observation can have posterior mean close
-to zero, whereas its limiting ODE endpoint is $+1$.
+Solving recovers the parameters above. For a Gaussian density, define
+$z=x-m_t$. Direct differentiation gives
 
-## Reading Song's forward and reverse SDEs {#song-sde-conventions}
+$$\frac{\partial_tq_t}{q_t}
+=-\frac{\dot V_t}{2V_t}+\frac{z\dot m_t}{V_t}
++\frac{z^2\dot V_t}{2V_t^2}.$$
 
-[Song's blog, “Reversing the SDE for sample generation”](https://yang-song.net/blog/2021/score/#reversing-the-sde-for-sample-generation)
-writes the reverse SDE in the original clock with **negative** $dt$. Our
-increasing-clock notation describes the same reverse process. Keep the three
-equations distinct:
+Meanwhile the Fokker–Planck right side divided by $q_t$ is
 
-| Dynamics | Equation | Time direction |
-|---|---|---|
-| Forward corruption SDE | $dX_t=f(X_t,t)dt+g(t)dW_t$ | $t:0\to T$ |
-| Reverse SDE, original clock | $dX_t=[f(X_t,t)-g(t)^2s_t(X_t)]dt+g(t)d\overline W_t$ | $t:T\to0$ |
-| Probability-flow ODE | $dx_t=[f(x_t,t)-\tfrac12g(t)^2s_t(x_t)]dt$ | Either direction |
+$$\frac1{a^2}-\frac{(z+m_t-\mu)z}{a^2V_t}
++\frac{z^2}{V_t^2}-\frac1{V_t}.$$
 
-Here $\overline W$ denotes Brownian motion in reverse time, not the original
-forward noise replayed. For a descending step $dt=-h$, its increment has
-covariance $hI=|dt|I$. Never take $\sqrt{dt}$ for negative $dt$.
-With $Y_\tau=X_{T-\tau}$, the reverse SDE becomes
+Substituting the moment equations makes the expressions equal. We have checked
+the same solution through its stochastic representation, moments, and density PDE.
 
-$$dY_\tau=[-f(Y_\tau,t)+g(t)^2s_t(Y_\tau)]d\tau
-+g(t)d\overline W_\tau,\qquad t=T-\tau.$$
+## Finite numerical steps introduce sampling bias {#ula-bias}
 
-Thus Euler–Maruyama gives
-$x_{\mathrm{next}}=x+h[-f(x,t)+g(t)^2s_\theta(x,t)]+g(t)\sqrt h\,\xi$,
-then $t\leftarrow t-h$. This is the stochastic update used in the next
-subsection and in Tutorial 4. The ODE uses half the score coefficient and no
-fresh noise; equal marginals do not imply identical trajectories.
+The unadjusted Langevin algorithm (ULA) is the Euler–Maruyama update above.
+For the Gaussian, write $r=1-h/a^2$. Then
 
-## Optional comparison: the stochastic sampler {#reverse-sde}
+$$x_{k+1}-\mu=r(x_k-\mu)+\sqrt{2h}\xi_k.$$
 
-The generation-clock probability-flow velocity is $-v$. Suppose we want to
-add fresh noise while keeping the same density evolution. A noise term with
-amplitude $g$ adds $g^2\Delta q/2$ to Fokker–Planck, where $q_\tau=p_{T-\tau}$.
-Compensate with additional drift $g^2s/2$:
+When $0<h<2a^2$, its stationary variance solves
+$V_h=r^2V_h+2h$, hence
 
-$$b=-v+\tfrac12g^2s=-f+g^2s.$$
+$$\boxed{V_h=\frac{2h}{1-(1-h/a^2)^2}
+=\frac{a^2}{1-h/(2a^2)}.}$$
 
-### Derivation: check the marginals and the factor of two
+It exceeds $a^2$. Running longer removes transient initialization effects, not
+this finite-step bias. At $h\ge2a^2$ this Gaussian update has no finite stationary
+variance. Stability for a general target requires more than this Gaussian bound.
 
-All forward quantities below are evaluated at $t=T-\tau$ and the current location.
-Since $\nabla q=q s$,
+For comparison, the exact Gaussian transition over a step $h$ is
 
-$$\begin{aligned}
--\nabla\cdot(qb)+\tfrac12g^2\Delta q
-&=\nabla\cdot(qv)-\tfrac12g^2\nabla\cdot(qs)+\tfrac12g^2\Delta q\\
-&=\nabla\cdot(qv)=\partial_\tau q.
-\end{aligned}$$
+$$x_{k+1}=\mu+e^{-h/a^2}(x_k-\mu)
++a\sqrt{1-e^{-2h/a^2}}\xi_k.$$
 
-Thus the SDE $dY_\tau=b\,d\tau+g(T-\tau)d\overline W_\tau$ has the desired
-reverse-time marginals under the same regularity assumptions. Identifying it
-with the reversed stochastic **path law** requires a time-reversal theorem;
-matching marginals alone does not prove that theorem.
+It preserves the target for every $h>0$. General targets rarely have such an
+explicit exact transition.
 
-Euler–Maruyama in increasing $\tau$ uses a positive step $h$:
+## Mixtures: stationarity survives, fast convergence may not
 
-$$y_{j+1}=y_j+h[-f(y_j,t)+g(t)^2s_\theta(y_j,t)]
-+g(t)\sqrt h\,\xi_j.$$
+Take $p(x)=\tfrac12\phi_a(x-m)+\tfrac12\phi_a(x+m)$, an equal mixture of
+$\mathcal N(\pm m,a^2)$, where $m>0$ and $\phi_a$ is the $\mathcal N(0,a^2)$
+density. Its likelihood ratio is $\phi_a(x-m)/\phi_a(x+m)=e^{2mx/a^2}$.
+Weighting the two component scores by their local density fractions gives
+$s(x)=[m\tanh(mx/a^2)-x]/a^2$. Use this score in the Langevin update. The same zero-flux proof
+shows the target is stationary for the continuous process. Noise permits paths
+to cross the low-density region between modes, unlike the score ODE's separated
+attraction regions. If the valley is deep, crossings can be rare. Consecutive
+samples are correlated; many steps are not necessarily many independent samples.
 
-The reverse SDE's score coefficient is one, while the probability-flow ODE's
-is one half. Deleting the noise from the reverse SDE retains the extra drift
-but removes the spreading it compensates for, generally changing the marginals.
-
-**Gaussian check:** for stationary VP, $s=-x$. Deleting reverse-SDE noise gives
-$dY/d\tau=-\beta Y/2$, which incorrectly contracts the cloud. The correct
-probability-flow velocity is zero.
+There is no elementary closed-form solution comparable to the Gaussian case.
+Numerical simulation illustrates mixing but does not replace a convergence proof.
+A smoothed, high-noise target can ease movement between modes; Tutorial 3
+explains annealed Langevin and its distinction from reverse diffusion.
 
 ## Check your understanding
 
-1. Why does a density obey a PDE even when every particle follows an ODE?
-2. Where does the one half in the probability-flow formula come from?
-3. If an exact sampler starts from a Gaussian approximation to $p_T$, does an
-   exact solver guarantee the correct data distribution?
-4. What distribution does an exact sampler return when stopped at $t_{\min}>0$?
+1. Why use $\sqrt h\xi$ rather than $h\xi$?
+2. What does the Itô correction contribute to $d(X_t^2)$?
+3. Why does a stationary Gaussian not collapse under Langevin?
+4. Does doubling ULA iterations remove its fixed-step stationary bias?
 
 ::: {.callout-tip collapse="true"}
 ## Answers
 
-1. Density depends on both location and time; flux determines its local change.
-2. The quadratic term of the Gaussian-step Taylor expansion.
-3. No. An exact solver still transports the substituted initial distribution.
-4. $p_{t_{\min}}$, when both the score and terminal law are exact.
+1. It produces variance proportional to elapsed time in the continuous limit.
+2. The additional $g(t)^2dt$ term due to accumulated squared random increments.
+3. Noise adds variance at exactly the rate the score drift removes it at equilibrium.
+4. No. Reduce the step or use a suitable corrected/exact sampler.
 :::
 
-**Training recap:** draw a positive noise level, corrupt a clean example, and
-regress onto its known conditional-score target. The posterior averaging proof,
-Tweedie derivation, and time-weighting rule are in
-[Tutorial 1](./25-learning-the-score.qmd#training-recipe).
-
-**Continue:** [Tutorial 3](./27-diffusion-neural-odes-normalizing-flows.qmd) connects
-this deterministic transport to neural ODEs, likelihood, and flow matching.
+**Continue:** [Score-based diffusion](./27-diffusion-neural-odes-normalizing-flows.qmd)
+uses these density tools to construct a changing distribution path and generate
+by following it backward.

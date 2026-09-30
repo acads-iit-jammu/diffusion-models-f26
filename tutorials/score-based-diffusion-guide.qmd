@@ -1,84 +1,98 @@
-# Score-Based Diffusion: Reading Guide {.unnumbered}
+# Score-Based Diffusion: A One-Dimensional Learning Sequence {.unnumbered}
 
-These tutorials are written for undergraduates with no prior SDE background.
-Read them in order. The numbers below identify the four parts of this series.
+Begin with particles on a line. Derive how their motion transports probability,
+then add random motion and study its effect on the density. Only after solving
+these problems do we learn an unknown score or introduce higher dimensions.
 
-| Order | Tutorial | Teaching question | Longer derivations, kept as subsections |
-|---|---|---|---|
-| 1 | [Learning the Score: VP Diffusion from First Principles](./25-learning-the-score.qmd) | How do we learn an unknown marginal score from a known corruption process? | Gaussian increments and expected Taylor step; VP moments and Gaussian kernel; posterior averaging and MSE proof; optional stochastic-integral derivation |
-| 2 | [Probability-Flow Sampling: From Density Evolution to Samples](./26-probability-flow-sampling.qmd) | Why does the score give a sampling velocity, and how do we use it? | Probability flux, Gaussian smoothing and Fokker–Planck; probability-flow construction; quantile maps; optional integration-by-parts and reverse-SDE checks |
-| 3 | [Diffusion, Neural ODEs, and Normalizing Flows](./27-diffusion-neural-odes-normalizing-flows.qmd) | What connects diffusion sampling to invertible transport and density estimation? | Continuous change of variables; Gaussian flow and coupling comparison; likelihood identity; conditional velocity regression and its score connection |
-| 4 | [Langevin Dynamics](./28-langevin-dynamics.qmd) | How does fixed-target sampling differ from reverse diffusion? | Gaussian moments and ULA bias; stationarity; time-scaling ratio; transport-plus-Langevin decomposition |
+The entry prerequisites are derivatives, integrals, Taylor expansion, elementary
+probability, and Gaussian distributions. No prior SDE, stochastic-calculus, PDE,
+or fluid-mechanics course is assumed. The ODE and SDE tutorials are stand-alone;
+the SDE tutorial includes the deterministic recap it needs.
 
-Each tutorial has a core reading route, worked examples, and derivation
-subsections. Advanced proofs are labelled optional. Topic ownership is explicit:
-Tutorial 1 proves the corruption and learning identities; Tutorial 2 derives
-density evolution and sampling; Tutorial 3 develops transport and likelihood; Tutorial 4 connects fixed-target
-Langevin sampling to diffusion and annealing.
+## Reading order
 
-## Prerequisite ladder and reading route
-
-| Stage | New material | Where introduced |
+| Part | Tutorial | Central question |
 |---|---|---|
-| Entry | Elementary derivatives, Taylor expansion, ODEs, Gaussian algebra, independence, Bayes' rule | Assumed; no stochastic calculus or PDE course required |
-| Random steps | Random variable versus realization, Gaussian increments, square-root step scaling, Euler–Maruyama | Tutorial 1: From Gaussian random steps to an SDE |
-| Corruption law | Expected Taylor step, mean/variance equations, Gaussian sums | Tutorial 1: Construct the variance-preserving corruption law |
-| Learning | Conditional expectation, tower property, posterior weights, MSE-optimality proof | Tutorial 1: Learn an unknown score from known targets |
-| Density dynamics | Particle versus population, flux, partial derivatives, divergence, Laplacian, Fokker–Planck | Tutorial 2: Describe motion of an entire density |
-| Sampling | Probability-flow velocity, backward steps, cutoff and terminal-prior errors | Tutorial 2: Construct the velocity and generate backward |
-| Transport | Jacobian volume scaling, invertibility, density change, couplings and likelihood | Tutorial 3 |
-| Equilibrium sampling | Langevin balance, invariance versus convergence, finite-step bias, annealing | Tutorial 4 |
+| 1 | [ODEs in One Dimension: Particles, Flows, and Densities](./25-learning-the-score.qmd) | How does a local velocity move each particle and its population density? |
+| 2 | [SDEs in One Dimension: Brownian Motion, Itô Calculus, and Langevin Sampling](./26-probability-flow-sampling.qmd) | How do random kicks change conservation, and why does balanced noise make score-based sampling possible? |
+| 3 | [Score-Based Diffusion in One Dimension: Corruption, Sampling, and Denoising](./27-diffusion-neural-odes-normalizing-flows.qmd) | How can the score reverse a prescribed density path, and how can we learn it? |
+| 4 | [From One-Dimensional Transport to Neural ODEs and Higher Dimensions](./28-langevin-dynamics.qmd) | How do these transports connect to normalizing flows, and what changes in several dimensions? |
 
-The published [From Local Arrows](./22-vector-fields-to-score-diffusion.qmd)
-and [Sampling with Scores](./24-sampling-with-scores.qmd) are
-optional geometric background, not substitutes for the SDE introduction here.
-The [score-flow lab](../materials/score-flow-lab.html) accompanies the
-Gaussian and two-point examples.
+Each worked model links **particle dynamics, its solution, the density, and a
+conservation/Fokker–Planck check**. The examples repeat deliberately: standard
+normal, shifted normal, arbitrary Gaussian variance, and a smooth two-Gaussian
+mixture. Long calculations are derivation subsections; optional connections
+are identified as such. Exact Gaussian solutions precede numerical mixtures.
 
-**First reading:** follow the four tutorials' core routes and attempt the
-understanding checks before opening the answers. In Tutorial 1, skip the
-stochastic-integral subsection. In Tutorial 2, the Gaussian-smoothing derivation
-provides the main intuition; the integration-by-parts proof and stochastic
-sampler can be a second pass. In Tutorial 3, the infinitesimal determinant and
-flow-matching proofs are enrichment. The remaining main arguments do not
-require those proofs. Tutorial 4 uses only the SDE and density tools from
-Tutorials 1–2; it can also be read directly after Tutorial 2. Its density-operator
-calculation is optional. Its reverse-diffusion comparison uses the
-[reverse-SDE check in Tutorial 2](./26-probability-flow-sampling.qmd#reverse-sde).
+The figures show arrows, paths, and population densities. The reproducible
+[simulation script](../materials/one-dimensional-score-examples.py) generates
+the four figures and checks the Gaussian formulas. Existing interactive practice
+is available in the [score-flow lab](../materials/score-flow-lab.html).
 
-The complete MSE proof is now inside Tutorial 1. The existing
-[Tweedie tutorial](./23-tweedie-bayes-denoising.qmd) remains a
-separate statistical treatment for additional practice.
+## Shared symbols
 
-## Shared notation
-
-| Symbol | Meaning throughout the series |
+| Symbol | Meaning |
 |---|---|
-| $X_t$, $x$ | Random state and a particular observed value, respectively |
-| $\epsilon$, $\xi_k$ | Corruption noise and independent numerical-step noise |
-| $p_t$, $s_t=\nabla_x\log p_t$ | Forward-noised density and its marginal score |
-| $s_\theta$ | Learned score approximation |
-| $f(x,t)$, $g(t)$ | Forward-SDE drift and scalar, time-dependent noise amplitude |
-| $\alpha_t$, $\sigma_t$ | Signal coefficient and conditional noise standard deviation |
-| $v(x,t)=f-\tfrac12g^2s_t$ | Forward-time probability-flow velocity |
-| $\Psi_{s\to t}$ | Flow map between specified times |
-| $\Phi$ | Standard normal CDF, never a flow map |
+| $x_t$, $X_t$ | One trajectory, and a random state respectively |
+| $q_t(x)$ | Current population or generic sampler density |
+| $p(x)$ | One fixed target density |
+| $p_t(x)$ | Prescribed forward-corruption density in Tutorial 3 |
+| $s(x)=\partial_x\log p(x)$, $s_t(x)=\partial_x\log p_t(x)$ | Fixed-target and time-dependent scores |
+| $v(x,t)$ | ODE velocity |
+| $f(x,t)$, $g(t)$ | SDE drift and spatially constant noise amplitude |
+| $W_t$ | Standard Brownian motion |
+| $\Psi_{r\to t}$ | Flow map from time $r$ to time $t$ |
+| $J(x,t)$ | Signed probability flux |
+| $m_t$, $V_t$, $a_t=\sqrt{V_t}$ | Gaussian population mean, variance, standard deviation |
+| $\mu$, $a^2$ | Fixed Gaussian target mean and variance |
+| $\alpha_t$, $\sigma_t^2$ | Corruption signal coefficient and conditional noise variance |
+| $\epsilon$, $\xi_k$ | Noise in one corruption observation; fresh numerical-step noises |
+| $\Phi$ | Standard normal CDF; never a flow map |
+| $F_t$ | CDF of $p_t$; never a flow map |
+| $\beta(t)$ | VP corruption schedule |
 | $\tau=T-t$ | Increasing generation clock |
-| $u$, $q_u$ | Fixed-target Langevin time and current sampler density |
-| $p_\sigma$ | Smoothed law indexed by noise standard deviation in Tutorial 4 |
-| $\varrho$ | Mixture-component standard deviation |
+| $u$, $B_u$ | Fixed-level Langevin clock and its Brownian motion |
+| $s_\theta(x,t)$ | Learned marginal-score approximation |
+| $\pi_T$ | Chosen terminal law, potentially approximating $p_T$ |
+| $\lambda(t)$ | Positive weight on a time-indexed training loss |
+| $\widehat X_k$ | Numerical approximation to an SDE state |
+| $\widehat x_0(x,t)$ | Posterior-mean clean-data denoiser |
+| $DF$ | Jacobian matrix of a map, introduced only in the final extension |
 
-Every numerical step magnitude is positive. A forward update uses $+h v$;
-a backward update uses $-h v$. On a descending grid, $h_k=t_k-t_{k-1}>0$.
-This local convention differs from the signed-step notation in some older notes.
-The conditional noise variance $\sigma_t^2$ is distinguished from total marginal
-variance, and exact sampling from $p_T$ from its Gaussian approximation.
+The first three tutorials use scalar states and $\partial_x$, never vector
+notation. Tutorial 4 explicitly introduces $d$-dimensional vectors, gradient,
+divergence, and Laplacian after completing its one-dimensional discussion.
 
-## Relationship to the existing course notes
+## Time and sign conventions
 
-The published notes 22, 24, and 23 provide geometric intuition, introductory
-worked sampling, and standalone statistical denoising, respectively. This
-series is the next derivation sequence: learning → sampling → connections → equilibrium sampling.
-It does not replace those notes. The existing broad
-[probability-flow perspective](./07-probability-flow-ode.qmd)
-can remain an alternative overview alongside this sequence.
+In Tutorial 1, $t$ is ordinary ODE evolution time. In Tutorial 2 it is SDE or
+Langevin algorithmic time; the Langevin target $p$ stays fixed. In Tutorial 3,
+$t$ labels **forward corruption from data to noise**, and $\tau=T-t$ is an
+increasing clock for generation. A separate $u$ is used only when running a
+fixed-target Langevin corrector while holding the corruption level $t$ fixed.
+
+The straight-path flow-matching example in Tutorial 4 explicitly uses source-to-data
+time and then switches back to the corruption convention for Gaussian paths.
+
+Every numerical step magnitude $h$ is positive. Backward ODE integration uses
+$-h v$; reverse-SDE noise has scale $g\sqrt h$. The
+[Song convention comparison](./27-diffusion-neural-odes-normalizing-flows.qmd#song-sde-conventions)
+explains how this relates to a reverse SDE written with negative $dt$.
+
+## Three distinctions to carry through the series
+
+1. Increasing density at an individual particle's location is not the same as
+   producing the correct population distribution. A bare Gaussian score ODE
+   contracts; an appropriately designed ODE can transport the entire distribution.
+2. A fixed density being stationary under an SDE does not by itself prove
+   convergence from another initial distribution or accuracy of a finite-step sampler.
+3. Equal one-time marginal densities do not mean equal paths or equal endpoint
+   couplings. This is the link between stochastic diffusion and deterministic flow.
+
+## Additional practice
+
+[From Local Arrows](./22-vector-fields-to-score-diffusion.qmd) and
+[Sampling with Scores](./24-sampling-with-scores.qmd) provide earlier geometric
+and worked-example perspectives. [Tweedie's Formula](./23-tweedie-bayes-denoising.qmd)
+is a stand-alone statistical derivation. The present sequence supplies the
+ordered ODE/SDE foundations and uses its own common notation throughout.

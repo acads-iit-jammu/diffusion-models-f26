@@ -29,6 +29,7 @@ project:
     - materials/score-flow-core.js
     - materials/score-flow-lab.js
     - materials/score-diffusion-example.py
+    - materials/one-dimensional-score-examples.py
     - materials/img/**
     - materials/site_libs/**
     - homeworks/*.pdf
@@ -72,13 +73,6 @@ book:
         - tutorials/22-vector-fields-to-score-diffusion.qmd
         - tutorials/24-sampling-with-scores.qmd
         - tutorials/23-tweedie-bayes-denoising.qmd
-    - part: "Score-Based Diffusion"
-      chapters:
-        - tutorials/score-based-diffusion-guide.qmd
-        - tutorials/25-learning-the-score.qmd
-        - tutorials/26-probability-flow-sampling.qmd
-        - tutorials/27-diffusion-neural-odes-normalizing-flows.qmd
-        - tutorials/28-langevin-dynamics.qmd
     - part: "Decks"
       chapters:
         - href: materials/w01-deck-01-mechanics.html
@@ -119,6 +113,13 @@ book:
         - tutorials/07-probability-flow-ode.qmd
         - tutorials/21-one-estimator-many-parameterizations.qmd
     - resources.qmd
+    - part: "Score-Based Diffusion"
+      chapters:
+        - tutorials/score-based-diffusion-guide.qmd
+        - tutorials/25-learning-the-score.qmd
+        - tutorials/26-probability-flow-sampling.qmd
+        - tutorials/27-diffusion-neural-odes-normalizing-flows.qmd
+        - tutorials/28-langevin-dynamics.qmd
 
 format:
   html:
