@@ -320,6 +320,12 @@ window.Quarto = {
  <span class="menu-text">16 · Probability-Flow ODE - Part 5</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/35-probability-flow-ode-part-6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">17 · Probability-Flow ODE - Part 6</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -577,8 +583,12 @@ window.Quarto = {
   <li><a href="#constructing-the-conditional-score-target" id="toc-constructing-the-conditional-score-target" class="nav-link" data-scroll-target="#constructing-the-conditional-score-target">Constructing the conditional-score target</a></li>
   <li><a href="#the-practical-positive-time-version" id="toc-the-practical-positive-time-version" class="nav-link" data-scroll-target="#the-practical-positive-time-version">The practical, positive-time version</a></li>
   </ul></li>
-  <li><a href="#why-conditional-targets-recover-the-marginal-score" id="toc-why-conditional-targets-recover-the-marginal-score" class="nav-link" data-scroll-target="#why-conditional-targets-recover-the-marginal-score">3. Why conditional targets recover the marginal score</a></li>
-  <li><a href="#predicting-noise-instead" id="toc-predicting-noise-instead" class="nav-link" data-scroll-target="#predicting-noise-instead">4. Predicting noise instead</a>
+  <li><a href="#why-conditional-targets-recover-the-marginal-score" id="toc-why-conditional-targets-recover-the-marginal-score" class="nav-link" data-scroll-target="#why-conditional-targets-recover-the-marginal-score">3. Why conditional targets recover the marginal score</a>
+  <ul class="collapse">
+  <li><a href="#why-the-noisy-position-must-be-an-input" id="toc-why-the-noisy-position-must-be-an-input" class="nav-link" data-scroll-target="#why-the-noisy-position-must-be-an-input">Why the noisy position must be an input</a></li>
+  <li><a href="#a-zero-conditional-score-label-can-have-a-nonzero-optimal-prediction" id="toc-a-zero-conditional-score-label-can-have-a-nonzero-optimal-prediction" class="nav-link" data-scroll-target="#a-zero-conditional-score-label-can-have-a-nonzero-optimal-prediction">A zero conditional-score label can have a nonzero optimal prediction</a></li>
+  </ul></li>
+  <li><a href="#noise-prediction-as-a-parameterization-of-the-marginal-score" id="toc-noise-prediction-as-a-parameterization-of-the-marginal-score" class="nav-link" data-scroll-target="#noise-prediction-as-a-parameterization-of-the-marginal-score">4. Noise prediction as a parameterization of the marginal score</a>
   <ul class="collapse">
   <li><a href="#why-noise-prediction-can-be-easier-to-optimize" id="toc-why-noise-prediction-can-be-easier-to-optimize" class="nav-link" data-scroll-target="#why-noise-prediction-can-be-easier-to-optimize">Why noise prediction can be easier to optimize</a></li>
   </ul></li>
@@ -786,6 +796,7 @@ s_t(x)=\frac{d}{dx}\log p_t(x).\]</span></p>
 <p>At the generated observation, this becomes</p>
 <p><span class="math display">\[U=-\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}.\]</span></p>
 <p>The network sees <span class="math inline">\((x_t,t)\)</span> as input and <span class="math inline">\(U\)</span> as a target. It does not see <span class="math inline">\(x_0\)</span> as an input. Individual training targets are noisy: several <span class="math inline">\((x_0,\varepsilon)\)</span> pairs can produce similar <span class="math inline">\(x_t\)</span>.</p>
+<p><strong>Target and prediction represent different quantities.</strong> In direct score regression, the available label is the conditional score <span class="math inline">\(\partial_x\log p_t(x_t\mid x_0)\)</span> for a particular clean/noisy pair. The fitted function <span class="math inline">\(s_\theta(x_t,t)\)</span> estimates the marginal score <span class="math inline">\(\partial_x\log p_t(x_t)\)</span>. It can do so because squared-error regression averages labels conditional on the features <span class="math inline">\((x_t,t)\)</span>; it does not have to reproduce every individual label. Section 3 proves this statement.</p>
 </section>
 <section id="the-practical-positive-time-version" class="level3">
 <h3 class="anchored" data-anchor-id="the-practical-positive-time-version">The practical, positive-time version</h3>
@@ -836,14 +847,78 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 +\mathbb E_{t,X_t}\left[\lambda(t)\operatorname{Var}(U\mid X_t,t)\right].\]</span></p>
 <p>Here <span class="math inline">\(\mathbb E_{t,X_t}\)</span> means first draw <span class="math inline">\(t\sim\operatorname{Uniform}[t_{\min},1]\)</span>, then <span class="math inline">\(X_t\sim p_t\)</span>. These two variables are generally dependent. Inside the conditional variance, <span class="math inline">\(X_t\)</span> and <span class="math inline">\(t\)</span> are held fixed and the remaining randomness is in <span class="math inline">\(U\)</span> (equivalently, the clean/noise pairs compatible with that observation).</p>
 <p>The second term does not depend on the network. Training against conditional targets minimizes the same parameter-dependent error as training against the unavailable marginal score.</p>
+<section id="why-the-noisy-position-must-be-an-input" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-noisy-position-must-be-an-input">Why the noisy position must be an input</h3>
+<p>Fix <span class="math inline">\(t\)</span> and a noisy input <span class="math inline">\(x\)</span>. If the predictor outputs a scalar <span class="math inline">\(a\)</span> there, its conditional risk is</p>
+<p><span class="math display">\[R(a;x,t)=\mathbb E_{U\mid X_t=x,t}[(a-U)^2].\]</span></p>
+<p>Expanding and differentiating with respect to <span class="math inline">\(a\)</span> gives</p>
+<p><span class="math display">\[\frac{\partial R}{\partial a}=2a-2\mathbb E_{U\mid X_t=x,t}[U],
+\qquad a_*(x,t)=\mathbb E_{U\mid X_t=x,t}[U]=s_t(x).\]</span></p>
+<p>The average is over targets compatible with <strong>that input</strong>, not over all training targets indiscriminately. Although the target has mean zero at each time,</p>
+<p><span class="math display">\[\mathbb E_{X_0,\varepsilon}[U]=0,\]</span></p>
+<p>its conditional mean given <span class="math inline">\(X_t=x\)</span> need not vanish. The noisy position depends on both the clean observation and the noise. If we withheld <span class="math inline">\(X_t\)</span> and supplied only time, squared-error regression would indeed learn zero. With <span class="math inline">\(X_t\)</span> as a feature, it can learn a nonzero function of position.</p>
+<p>There are two different conditioning directions:</p>
+<p><span class="math display">\[\underbrace{\mathbb E_{X_t\mid X_0=x_0}[\partial_{X_t}\log p_t(X_t\mid x_0)]}_{\text{hold clean value fixed; average noisy observations}}=0,\]</span></p>
+<p>whereas</p>
+<p><span class="math display">\[\underbrace{\mathbb E_{X_0\mid X_t=x}[\partial_x\log p_t(x\mid X_0)]}_{\text{hold noisy value fixed; average compatible clean values}}=s_t(x).\]</span></p>
+<p>For the Gaussian kernel, the first equality follows directly from <span class="math inline">\(\mathbb E[X_t\mid X_0=x_0]=\alpha_t x_0\)</span>. It does not imply that the second expectation is zero.</p>
 </section>
-<section id="predicting-noise-instead" class="level2">
-<h2 class="anchored" data-anchor-id="predicting-noise-instead">4. Predicting noise instead</h2>
+<section id="a-zero-conditional-score-label-can-have-a-nonzero-optimal-prediction" class="level3">
+<h3 class="anchored" data-anchor-id="a-zero-conditional-score-label-can-have-a-nonzero-optimal-prediction">A zero conditional-score label can have a nonzero optimal prediction</h3>
+<p>Take <span class="math inline">\(X_0\sim\mathcal N(0,1)\)</span> and fix a positive time with <span class="math inline">\(\alpha_t=1/2\)</span>. Then</p>
+<p><span class="math display">\[X_t=\tfrac12X_0+\tfrac{\sqrt3}{2}\varepsilon,
+\qquad P_t=\mathcal N(0,1),\qquad s_t(x)=-x.\]</span></p>
+<p>Consider the clean value <span class="math inline">\(x_0=2\)</span> and noisy value <span class="math inline">\(x_t=1\)</span>, corresponding to the noise value <span class="math inline">\(\varepsilon=0\)</span>. The conditional-score label for this pair is</p>
+<p><span class="math display">\[\left.\partial_x\log p_t(x\mid x_0=2)\right|_{x=1}
+=-\frac{1-\tfrac12(2)}{3/4}=0.\]</span></p>
+<p>But the marginal score at exactly the same noisy input is</p>
+<p><span class="math display">\[\boxed{s_t(1)=-1\ne0.}\]</span></p>
+<p>Why? Given only <span class="math inline">\(X_t=1\)</span>, the clean value is not known to be 2. Gaussian conditioning gives</p>
+<p><span class="math display">\[X_0\mid X_t=1\sim\mathcal N(1/2,3/4).\]</span></p>
+<p>Averaging the conditional-score labels under this posterior yields</p>
+<p><span class="math display">\[\mathbb E_{X_0\mid X_t=1}\left[-\frac{1-\tfrac12X_0}{3/4}\right]
+=-\frac{1-\tfrac12(1/2)}{3/4}=-1.\]</span></p>
+<p>Thus zero is the label of one particular pair; <span class="math inline">\(-1\)</span> is the squared-error-optimal prediction using the available features. Exact point events have probability zero under continuous distributions; the example evaluates the score functions at a point. Nearby pairs have small conditional-score labels while their marginal scores remain close to <span class="math inline">\(-1\)</span>, so the distinction also holds on neighborhoods with positive probability.</p>
+<p>This does not say that an average of identically zero labels can be nonzero. Other clean values compatible with the same noisy observation have different labels. Also, because this example starts from standard normal, its VP probability-flow velocity is <span class="math inline">\(-\beta(t)[x+s_t(x)]/2=0\)</span>, even though its marginal score is nonzero away from the origin.</p>
+</section>
+</section>
+<section id="noise-prediction-as-a-parameterization-of-the-marginal-score" class="level2">
+<h2 class="anchored" data-anchor-id="noise-prediction-as-a-parameterization-of-the-marginal-score">4. Noise prediction as a parameterization of the marginal score</h2>
 <p>A numerically convenient network output is <span class="math inline">\(\varepsilon_\theta(x,t)\)</span>, trained with</p>
 <p><span class="math display">\[\mathcal J_\varepsilon(\theta)
 =\mathbb E_{t,X_0,\varepsilon}[(\varepsilon-\varepsilon_\theta(X_t,t))^2].\]</span></p>
 <p>This expectation uses the same time, clean-data, and Gaussian-noise draws defined in Section 2. At the population optimum, <span class="math inline">\(\varepsilon_*(x,t)=\mathbb E_{\varepsilon\mid X_t=x}[\varepsilon]\)</span>. Convert any noise predictor to a score estimate using</p>
 <p><span class="math display">\[\boxed{s_\theta(x,t)=-\frac{\varepsilon_\theta(x,t)}{\sqrt{1-\alpha_t^2}}.}\]</span></p>
+<p>The phrase <strong>noise predictor</strong> names the regression target and output units. It does not mean that the fitted model recovers the particular noise draw in each training pair. Its optimal output is a posterior mean of noise. Only after the scaling above do we obtain the marginal-score estimate.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameterization</th>
+<th>Label available for each training pair</th>
+<th>Population prediction from <span class="math inline">\((x,t)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Direct score</td>
+<td><span class="math inline">\(U=-\varepsilon/\sqrt{1-\alpha_t^2}\)</span>, the conditional score</td>
+<td><span class="math inline">\(\mathbb E[U\mid X_t=x,t]=s_t(x)\)</span></td>
+</tr>
+<tr class="even">
+<td>Noise</td>
+<td>Realized <span class="math inline">\(\varepsilon\)</span></td>
+<td><span class="math inline">\(\mathbb E[\varepsilon\mid X_t=x,t]=-\sqrt{1-\alpha_t^2}\,s_t(x)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>In the preceding Gaussian example, <span class="math inline">\(\operatorname{Cov}(\varepsilon,X_t)=\sqrt{1-\alpha_t^2}\)</span> and <span class="math inline">\(\operatorname{Var}(X_t)=1\)</span>. Joint Gaussian conditioning therefore gives</p>
+<p><span class="math display">\[\varepsilon_*(x,t)=\sqrt{1-\alpha_t^2}\,x.\]</span></p>
+<p>At <span class="math inline">\(\alpha_t=1/2\)</span> and <span class="math inline">\(x=1\)</span>, the optimal noise prediction is <span class="math inline">\(\sqrt3/2\)</span>, although the particular pair used above had noise label zero. Dividing by the negative noise standard deviation gives the correct marginal score <span class="math inline">\(-1\)</span>. There is no inconsistency: a regression prediction minimizes expected error across possible labels, not the error of every pair separately.</p>
 <p>You can also construct a clean-data predictor:</p>
 <p><span class="math display">\[\boxed{\widehat x_{0,\theta}(x,t)
 =\frac{x-\sqrt{1-\alpha_t^2}\,\varepsilon_\theta(x,t)}{\alpha_t}.}\]</span></p>
@@ -981,7 +1056,7 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 <p><span class="math display">\[\mathbf v_\theta(\mathbf x,t)
 =-\frac{\beta(t)}2\left[\mathbf x-
 \frac{\boldsymbol\varepsilon_\theta(\mathbf x,t)}{\sqrt{1-\alpha_t^2}}\right].\]</span></p>
-<p>Start with a standard-normal sample at <span class="math inline">\(t=1\)</span> and integrate toward smaller <span class="math inline">\(t\)</span>. An ODE step uses no fresh randomness. A reverse-SDE step adds the appropriate Gaussian increment, as specified in Part 2.</p>
+<p>For exact transport, start with a sample from the actual terminal law <span class="math inline">\(p_1\)</span> and integrate toward smaller <span class="math inline">\(t\)</span>. In the practical VP sampler below, we use standard normal as an approximation to that law. An ODE step uses no fresh randomness. A reverse-SDE step adds the appropriate Gaussian increment, as specified in Part 2.</p>
 <p>For <span class="math inline">\(h=t_k-t_{k+1}&gt;0\)</span>, the explicit reverse-time Euler update is</p>
 <p><span class="math display">\[\boxed{x_{k+1}=x_k+\frac{h\beta(t_k)}2
 \left[x_k-\frac{\varepsilon_\theta(x_k,t_k)}{\sqrt{1-\alpha_{t_k}^2}}\right].}\]</span></p>
@@ -991,7 +1066,7 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="at">@torch.no_grad</span>()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sample_ode(network, x1, steps<span class="op">=</span><span class="dv">1000</span>, t_min<span class="op">=</span><span class="fl">1e-3</span>):</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    network.<span class="bu">eval</span>()</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> x1.clone()  <span class="co"># x1 is sampled from N(0, I) before this call.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> x1.clone()  <span class="co"># Supply draws from p1, or explicitly use a prior approximation.</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    times <span class="op">=</span> torch.linspace(<span class="fl">1.</span>, t_min, steps<span class="op">+</span><span class="dv">1</span>, device<span class="op">=</span>x.device,</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                           dtype<span class="op">=</span>x.dtype)</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> current, next_time <span class="kw">in</span> <span class="bu">zip</span>(times[:<span class="op">-</span><span class="dv">1</span>], times[<span class="dv">1</span>:]):</span>
@@ -1037,9 +1112,20 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 </section>
 <section id="analytic-check-of-the-schedule-and-solver" class="level3">
 <h3 class="anchored" data-anchor-id="analytic-check-of-the-schedule-and-solver">Analytic check of the schedule and solver</h3>
-<p>As an analytic check, take <span class="math inline">\(P_0=\mathcal N(\mu,1)\)</span>. Then <span class="math inline">\(s_t(x)=-(x-\alpha_t\mu)\)</span>, so</p>
-<p><span class="math display">\[v(x,t)=-\tfrac12\beta(t)\alpha_t\mu=\alpha_t'\mu.\]</span></p>
-<p>The trajectory is <span class="math inline">\(x(t)=x(1)+(\alpha_t-\alpha_1)\mu\)</span>. Starting from the actual <span class="math inline">\(p_1=\mathcal N(\alpha_1\mu,1)\)</span> recovers <span class="math inline">\(p_0\)</span> exactly with the exact flow. Starting from <span class="math inline">\(\mathcal N(0,1)\)</span> instead leaves a mean error <span class="math inline">\(-\alpha_1\mu\)</span> at time zero, even with the exact score and exact integration. For <span class="math inline">\(\mu=0\)</span>, the score is <span class="math inline">\(-x\)</span> and the probability-flow velocity is zero. These checks test the sign, factor of two, and schedule consistency before neural-network error is introduced.</p>
+<p>The probability-flow construction does not require a standard-normal terminal law. It requires that initialization match the terminal density of the forward process used to derive the score and velocity. Changing the terminal distribution alone generally breaks that match.</p>
+<p>For a fully matched Gaussian example, take <span class="math inline">\(P_0=\mathcal N(\mu,1)\)</span> and retain the VP schedule above. The forward corruption gives</p>
+<p><span class="math display">\[P_t=\mathcal N(\alpha_t\mu,1),\qquad
+P_1=\mathcal N(\alpha_1\mu,1).\]</span></p>
+<p>The score and velocity of this same density path are</p>
+<p><span class="math display">\[s_t(x)=-(x-\alpha_t\mu),\qquad
+v(x,t)=-\tfrac12\beta(t)\alpha_t\mu=\alpha_t'\mu.\]</span></p>
+<p>Now initialize from its actual terminal law:</p>
+<p><span class="math display">\[\varepsilon\sim\mathcal N(0,1),\qquad X_1=\alpha_1\mu+\varepsilon.\]</span></p>
+<p>Integrating the ODE backward gives</p>
+<p><span class="math display">\[X_t=X_1+(\alpha_t-\alpha_1)\mu
+=\alpha_t\mu+\varepsilon.\]</span></p>
+<p>Consequently, <span class="math inline">\(X_t\sim P_t\)</span> at every time and <span class="math inline">\(X_0=\mu+\varepsilon\sim\mathcal N(\mu,1)\)</span> exactly for the exact flow. This example has no terminal-prior approximation. Comparing Euler endpoints with this trajectory isolates numerical error. For <span class="math inline">\(\mu=0\)</span>, the score is <span class="math inline">\(-x\)</span> and the probability-flow velocity is zero.</p>
+<p><strong>A separate approximation experiment:</strong> if we replace this matched initialization by <span class="math inline">\(X_1\sim\mathcal N(0,1)\)</span> while leaving the field unchanged, the output at time zero is <span class="math inline">\(\mathcal N((1-\alpha_1)\mu,1)\)</span>, not <span class="math inline">\(P_0\)</span>. Its mean error is <span class="math inline">\(-\alpha_1\mu\)</span>. This quantifies the cost of substituting a convenient prior; it is not part of the exact derivation above.</p>
 <p>If sampling stops at <span class="math inline">\(t_{\min}\)</span>, its intended output law is <span class="math inline">\(p_{t_{\min}}\)</span>, not exactly <span class="math inline">\(p_0\)</span>. Applying a final posterior mean changes the output law again; it is not an exact substitute for the missing evolution. Evaluate separately:</p>
 <ul>
 <li>terminal prior error: standard normal versus the actual <span class="math inline">\(p_1\)</span>;</li>
@@ -1137,6 +1223,7 @@ V_{k+1}&amp;=(1-\beta(t_k)h)V_k+\beta(t_k)h,\\
 +\frac{\beta(t)}2\partial_{xx}p_t
 =-\partial_x\!\left[p_t\left(-\frac{\beta(t)}2[x+s_t(x)]\right)\right].\]</span></p>
 <p>Thus the same schedule that supplies the training pairs determines the probability-flow velocity. This is the VP specialization of the paper’s Eq. (13); the conditional kernel agrees with its Appendix B.</p>
+<p><a href="../tutorials/35-probability-flow-ode-part-6.html">Part 6</a> provides a complete executed notebook that trains a small network and samples the two-component example.</p>
 
 
 </section>
