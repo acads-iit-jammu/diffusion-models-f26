@@ -181,10 +181,20 @@ To see why, differentiate the marginal mixture and divide by its density:
 $$\begin{aligned}
 \frac{p_t'(x)}{p_t(x)}
 &=\int \frac{\partial_xp_t(x\mid x_0)}{p_t(x)}p_{\mathrm{data}}(x_0)\,dx_0\\
-&=\int \partial_x\log p_t(x\mid x_0)\,p(x_0\mid x)\,dx_0.
+&=\int \partial_x\log p_t(x\mid x_0)\,p(x_0\mid X_t=x)\,dx_0.
 \end{aligned}$$
 
 The second line uses Bayes' rule. The integral notation assumes a data density; an expectation with respect to the data distribution gives the same identity for discrete data after positive Gaussian corruption. Differentiation under the integral requires the usual integrability conditions.
+
+::: {.callout-note}
+## The unknown posterior is used in the proof, not in training
+
+The posterior $p(x_0\mid X_t=x)$ is generally unknown. Its appearance above does **not** give a directly computable formula for the marginal score. It identifies the function that we want regression to learn.
+
+Training uses forward samples: draw $X_0$ from the dataset, draw independent Gaussian noise, and construct $X_t$ and the known target $U=-\varepsilon/\sqrt{1-\alpha_t^2}$. These pairs have the required joint distribution without evaluating its density or the posterior. A network minimizing squared prediction error learns the conditional average of $U$ given $(X_t,t)$; the identity above shows that this average is the marginal score.
+
+We therefore do not compute posterior probabilities or numerically integrate over $p(x_0\mid X_t=x)$. Conditional expectation describes the population regression solution. A finite neural network fitted to finite data approximates it. In continuous space, training also does not require repeated observations with exactly the same noisy value: the shared regression function is fitted across noisy inputs.
+:::
 
 Squared-error regression estimates the conditional mean of its target given the input. Here the input is $(X_t,t)$, the target is $U$, and the identity above identifies that conditional mean with $s_t(X_t)$. More explicitly, the loss decomposes as (see Appendix B for the conditional squared-error expansion)
 
