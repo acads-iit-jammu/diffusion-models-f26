@@ -812,9 +812,24 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 <p><span class="math display">\[\begin{aligned}
 \frac{p_t'(x)}{p_t(x)}
 &amp;=\int \frac{\partial_xp_t(x\mid x_0)}{p_t(x)}p_{\mathrm{data}}(x_0)\,dx_0\\
-&amp;=\int \partial_x\log p_t(x\mid x_0)\,p(x_0\mid x)\,dx_0.
+&amp;=\int \partial_x\log p_t(x\mid x_0)\,p(x_0\mid X_t=x)\,dx_0.
 \end{aligned}\]</span></p>
 <p>The second line uses Bayes’ rule. The integral notation assumes a data density; an expectation with respect to the data distribution gives the same identity for discrete data after positive Gaussian corruption. Differentiation under the integral requires the usual integrability conditions.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The unknown posterior is used in the proof, not in training
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The posterior <span class="math inline">\(p(x_0\mid X_t=x)\)</span> is generally unknown. Its appearance above does <strong>not</strong> give a directly computable formula for the marginal score. It identifies the function that we want regression to learn.</p>
+<p>Training uses forward samples: draw <span class="math inline">\(X_0\)</span> from the dataset, draw independent Gaussian noise, and construct <span class="math inline">\(X_t\)</span> and the known target <span class="math inline">\(U=-\varepsilon/\sqrt{1-\alpha_t^2}\)</span>. These pairs have the required joint distribution without evaluating its density or the posterior. A network minimizing squared prediction error learns the conditional average of <span class="math inline">\(U\)</span> given <span class="math inline">\((X_t,t)\)</span>; the identity above shows that this average is the marginal score.</p>
+<p>We therefore do not compute posterior probabilities or numerically integrate over <span class="math inline">\(p(x_0\mid X_t=x)\)</span>. Conditional expectation describes the population regression solution. A finite neural network fitted to finite data approximates it. In continuous space, training also does not require repeated observations with exactly the same noisy value: the shared regression function is fitted across noisy inputs.</p>
+</div>
+</div>
 <p>Squared-error regression estimates the conditional mean of its target given the input. Here the input is <span class="math inline">\((X_t,t)\)</span>, the target is <span class="math inline">\(U\)</span>, and the identity above identifies that conditional mean with <span class="math inline">\(s_t(X_t)\)</span>. More explicitly, the loss decomposes as (see Appendix B for the conditional squared-error expansion)</p>
 <p><span class="math display">\[\mathcal J_s(\theta)
 =\mathbb E_{t,X_t}\left[\lambda(t)(s_\theta(X_t,t)-s_t(X_t))^2\right]
