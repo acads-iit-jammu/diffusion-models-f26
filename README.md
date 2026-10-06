@@ -11,6 +11,10 @@ Same layout as the CS-1-01 (MO) course site.
 quarto preview
 ```
 
+Preview reuses the rendered notebook reading pages. After editing and saving a
+notebook, run `quarto render` to refresh its page. Full renders build the
+notebooks without executing their code; normal lecture edits use live preview.
+
 ## Publish to GitHub Pages
 
 ```sh

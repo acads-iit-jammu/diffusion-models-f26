@@ -1,0 +1,221 @@
+---
+title: "HW 4 · Gaussian-Corruption Probability Flows"
+subtitle: "Mathematical Foundations of Diffusion Models · Monsoon 2026 · IIT Jammu"
+format:
+  html:
+    theme: cosmo
+    toc: false
+    number-sections: false
+    fontsize: 10.5pt
+    include-in-header:
+      text: |
+        <style>
+        @page { size: A4; margin: 17mm 18mm 18mm; }
+        @media print {
+          body { font-size: 10.5pt; line-height: 1.3; }
+          #quarto-content, main { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; }
+          h1.title { font-size: 20pt; }
+          h2 { font-size: 14pt; margin-top: 1em; }
+          h3 { font-size: 11.5pt; }
+          h2, h3 { break-after: avoid; }
+          .new-page { break-before: page; }
+          .quarto-title-meta, .anchorjs-link { display: none !important; }
+          p, li { orphans: 2; widows: 2; }
+          p { margin-bottom: 0.55em; }
+          mjx-container[display="true"] { margin: 0.65em 0 !important; }
+          a { color: inherit; text-decoration: none; }
+          table { font-size: 10pt; }
+        }
+        </style>
+---
+
+**Format:** individual programming homework with derivations and experiments  
+**Marks:** 50 points across three parts  
+**Release and due dates:** TBA
+
+## Overview
+
+HW 3 prescribes a mixture of endpoint densities. This homework instead uses Gaussian corruption of observations to define a density path with a direct score-to-velocity relation. Work entirely in one dimension.
+
+Submit one executed notebook with three labeled parts, derivations in LaTeX, figures, tables, seeds, runtime, and a requirements file. Use NumPy/SciPy and PyTorch or an equivalent framework. Write the Euler loop yourself, cite reused course code, and do not use pretrained models or library diffusion samplers.
+
+## The sampling problem
+
+
+
+The goal is to generate samples from a data distribution $P_0$ by starting with $X_1\sim P_1=\mathcal N(0,1)$ and integrating an ODE backward in time. In Parts 1–2, let $P_0=\mathcal N(\mu,1)$: derive your results for general $\mu$, then use **$\mu=2$** in the main experiment. In Part 3, replace $P_0$ by the **standard Laplace distribution**, with density
+
+$$p_0(x)=\frac12e^{-|x|}.$$
+
+Its location is zero, its scale is one, and its variance is **two**. All experiments are one-dimensional and must run on a laptop CPU.
+
+## A common density path
+
+Use the following path in Parts 1–3:
+
+$$\boxed{X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,
+\qquad \alpha_t=1-t,\quad 0\le t\le1,\quad
+\varepsilon\sim\mathcal N(0,1),}$$
+
+where the Gaussian noise is independent of $X_0$. Let $P_t$ be the distribution of this random variable and $p_t$ its density. Thus $P_t$ interpolates from $P_0$ at $t=0$ to **exactly** $P_1=\mathcal N(0,1)$ at $t=1$.
+
+This formula specifies a marginal distribution at each time. Drawing independent noise at each time does not produce an ODE trajectory. Trajectories must be obtained by solving the ODE whose velocity you derive.
+
+Define the marginal score and posterior mean denoiser by
+
+$$s_t(x)=\partial_x\log p_t(x),\qquad
+D_*(x,t)=\mathbb E[X_0\mid X_t=x].$$
+
+A transporting field satisfies the continuity equation
+
+$$\partial_t p_t(x)=-\partial_x[p_t(x)v(x,t)].$$
+
+The velocity $v(x,t)$ and the score $s_t(x)$ are different functions. Use the probability-flow velocity in the sampler, rather than substituting the score alone as the velocity.
+
+
+::: {.new-page}
+## Part 1. Analytic Gaussian transport and Euler sampling — 15 points
+
+**1(a). Derive the density path and its score. [5 points]**
+
+Starting from $X_0\sim\mathcal N(\mu,1)$ and the common corruption formula, derive the mean, variance, density $p_t(x)$, and score $s_t(x)$ for every $t$. Verify both endpoint distributions explicitly. Show intermediate steps rather than quoting only the final expressions.
+
+**1(b). Derive a transporting vector field. [5 points]**
+
+Use the continuity equation to derive a velocity $v(x,t)$ for this density path. One route is to integrate the equation from $-\infty$ to $x$, assuming vanishing flux there:
+
+$$v(x,t)=-\frac{\partial_tF_t(x)}{p_t(x)},\qquad
+F_t(x)=\int_{-\infty}^xp_t(u)\,du.$$
+
+Explain this formula and evaluate it for your Gaussian path. Verify the resulting field directly in the continuity equation. Solve the trajectory starting from a terminal position $x(1)=x_1$, and show what distribution its position has at time zero.
+
+**1(c). Implement and evaluate the sampler. [5 points]**
+
+Draw 10,000 independent terminal samples from $\mathcal N(0,1)$. For $N$ equal reverse steps, use
+
+$$h=\frac1N,\qquad t_k=1-kh,\qquad
+x_{k+1}=x_k-h\,v(x_k,t_k),\quad k=0,\ldots,N-1.$$
+
+Here $x_k$ is the numerical position at time $t_k$; the output $x_N$ is at data time zero. Use **explicit Euler with decreasing time**, not the implicit backward-Euler method. Do not inject additional noise after initialization.
+
+Run $N\in\{20,100,500\}$ using the same initial particles for each resolution. Compare numerical endpoints with the exact trajectory endpoints. Plot a few trajectories and overlay the generated histogram with the true $p_0$. Report mean, variance, and empirical CDF discrepancy as defined in the evaluation section for Parts 1–3.
+
+Explain whether step-size refinement changes the discretization error for this particular field. Separate numerical error from the finite-sample discrepancy between a histogram and a population density. Repeat the main check with $\mu=0$ as a control.
+
+### Hints for connecting the three Gaussian-corruption parts
+
+For the chosen path, the probability-flow relation on $0<t<1$ is
+
+$$v(x,t)=\frac{\alpha_t'}{\alpha_t}[x+s_t(x)]
+=-\frac{x+s_t(x)}{1-t}.$$
+
+Check that it agrees with your independently derived Gaussian field. This relation is for the **intermediate marginal score** $s_t$, not just the clean score $s_0$. Its apparent singularity at $t=1$ requires the endpoint treatment described in Part 2.
+:::
+
+::: {.new-page}
+## Part 2. Learn the Gaussian score and sample — 20 points
+
+**2(a). Build a denoising training problem. [7 points]**
+
+Simulate 20,000 clean training observations and a separate set of 5,000 held-out observations from $\mathcal N(2,1)$. For every training minibatch, draw fresh independent noise and times uniformly in $[0.001,1]$, then construct $X_t$ from the common path. Condition the network on both position and time.
+
+A recommended implementation trains a posterior-mean predictor $D_\theta(x,t)$ using
+
+$$\mathcal J_D(\theta)=\mathbb E[(X_0-D_\theta(X_t,t))^2].$$
+
+Use Tweedie's identity to turn it into a score estimator:
+
+$$\boxed{s_\theta(x,t)=
+\frac{\alpha_tD_\theta(x,t)-x}{1-\alpha_t^2}.}$$
+
+Explain why the population squared-error optimum is $D_*$ and why its converted output is the marginal score. A small multilayer network with two hidden layers of 64 units is a suitable starting point. State the architecture, loss, optimizer, training budget, and any changes you make. The exact marginal score is reserved for evaluation, not used as a supervised training target.
+
+You may instead train a noise or direct-score predictor. If so, derive its training target, specify the time weighting, and explain how you construct a numerically stable sampling field. Equivalent output parameterizations need not have equivalent unweighted losses.
+
+**2(b). Measure score accuracy. [5 points]**
+
+At $t\in\{0.1,0.25,0.5,0.75,0.9\}$, overlay the learned and true scores on a common spatial grid. Also report held-out, marginal-weighted score MSE by corrupting the held-out data independently at each time. A training-loss curve alone is not evidence of score accuracy. Explain any dependence of the error on time.
+
+**2(c). Construct the learned field and sample. [5 points]**
+
+Derive the following algebraically equivalent form of the interior velocity and implement it using the denoiser:
+
+$$\boxed{v_\theta(x,t)=
+\frac{\alpha_tx-D_\theta(x,t)}{1-\alpha_t^2},\qquad 0<t<1.}$$
+
+This form avoids division by $1-t$ near the Gaussian terminal endpoint. At **$t=1$**, use the continuous endpoint value $v(x,1)=-m_0$, where $m_0=\mathbb E[X_0]$ is the specified data mean: $m_0=\mu$ here and $m_0=0$ in Part 3. Justify the limit using $D_*(x,1)=m_0$. This prescribed endpoint value is used only for the first Euler step. Never evaluate the score conversion at $t=0$; explicit Euler's last field evaluation is at $t=h>0$.
+
+Freeze the fitted network. Generate 10,000 samples with $N\in\{20,100,500\}$ and compare them with $p_0$ using the metrics in the evaluation section for Parts 1–3. Run the analytic and learned fields on the same terminal particles and report the mean absolute difference between their output positions.
+
+**2(d). Interpret and reproduce. [3 points]**
+
+Repeat the final learned-model experiment with three random seeds. Report the mean and spread of the fidelity metrics. Discuss score-estimation error, training-data sampling error, and Euler discretization error separately. Explain why more Euler steps cannot in general correct an inaccurate fitted field.
+:::
+
+::: {.new-page}
+## Part 3. Learn and sample standard Laplace data — 15 points
+
+**3(a). Construct the data and reference density path. [4 points]**
+
+Generate new, independent training and held-out datasets from $p_0(x)=\tfrac12e^{-|x|}$, with the same sizes as Part 2. Confirm their approximate mean and variance. Use the same $\alpha_t=1-t$ and Gaussian corruption; verify the endpoint laws.
+
+For $0<t<1$, the noisy density is a Gaussian convolution:
+
+$$p_t(x)=\int_{\mathbb R}\frac12e^{-|u|}
+\frac{\exp\!\left[-\dfrac{(x-\alpha_tu)^2}{2(1-\alpha_t^2)}\right]}
+{\sqrt{2\pi(1-\alpha_t^2)}}\,du.$$
+
+Its score is the derivative of this **noisy marginal**, not the clean Laplace score reused at every time. Derive an integral expression for $s_t(x)$ by differentiating under the integral sign. You may evaluate the two integrals numerically for reference checks; split integration at $u=0$ and report your integration tolerance. A validated analytic convolution formula is also acceptable.
+
+The clean score is $-\operatorname{sign}(x)$ for $x\ne0$ and is undefined at zero. Positive Gaussian corruption smooths this cusp. Explain why this does not prevent the positive-time score comparisons or the Euler sampler specified above.
+
+**3(b). Train a new score estimator. [5 points]**
+
+Train a new network from scratch on the Laplace training data using the same denoising construction. Keep the training and evaluation data separate. Explain any changes in architecture, loss weighting, or training budget compared with the Gaussian experiment.
+
+Plot exact-reference and estimated scores at $t=0.1,0.5,0.9$. Evaluate a reference score by quadrature only on a modest grid or held-out subset; do not put quadrature inside neural-network training. Report a numerical score error on an independent subset at each time and check that tightening the quadrature tolerance does not materially change the reference values.
+
+**3(c). Generate and assess fidelity. [6 points]**
+
+Use the fitted velocity, the endpoint convention from Part 2, and the same explicit reverse-time Euler code. Initialize from $\mathcal N(0,1)$ and use $N\in\{20,100,500\}$. Compare the generated samples with standard Laplace data through density overlays, empirical CDFs, mean, variance, and a quantile-based discrepancy.
+
+Include a tail check: estimate $P(|X|>3)$ and compare it with the target value $e^{-3}$. Repeat the final experiment with three seeds. Discuss whether the sampler captures the central peak and the tails, and whether observed discrepancies are more consistent with finite-sample variation, numerical error, or score error. Do not infer good fidelity from a visually plausible histogram alone.
+
+### A question to answer in your report
+
+What would happen if you replaced the probability-flow field by the clean score alone and integrated that deterministic ODE forward? Explain why this would not be a valid replacement for the sampler developed in this assignment.
+:::
+
+::: {.new-page}
+## Evaluation and endpoint conventions for Parts 1–3
+
+### Use comparable experiments
+
+Keep the terminal particles fixed when comparing step counts or exact and learned fields. Draw an independent reference sample from $P_0$ for sample-to-sample comparisons. Do not tune model choices on that final reference sample. Use three different seeds to assess the variability of your final results; you need not repeat every diagnostic plot for every seed.
+
+Report the following metrics, with the settings used:
+
+- **Mean and variance errors:** compare the generated empirical moments with $(\mu,1)$ for the Gaussian or $(0,2)$ for standard Laplace.
+- **Empirical CDF discrepancy:** $D=\sup_x|\widehat F(x)-F_0(x)|$, where $F_0$ is the analytic target CDF. This is the one-sample Kolmogorov--Smirnov statistic; report the discrepancy, not just a hypothesis-test decision.
+- **Quantile-based discrepancy:** for equal-sized generated and independent reference samples of size $M$, sort both and compute $M^{-1}\sum_{i=1}^M|x_{(i)}-y_{(i)}|$. This is their empirical one-dimensional Wasserstein-1 distance.
+- **Score error at each time:** for held-out $x_t^{(i)}\sim p_t$, compute $M^{-1}\sum_i[s_\theta(x_t^{(i)},t)-s_t(x_t^{(i)})]^2$.
+
+For calibration, compare an independent direct draw from $P_0$ with the target using the same sample size and metrics. Even genuine target samples have nonzero empirical discrepancies. A finite-sample baseline helps interpret how much discrepancy is attributable to the learned sampler.
+
+### Why this path needs an endpoint convention
+
+This homework uses $\alpha_t=1-t$ to make the terminal law exactly Gaussian. It differs from the finite-rate schedule $\alpha_t=e^{-\beta t/2}$ used in some lecture examples, whose terminal law is only approximately Gaussian for general data. If you relate this assignment's path to a VP SDE, its rate is $\beta(t)=2/(1-t)$ on $t<1$; do not evaluate that singular coefficient at $t=1$.
+
+The probability-flow velocity for these examples has the finite endpoint extension specified in Part 2. Use it for the initial Euler evaluation and the denoiser-based field at all interior times. The last evaluation is at $h$, so no division by zero is needed at the data endpoint. With the required resolutions, $h\ge0.002$, within the specified positive-time training range.
+
+The score conversion is still sensitive to denoiser error near $t=0$. If performance deteriorates there, investigate training coverage and prediction error rather than silently clipping the field or changing the endpoint. State and evaluate any numerical modification you introduce.
+
+### Checklist
+
+1. Three parts with complete derivations and consistent notation: $P_t$ for the law, $p_t$ for its density, $\varepsilon$ for Gaussian noise, and $\mathbb E$ for expectation.
+2. A runnable CPU notebook with a hand-written explicit Euler loop and separately defined density, score, denoiser, and velocity functions.
+3. Plots of trajectories, densities, CDFs, and true versus estimated scores; tables covering the required resolutions and final seeds.
+4. An explanation of what each experiment establishes and what remains approximate. Include runtime and package versions.
+
+**Useful course material:** Probability-Flow ODE Parts 1--4 (Lectures 12--15), especially the continuity equation, score/denoiser relation, and exact-versus-learned sampling comparisons.
+:::

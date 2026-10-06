@@ -39,8 +39,15 @@ check does not establish image quality. See Lecture 16 for the full recipe.
 
 ## Browser reading copies
 
-The course build runs `quarto render materials/probability-flow/notebooks`
-before rendering the book. The nested Quarto configuration renders saved
+A full `quarto render` runs the notebook renderer through
+`scripts/render-notebooks.ts`. The nested Quarto configuration renders saved
 notebook outputs without executing the training cells. Lecture 15 links to
-both the rendered HTML and the downloadable notebook sources. After changing
-code, rerun and save the notebook to update its outputs before rendering.
+both the rendered HTML and the downloadable notebook sources.
+
+`quarto preview` reuses those HTML pages rather than rebuilding the nested
+notebook project on each preview event. If notebook HTML is missing, the hook
+creates it once. This prevents generated files from causing a rebuild loop.
+
+After editing notebook code, rerun and save the notebook to update its outputs.
+Then run `quarto render` to refresh its reading page and the course site.
+Ordinary lecture edits still update through live preview.

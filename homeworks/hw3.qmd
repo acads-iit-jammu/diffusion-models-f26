@@ -1,0 +1,193 @@
+---
+title: "HW 3 · Density Interpolation and Learned Scores"
+subtitle: "Mathematical Foundations of Diffusion Models · Monsoon 2026 · IIT Jammu"
+format:
+  html:
+    theme: cosmo
+    toc: false
+    number-sections: false
+    fontsize: 10.5pt
+    include-in-header:
+      text: |
+        <style>
+        @page { size: A4; margin: 17mm 18mm 18mm; }
+        @media print {
+          body { font-size: 10.5pt; line-height: 1.3; }
+          #quarto-content, main { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; }
+          h1.title { font-size: 20pt; }
+          h2 { font-size: 14pt; margin-top: 1em; }
+          h3 { font-size: 11.5pt; }
+          h2, h3 { break-after: avoid; }
+          .new-page { break-before: page; }
+          .quarto-title-meta, .anchorjs-link { display: none !important; }
+          p, li { orphans: 2; widows: 2; }
+          p { margin-bottom: 0.55em; }
+          mjx-container[display="true"] { margin: 0.65em 0 !important; }
+          a { color: inherit; text-decoration: none; }
+          table { font-size: 10pt; }
+        }
+        </style>
+---
+
+**Format:** individual programming homework with derivations and experiments  
+**Marks:** 50 points across two parts  
+**Release and due dates:** TBA
+
+## Overview
+
+This homework prescribes a linear mixture of endpoint densities. Part 1 derives its transporting velocity and implements Euler sampling. Part 2 learns the score and reconstructs a density path and its velocity numerically. HW 4 considers a different construction based on Gaussian corruption.
+
+## The sampling problem for Parts 1–2
+
+Work entirely in one dimension. The data law is $P_0=\mathcal N(\mu,1)$ and the terminal law is $P_1=\mathcal N(0,1)$. Derive results for general $\mu$, use **$\mu=2$** for experiments, and use $\mu=0$ as a control. Generate data by transporting independent terminal samples backward from $t=1$ to $t=0$.
+
+Write $p_t$ for a density and $F_t$ for its CDF. Prescribe the **linear interpolation of densities**
+
+$$\boxed{p_t(x)=(1-t)p_0(x)+tp_1(x),\qquad 0\le t\le1.}$$
+
+This is a mixture distribution. To draw one observation at time $t$, choose $P_0$ with probability $1-t$, or $P_1$ with probability $t$, and draw from the chosen distribution. Do not form a weighted average of two observations. Independent draws from these mixtures are training observations, not ODE trajectories.
+
+The goal is to construct $v(x,t)$ such that
+
+$$\frac{dx}{dt}=v(x,t),\qquad
+\partial_t p_t(x)=-\partial_x[p_t(x)v(x,t)],$$
+
+then implement its reverse-time sampler. Define the score as
+
+$$s_t(x)=\partial_x\log p_t(x).$$
+
+**The score and the transport velocity are different.** Derive the velocity from the prescribed density path and continuity equation. The Gaussian-corruption probability-flow formula does not apply to this mixture path.
+
+## What to submit
+
+Submit one executed notebook with two labeled parts, mathematical explanations in LaTeX, figures, tables, random seeds, runtime, and a requirements file. Use NumPy/SciPy and PyTorch or an equivalent framework. Write the Euler loop yourself. Cite any reused course code. Do not use pretrained models or library diffusion samplers.
+
+Part 1 uses analytic densities and CDFs. Part 2 learns the score from mixture observations and reconstructs the density path numerically before sampling. The Gaussian formulas are reference checks in Part 2, not supervised training targets.
+
+::: {.new-page}
+## Part 1. Derive and sample the mixture path — 20 points
+
+**1(a). Density, CDF, and score. [6 points]**
+
+Let $\phi$ and $\Phi$ denote the standard Gaussian density and CDF. Express $p_t(x)$, $F_t(x)$, and $s_t(x)$ using these functions. Verify the endpoint laws. Derive the mean and variance of $P_t$, and explain why the intermediate law is generally not a single Gaussian.
+
+Plot the density and score for $t\in\{0,0.25,0.5,0.75,1\}$. Use a common spatial grid. Explain the difference between this density mixture and a weighted average of two independent Gaussian random variables.
+
+**1(b). Derive the velocity. [7 points]**
+
+Integrate the continuity equation from $-\infty$ to $x$, assuming the probability flux vanishes at $-\infty$. Derive
+
+$$v(x,t)=-\frac{\partial_tF_t(x)}{p_t(x)}.$$
+
+Use the mixture path to express the numerator in terms of $F_0$ and $F_1$, then obtain an explicit Gaussian formula. Check the sign of the field when $\mu>0$ and verify the continuity equation. Explain why this field also conserves total probability, including its flux at $+\infty$.
+
+Along an exact trajectory, show that $F_t(x(t))$ is constant. Deduce the endpoint map
+
+$$x(0)=F_0^{-1}(F_1(x(1))),$$
+
+and simplify it for the present two Gaussian endpoint laws. This gives an independent reference for your numerical sampler, even though the intermediate velocity is not generally constant.
+
+**1(c). Explicit Euler sampling and fidelity. [7 points]**
+
+Draw 10,000 terminal particles from $\mathcal N(0,1)$. Set $h=1/N$, $t_k=1-kh$, and implement
+
+$$\boxed{x_{k+1}=x_k-h\,v(x_k,t_k),\qquad k=0,\ldots,N-1.}$$
+
+This is explicit Euler with decreasing time, not the implicit backward-Euler method. Use $N\in\{20,100,500\}$ and the same terminal particles for each resolution. Do not add noise after initialization.
+
+Plot particle trajectories and compare the empirical densities at selected intermediate times with their prescribed mixture densities. At time zero, overlay the generated histogram and CDF with the target. Report the metrics in the evaluation section, including the mean absolute difference from the exact endpoint map. Explain the effect of step size and separate discretization error from finite-sample error. Repeat the main checks with $\mu=0$.
+
+Use numerically stable Gaussian density/CDF evaluations. Inspect tail behavior; do not silently replace non-finite velocities with zero.
+:::
+
+::: {.new-page}
+## Part 2. Learn the score, reconstruct the path, and sample — 30 points
+
+**2(a). Learn from mixture observations. [8 points]**
+
+Generate 20,000 independent clean training samples from $P_0$ and 5,000 separate held-out samples. At each training update, draw times uniformly on $[0,1]$. For each time, choose a clean training observation with probability $1-t$, or draw fresh standard Gaussian noise with probability $t$. The resulting input has the required mixture law. Condition the network on both $x$ and $t$.
+
+Use the one-dimensional score-matching objective
+
+$$\mathcal J(\theta)=\mathbb E_{t,\,X_t\sim p_t}
+\left[\frac12s_\theta(X_t,t)^2+
+\partial_xs_\theta(X_t,t)\right].$$
+
+By integration by parts, show that this differs from
+$\tfrac12\mathbb E[(s_\theta(X_t,t)-s_t(X_t))^2]$ by a term independent of $\theta$. State the boundary condition needed. Compute the spatial derivative using automatic differentiation and retain the graph needed for parameter gradients. Do not train on exact marginal scores or use a Gaussian denoising target: this dataset was generated by choosing a mixture component, not by Gaussian corruption of every observation.
+
+A useful parameterization is
+
+$$s_\theta(x,t)=-x+(1-t)r_\theta(x,t),$$
+
+where $r_\theta$ is a smooth MLP with two hidden layers of 64 tanh units and a linear output. For fixed finite parameters this residual is bounded in $x$, so the reconstructed density below is integrable. It also enforces $s_\theta(x,1)=-x$ exactly. Explain both properties. Use smooth activations and report the optimizer, training budget, validation procedure, and final loss curves.
+
+**2(b). Evaluate score accuracy. [5 points]**
+
+At $t\in\{0,0.1,0.25,0.5,0.75,0.9,1\}$, overlay learned and exact scores on a shared grid and report score MSE on independent held-out mixture observations. Include the endpoints: accuracy at time zero affects the generated data law. The exact Gaussian-mixture score is for evaluation only. Explain time dependence and distinguish errors in high-density regions from errors in the tails.
+
+**2(c). Recover the density and velocity. [9 points]**
+
+A score specifies spatial log-density differences. Derive
+
+$$A_\theta(x,t)=\int_0^x s_\theta(u,t)\,du,\qquad
+\widehat p_t(x)=\frac{e^{A_\theta(x,t)}}{\int_{\mathbb R}e^{A_\theta(z,t)}\,dz}.$$
+
+Then define $\widehat F_t(x)=\int_{-\infty}^x\widehat p_t(u)\,du$ and derive the corresponding velocity
+
+$$\boxed{\widehat v(x,t)=-\frac{\partial_t\widehat F_t(x)}{\widehat p_t(x)}.}$$
+
+Continue with the numerical requirements on the next page.
+:::
+
+::: {.new-page}
+## Part 2 continued: numerical reconstruction and sampling
+
+Implement spatial quadrature on a finite interval $[-L,L]$, starting with $L=10$ and a uniform grid. Integrate the score cumulatively, subtract the maximum log-density before exponentiating, normalize, and integrate the resulting density to obtain its CDF. Refine the grid and enlarge the interval to assess truncation and quadrature errors. Explain the interpretation of this finite-interval normalization.
+
+Compute $\partial_t\widehat F_t$ by differentiating the quadrature calculation through automatic differentiation, or by validated finite differences in time. Finite differences must include the time dependence of the normalizing constant. Use centered differences in the interior and appropriate one-sided differences at the endpoints. Check convergence of the derivative as its step size decreases.
+
+Reconstruct fields on a spatial grid and interpolate them for the particles. Report the interpolation method. Detect particles outside the grid and enlarge the domain if needed; do not silently clip their positions. Verify that normalization and the terminal density agree with the standard Gaussian to your stated numerical tolerance.
+
+**Important:** independently fitted scores at different times need not reconstruct an exactly linear mixture path. Therefore, in this learned experiment use $-\partial_t\widehat F_t/\widehat p_t$. Replacing its numerator by $\widehat F_0-\widehat F_1$ is valid only if you explicitly impose a linear mixture path on the reconstructed densities. Do not combine that numerator with unrelated reconstructed intermediate densities.
+
+Before using the network, run this entire reconstruction procedure with the **exact score** from Part 1. Compare the reconstructed densities and velocities against their analytic counterparts. This isolates quadrature, time-differentiation, and interpolation errors from learning errors. Plot these comparisons at several times, including the terminal time.
+
+**2(d). Generate and interpret. [8 points]**
+
+Freeze the network and use the same reverse-time Euler code and terminal particles as Part 1. Generate 10,000 samples for $N\in\{20,100,500\}$. Compare three samplers: analytic velocity, numerically reconstructed velocity from the exact score, and numerically reconstructed velocity from the learned score.
+
+Report score, density, and output-sample fidelity. Repeat the final learned experiment with three training seeds, reporting the mean and spread of the sample metrics. Explain separately the effects of score error, finite-interval normalization, quadrature, time differentiation, interpolation, Euler discretization, and finite sample size. You need not repeat every plot for every seed.
+
+Explain why increasing the number of Euler steps cannot correct a learned density path whose data endpoint is inaccurate. Also explain why directly substituting $s_\theta$ for the velocity would not solve this transport problem.
+
+The reconstruction is deliberately one-dimensional. Briefly explain why integrating a score and normalizing its density becomes substantially harder in higher dimensions. This limitation motivates later constructions that provide a direct relation between the time-dependent score and a transporting field.
+:::
+
+::: {.new-page}
+## Evaluation for Parts 1–2
+
+### Required fidelity checks
+
+Use independent reference observations for the final evaluations. Report the settings and sample sizes for each metric.
+
+- **Mean and variance:** compare generated moments with $\mu$ and $1$ at data time zero. For intermediate-time plots use the mixture moments derived in Part 1.
+- **Empirical CDF discrepancy:** $\sup_x|\widehat F_{\rm samples}(x)-F_0(x)|$. Report the one-sample Kolmogorov--Smirnov statistic, not just a test decision. Here $\widehat F_{\rm samples}$ is the empirical CDF of generated samples, distinct from the CDF reconstructed from a score.
+- **Quantile discrepancy:** for equally sized generated and independent target samples of size $M$, compute $M^{-1}\sum_i|x_{(i)}-y_{(i)}|$ after sorting both. This is their empirical Wasserstein-1 distance.
+- **Paired endpoint error:** compare generated positions with $F_0^{-1}(F_1(x_1))$ for the same initial terminal particles.
+- **Score MSE:** at each evaluation time, compute $M^{-1}\sum_i[s_\theta(x_t^{(i)},t)-s_t(x_t^{(i)})]^2$ on held-out mixture observations.
+- **Reconstructed-density error:** compare $\widehat p_t$ and $p_t$ on the spatial grid, including their normalization, density overlays, and a quadrature estimate of $\int|\widehat p_t-p_t|\,dx$ over that interval. Report the analytic mixture probability outside the interval separately.
+
+Calibrate sample metrics using an independent direct draw from $P_0$ of the same size. Even true target samples have nonzero empirical discrepancies. Use common terminal particles when comparing fields and Euler resolutions.
+
+### Practical checks
+
+1. Clearly distinguish the density mixture $(1-t)p_0+tp_1$ from interpolation of sample values.
+2. Show the continuity-equation derivation, the score-matching integration by parts, and the density reconstruction with normalization.
+3. Include analytic checks before neural-network experiments. Keep training, validation, and final evaluation separate.
+4. Demonstrate numerical convergence of the reconstruction. Start with a coarse grid for debugging, then refine it; batching network evaluations and precomputing fields can reduce runtime.
+5. Explain the meaning of every plot and table. Report package versions, seeds, training and sampling runtimes, and any numerical safeguards.
+
+**Useful course material:** Probability-Flow ODE Parts 1--4 (Lectures 12--15), especially continuity, CDF-based transport, score estimation, and numerical sampling. Parts 1–2 prescribe a density-mixture path. HW 4 uses Gaussian corruption and obtain a direct score-to-velocity relation.
+:::
+

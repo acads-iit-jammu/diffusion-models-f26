@@ -160,7 +160,7 @@ $$\alpha_t=\exp\left[-\frac12\int_0^t\beta(u)\,du\right].$$
 
 Replace the constant $\beta$ in the drift, noise coefficient, and sampling
 updates by its value at the current time. This schedule generalization is
-used in the later training and image-model notes.
+used in the later training and image-model notes. Equivalently, $\beta(t)=-2\,d(\log\alpha_t)/dt$. The training corruption, score conversion, and solver must all use this same schedule; see the worked schedule in [Part 3](./32-probability-flow-ode-part-3.qmd).
 
 ## 5. The score and the probability-flow vector field
 

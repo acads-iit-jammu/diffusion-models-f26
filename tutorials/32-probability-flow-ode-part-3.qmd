@@ -3,10 +3,18 @@
 ::: {.callout-note}
 ## Draft — Learning the score
 
-These lecture notes are in development and may be revised. [Part 2](./31-probability-flow-ode-part-2.qmd) specified sampling dynamics given a score. We now construct training targets from clean data and Gaussian noise. We first use scalars to make the conditional expectations explicit, then state the vector formulas.
+These lecture notes are in development and may be revised. [Part 1](./07-probability-flow-ode.qmd) established that a score and the forward schedule determine a sampling vector field; [Part 2](./31-probability-flow-ode-part-2.qmd) extended the construction to vectors. We now construct training targets from clean data and Gaussian noise. We first use scalars to make the conditional expectations explicit, then state the vector formulas.
 :::
 
-## 1. What remains unknown?
+::: {.callout-note}
+## Primary reference and learning objective
+
+The primary reference is [Song et al., *Score-Based Generative Modeling through Stochastic Differential Equations*, ICLR 2021, arXiv:2011.13456v2](https://arxiv.org/abs/2011.13456v2). Use Section 3.3, Eq. (7), for training; Section 4.3, Eq. (13), for the probability-flow ODE; and Appendix B, Eqs. (32)–(33), for the linear VP schedule and its Gaussian transition law. The paper's reverse SDE is Eq. (6), a different sampling dynamics from Eq. (13).
+
+**Sampling is the goal.** Choose one forward schedule, generate noisy training examples from it, fit a time-dependent score, and insert that score into the corresponding vector field. Explicit Euler integration with decreasing time then generates approximate data samples. Training and sampling must use the same schedule and time convention.
+:::
+
+## 1. The forward process, SDE, and noise schedule
 
 Generation requires evaluating a vector field at the current sample and time. For VP diffusion, the probability-flow field in one dimension is
 
@@ -15,19 +23,114 @@ s_t(x)=\frac{d}{dx}\log p_t(x).$$
 
 The schedule is chosen by us; the marginal score is unknown. Our dataset contains observations $X_0\sim p_{\mathrm{data}}$, not values of $p_t$ or its derivative. We therefore need a regression problem that can be constructed from those observations and whose population solution is the score.
 
-Throughout this lecture,
+### The forward process and its SDE
 
-$$X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,\qquad \varepsilon\sim\mathcal N(0,1),$$
+Choose a nonnegative rate schedule $\beta(t)$ on $0\le t\le1$. It specifies how rapidly each forward step contracts the particle and adds noise. For a small step $h>0$, at time $t_k=kh$ use
 
-with independent $X_0,\varepsilon$. Data are at $t=0$ and the terminal prior is at $t=1$. For a VP rate schedule,
+$$\boxed{X_{t_{k+1}}=\sqrt{1-\beta(t_k)h}\,X_{t_k}
++\sqrt{\beta(t_k)h}\,\varepsilon_k,\qquad
+\varepsilon_k\sim\mathcal N(0,1),\quad \beta(t_k)h<1.}$$
 
-$$\alpha_t=\exp\left(-\frac12\int_0^t\beta(u)\,du\right).$$
+The noise draws are independent across steps and independent of the current particle. The one-step noise variance is $\beta(t_k)h$. As the step size tends to zero, this construction gives the VP SDE
 
-A constant rate gives the expression $e^{-\beta t/2}$ used in Part 1. The training identities depend on $\alpha_t$, and do not require a constant rate. We work at times with $0<\alpha_t<1$.
+$$\boxed{dX_t=-\frac{\beta(t)}2X_t\,dt+\sqrt{\beta(t)}\,dW_t.}$$
 
-## 2. Forward corruption supplies supervised examples
+Define the cumulative signal amplitude by
 
-For each minibatch, select a clean observation $x_0$, a time $t$, and independent standard-normal noise $\varepsilon$. Construct
+$$\boxed{\alpha_t=\exp\!\left[-\frac12\int_0^t\beta(u)\,du\right],
+\qquad\alpha_0=1.}$$
+
+The corresponding conditional law can be sampled directly at any selected positive time:
+
+$$\boxed{X_t\mid X_0=x_0\sim\mathcal N(\alpha_t x_0,1-\alpha_t^2),
+\qquad X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,}$$
+
+where $\varepsilon\sim\mathcal N(0,1)$ is independent of $X_0$. This formula generates a training observation at one selected time; it does not specify an SDE trajectory by reusing the same noise at every time.
+
+The rate and accumulated amplitude describe the same schedule:
+
+$$\boxed{\alpha_t'=-\frac{\beta(t)}2\alpha_t,
+\qquad\beta(t)=-2\frac{d}{dt}\log\alpha_t.}$$
+
+Thus the $\alpha_t$ used to generate training examples determines the $\beta(t)$ in the sampling field $v(x,t)=-\beta(t)[x+s_t(x)]/2$. Appendix C derives the small-step limit, cumulative amplitude, and conditional variance. Data are at time zero; the standard Gaussian used at time one approximates the actual terminal law for a finite-rate schedule.
+
+| Quantity | Formula | Role |
+|---|---|---|
+| Instantaneous rate | $\beta(t)$ | Rate in the forward SDE and sampling ODE |
+| Cumulative signal amplitude | $\alpha_t$ | Multiplies the clean observation |
+| Conditional noise variance | $1-\alpha_t^2$ | Accumulated variance in a training example |
+| Conditional noise standard deviation | $\sqrt{1-\alpha_t^2}$ | Multiplies sampled Gaussian noise |
+
+### Constant rate in Part 1; linear rate in the paper
+
+The existing teaching notebooks use $\beta(t)=8$, hence $\alpha_t=e^{-4t}$ and conditional variance $1-e^{-8t}$. Their training code and ODE both use this constant rate. It is a valid VP example, not the paper's experimental linear schedule.
+
+For the paper's linear VP schedule on $[0,1]$, write its endpoint rates in our notation as
+
+$$\beta(t)=\beta_{\min}+t(\beta_{\max}-\beta_{\min}),\qquad
+\beta_{\min}=0.1,\quad\beta_{\max}=20.$$
+
+Integrating this rate gives
+
+$$\boxed{\alpha_t=\exp\!\left[-\frac{\beta_{\min}t}{2}
+-\frac{(\beta_{\max}-\beta_{\min})t^2}{4}\right].}$$
+
+The forward training example is therefore
+
+$$X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,$$
+
+and its sampling field uses $\beta(t)=0.1+19.9t$, evaluated at the current solver time. Replacing this coefficient by 8 while keeping the linear-schedule training data would give the wrong field for the learned density path.
+
+For this linear schedule, $\alpha_1=e^{-5.025}\approx0.00657$. The terminal law generally retains a small data contribution; it is not exactly standard normal. Increasing the number of Euler steps does not reduce that terminal-prior approximation. The constant-rate notebooks likewise retain $\alpha_1=e^{-4}$.
+
+::: {.callout-note}
+## Relating a discrete forward step to the continuous rate
+
+For $0\le u<t\le1$, the exact VP transition is
+
+$$X_t\mid X_u=x\sim\mathcal N\!\left(
+\frac{\alpha_t}{\alpha_u}x,\ 1-\frac{\alpha_t^2}{\alpha_u^2}\right).$$
+
+In discrete DDPM notation, a step's noise variance $\beta_i$ is related to the continuous rate by
+
+$$\beta_i=1-\exp\!\left[-\int_{t_{i-1}}^{t_i}\beta(u)\,du\right]
+\approx\beta(t_{i-1})(t_i-t_{i-1}).$$
+
+Our $\alpha_{t_i}$ is the cumulative **amplitude** $\sqrt{\prod_{j=1}^i(1-\beta_j)}$. It is not the one-step retention $1-\beta_i$. One-step noise variance, accumulated noise variance, and continuous-time rate must not be interchanged.
+:::
+
+
+## 2. The score-estimation objective: Song et al.'s Eq. (7)
+
+With the paper's terminal time normalized to 1, its population objective is
+
+$$\begin{aligned}
+\mathcal J_s^{\mathrm{paper}}(\theta)
+&=\mathbb E_{t\sim\operatorname{Uniform}[0,1]}\Bigg[
+\lambda(t)\,
+\mathbb E_{X_0\sim p_{\mathrm{data}}}\Big[
+\mathbb E_{X_t\sim p_{0t}(\cdot\mid X_0)}
+\big[(s_\theta(X_t,t)-\partial_{X_t}\log p_{0t}(X_t\mid X_0))^2\big]
+\Big]\Bigg].
+\end{aligned}$$
+
+The notation $p_{0t}(\cdot\mid x_0)$ is the paper's forward transition law from time 0 to time $t$; it is the same conditional density denoted $p_t(\cdot\mid x_0)$ in these notes. The three averages mean:
+
+1. Draw time $t$ uniformly on $[0,1]$.
+2. Draw a clean observation $X_0$ from $p_{\mathrm{data}}$.
+3. Holding that time and clean observation fixed, draw $X_t$ from $p_{0t}(\cdot\mid X_0)$.
+
+In particular, the innermost expectation is over the **conditional forward distribution**, not an independent draw from the marginal $p_t$, and not the posterior $p(X_0\mid X_t)$. The posterior appears in the regression identity in Section 3; the training pairs are drawn in the forward direction. With a finite dataset, the clean-data expectation is approximated by sampling observations from its empirical distribution.
+
+For VP diffusion,
+
+$$p_{0t}(\cdot\mid x_0)=\mathcal N(\alpha_t x_0,1-\alpha_t^2).$$
+
+Consequently, sampling independent $\varepsilon\sim\mathcal N(0,1)$ and forming $X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\varepsilon$ is exactly a reparameterization of that innermost conditional expectation. It is not a different training distribution.
+
+### Constructing the conditional-score target
+
+We can sample the exact conditional law at a selected time without simulating all intervening forward steps. For each minibatch, select a clean observation $x_0$, a time $t$, and independent standard-normal noise $\varepsilon$. Construct
 
 $$x_t=\alpha_tx_0+\sqrt{1-\alpha_t^2}\,\varepsilon.$$
 
@@ -42,14 +145,36 @@ $$U=-\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}.$$
 
 The network sees $(x_t,t)$ as input and $U$ as a target. It does not see $x_0$ as an input. Individual training targets are noisy: several $(x_0,\varepsilon)$ pairs can produce similar $x_t$.
 
+
+### The practical, positive-time version
+
+Eq. (7) uses the full time interval. In the implementation here, $t\sim\operatorname{Uniform}[t_{\min},1]$ instead: this is an explicitly truncated training objective, not literally the same time distribution as Eq. (7). It avoids the zero-variance conditional kernel at time zero. The score-regression identity is unchanged on the retained times, but the objective gives no direct training constraint below $t_{\min}$.
+
+For this practical loss, average over three independent draws before constructing $X_t$:
+
+$$t\sim\operatorname{Uniform}[t_{\min},1],\qquad
+X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
+\qquad X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon.$$
+
+We write this joint average as $\mathbb E_{t,X_0,\varepsilon}$. The noisy input $X_t$ is computed from these draws; it is not drawn independently of them. A positive $t_{\min}$ excludes the zero-noise endpoint.
+
+The resulting **denoising score-matching** loss is
+
+$$\boxed{\mathcal J_s(\theta)=\mathbb E_{t,X_0,\varepsilon}\left[
+\lambda(t)\left(s_\theta(X_t,t)+\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}\right)^2\right]}$$
+
+and we train by minimizing it over $\theta$. Section 3 explains why it has the desired population solution $s_\theta(x,t)=s_t(x)$, for positive weights on the times being trained and sufficient model capacity. Finite datasets, restricted networks, and optimization error make practical estimates approximate. This is the Gaussian reparameterization of [Song et al., Eq. (7)](https://arxiv.org/html/2011.13456v2#S3.E7), with the positive-time cutoff stated above.
+
+
 ## 3. Why conditional targets recover the marginal score
+
+In the conditional expectations below, the time $t$ is fixed. The subscript states which conditional distribution is being averaged over: for example, $\mathbb E_{X_0\mid X_t=x}[X_0]$ averages possible clean values under the posterior distribution given the noisy observation. It does not average over $x$ or over time.
 
 The key identity is
 
-$$\boxed{s_t(x)=\mathbb E\left[
-\left.\frac{\partial}{\partial x}\log p_t(x\mid X_0)
-\right|X_t=x\right]
-=-\frac{\mathbb E[\varepsilon\mid X_t=x]}{\sqrt{1-\alpha_t^2}}.}$$
+$$\boxed{s_t(x)=\mathbb E_{X_0\mid X_t=x}\left[
+\frac{\partial}{\partial x}\log p_t(x\mid X_0)\right]
+=-\frac{\mathbb E_{\varepsilon\mid X_t=x}[\varepsilon]}{\sqrt{1-\alpha_t^2}}.}$$
 
 To see why, differentiate the marginal mixture and divide by its density:
 
@@ -61,18 +186,13 @@ $$\begin{aligned}
 
 The second line uses Bayes' rule. The integral notation assumes a data density; an expectation with respect to the data distribution gives the same identity for discrete data after positive Gaussian corruption. Differentiation under the integral requires the usual integrability conditions.
 
-Squared-error regression estimates conditional means. Therefore the **denoising score-matching** loss
-
-$$\boxed{\mathcal J_s(\theta)=\mathbb E\left[
-\lambda(t)\left(s_\theta(X_t,t)+\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}\right)^2\right]}$$
-
-has the desired population solution $s_\theta(x,t)=s_t(x)$, for positive weights on the times being trained and sufficient model capacity. Finite datasets, restricted networks, and optimization error make practical estimates approximate. This training construction is used in [Song et al., *Score-Based Generative Modeling through Stochastic Differential Equations*](https://arxiv.org/abs/2011.13456).
-
-The loss can also be decomposed as
+Squared-error regression estimates the conditional mean of its target given the input. Here the input is $(X_t,t)$, the target is $U$, and the identity above identifies that conditional mean with $s_t(X_t)$. More explicitly, the loss decomposes as (see Appendix B for the conditional squared-error expansion)
 
 $$\mathcal J_s(\theta)
-=\mathbb E\left[\lambda(t)(s_\theta(X_t,t)-s_t(X_t))^2\right]
-+\mathbb E\left[\lambda(t)\operatorname{Var}(U\mid X_t,t)\right].$$
+=\mathbb E_{t,X_t}\left[\lambda(t)(s_\theta(X_t,t)-s_t(X_t))^2\right]
++\mathbb E_{t,X_t}\left[\lambda(t)\operatorname{Var}(U\mid X_t,t)\right].$$
+
+Here $\mathbb E_{t,X_t}$ means first draw $t\sim\operatorname{Uniform}[t_{\min},1]$, then $X_t\sim p_t$. These two variables are generally dependent. Inside the conditional variance, $X_t$ and $t$ are held fixed and the remaining randomness is in $U$ (equivalently, the clean/noise pairs compatible with that observation).
 
 The second term does not depend on the network. Training against conditional targets minimizes the same parameter-dependent error as training against the unavailable marginal score.
 
@@ -81,9 +201,9 @@ The second term does not depend on the network. Training against conditional tar
 A numerically convenient network output is $\varepsilon_\theta(x,t)$, trained with
 
 $$\mathcal J_\varepsilon(\theta)
-=\mathbb E[(\varepsilon-\varepsilon_\theta(X_t,t))^2].$$
+=\mathbb E_{t,X_0,\varepsilon}[(\varepsilon-\varepsilon_\theta(X_t,t))^2].$$
 
-At the population optimum, $\varepsilon_*(x,t)=\mathbb E[\varepsilon\mid X_t=x]$. Convert any noise predictor to a score estimate using
+This expectation uses the same time, clean-data, and Gaussian-noise draws defined in Section 2. At the population optimum, $\varepsilon_*(x,t)=\mathbb E_{\varepsilon\mid X_t=x}[\varepsilon]$. Convert any noise predictor to a score estimate using
 
 $$\boxed{s_\theta(x,t)=-\frac{\varepsilon_\theta(x,t)}{\sqrt{1-\alpha_t^2}}.}$$
 
@@ -103,17 +223,106 @@ $$\begin{aligned}
 
 Thus uniform-time noise prediction is a particular time weighting of score matching. Near zero noise, dividing prediction error by $\sqrt{1-\alpha_t^2}$ amplifies score error. Near the terminal time, a small $\alpha_t$ amplifies errors in clean-data prediction.
 
-## 5. Tweedie's formula: the posterior mean denoiser
+### Why noise prediction can be easier to optimize
+
+At a fixed positive time, average over the independent clean-data and noise draws. The conditional-score target $U=-\varepsilon/\sqrt{1-\alpha_t^2}$ satisfies
+
+$$\mathbb E_{X_0\sim p_{\mathrm{data}},\,\varepsilon\sim\mathcal N(0,1)}[U^2]
+=\frac1{1-\alpha_t^2},\qquad
+\mathbb E_{\varepsilon\sim\mathcal N(0,1)}[\varepsilon^2]=1.$$
+
+The raw conditional-score targets grow near zero noise, whereas the noise targets have the same second moment at every time. Noise prediction avoids regressing directly onto these increasingly large targets. Algebraically, its unweighted MSE corresponds to score matching with $\lambda(t)=1-\alpha_t^2$, for the same time-sampling law.
+
+Song et al.'s Section 3.3 recommends weighting inversely to the conditional-score target's expected squared norm. In one-dimensional VP diffusion this gives $\lambda(t)\propto1-\alpha_t^2$, exactly the weighting above. In $d$ dimensions the second moment is $d/(1-\alpha_t^2)$, giving the same time weighting up to a constant.
+
+This is a useful scaling choice, not a guarantee of better optimization for every model. Appropriately weighted direct score prediction is also valid. Converting a fitted noise predictor back to a score still divides its error by $\sqrt{1-\alpha_t^2}$; a stable training loss does not guarantee an accurate low-noise score. Evaluate the score at small positive times as well as the average training loss.
+
+## 5. An explicit algorithm for training the network
+
+Use a time-conditioned network $\varepsilon_\theta(x,t)$ with one scalar output in one dimension. Given a dataset, a fixed VP schedule, and a cutoff $t_{\min}>0$:
+
+1. Initialize the network parameters and optimizer.
+2. Draw a minibatch of clean observations uniformly from the dataset.
+3. Independently for each observation, draw $t\sim\operatorname{Uniform}[t_{\min},1]$ and $\varepsilon\sim\mathcal N(0,1)$.
+4. Compute $\alpha_t$ from the chosen schedule and form $x_t=\alpha_tx_0+\sqrt{1-\alpha_t^2}\varepsilon$.
+5. Predict $\varepsilon_\theta(x_t,t)$ and average its squared error against the sampled noise over the minibatch.
+6. Backpropagate this loss and update the parameters. Repeat with fresh times and noise.
+7. Evaluate on held-out observations; save the fitted parameters, schedule, and time range. At generation time, freeze the model and use $s_\theta=-\varepsilon_\theta/\sqrt{1-\alpha_t^2}$.
+
+The network receives the noisy position and time, not the clean observation or the sampled noise. A minibatch average estimates the nested population expectation in Section 2; it is not an additional density-estimation step. No ODE solver is needed during this training procedure.
+
+### PyTorch implementation
+
+The code below uses the paper's linear VP schedule. Setting both endpoint rates to 8 recovers the teaching notebooks' constant schedule. The data tensor has shape `[number_of_observations, 1]`; flattening images or vectors gives `[number_of_observations, data_dimension]`.
+
+```{.python}
+import torch
+
+beta_min, beta_max = 0.1, 20.0
+
+def beta(t):
+    return beta_min + (beta_max - beta_min) * t
+
+def vp_coefficients(t):
+    integrated_beta = beta_min*t + 0.5*(beta_max-beta_min)*t.square()
+    alpha = torch.exp(-0.5 * integrated_beta)
+    # expm1 avoids cancellation at small positive times.
+    noise_variance = -torch.expm1(-integrated_beta)
+    return alpha, noise_variance.sqrt()
+
+def noise_loss(network, x0, t_min=1e-3):
+    # x0 has shape [batch, data_dimension]; fresh t and noise each update.
+    t = t_min + (1-t_min)*torch.rand(len(x0), device=x0.device,
+                                   dtype=x0.dtype)
+    alpha, noise_std = vp_coefficients(t)
+    eps = torch.randn_like(x0)
+    xt = alpha[:, None]*x0 + noise_std[:, None]*eps
+    return (network(xt, t) - eps).square().mean()
+
+
+class NoisePredictor(torch.nn.Module):
+    def __init__(self, data_dimension=1):
+        super().__init__()
+        self.net = torch.nn.Sequential(
+            torch.nn.Linear(data_dimension + 1, 64), torch.nn.SiLU(),
+            torch.nn.Linear(64, 64), torch.nn.SiLU(),
+            torch.nn.Linear(64, data_dimension))
+
+    def forward(self, x, t):
+        return self.net(torch.cat([x, t[:, None]], dim=1))
+
+def train_score_model(data, updates=2500, batch_size=512, t_min=1e-3):
+    model = NoisePredictor(data.shape[1]).to(device=data.device,
+                                           dtype=data.dtype)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    model.train()
+    history = []
+    for _ in range(updates):
+        indices = torch.randint(len(data), (batch_size,), device=data.device)
+        loss = noise_loss(model, data[indices], t_min=t_min)
+        optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        optimizer.step()
+        history.append(loss.item())
+    model.eval()
+    return model, history
+```
+
+For vectors, the Gaussian noise is $\mathcal N(\mathbf0,I_d)$ and the network predicts one noise component per data coordinate. The code averages over coordinates as well as observations; this differs from the squared Euclidean norm by the fixed factor $1/d$ and has the same minimizer. The vector score conversion is $\mathbf s_\theta=-\boldsymbol\varepsilon_\theta/\sqrt{1-\alpha_t^2}$.
+
+The displayed cutoff $10^{-3}$ is a teaching choice; the existing notebook uses $0.01$. Train and sample on compatible time ranges. In this code, `beta_min` and `beta_max` are globals read by both training and sampling; do not change them between those operations. Keep the schedule parameters with the saved model: changing the schedule after fitting changes the density associated with each time. An average noise loss need not approach zero because the noise is uncertain given $(X_t,t)$.
+
+## 6. Tweedie's formula: the posterior mean denoiser
 
 First consider the standalone additive-noise model
 
 $$Y=X+\sigma \varepsilon,\qquad \varepsilon\sim\mathcal N(0,1),\quad \sigma>0.$$
 
-Among all functions $D(y)$, the one minimizing expected squared denoising error is
+The denoising risk is $\mathbb E_{X,\varepsilon}[(X-D(X+\sigma\varepsilon))^2]$, with independent $X\sim p_X$ and $\varepsilon\sim\mathcal N(0,1)$. Among all functions $D(y)$, its minimizer is
 
-$$D_*(y)=\mathbb E[X\mid Y=y].$$
+$$D_*(y)=\mathbb E_{X\mid Y=y}[X].$$
 
-Tweedie's formula expresses this optimal estimator through the noisy density:
+This conditional expectation averages $X$ under $p(x\mid y)$ with the observed $y$ held fixed. Tweedie's formula expresses this optimal estimator through the noisy density:
 
 $$\boxed{D_*(y)=y+\sigma^2\frac{d}{dy}\log p_Y(y).}$$
 
@@ -121,12 +330,12 @@ Equivalently, the score is the displacement from the observed value toward its p
 
 Apply this formula to $Z=\alpha_tX_0$, with noise variance $1-\alpha_t^2$:
 
-$$\boxed{\mathbb E[X_0\mid X_t=x]
+$$\boxed{\mathbb E_{X_0\mid X_t=x}[X_0]
 =\frac{x+(1-\alpha_t^2)s_t(x)}{\alpha_t}.}$$
 
 This also follows directly by taking conditional expectations in the forward corruption equation and using the noise–score identity. It connects the same three quantities: posterior mean clean data, conditional mean noise, and marginal score.
 
-## 6. Two solved denoising examples
+## 7. Two solved denoising examples
 
 ### A Gaussian prior
 
@@ -137,7 +346,7 @@ $$p_Y=\mathcal N(\mu,V+\sigma^2),\qquad
 
 Tweedie's formula gives
 
-$$\mathbb E[X\mid Y=y]
+$$\mathbb E_{X\mid Y=y}[X]
 =\mu+\frac{V}{V+\sigma^2}(y-\mu).$$
 
 At small noise, the posterior mean stays close to $y$. At large noise, it stays close to the prior mean. The posterior variance is $V\sigma^2/(V+\sigma^2)$; the mean alone does not represent this remaining uncertainty.
@@ -151,7 +360,7 @@ $$\log\frac{P(X_0=1\mid X_t=x)}{P(X_0=-1\mid X_t=x)}
 
 Consequently,
 
-$$\mathbb E[X_0\mid X_t=x]
+$$\mathbb E_{X_0\mid X_t=x}[X_0]
 =\tanh\left(\frac{\alpha_tx}{1-\alpha_t^2}\right),$$
 
 $$s_t(x)=\frac{\alpha_t\tanh(\alpha_tx/(1-\alpha_t^2))-x}{1-\alpha_t^2}.$$
@@ -159,31 +368,6 @@ $$s_t(x)=\frac{\alpha_t\tanh(\alpha_tx/(1-\alpha_t^2))-x}{1-\alpha_t^2}.$$
 At $x=0$, the posterior mean is zero, although clean observations are only $-1$ or $+1$. A posterior sample is one of those two values. This is why a single posterior-mean denoising operation generally does not generate the clean-data distribution.
 
 For each fixed nonzero $x$, the posterior mean tends to $\operatorname{sign}(x)$ as noise vanishes. At $x=0$, it remains zero by symmetry. This discrete clean distribution also illustrates why smooth invertible flow statements are made at positive noise or under appropriate endpoint regularity.
-
-## 7. The vector formulas and an implementable training loop
-
-For $\mathbf X_0\in\mathbb R^d$, use independent Gaussian noise $\boldsymbol\varepsilon\sim\mathcal N(\mathbf0,I_d)$. Replace scalar derivatives by gradients and scalar squared errors by squared Euclidean norms. In particular,
-
-$$\mathbf s_t(\mathbf x)
-=-\frac{\mathbb E[\boldsymbol\varepsilon\mid\mathbf X_t=\mathbf x]}{\sqrt{1-\alpha_t^2}},\qquad
-\mathbb E[\mathbf X_0\mid\mathbf X_t=\mathbf x]
-=\frac{\mathbf x+(1-\alpha_t^2)\mathbf s_t(\mathbf x)}{\alpha_t}.$$
-
-A continuous-time training loop can use:
-
-```text
-repeat:
-    draw a minibatch x0 from the data
-    draw t in [t_min, 1], independently for each observation
-    draw independent standard-normal noise eps
-    xt = alpha(t) * x0 + sqrt(1 - alpha(t)^2) * eps
-    predict eps_hat = network(xt, t)
-    minimize mean squared error between eps_hat and eps
-```
-
-Time is an input because the density and its score change with noise level. A small positive $t_{\min}$ avoids evaluating a score conversion at zero noise. Its value is an implementation choice, not a universal constant. The notebook uses $t_{\min}=0.01$ and reports sampling at that time.
-
-The conditional score target $\mathbf U=-\boldsymbol\varepsilon/\sqrt{1-\alpha_t^2}$ has second moment $d/(1-\alpha_t^2)$ at a fixed time. The noise target $\boldsymbol\varepsilon$ instead has second moment $d$. It can become large near zero noise, even when the marginal score is well behaved. This is another reason to state the output parameterization, time sampling, and loss weighting explicitly.
 
 ## 8. Using the trained model for generation
 
@@ -194,6 +378,78 @@ $$\mathbf v_\theta(\mathbf x,t)
 \frac{\boldsymbol\varepsilon_\theta(\mathbf x,t)}{\sqrt{1-\alpha_t^2}}\right].$$
 
 Start with a standard-normal sample at $t=1$ and integrate toward smaller $t$. An ODE step uses no fresh randomness. A reverse-SDE step adds the appropriate Gaussian increment, as specified in Part 2.
+
+For $h=t_k-t_{k+1}>0$, the explicit reverse-time Euler update is
+
+$$\boxed{x_{k+1}=x_k+\frac{h\beta(t_k)}2
+\left[x_k-\frac{\varepsilon_\theta(x_k,t_k)}{\sqrt{1-\alpha_{t_k}^2}}\right].}$$
+
+The plus sign comes from integrating $v_\theta$ over the negative increment $-h$. This is explicit Euler run backward in time, not the implicit backward-Euler method. The reverse SDE instead uses a full $\beta(t_k)s_\theta$ score term and adds noise; removing its noise term does not give this ODE.
+
+### Euler sampler using the schedule and network from Section 5
+
+```{.python}
+@torch.no_grad()
+def sample_ode(network, x1, steps=1000, t_min=1e-3):
+    network.eval()
+    x = x1.clone()  # x1 is sampled from N(0, I) before this call.
+    times = torch.linspace(1., t_min, steps+1, device=x.device,
+                           dtype=x.dtype)
+    for current, next_time in zip(times[:-1], times[1:]):
+        t = current.expand(len(x))
+        _, noise_std = vp_coefficients(t)
+        score = -network(x, t) / noise_std[:, None]
+        h = current - next_time
+        x = x + 0.5*h*beta(t)[:, None]*(x + score)
+    return x  # intended law: p(t_min), subject to approximation errors
+```
+
+Use the fitted model from Section 5 and supply independent standard-normal `x1`. The sampler's cutoff must lie in the trained range. There are no optimizer updates or fresh noise draws inside this ODE loop.
+
+### Run training and generation end to end
+
+Run the definitions in Section 5 and the sampler above first. This CPU example uses the same two-component Gaussian data distribution as the teaching notebooks. The schedule remains the linear VP schedule defined in Section 5.
+
+```{.python}
+import matplotlib.pyplot as plt
+
+torch.manual_seed(20261006)
+torch.set_num_threads(2)
+component = 2*torch.randint(0, 2, (10000, 1)) - 1
+data = 2*component.float() + 0.5*torch.randn(10000, 1)
+model, history = train_score_model(data, updates=2500, t_min=1e-3)
+x1 = torch.randn(5000, 1)
+samples = sample_ode(model, x1, steps=1000, t_min=1e-3)
+assert torch.isfinite(samples).all()
+
+# Compare with an independent draw from the intended positive-time law.
+component = 2*torch.randint(0, 2, (5000, 1)) - 1
+reference_clean = 2*component.float() + 0.5*torch.randn(5000, 1)
+a, noise_std = vp_coefficients(torch.tensor(1e-3))
+reference = a*reference_clean + noise_std*torch.randn_like(reference_clean)
+fig, axes = plt.subplots(1, 2, figsize=(10, 3))
+axes[0].plot(history)
+axes[0].set(xlabel="Training update", ylabel="Minibatch noise MSE")
+axes[1].hist(reference.numpy().ravel(), bins=70, density=True,
+             alpha=0.5, label="Reference p(t_min)")
+axes[1].hist(samples.numpy().ravel(), bins=70, density=True,
+             alpha=0.5, label="Generated")
+axes[1].set(xlabel="Position", ylabel="Density")
+axes[1].legend()
+plt.tight_layout()
+plt.show()
+```
+
+This comparison checks the complete procedure, not convergence to an exact solution. The intended output is $p_{0.001}$; learned-score error, Gaussian terminal initialization, and finite Euler steps remain approximations. The more detailed fidelity checks are in Part 4.
+
+### Analytic check of the schedule and solver
+
+As an analytic check, take $P_0=\mathcal N(\mu,1)$. Then $s_t(x)=-(x-\alpha_t\mu)$, so
+
+$$v(x,t)=-\tfrac12\beta(t)\alpha_t\mu=\alpha_t'\mu.$$
+
+The trajectory is $x(t)=x(1)+(\alpha_t-\alpha_1)\mu$. Starting from the actual $p_1=\mathcal N(\alpha_1\mu,1)$ recovers $p_0$ exactly with the exact flow. Starting from $\mathcal N(0,1)$ instead leaves a mean error $-\alpha_1\mu$ at time zero, even with the exact score and exact integration. For $\mu=0$, the score is $-x$ and the probability-flow velocity is zero. These checks test the sign, factor of two, and schedule consistency before neural-network error is introduced.
+
 
 If sampling stops at $t_{\min}$, its intended output law is $p_{t_{\min}}$, not exactly $p_0$. Applying a final posterior mean changes the output law again; it is not an exact substitute for the missing evolution. Evaluate separately:
 
@@ -206,15 +462,15 @@ If sampling stops at $t_{\min}$, its intended output law is $p_{t_{\min}}$, not 
 
 ## Appendix A. Bayes optimality and a standalone derivation of Tweedie's formula
 
-Assume $X$ has a finite second moment. Let $m(y)=\mathbb E[X\mid Y=y]$. For any proposed estimate $d$,
+Assume $X$ has a finite second moment. Let $m(y)=\mathbb E_{X\mid Y=y}[X]$. For any proposed estimate $d$,
 
 $$\begin{aligned}
-\mathbb E[(X-d)^2\mid Y=y]
-&=\mathbb E[(X-m(y)+m(y)-d)^2\mid Y=y]\\
+\mathbb E_{X\mid Y=y}[(X-d)^2]
+&=\mathbb E_{X\mid Y=y}[(X-m(y)+m(y)-d)^2]\\
 &=\operatorname{Var}(X\mid Y=y)+(m(y)-d)^2.
 \end{aligned}$$
 
-The cross term vanishes because $\mathbb E[X-m(y)\mid Y=y]=0$. Hence $d=m(y)$ minimizes conditional risk, and choosing this value at each $y$ minimizes overall risk. This is Bayes optimality **for squared error**; other losses can give other estimators.
+The cross term vanishes because $\mathbb E_{X\mid Y=y}[X-m(y)]=0$. Hence $d=m(y)$ minimizes conditional risk, and choosing this value at each $y$ minimizes overall risk, obtained by averaging the conditional risk over $Y\sim p_Y$. This is Bayes optimality **for squared error**; other losses can give other estimators.
 
 Now write the Gaussian likelihood and marginal:
 
@@ -231,17 +487,111 @@ Differentiate the marginal and separate terms:
 $$p_Y'(y)=\frac{1}{\sigma^2}
 \left[\int x\,p(y\mid x)p_X(x)\,dx-y\,p_Y(y)\right].$$
 
-Bayes' rule identifies the first integral as $p_Y(y)\mathbb E[X\mid Y=y]$. Dividing by the positive noisy marginal gives
+Bayes' rule identifies the first integral as $p_Y(y)\mathbb E_{X\mid Y=y}[X]$. Dividing by the positive noisy marginal gives
 
-$$\partial_y\log p_Y(y)=\frac{\mathbb E[X\mid Y=y]-y}{\sigma^2}.$$
+$$\partial_y\log p_Y(y)=\frac{\mathbb E_{X\mid Y=y}[X]-y}{\sigma^2}.$$
 
-Rearrange to obtain the stated formula. For data without a density, replace $p_X(x)dx$ by the probability measure of $X$. For vectors and isotropic Gaussian noise, the same calculation uses a gradient and gives $\mathbb E[\mathbf X\mid\mathbf Y=\mathbf y]=\mathbf y+\sigma^2\nabla\log p_{\mathbf Y}(\mathbf y)$.
+Rearrange to obtain the stated formula. For data without a density, replace $p_X(x)dx$ by the probability measure of $X$. For vectors and isotropic Gaussian noise, the same calculation uses a gradient and gives $\mathbb E_{\mathbf X\mid\mathbf Y=\mathbf y}[\mathbf X]=\mathbf y+\sigma^2\nabla\log p_{\mathbf Y}(\mathbf y)$.
 
 ## Appendix B. The regression decomposition
 
-For a target $U$ and input $A=(X_t,t)$, let $m(A)=\mathbb E[U\mid A]$. Conditional expansion gives
+For a target $U$, input $A=(X_t,t)$, and regression function $r(A)$, let $m(A)=\mathbb E_{U\mid A}[U]$. Conditional expansion gives
 
-$$\mathbb E[(h(A)-U)^2\mid A]
-=(h(A)-m(A))^2+\operatorname{Var}(U\mid A).$$
+$$\mathbb E_{U\mid A}[(r(A)-U)^2]
+=(r(A)-m(A))^2+\operatorname{Var}(U\mid A).$$
 
-Multiply by a time-dependent weight and average. Taking $U$ to be the conditional corruption score makes $m(A)$ the marginal score, which proves the loss decomposition in Section 3. The irreducible conditional variance is nonnegative; it need not be strictly positive for every possible data distribution.
+The expectation on the left is over the conditional law of $U$ given the fixed input $A$. Multiply by a time-dependent weight and average over $A=(X_t,t)$: first draw $t$ from the training-time distribution, then $X_t\sim p_t$. Taking $U$ to be the conditional corruption score makes $m(A)$ the marginal score, which proves the loss decomposition in Section 3. The irreducible conditional variance is nonnegative; it need not be strictly positive for every possible data distribution.
+
+
+## Appendix C. Deriving the forward SDE and its training kernel
+
+### One forward step and its small-time limit
+
+On a uniform grid $t_k=kh$, set $t=t_k$. Let $h>0$ be a small step and choose the rate $\beta(t)\ge0$. The forward update contracts each particle and adds independent Gaussian noise:
+
+$$\boxed{X_{t+h}=\sqrt{1-\beta(t)h}\,X_t+
+\sqrt{\beta(t)h}\,\varepsilon_k,\qquad
+\varepsilon_k\sim\mathcal N(0,1),\quad \beta(t)h<1.}$$
+
+The noise draws are independent across steps and independent of the current particle. The one-step noise **variance** is $\beta(t)h$; the one-step signal **amplitude** is $\sqrt{1-\beta(t)h}$. Their squared coefficients add to one.
+
+For a bounded continuous rate, expand the contraction as $h\to0$:
+
+$$\sqrt{1-\beta(t)h}=1-\tfrac12\beta(t)h+O(h^2).$$
+
+Therefore, for a fixed current position,
+
+$$X_{t+h}-X_t=-\tfrac12\beta(t)X_t h
++\sqrt{\beta(t)}\,\sqrt h\,\varepsilon_k+O(h^2)X_t.$$
+
+A Brownian increment $\Delta W_k=W_{t+h}-W_t$ has distribution $\mathcal N(0,h)$, so it can be represented by $\sqrt h\,\varepsilon_k$. The leading terms are precisely the Euler–Maruyama discretization of
+
+$$\boxed{dX_t=-\tfrac12\beta(t)X_t\,dt+\sqrt{\beta(t)}\,dW_t.}$$
+
+Under the usual regularity conditions, the discrete process converges to this SDE as the mesh shrinks. Equivalently, its conditional mean increment divided by $h$ tends to $-\beta(t)x/2$, and its conditional increment variance divided by $h$ tends to $\beta(t)$. We do not divide Gaussian noise by $h$ to obtain an ordinary derivative: Brownian motion has no ordinary velocity. This is the VP limit developed in Song et al.'s Appendix B, Eqs. (22)–(25).
+
+### Why the accumulated amplitude is determined by the rate
+
+After $k$ discrete steps of size $h$, repeated substitution gives the cumulative multiplier
+
+$$\alpha_{t_k}^{(h)}=\prod_{j=0}^{k-1}\sqrt{1-\beta(t_j)h}.$$
+
+Conditional on $X_0=x_0$, the chain is Gaussian: each step is a linear transformation of the previous Gaussian position plus independent Gaussian noise. Its conditional mean is $\alpha_{t_k}^{(h)}x_0$. To find its conditional variance, define $V_k=\operatorname{Var}(X_{t_k}\mid X_0=x_0)$, with $V_0=0$. Independence of the new noise gives
+
+$$\begin{aligned}
+V_{k+1}&=(1-\beta(t_k)h)V_k+\beta(t_k)h,\\
+1-V_{k+1}&=(1-\beta(t_k)h)(1-V_k).
+\end{aligned}$$
+
+Iterating from $1-V_0=1$ gives
+
+$$1-V_k=\prod_{j=0}^{k-1}(1-\beta(t_j)h)
+=(\alpha_{t_k}^{(h)})^2.$$
+
+Thus the accumulated conditional variance is $V_k=1-(\alpha_{t_k}^{(h)})^2$. This is variance **given the clean observation**, not the marginal variance after averaging over the data.
+
+Now hold a terminal time $t$ fixed and take grids with $h=t/k\to0$. For bounded $\beta$, the expansion $\log(1-\beta(t_j)h)=-\beta(t_j)h+O(h^2)$ has a uniform remainder. The sum of $k$ remainders is $O(kh^2)=O(h)$ at fixed $t$, and therefore vanishes. Taking logarithms of the product gives
+
+$$\log\alpha_{t_k}^{(h)}=\frac12\sum_{j=0}^{k-1}\log(1-\beta(t_j)h)
+\longrightarrow-\frac12\int_0^t\beta(u)\,du.$$
+
+The Riemann sum converges for continuous $\beta$. Hence $\alpha_t^{(h)}\to\alpha_t$, and the conditional variance converges to $1-\alpha_t^2$. At finite $h$, the discrete multiplier $\alpha_t^{(h)}$ generally differs from the exact continuous multiplier $\alpha_t$; the exact transition stated in Section 1 avoids this discretization error.
+
+Thus the continuous-time conditional law can be sampled in one operation:
+
+$$\boxed{X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,
+\qquad \alpha_t=\exp\!\left[-\frac12\int_0^t\beta(u)\,du\right],
+\quad\varepsilon\sim\mathcal N(0,1).}$$
+
+Here the equality describes the conditional law at one selected time, with noise independent of $X_0$. It does not specify a trajectory by reusing this one noise draw at every time. The final subsection below verifies the kernel directly from the SDE's conditional moment equations.
+
+Differentiating the cumulative multiplier gives the inverse relationship:
+
+$$\boxed{\alpha_t'=-\tfrac12\beta(t)\alpha_t,
+\qquad\beta(t)=-2\frac{d}{dt}\log\alpha_t.}$$
+
+The training-data schedule and the ODE rate are not independent choices. The same $\beta(t)$ produces the noisy densities and appears in $v(x,t)=-\beta(t)[x+s_t(x)]/2$. Data are at time zero; the standard Gaussian used at time one approximates the actual terminal law for a finite-rate schedule.
+
+
+### Checking the conditional law directly from the SDE
+
+Fix the clean value $X_0=x_0$. For the forward SDE, let $m_t$ and $V_t$ be the conditional mean and variance. The linear drift and Gaussian Brownian increments give a Gaussian conditional law, with
+
+$$m_t'=-\tfrac12\beta(t)m_t,\quad m_0=x_0,
+\qquad V_t'=-\beta(t)V_t+\beta(t),\quad V_0=0.$$
+
+Solving the first equation gives $m_t=\alpha_t x_0$. Since
+$\frac{d}{dt}\alpha_t^2=-\beta(t)\alpha_t^2$, the function
+$V_t=1-\alpha_t^2$ satisfies the second equation and its initial condition. Hence
+
+$$X_t\mid X_0=x_0\sim\mathcal N(\alpha_t x_0,1-\alpha_t^2).$$
+
+The coefficient of $dW_t$ is $\sqrt{\beta(t)}$, so its contribution to the variance equation is $\beta(t)$. This is why using $\beta(t)$ itself as the noise standard deviation would change the density path.
+
+Finally, the forward Fokker–Planck equation is
+
+$$\partial_t p_t=\frac{\beta(t)}2\partial_x(xp_t)
++\frac{\beta(t)}2\partial_{xx}p_t
+=-\partial_x\!\left[p_t\left(-\frac{\beta(t)}2[x+s_t(x)]\right)\right].$$
+
+Thus the same schedule that supplies the training pairs determines the probability-flow velocity. This is the VP specialization of the paper's Eq. (13); the conditional kernel agrees with its Appendix B.

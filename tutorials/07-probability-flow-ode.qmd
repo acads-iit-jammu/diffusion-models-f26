@@ -59,6 +59,8 @@ a density path, then recover a deterministic field that reproduces it.
 $$\boxed{v(x,t)=-\frac{\beta}{2}\bigl[x+s_t(x)\bigr],
 \qquad s_t(x)=\partial_x\log p_t(x).}$$
 
+For training with a time-dependent VP schedule, replace $\beta$ by $\beta(t)$ and use $\alpha_t=\exp[-\frac12\int_0^t\beta(u)du]$ in the forward corruption. These coefficients describe the same process; they cannot be selected independently. [Part 3](./32-probability-flow-ode-part-3.qmd) connects the training examples to this ODE using [Song et al.](https://arxiv.org/abs/2011.13456v2) as the primary reference.
+
 Here $\beta>0$ is the chosen constant rate of the forward diffusion and
 $s_t$ is the **score** of its intermediate density. We will derive this
 field by expressing the diffusion's density evolution as a continuity

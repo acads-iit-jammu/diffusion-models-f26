@@ -4,7 +4,7 @@ All graded work for the course is listed here. Dates and details will be posted 
 
 ## Homeworks
 
-Five homeworks, together worth **20%**. Each carries 50 points, in five problems.
+Five homeworks, together worth **20%**. Each carries 50 points; the problem format is specified in each sheet.
 Problem sets are distributed as PDF; solution sets are posted after the
 submission deadline. HW 1 is **graded for completion** — credit is for a genuine
 attempt at every part rather than for correct answers. HW 2 onwards are **graded
@@ -14,8 +14,8 @@ on correctness**, with marks carried by the reasoning as much as the answer.
 |:---:|---|---|---|:---:|:---:|
 | HW 1 | Random variables, joints, conditionals, Bayes | Mon 10 Aug 2026 | Tue 18 Aug 2026, in class | [PDF](./homeworks/hw1.pdf) | [PDF](./homeworks/hw1-solutions.pdf) |
 | HW 2 | Distributions and maximum likelihood | Mon 10 Aug 2026 | Tue 25 Aug 2026, in class | [PDF](./homeworks/hw2.pdf) | [PDF](./homeworks/hw2-solutions.pdf) |
-| HW 3 | — | TBA | TBA | — | — |
-| HW 4 | — | TBA | TBA | — | — |
+| HW 3 | Density interpolation and learned-score reconstruction | TBA | TBA | [PDF](./homeworks/hw3.pdf) | — |
+| HW 4 | Gaussian-corruption probability flows: Gaussian and Laplace data | TBA | TBA | [PDF](./homeworks/hw4.pdf) | — |
 | HW 5 | — | TBA | TBA | — | — |
 
 : {tbl-colwidths="[8,34,14,14,15,15]"}
@@ -24,6 +24,7 @@ Solution sets are worked derivations rather than answer keys: each problem state
 the concept it is testing and derives the answer in full.
 
 **HW 1 and HW 2 problem sheets and worked solutions are now available above.**
+HW 3 has two parts on density interpolation and learned-score reconstruction. HW 4 has three parts on Gaussian-corruption transport and learned Gaussian/Laplace sampling. Each carries 50 points; release and due dates are TBA.
 The HW 2 solutions also include the per-part marking scheme.
 
 ## Practice sheets
