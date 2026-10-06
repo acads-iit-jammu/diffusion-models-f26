@@ -698,7 +698,7 @@ p_1=p_{\mathrm{prior}}=\mathcal N(\mathbf0,I_d).}\]</span></p>
 <p>The noise is independent of the clean sample. This describes a conditional Gaussian; the marginal <span class="math inline">\(p_t\)</span> is generally not Gaussian because the clean sample follows the data distribution. At <span class="math inline">\(t=1\)</span>, the law approaches standard normal as <span class="math inline">\(\alpha_1\)</span> becomes small. Positive finite <span class="math inline">\(\beta\)</span> generally gives an approximate terminal match.</p>
 <p>A time-dependent nonnegative rate <span class="math inline">\(\beta(t)\)</span> uses the same formulas with</p>
 <p><span class="math display">\[\alpha_t=\exp\left[-\frac12\int_0^t\beta(u)\,du\right].\]</span></p>
-<p>Replace the constant <span class="math inline">\(\beta\)</span> in the drift, noise coefficient, and sampling updates by its value at the current time. This schedule generalization is used in the later training and image-model notes.</p>
+<p>Replace the constant <span class="math inline">\(\beta\)</span> in the drift, noise coefficient, and sampling updates by its value at the current time. This schedule generalization is used in the later training and image-model notes. Equivalently, <span class="math inline">\(\beta(t)=-2\,d(\log\alpha_t)/dt\)</span>. The training corruption, score conversion, and solver must all use this same schedule; see the worked schedule in <a href="../tutorials/32-probability-flow-ode-part-3.html">Part 3</a>.</p>
 </section>
 </section>
 <section id="the-score-and-the-probability-flow-vector-field" class="level2">
