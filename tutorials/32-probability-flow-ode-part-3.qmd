@@ -145,6 +145,8 @@ $$U=-\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}.$$
 
 The network sees $(x_t,t)$ as input and $U$ as a target. It does not see $x_0$ as an input. Individual training targets are noisy: several $(x_0,\varepsilon)$ pairs can produce similar $x_t$.
 
+**Target and prediction represent different quantities.** In direct score regression, the available label is the conditional score $\partial_x\log p_t(x_t\mid x_0)$ for a particular clean/noisy pair. The fitted function $s_\theta(x_t,t)$ estimates the marginal score $\partial_x\log p_t(x_t)$. It can do so because squared-error regression averages labels conditional on the features $(x_t,t)$; it does not have to reproduce every individual label. Section 3 proves this statement.
+
 
 ### The practical, positive-time version
 
@@ -206,7 +208,64 @@ Here $\mathbb E_{t,X_t}$ means first draw $t\sim\operatorname{Uniform}[t_{\min},
 
 The second term does not depend on the network. Training against conditional targets minimizes the same parameter-dependent error as training against the unavailable marginal score.
 
-## 4. Predicting noise instead
+### Why the noisy position must be an input
+
+Fix $t$ and a noisy input $x$. If the predictor outputs a scalar $a$ there, its conditional risk is
+
+$$R(a;x,t)=\mathbb E_{U\mid X_t=x,t}[(a-U)^2].$$
+
+Expanding and differentiating with respect to $a$ gives
+
+$$\frac{\partial R}{\partial a}=2a-2\mathbb E_{U\mid X_t=x,t}[U],
+\qquad a_*(x,t)=\mathbb E_{U\mid X_t=x,t}[U]=s_t(x).$$
+
+The average is over targets compatible with **that input**, not over all training targets indiscriminately. Although the target has mean zero at each time,
+
+$$\mathbb E_{X_0,\varepsilon}[U]=0,$$
+
+its conditional mean given $X_t=x$ need not vanish. The noisy position depends on both the clean observation and the noise. If we withheld $X_t$ and supplied only time, squared-error regression would indeed learn zero. With $X_t$ as a feature, it can learn a nonzero function of position.
+
+There are two different conditioning directions:
+
+$$\underbrace{\mathbb E_{X_t\mid X_0=x_0}[\partial_{X_t}\log p_t(X_t\mid x_0)]}_{\text{hold clean value fixed; average noisy observations}}=0,$$
+
+whereas
+
+$$\underbrace{\mathbb E_{X_0\mid X_t=x}[\partial_x\log p_t(x\mid X_0)]}_{\text{hold noisy value fixed; average compatible clean values}}=s_t(x).$$
+
+For the Gaussian kernel, the first equality follows directly from $\mathbb E[X_t\mid X_0=x_0]=\alpha_t x_0$. It does not imply that the second expectation is zero.
+
+### A zero conditional-score label can have a nonzero optimal prediction
+
+Take $X_0\sim\mathcal N(0,1)$ and fix a positive time with $\alpha_t=1/2$. Then
+
+$$X_t=\tfrac12X_0+\tfrac{\sqrt3}{2}\varepsilon,
+\qquad P_t=\mathcal N(0,1),\qquad s_t(x)=-x.$$
+
+Consider the clean value $x_0=2$ and noisy value $x_t=1$, corresponding to the noise value $\varepsilon=0$. The conditional-score label for this pair is
+
+$$\left.\partial_x\log p_t(x\mid x_0=2)\right|_{x=1}
+=-\frac{1-\tfrac12(2)}{3/4}=0.$$
+
+But the marginal score at exactly the same noisy input is
+
+$$\boxed{s_t(1)=-1\ne0.}$$
+
+Why? Given only $X_t=1$, the clean value is not known to be 2. Gaussian conditioning gives
+
+$$X_0\mid X_t=1\sim\mathcal N(1/2,3/4).$$
+
+Averaging the conditional-score labels under this posterior yields
+
+$$\mathbb E_{X_0\mid X_t=1}\left[-\frac{1-\tfrac12X_0}{3/4}\right]
+=-\frac{1-\tfrac12(1/2)}{3/4}=-1.$$
+
+Thus zero is the label of one particular pair; $-1$ is the squared-error-optimal prediction using the available features. Exact point events have probability zero under continuous distributions; the example evaluates the score functions at a point. Nearby pairs have small conditional-score labels while their marginal scores remain close to $-1$, so the distinction also holds on neighborhoods with positive probability.
+
+This does not say that an average of identically zero labels can be nonzero. Other clean values compatible with the same noisy observation have different labels. Also, because this example starts from standard normal, its VP probability-flow velocity is $-\beta(t)[x+s_t(x)]/2=0$, even though its marginal score is nonzero away from the origin.
+
+
+## 4. Noise prediction as a parameterization of the marginal score
 
 A numerically convenient network output is $\varepsilon_\theta(x,t)$, trained with
 
@@ -216,6 +275,19 @@ $$\mathcal J_\varepsilon(\theta)
 This expectation uses the same time, clean-data, and Gaussian-noise draws defined in Section 2. At the population optimum, $\varepsilon_*(x,t)=\mathbb E_{\varepsilon\mid X_t=x}[\varepsilon]$. Convert any noise predictor to a score estimate using
 
 $$\boxed{s_\theta(x,t)=-\frac{\varepsilon_\theta(x,t)}{\sqrt{1-\alpha_t^2}}.}$$
+
+The phrase **noise predictor** names the regression target and output units. It does not mean that the fitted model recovers the particular noise draw in each training pair. Its optimal output is a posterior mean of noise. Only after the scaling above do we obtain the marginal-score estimate.
+
+| Parameterization | Label available for each training pair | Population prediction from $(x,t)$ |
+|---|---|---|
+| Direct score | $U=-\varepsilon/\sqrt{1-\alpha_t^2}$, the conditional score | $\mathbb E[U\mid X_t=x,t]=s_t(x)$ |
+| Noise | Realized $\varepsilon$ | $\mathbb E[\varepsilon\mid X_t=x,t]=-\sqrt{1-\alpha_t^2}\,s_t(x)$ |
+
+In the preceding Gaussian example, $\operatorname{Cov}(\varepsilon,X_t)=\sqrt{1-\alpha_t^2}$ and $\operatorname{Var}(X_t)=1$. Joint Gaussian conditioning therefore gives
+
+$$\varepsilon_*(x,t)=\sqrt{1-\alpha_t^2}\,x.$$
+
+At $\alpha_t=1/2$ and $x=1$, the optimal noise prediction is $\sqrt3/2$, although the particular pair used above had noise label zero. Dividing by the negative noise standard deviation gives the correct marginal score $-1$. There is no inconsistency: a regression prediction minimizes expected error across possible labels, not the error of every pair separately.
 
 You can also construct a clean-data predictor:
 
@@ -387,7 +459,7 @@ $$\mathbf v_\theta(\mathbf x,t)
 =-\frac{\beta(t)}2\left[\mathbf x-
 \frac{\boldsymbol\varepsilon_\theta(\mathbf x,t)}{\sqrt{1-\alpha_t^2}}\right].$$
 
-Start with a standard-normal sample at $t=1$ and integrate toward smaller $t$. An ODE step uses no fresh randomness. A reverse-SDE step adds the appropriate Gaussian increment, as specified in Part 2.
+For exact transport, start with a sample from the actual terminal law $p_1$ and integrate toward smaller $t$. In the practical VP sampler below, we use standard normal as an approximation to that law. An ODE step uses no fresh randomness. A reverse-SDE step adds the appropriate Gaussian increment, as specified in Part 2.
 
 For $h=t_k-t_{k+1}>0$, the explicit reverse-time Euler update is
 
@@ -402,7 +474,7 @@ The plus sign comes from integrating $v_\theta$ over the negative increment $-h$
 @torch.no_grad()
 def sample_ode(network, x1, steps=1000, t_min=1e-3):
     network.eval()
-    x = x1.clone()  # x1 is sampled from N(0, I) before this call.
+    x = x1.clone()  # Supply draws from p1, or explicitly use a prior approximation.
     times = torch.linspace(1., t_min, steps+1, device=x.device,
                            dtype=x.dtype)
     for current, next_time in zip(times[:-1], times[1:]):
@@ -454,11 +526,30 @@ This comparison checks the complete procedure, not convergence to an exact solut
 
 ### Analytic check of the schedule and solver
 
-As an analytic check, take $P_0=\mathcal N(\mu,1)$. Then $s_t(x)=-(x-\alpha_t\mu)$, so
+The probability-flow construction does not require a standard-normal terminal law. It requires that initialization match the terminal density of the forward process used to derive the score and velocity. Changing the terminal distribution alone generally breaks that match.
 
-$$v(x,t)=-\tfrac12\beta(t)\alpha_t\mu=\alpha_t'\mu.$$
+For a fully matched Gaussian example, take $P_0=\mathcal N(\mu,1)$ and retain the VP schedule above. The forward corruption gives
 
-The trajectory is $x(t)=x(1)+(\alpha_t-\alpha_1)\mu$. Starting from the actual $p_1=\mathcal N(\alpha_1\mu,1)$ recovers $p_0$ exactly with the exact flow. Starting from $\mathcal N(0,1)$ instead leaves a mean error $-\alpha_1\mu$ at time zero, even with the exact score and exact integration. For $\mu=0$, the score is $-x$ and the probability-flow velocity is zero. These checks test the sign, factor of two, and schedule consistency before neural-network error is introduced.
+$$P_t=\mathcal N(\alpha_t\mu,1),\qquad
+P_1=\mathcal N(\alpha_1\mu,1).$$
+
+The score and velocity of this same density path are
+
+$$s_t(x)=-(x-\alpha_t\mu),\qquad
+v(x,t)=-\tfrac12\beta(t)\alpha_t\mu=\alpha_t'\mu.$$
+
+Now initialize from its actual terminal law:
+
+$$\varepsilon\sim\mathcal N(0,1),\qquad X_1=\alpha_1\mu+\varepsilon.$$
+
+Integrating the ODE backward gives
+
+$$X_t=X_1+(\alpha_t-\alpha_1)\mu
+=\alpha_t\mu+\varepsilon.$$
+
+Consequently, $X_t\sim P_t$ at every time and $X_0=\mu+\varepsilon\sim\mathcal N(\mu,1)$ exactly for the exact flow. This example has no terminal-prior approximation. Comparing Euler endpoints with this trajectory isolates numerical error. For $\mu=0$, the score is $-x$ and the probability-flow velocity is zero.
+
+**A separate approximation experiment:** if we replace this matched initialization by $X_1\sim\mathcal N(0,1)$ while leaving the field unchanged, the output at time zero is $\mathcal N((1-\alpha_1)\mu,1)$, not $P_0$. Its mean error is $-\alpha_1\mu$. This quantifies the cost of substituting a convenient prior; it is not part of the exact derivation above.
 
 
 If sampling stops at $t_{\min}$, its intended output law is $p_{t_{\min}}$, not exactly $p_0$. Applying a final posterior mean changes the output law again; it is not an exact substitute for the missing evolution. Evaluate separately:
@@ -605,3 +696,5 @@ $$\partial_t p_t=\frac{\beta(t)}2\partial_x(xp_t)
 =-\partial_x\!\left[p_t\left(-\frac{\beta(t)}2[x+s_t(x)]\right)\right].$$
 
 Thus the same schedule that supplies the training pairs determines the probability-flow velocity. This is the VP specialization of the paper's Eq. (13); the conditional kernel agrees with its Appendix B.
+
+[Part 6](./35-probability-flow-ode-part-6.qmd) provides a complete executed notebook that trains a small network and samples the two-component example.

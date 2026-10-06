@@ -1,6 +1,6 @@
 # Probability-flow teaching code (Draft)
 
-Companion to Lecture Notes 15–16. Data time is 0; terminal time is 1.
+Companion to Lecture Notes 15–17. Data time is 0; terminal time is 1.
 
 ## Setup
 
@@ -9,7 +9,7 @@ notebooks with that environment as the kernel in a Jupyter-compatible editor.
 The notebooks are self-contained mini-tutorials with LaTeX derivations, explanations before the code, interpretations of results, exercises, and executed outputs. No GPU or
 external data is needed for the scalar experiments.
 
-Run notebooks 01–04 in order. Notebook 03 optionally writes `toy-noise.pt`;
+Run notebooks 01–04 in order. Notebook 05 is the self-contained Part 6 worked example, with its own linear VP schedule, training loop, and inference diagnostics. Notebook 03 optionally writes `toy-noise.pt`;
 Notebook 04 trains independently if it cannot find that checkpoint.
 
 `verification.json` records the local CPU run and its quantitative checks.
