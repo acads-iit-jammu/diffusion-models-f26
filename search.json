@@ -1439,138 +1439,6 @@
     ]
   },
   {
-    "objectID": "tutorials/39-denoising-score-matching.html",
-    "href": "tutorials/39-denoising-score-matching.html",
-    "title": "Denoising Score Matching",
-    "section": "",
-    "text": "1. Learn from clean/noisy pairs\nDraw \\(X_0\\sim p_{\\mathrm{data}}\\) and independent \\(\\varepsilon\\sim\\mathcal N(0,1)\\). At a fixed noise scale \\(\\sigma&gt;0\\), form\n\\[Y=X_0+\\sigma\\varepsilon,\\qquad\np_\\sigma(y)=\\int\\mathcal N(y;x_0,\\sigma^2)p_{\\mathrm{data}}(x_0)\\,dx_0.\\]\nA denoiser trained with squared error estimates \\(D_*(y,\\sigma)=\\mathbb E[X_0\\mid Y=y]\\). Tweedie’s formula connects it to the noisy marginal score:\n\\[s_\\sigma(y)=\\partial_y\\log p_\\sigma(y)\n=\\frac{D_*(y,\\sigma)-y}{\\sigma^2}.\\]\nThe regression averages possible clean origins conditional on the noisy input. It does not recover the particular noise realization of every pair. The score is a property of the smoothed density \\(p_\\sigma\\), not exactly the original clean density at finite \\(\\sigma\\).",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Denoising Score Matching"
-    ]
-  },
-  {
-    "objectID": "tutorials/39-denoising-score-matching.html#denoising-score-matching",
-    "href": "tutorials/39-denoising-score-matching.html#denoising-score-matching",
-    "title": "Denoising Score Matching",
-    "section": "2. Denoising score matching",
-    "text": "2. Denoising score matching\nThe conditional Gaussian score is available for every constructed pair:\n\\[U=\\partial_y\\log p(Y\\mid X_0)\n=-\\frac{Y-X_0}{\\sigma^2}=-\\frac{\\varepsilon}{\\sigma}.\\]\nMinimize\n\\[\\mathcal L_{\\mathrm{DSM}}(\\theta;\\sigma)\n=\\mathbb E_{X_0\\sim p_{\\mathrm{data}},\\,\\varepsilon\\sim\\mathcal N(0,1)}\n[(s_\\theta(X_0+\\sigma\\varepsilon,\\sigma)+\\varepsilon/\\sigma)^2].\\]\nAt the unrestricted optimum, \\(s_*(y,\\sigma)=\\mathbb E[U\\mid Y=y]=s_\\sigma(y)\\). The conditional target is known even though the marginal score is not. The loss differs from marginal-score regression by a conditional-variance term independent of the predictor. This is the denoising/score-matching connection developed by Vincent (2011).\nPlanned derivation: expand the conditional squared error, differentiate the Gaussian convolution, and show explicitly why the posterior mean appears. Finite-data training targets the corrupted empirical law at its unrestricted optimum.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Denoising Score Matching"
-    ]
-  },
-  {
-    "objectID": "tutorials/39-denoising-score-matching.html#once-a-fixed-score-is-known-langevin-sampling",
-    "href": "tutorials/39-denoising-score-matching.html#once-a-fixed-score-is-known-langevin-sampling",
-    "title": "Denoising Score Matching",
-    "section": "3. Once a fixed score is known: Langevin sampling",
-    "text": "3. Once a fixed score is known: Langevin sampling\nLet \\(p\\) be a smooth positive target density and \\(s=\\partial_x\\log p\\). Use sampling time \\(\\tau\\), with \\(p\\) held fixed:\n\\[dX_\\tau=s(X_\\tau)\\,d\\tau+\\sqrt2\\,dW_\\tau.\\]\nBrownian increments over an interval of length \\(\\eta\\) are independent Gaussians with variance \\(\\eta\\). Euler–Maruyama therefore gives\n\\[\\boxed{x_{k+1}=x_k+\\eta s(x_k)+\\sqrt{2\\eta}\\,z_k,\n\\qquad z_k\\overset{\\mathrm{iid}}{\\sim}\\mathcal N(0,1).}\\]\nScore-directed drift and random spreading balance at the target distribution. For the continuous SDE, \\(p\\) is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error.\nIf the learned score is \\(s_\\sigma\\), the intended stationary target is \\(p_\\sigma\\). Langevin does not remove the smoothing merely by running longer. Its sampling clock is not a schedule that automatically reduces \\(\\sigma\\).",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Denoising Score Matching"
-    ]
-  },
-  {
-    "objectID": "tutorials/39-denoising-score-matching.html#first-solved-check-a-standard-gaussian",
-    "href": "tutorials/39-denoising-score-matching.html#first-solved-check-a-standard-gaussian",
-    "title": "Denoising Score Matching",
-    "section": "4. First solved check: a standard Gaussian",
-    "text": "4. First solved check: a standard Gaussian\nFor \\(p=\\mathcal N(0,1)\\), \\(s(x)=-x\\). Deterministic score ascent \\(\\dot x=-x\\) collapses toward zero. Langevin instead gives\n\\[x_{k+1}=(1-\\eta)x_k+\\sqrt{2\\eta}\\,z_k.\\]\nFor \\(0&lt;\\eta&lt;2\\), the discrete chain’s stationary variance solves\n\\[V=(1-\\eta)^2V+2\\eta,\n\\qquad V=\\frac1{1-\\eta/2}.\\]\nIt approaches the target variance 1 as \\(\\eta\\to0\\), but is not exactly 1 at a finite step. This will anchor simulations of step-size bias, convergence, and multimodal mixing.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Denoising Score Matching"
-    ]
-  },
-  {
-    "objectID": "tutorials/39-denoising-score-matching.html#several-noise-levels-and-annealed-langevin-dynamics",
-    "href": "tutorials/39-denoising-score-matching.html#several-noise-levels-and-annealed-langevin-dynamics",
-    "title": "Denoising Score Matching",
-    "section": "5. Several noise levels and annealed Langevin dynamics",
-    "text": "5. Several noise levels and annealed Langevin dynamics\nTrain \\(s_\\theta(x,\\sigma)\\) at a decreasing sequence \\(\\sigma_1&gt;\\cdots&gt;\\sigma_L&gt;0\\), averaging the DSM loss over a stated distribution of noise levels with positive weights. At each level, perform several Langevin steps targeting \\(p_{\\sigma_i}\\), then lower the noise scale. Large smoothing can make movement between modes easier; short runs at each level do not guarantee equilibrium.\nThis is the approach of Song and Ermon (2019). It differs from a reverse diffusion SDE designed to follow prescribed changing marginals without equilibrating at every level. The final positive noise level retains smoothing error.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Denoising Score Matching"
-    ]
-  },
-  {
-    "objectID": "tutorials/39-denoising-score-matching.html#appendix-outline-stationarity-from-density-evolution",
-    "href": "tutorials/39-denoising-score-matching.html#appendix-outline-stationarity-from-density-evolution",
-    "title": "Denoising Score Matching",
-    "section": "Appendix outline: stationarity from density evolution",
-    "text": "Appendix outline: stationarity from density evolution\nIf \\(r_\\tau\\) is the current sampler density, its Fokker–Planck equation is\n\\[\\partial_\\tau r_\\tau=-\\partial_x(r_\\tau s)+\\partial_{xx}r_\\tau.\\]\nAt \\(r_\\tau=p\\), \\(ps=\\partial_xp\\), so the two terms cancel. This proves invariance subject to the relevant boundary and regularity conditions; it does not establish a mixing rate. The full appendix will develop the fixed-interval probability balance and distinguish invariance, convergence, and discretization bias.\nFor a different use of a time-dependent score—deterministic transport through a prescribed density path—see the separate Probability-Flow ODE topic.\nContinue to Reverse-SDE sampling to follow a changing density path rather than equilibrate at one noise level.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Denoising Score Matching"
-    ]
-  },
-  {
-    "objectID": "tutorials/40-reverse-sde-sampling.html",
-    "href": "tutorials/40-reverse-sde-sampling.html",
-    "title": "Reverse-SDE sampling",
-    "section": "",
-    "text": "1. From a fixed target to a prescribed density path\nOrdinary Langevin dynamics uses the score of one fixed target and attempts to approach its stationary distribution. Reverse diffusion instead follows a time-dependent sequence of target densities, \\(p_1,p_{1-h},\\ldots,p_0\\). It does not wait for equilibrium at each noise level.\nChoose a forward process\n\\[dX_t=f(X_t,t)\\,dt+g(t)\\,dW_t,\\]\nand let \\(p_t\\) be its marginal density. A one-step Euler–Maruyama approximation adds deterministic drift \\(h f\\) and independent Gaussian noise with standard deviation \\(g\\sqrt h\\). Brownian increments scale with \\(\\sqrt h\\), not \\(h\\).\nLearn \\(s_\\theta(x,t)\\approx\\partial_x\\log p_t(x)\\) using known conditional corruption kernels. The distinction between conditional labels and marginal predictions is the same as in the preceding topic.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Reverse-SDE sampling"
-    ]
-  },
-  {
-    "objectID": "tutorials/40-reverse-sde-sampling.html#reverse-the-stochastic-process",
-    "href": "tutorials/40-reverse-sde-sampling.html#reverse-the-stochastic-process",
-    "title": "Reverse-SDE sampling",
-    "section": "2. Reverse the stochastic process",
-    "text": "2. Reverse the stochastic process\nWrite \\(Y_\\tau=X_{1-\\tau}\\) for the time-reversed process in law. Under the usual smoothness and time-reversal conditions, and with diffusion coefficient independent of position,\n\\[\\boxed{dY_\\tau=\n[-f(Y_\\tau,t)+g(t)^2s_t(Y_\\tau)]\\,d\\tau\n+g(t)\\,d\\overline W_\\tau,\\qquad t=1-\\tau.}\\]\nThe Brownian motion is defined with respect to the reverse-time information; it is not obtained by simply negating the original Brownian increments. The formula above applies to scalar \\(g(t)\\); state-dependent diffusion requires additional derivative terms.\nIn the original decreasing clock, the same reverse dynamics is often written\n\\[dX_t=[f(X_t,t)-g(t)^2s_t(X_t)]\\,dt+g(t)\\,d\\overline W_t,\n\\qquad dt&lt;0.\\]\nNoise increments in this notation have variance proportional to \\(|dt|\\). We use the increasing reverse clock to avoid negative-variance interpretations. The primary reference is Song et al., Eq. (6); Yang Song’s blog explains the forward and reverse SDEs as separate processes.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Reverse-SDE sampling"
-    ]
-  },
-  {
-    "objectID": "tutorials/40-reverse-sde-sampling.html#vp-diffusion-and-an-explicit-sampler",
-    "href": "tutorials/40-reverse-sde-sampling.html#vp-diffusion-and-an-explicit-sampler",
-    "title": "Reverse-SDE sampling",
-    "section": "3. VP diffusion and an explicit sampler",
-    "text": "3. VP diffusion and an explicit sampler\nFor the VP forward process,\n\\[f(x,t)=-\\tfrac12\\beta(t)x,\\qquad g(t)=\\sqrt{\\beta(t)},\\]\nwith the same schedule relation as before:\n\\[\\alpha_t=\\exp\\left[-\\tfrac12\\int_0^t\\beta(u)\\,du\\right],\n\\qquad X_t\\mid X_0=x_0\\sim\\mathcal N(\\alpha_tx_0,1-\\alpha_t^2).\\]\nThe reverse SDE is\n\\[dY_\\tau=\\beta(t)[\\tfrac12Y_\\tau+s_t(Y_\\tau)]\\,d\\tau\n+\\sqrt{\\beta(t)}\\,d\\overline W_\\tau.\\]\nFor \\(h=t_k-t_{k+1}&gt;0\\), generate with\n\\[\\boxed{x_{k+1}=x_k+h\\beta(t_k)[\\tfrac12x_k+s_\\theta(x_k,t_k)]\n+\\sqrt{h\\beta(t_k)}\\,z_k,\\qquad z_k\\sim\\mathcal N(0,1).}\\]\nStart from the actual \\(p_1\\) if available, or a justified approximation such as standard normal after sufficient corruption. Draw fresh independent noise at each step. Stop at a positive cutoff compatible with the trained score if the endpoint is singular. The exact continuous process has the required marginals with the exact score and matched initialization; a learned score, finite steps, and approximate prior introduce errors.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Reverse-SDE sampling"
-    ]
-  },
-  {
-    "objectID": "tutorials/40-reverse-sde-sampling.html#why-this-is-not-an-ode-with-noise-simply-added",
-    "href": "tutorials/40-reverse-sde-sampling.html#why-this-is-not-an-ode-with-noise-simply-added",
-    "title": "Reverse-SDE sampling",
-    "section": "4. Why this is not an ODE with noise simply added",
-    "text": "4. Why this is not an ODE with noise simply added\nIn increasing reverse time, the probability-flow ODE uses\n\\[b_{\\mathrm{ODE}}=-f+\\tfrac12g^2s_t,\\]\nwhile the reverse SDE uses\n\\[b_{\\mathrm{SDE}}=-f+g^2s_t.\\]\nTherefore\n\\[b_{\\mathrm{SDE}}=b_{\\mathrm{ODE}}+\\tfrac12g^2s_t.\\]\nThe extra score drift compensates for the Brownian spreading. Adding \\(g\\,dW\\) to the probability-flow ODE without that drift correction changes the density evolution. Appendix A checks the factors explicitly.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Reverse-SDE sampling"
-    ]
-  },
-  {
-    "objectID": "tutorials/40-reverse-sde-sampling.html#a-gaussian-example-checks-the-sign-and-coefficient",
-    "href": "tutorials/40-reverse-sde-sampling.html#a-gaussian-example-checks-the-sign-and-coefficient",
-    "title": "Reverse-SDE sampling",
-    "section": "5. A Gaussian example checks the sign and coefficient",
-    "text": "5. A Gaussian example checks the sign and coefficient\nIf the clean law is standard normal, VP preserves it and \\(s_t(x)=-x\\). The reverse SDE becomes\n\\[dY_\\tau=-\\tfrac12\\beta(t)Y_\\tau\\,d\\tau\n+\\sqrt{\\beta(t)}\\,d\\overline W_\\tau.\\]\nAt mean zero and variance one, the instantaneous mean and variance derivatives are zero. The density stays standard normal although particles move randomly. The corresponding probability-flow ODE has zero velocity, so its particles remain fixed. The two processes agree on marginals, not trajectories.\nFor constant \\(\\beta\\) and Euler step \\(h\\), the stochastic update has stationary variance \\(1/(1-h\\beta/4)\\) when \\(0&lt;h\\beta&lt;4\\). Its deviation from one is a discretization effect, not a failure of the continuous reverse-SDE formula.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Reverse-SDE sampling"
-    ]
-  },
-  {
-    "objectID": "tutorials/40-reverse-sde-sampling.html#appendix-a.-check-the-reversed-density-evolution",
-    "href": "tutorials/40-reverse-sde-sampling.html#appendix-a.-check-the-reversed-density-evolution",
-    "title": "Reverse-SDE sampling",
-    "section": "Appendix A. Check the reversed density evolution",
-    "text": "Appendix A. Check the reversed density evolution\nThe forward Fokker–Planck equation is\n\\[\\partial_tp_t=-\\partial_x(fp_t)+\\tfrac12g^2\\partial_{xx}p_t.\\]\nSet \\(r_\\tau=p_{1-\\tau}\\). Then\n\\[\\partial_\\tau r_\\tau=\\partial_x(fr_\\tau)-\\tfrac12g^2\\partial_{xx}r_\\tau,\\]\nwhere coefficients and scores are evaluated at \\(t=1-\\tau\\). The proposed reverse SDE gives\n\\[\\begin{aligned}\n-\\partial_x[(-f+g^2s_t)r_\\tau]+\\tfrac12g^2\\partial_{xx}r_\\tau\n&=\\partial_x(fr_\\tau)-g^2\\partial_x(r_\\tau s_t)\n+\\tfrac12g^2\\partial_{xx}r_\\tau\\\\\n&=\\partial_x(fr_\\tau)-\\tfrac12g^2\\partial_{xx}r_\\tau,\n\\end{aligned}\\]\nbecause \\(r_\\tau s_t=\\partial_xr_\\tau\\). This verifies the marginal equation. Identifying the full reversed path law requires the time-reversal result cited above; the marginal calculation alone does not establish that joint law.\nFor comparison, the ODE flux with \\(-f+g^2s_t/2\\) gives the same marginal equation without a diffusion term. See Probability-Flow ODE, Part 09 for the connection to DDPM and DDIM.",
-    "crumbs": [
-      "Score Matching and Stochastic Sampling",
-      "Reverse-SDE sampling"
-    ]
-  },
-  {
     "objectID": "tutorials/probability-flow-ode.html",
     "href": "tutorials/probability-flow-ode.html",
     "title": "Probability-Flow ODE",
@@ -2348,6 +2216,138 @@
     "crumbs": [
       "Probability-Flow ODE",
       "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html",
+    "href": "tutorials/39-denoising-score-matching.html",
+    "title": "Denoising Score Matching",
+    "section": "",
+    "text": "1. Learn from clean/noisy pairs\nDraw \\(X_0\\sim p_{\\mathrm{data}}\\) and independent \\(\\varepsilon\\sim\\mathcal N(0,1)\\). At a fixed noise scale \\(\\sigma&gt;0\\), form\n\\[Y=X_0+\\sigma\\varepsilon,\\qquad\np_\\sigma(y)=\\int\\mathcal N(y;x_0,\\sigma^2)p_{\\mathrm{data}}(x_0)\\,dx_0.\\]\nA denoiser trained with squared error estimates \\(D_*(y,\\sigma)=\\mathbb E[X_0\\mid Y=y]\\). Tweedie’s formula connects it to the noisy marginal score:\n\\[s_\\sigma(y)=\\partial_y\\log p_\\sigma(y)\n=\\frac{D_*(y,\\sigma)-y}{\\sigma^2}.\\]\nThe regression averages possible clean origins conditional on the noisy input. It does not recover the particular noise realization of every pair. The score is a property of the smoothed density \\(p_\\sigma\\), not exactly the original clean density at finite \\(\\sigma\\).",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#denoising-score-matching",
+    "href": "tutorials/39-denoising-score-matching.html#denoising-score-matching",
+    "title": "Denoising Score Matching",
+    "section": "2. Denoising score matching",
+    "text": "2. Denoising score matching\nThe conditional Gaussian score is available for every constructed pair:\n\\[U=\\partial_y\\log p(Y\\mid X_0)\n=-\\frac{Y-X_0}{\\sigma^2}=-\\frac{\\varepsilon}{\\sigma}.\\]\nMinimize\n\\[\\mathcal L_{\\mathrm{DSM}}(\\theta;\\sigma)\n=\\mathbb E_{X_0\\sim p_{\\mathrm{data}},\\,\\varepsilon\\sim\\mathcal N(0,1)}\n[(s_\\theta(X_0+\\sigma\\varepsilon,\\sigma)+\\varepsilon/\\sigma)^2].\\]\nAt the unrestricted optimum, \\(s_*(y,\\sigma)=\\mathbb E[U\\mid Y=y]=s_\\sigma(y)\\). The conditional target is known even though the marginal score is not. The loss differs from marginal-score regression by a conditional-variance term independent of the predictor. This is the denoising/score-matching connection developed by Vincent (2011).\nPlanned derivation: expand the conditional squared error, differentiate the Gaussian convolution, and show explicitly why the posterior mean appears. Finite-data training targets the corrupted empirical law at its unrestricted optimum.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#once-a-fixed-score-is-known-langevin-sampling",
+    "href": "tutorials/39-denoising-score-matching.html#once-a-fixed-score-is-known-langevin-sampling",
+    "title": "Denoising Score Matching",
+    "section": "3. Once a fixed score is known: Langevin sampling",
+    "text": "3. Once a fixed score is known: Langevin sampling\nLet \\(p\\) be a smooth positive target density and \\(s=\\partial_x\\log p\\). Use sampling time \\(\\tau\\), with \\(p\\) held fixed:\n\\[dX_\\tau=s(X_\\tau)\\,d\\tau+\\sqrt2\\,dW_\\tau.\\]\nBrownian increments over an interval of length \\(\\eta\\) are independent Gaussians with variance \\(\\eta\\). Euler–Maruyama therefore gives\n\\[\\boxed{x_{k+1}=x_k+\\eta s(x_k)+\\sqrt{2\\eta}\\,z_k,\n\\qquad z_k\\overset{\\mathrm{iid}}{\\sim}\\mathcal N(0,1).}\\]\nScore-directed drift and random spreading balance at the target distribution. For the continuous SDE, \\(p\\) is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error.\nIf the learned score is \\(s_\\sigma\\), the intended stationary target is \\(p_\\sigma\\). Langevin does not remove the smoothing merely by running longer. Its sampling clock is not a schedule that automatically reduces \\(\\sigma\\).",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#first-solved-check-a-standard-gaussian",
+    "href": "tutorials/39-denoising-score-matching.html#first-solved-check-a-standard-gaussian",
+    "title": "Denoising Score Matching",
+    "section": "4. First solved check: a standard Gaussian",
+    "text": "4. First solved check: a standard Gaussian\nFor \\(p=\\mathcal N(0,1)\\), \\(s(x)=-x\\). Deterministic score ascent \\(\\dot x=-x\\) collapses toward zero. Langevin instead gives\n\\[x_{k+1}=(1-\\eta)x_k+\\sqrt{2\\eta}\\,z_k.\\]\nFor \\(0&lt;\\eta&lt;2\\), the discrete chain’s stationary variance solves\n\\[V=(1-\\eta)^2V+2\\eta,\n\\qquad V=\\frac1{1-\\eta/2}.\\]\nIt approaches the target variance 1 as \\(\\eta\\to0\\), but is not exactly 1 at a finite step. This will anchor simulations of step-size bias, convergence, and multimodal mixing.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#several-noise-levels-and-annealed-langevin-dynamics",
+    "href": "tutorials/39-denoising-score-matching.html#several-noise-levels-and-annealed-langevin-dynamics",
+    "title": "Denoising Score Matching",
+    "section": "5. Several noise levels and annealed Langevin dynamics",
+    "text": "5. Several noise levels and annealed Langevin dynamics\nTrain \\(s_\\theta(x,\\sigma)\\) at a decreasing sequence \\(\\sigma_1&gt;\\cdots&gt;\\sigma_L&gt;0\\), averaging the DSM loss over a stated distribution of noise levels with positive weights. At each level, perform several Langevin steps targeting \\(p_{\\sigma_i}\\), then lower the noise scale. Large smoothing can make movement between modes easier; short runs at each level do not guarantee equilibrium.\nThis is the approach of Song and Ermon (2019). It differs from a reverse diffusion SDE designed to follow prescribed changing marginals without equilibrating at every level. The final positive noise level retains smoothing error.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#appendix-outline-stationarity-from-density-evolution",
+    "href": "tutorials/39-denoising-score-matching.html#appendix-outline-stationarity-from-density-evolution",
+    "title": "Denoising Score Matching",
+    "section": "Appendix outline: stationarity from density evolution",
+    "text": "Appendix outline: stationarity from density evolution\nIf \\(r_\\tau\\) is the current sampler density, its Fokker–Planck equation is\n\\[\\partial_\\tau r_\\tau=-\\partial_x(r_\\tau s)+\\partial_{xx}r_\\tau.\\]\nAt \\(r_\\tau=p\\), \\(ps=\\partial_xp\\), so the two terms cancel. This proves invariance subject to the relevant boundary and regularity conditions; it does not establish a mixing rate. The full appendix will develop the fixed-interval probability balance and distinguish invariance, convergence, and discretization bias.\nFor a different use of a time-dependent score—deterministic transport through a prescribed density path—see the separate Probability-Flow ODE topic.\nContinue to Reverse-SDE sampling to follow a changing density path rather than equilibrate at one noise level.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html",
+    "href": "tutorials/40-reverse-sde-sampling.html",
+    "title": "Reverse-SDE sampling",
+    "section": "",
+    "text": "1. From a fixed target to a prescribed density path\nOrdinary Langevin dynamics uses the score of one fixed target and attempts to approach its stationary distribution. Reverse diffusion instead follows a time-dependent sequence of target densities, \\(p_1,p_{1-h},\\ldots,p_0\\). It does not wait for equilibrium at each noise level.\nChoose a forward process\n\\[dX_t=f(X_t,t)\\,dt+g(t)\\,dW_t,\\]\nand let \\(p_t\\) be its marginal density. A one-step Euler–Maruyama approximation adds deterministic drift \\(h f\\) and independent Gaussian noise with standard deviation \\(g\\sqrt h\\). Brownian increments scale with \\(\\sqrt h\\), not \\(h\\).\nLearn \\(s_\\theta(x,t)\\approx\\partial_x\\log p_t(x)\\) using known conditional corruption kernels. The distinction between conditional labels and marginal predictions is the same as in the preceding topic.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#reverse-the-stochastic-process",
+    "href": "tutorials/40-reverse-sde-sampling.html#reverse-the-stochastic-process",
+    "title": "Reverse-SDE sampling",
+    "section": "2. Reverse the stochastic process",
+    "text": "2. Reverse the stochastic process\nWrite \\(Y_\\tau=X_{1-\\tau}\\) for the time-reversed process in law. Under the usual smoothness and time-reversal conditions, and with diffusion coefficient independent of position,\n\\[\\boxed{dY_\\tau=\n[-f(Y_\\tau,t)+g(t)^2s_t(Y_\\tau)]\\,d\\tau\n+g(t)\\,d\\overline W_\\tau,\\qquad t=1-\\tau.}\\]\nThe Brownian motion is defined with respect to the reverse-time information; it is not obtained by simply negating the original Brownian increments. The formula above applies to scalar \\(g(t)\\); state-dependent diffusion requires additional derivative terms.\nIn the original decreasing clock, the same reverse dynamics is often written\n\\[dX_t=[f(X_t,t)-g(t)^2s_t(X_t)]\\,dt+g(t)\\,d\\overline W_t,\n\\qquad dt&lt;0.\\]\nNoise increments in this notation have variance proportional to \\(|dt|\\). We use the increasing reverse clock to avoid negative-variance interpretations. The primary reference is Song et al., Eq. (6); Yang Song’s blog explains the forward and reverse SDEs as separate processes.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#vp-diffusion-and-an-explicit-sampler",
+    "href": "tutorials/40-reverse-sde-sampling.html#vp-diffusion-and-an-explicit-sampler",
+    "title": "Reverse-SDE sampling",
+    "section": "3. VP diffusion and an explicit sampler",
+    "text": "3. VP diffusion and an explicit sampler\nFor the VP forward process,\n\\[f(x,t)=-\\tfrac12\\beta(t)x,\\qquad g(t)=\\sqrt{\\beta(t)},\\]\nwith the same schedule relation as before:\n\\[\\alpha_t=\\exp\\left[-\\tfrac12\\int_0^t\\beta(u)\\,du\\right],\n\\qquad X_t\\mid X_0=x_0\\sim\\mathcal N(\\alpha_tx_0,1-\\alpha_t^2).\\]\nThe reverse SDE is\n\\[dY_\\tau=\\beta(t)[\\tfrac12Y_\\tau+s_t(Y_\\tau)]\\,d\\tau\n+\\sqrt{\\beta(t)}\\,d\\overline W_\\tau.\\]\nFor \\(h=t_k-t_{k+1}&gt;0\\), generate with\n\\[\\boxed{x_{k+1}=x_k+h\\beta(t_k)[\\tfrac12x_k+s_\\theta(x_k,t_k)]\n+\\sqrt{h\\beta(t_k)}\\,z_k,\\qquad z_k\\sim\\mathcal N(0,1).}\\]\nStart from the actual \\(p_1\\) if available, or a justified approximation such as standard normal after sufficient corruption. Draw fresh independent noise at each step. Stop at a positive cutoff compatible with the trained score if the endpoint is singular. The exact continuous process has the required marginals with the exact score and matched initialization; a learned score, finite steps, and approximate prior introduce errors.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#why-this-is-not-an-ode-with-noise-simply-added",
+    "href": "tutorials/40-reverse-sde-sampling.html#why-this-is-not-an-ode-with-noise-simply-added",
+    "title": "Reverse-SDE sampling",
+    "section": "4. Why this is not an ODE with noise simply added",
+    "text": "4. Why this is not an ODE with noise simply added\nIn increasing reverse time, the probability-flow ODE uses\n\\[b_{\\mathrm{ODE}}=-f+\\tfrac12g^2s_t,\\]\nwhile the reverse SDE uses\n\\[b_{\\mathrm{SDE}}=-f+g^2s_t.\\]\nTherefore\n\\[b_{\\mathrm{SDE}}=b_{\\mathrm{ODE}}+\\tfrac12g^2s_t.\\]\nThe extra score drift compensates for the Brownian spreading. Adding \\(g\\,dW\\) to the probability-flow ODE without that drift correction changes the density evolution. Appendix A checks the factors explicitly.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#a-gaussian-example-checks-the-sign-and-coefficient",
+    "href": "tutorials/40-reverse-sde-sampling.html#a-gaussian-example-checks-the-sign-and-coefficient",
+    "title": "Reverse-SDE sampling",
+    "section": "5. A Gaussian example checks the sign and coefficient",
+    "text": "5. A Gaussian example checks the sign and coefficient\nIf the clean law is standard normal, VP preserves it and \\(s_t(x)=-x\\). The reverse SDE becomes\n\\[dY_\\tau=-\\tfrac12\\beta(t)Y_\\tau\\,d\\tau\n+\\sqrt{\\beta(t)}\\,d\\overline W_\\tau.\\]\nAt mean zero and variance one, the instantaneous mean and variance derivatives are zero. The density stays standard normal although particles move randomly. The corresponding probability-flow ODE has zero velocity, so its particles remain fixed. The two processes agree on marginals, not trajectories.\nFor constant \\(\\beta\\) and Euler step \\(h\\), the stochastic update has stationary variance \\(1/(1-h\\beta/4)\\) when \\(0&lt;h\\beta&lt;4\\). Its deviation from one is a discretization effect, not a failure of the continuous reverse-SDE formula.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#appendix-a.-check-the-reversed-density-evolution",
+    "href": "tutorials/40-reverse-sde-sampling.html#appendix-a.-check-the-reversed-density-evolution",
+    "title": "Reverse-SDE sampling",
+    "section": "Appendix A. Check the reversed density evolution",
+    "text": "Appendix A. Check the reversed density evolution\nThe forward Fokker–Planck equation is\n\\[\\partial_tp_t=-\\partial_x(fp_t)+\\tfrac12g^2\\partial_{xx}p_t.\\]\nSet \\(r_\\tau=p_{1-\\tau}\\). Then\n\\[\\partial_\\tau r_\\tau=\\partial_x(fr_\\tau)-\\tfrac12g^2\\partial_{xx}r_\\tau,\\]\nwhere coefficients and scores are evaluated at \\(t=1-\\tau\\). The proposed reverse SDE gives\n\\[\\begin{aligned}\n-\\partial_x[(-f+g^2s_t)r_\\tau]+\\tfrac12g^2\\partial_{xx}r_\\tau\n&=\\partial_x(fr_\\tau)-g^2\\partial_x(r_\\tau s_t)\n+\\tfrac12g^2\\partial_{xx}r_\\tau\\\\\n&=\\partial_x(fr_\\tau)-\\tfrac12g^2\\partial_{xx}r_\\tau,\n\\end{aligned}\\]\nbecause \\(r_\\tau s_t=\\partial_xr_\\tau\\). This verifies the marginal equation. Identifying the full reversed path law requires the time-reversal result cited above; the marginal calculation alone does not establish that joint law.\nFor comparison, the ODE flux with \\(-f+g^2s_t/2\\) gives the same marginal equation without a diffusion term. See Probability-Flow ODE, Part 09 for the connection to DDPM and DDIM.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
     ]
   },
   {
