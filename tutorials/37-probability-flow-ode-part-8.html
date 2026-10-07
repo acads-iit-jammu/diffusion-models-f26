@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>00 · Introduction and Motivation – ID-5-02 (TO)</title>
+<title>08 · Flow matching – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,6 +26,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -36,8 +71,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/01-probability-101.html" rel="next">
-<link href="../assignments.html" rel="prev">
+<link href="../materials/w01-deck-01-mechanics.html" rel="next">
+<link href="../tutorials/36-probability-flow-ode-part-7.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +152,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/37-probability-flow-ode-part-8.html">08 · Flow matching</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -182,16 +217,16 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Lecture Notes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">00 · Introduction and Motivation</span></a>
   </div>
 </li>
@@ -261,11 +296,11 @@ window.Quarto = {
       <div class="sidebar-item-container"> 
             <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Probability-Flow ODE</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
@@ -310,7 +345,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/37-probability-flow-ode-part-8.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/37-probability-flow-ode-part-8.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">08 · Flow matching</span></a>
   </div>
 </li>
@@ -561,28 +596,28 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#what-this-course-is-about" id="toc-what-this-course-is-about" class="nav-link active" data-scroll-target="#what-this-course-is-about">What this course is about</a>
+  <li><a href="#the-learning-objective-is-still-sampling" id="toc-the-learning-objective-is-still-sampling" class="nav-link active" data-scroll-target="#the-learning-objective-is-still-sampling">1. The learning objective is still sampling</a></li>
+  <li><a href="#construct-training-pairs-and-their-conditional-velocities" id="toc-construct-training-pairs-and-their-conditional-velocities" class="nav-link" data-scroll-target="#construct-training-pairs-and-their-conditional-velocities">2. Construct training pairs and their conditional velocities</a></li>
+  <li><a href="#why-velocity-regression-produces-the-marginal-transport" id="toc-why-velocity-regression-produces-the-marginal-transport" class="nav-link" data-scroll-target="#why-velocity-regression-produces-the-marginal-transport">3. Why velocity regression produces the marginal transport</a>
   <ul class="collapse">
-  <li><a href="#the-route-in-one-paragraph" id="toc-the-route-in-one-paragraph" class="nav-link" data-scroll-target="#the-route-in-one-paragraph">The route, in one paragraph</a></li>
-  <li><a href="#how-the-material-is-organised" id="toc-how-the-material-is-organised" class="nav-link" data-scroll-target="#how-the-material-is-organised">How the material is organised</a></li>
-  <li><a href="#where-to-start" id="toc-where-to-start" class="nav-link" data-scroll-target="#where-to-start">Where to start</a></li>
+  <li><a href="#individual-straight-paths-are-not-the-learned-ode-trajectories" id="toc-individual-straight-paths-are-not-the-learned-ode-trajectories" class="nav-link" data-scroll-target="#individual-straight-paths-are-not-the-learned-ode-trajectories">Individual straight paths are not the learned ODE trajectories</a></li>
   </ul></li>
-  <li><a href="#the-simplest-generative-model-there-is" id="toc-the-simplest-generative-model-there-is" class="nav-link" data-scroll-target="#the-simplest-generative-model-there-is">The simplest generative model there is</a></li>
-  <li><a href="#view-1-conditional-generation-a-hierarchical-model" id="toc-view-1-conditional-generation-a-hierarchical-model" class="nav-link" data-scroll-target="#view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</a></li>
-  <li><a href="#view-2-the-coin-disappears-into-a-map" id="toc-view-2-the-coin-disappears-into-a-map" class="nav-link" data-scroll-target="#view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</a></li>
-  <li><a href="#the-two-point-limit" id="toc-the-two-point-limit" class="nav-link" data-scroll-target="#the-two-point-limit">The two-point limit</a></li>
-  <li><a href="#maps-are-not-unique" id="toc-maps-are-not-unique" class="nav-link" data-scroll-target="#maps-are-not-unique">Maps are not unique</a></li>
-  <li><a href="#the-claim-that-organizes-everything" id="toc-the-claim-that-organizes-everything" class="nav-link" data-scroll-target="#the-claim-that-organizes-everything">The claim that organizes everything</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
+  <li><a href="#connection-to-the-posterior-mean-and-score" id="toc-connection-to-the-posterior-mean-and-score" class="nav-link" data-scroll-target="#connection-to-the-posterior-mean-and-score">4. Connection to the posterior mean and score</a>
+  <ul class="collapse">
+  <li><a href="#recovering-the-vp-probability-flow-field" id="toc-recovering-the-vp-probability-flow-field" class="nav-link" data-scroll-target="#recovering-the-vp-probability-flow-field">Recovering the VP probability-flow field</a></li>
+  </ul></li>
+  <li><a href="#a-solved-gaussian-example" id="toc-a-solved-gaussian-example" class="nav-link" data-scroll-target="#a-solved-gaussian-example">5. A solved Gaussian example</a></li>
+  <li><a href="#minimal-training-and-backward-sampling" id="toc-minimal-training-and-backward-sampling" class="nav-link" data-scroll-target="#minimal-training-and-backward-sampling">6. Minimal training and backward sampling</a></li>
+  <li><a href="#appendix-a.-why-the-averaged-velocity-follows-the-marginal-path" id="toc-appendix-a.-why-the-averaged-velocity-follows-the-marginal-path" class="nav-link" data-scroll-target="#appendix-a.-why-the-averaged-velocity-follows-the-marginal-path">Appendix A. Why the averaged velocity follows the marginal path</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/37-probability-flow-ode-part-8.html">08 · Flow matching</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">00 · Introduction and Motivation</h1>
+<h1 class="title">08 · Flow matching</h1>
 </div>
 
 
@@ -599,148 +634,137 @@ window.Quarto = {
 </header>
 
 
-<p><em>The first note of the course. It says what the subject is, what the rest of the material is for, and then earns the claim that organises everything with the smallest possible example. Interactive version: <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>.</em></p>
-<section id="what-this-course-is-about" class="level2">
-<h2 class="anchored" data-anchor-id="what-this-course-is-about">What this course is about</h2>
-<p>A <strong>generative model</strong> is a thing that produces samples. Show it a pile of handwritten digits and it should produce new handwritten digits — not ones from the pile, and not noise, but plausible new members of the same population.</p>
-<p>The difficulty is that nobody hands you the population. You get a finite pile of examples, and from that pile you must build something that can generate more. Put formally: given samples <span class="math inline">\(x_1,\dots,x_n\)</span> drawn from an unknown <span class="math inline">\(p_{\text{data}}\)</span>, construct a procedure that draws fresh samples from something close to <span class="math inline">\(p_{\text{data}}\)</span>.</p>
-<p>Two observations shape everything that follows.</p>
-<p><strong>Sampling is not the same as knowing the density.</strong> You do not need a formula for <span class="math inline">\(p_{\text{data}}(x)\)</span> in order to draw from it, and — as the course will show — for images you could not write one down anyway. What you need is a <em>procedure</em>.</p>
-<p><strong>Every such procedure turns simple randomness into structured output.</strong> Somewhere in the machine there is a coin flip, a uniform draw, or a burst of Gaussian noise, and everything downstream of it is arithmetic. That is the picture this note builds, and the rest of the course is about how to <em>learn</em> the arithmetic when the target is complicated.</p>
-<section id="the-route-in-one-paragraph" class="level3">
-<h3 class="anchored" data-anchor-id="the-route-in-one-paragraph">The route, in one paragraph</h3>
-<p>We start with probability itself — random variables, joints, conditionals, Bayes — because generation runs forward from a latent cause to an observation while inference runs backward, and Bayes is the bridge. Then distributions and maximum likelihood in one dimension, where fitting has closed forms. Then the multivariate Gaussian, the one family closed under everything linear, which is why every tractable calculation in this subject goes through it. Then the wall: in high dimension, estimating a density directly stops working, even with structure. That failure is what forces the modern approach — stop describing distributions and start <strong>comparing</strong> them, which is why distances and divergences become central. Diffusion models are then one particular, very effective answer.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Draft — Learning the sampling velocity directly
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Part 07 established that a learned velocity can define a continuous normalizing flow. Flow matching gives a regression objective for learning that velocity. We retain <strong><span class="math inline">\(t=0\)</span> for data and <span class="math inline">\(t=1\)</span> for the prior</strong>; generation runs from 1 to 0. Many flow-matching papers use the opposite convention. With <span class="math inline">\(\tau=1-t\)</span>, the reversed field is <span class="math inline">\(\widetilde v(x,\tau)=-v(x,1-\tau)\)</span>: both the sign and time argument change.</p>
+<p>Primary reference: <a href="https://arxiv.org/abs/2210.02747">Lipman et al., Flow Matching for Generative Modeling</a>. The straight interpolation below is the zero-terminal-smoothing limit of the Gaussian conditional path, written in our reversed time convention. Independent endpoint interpolation is also studied in <a href="https://arxiv.org/abs/2209.03003">rectified flow</a>, <a href="https://arxiv.org/abs/2209.15571">stochastic interpolants</a>, and <a href="https://arxiv.org/abs/2302.00482">independent conditional flow matching</a>. A positive smoothing variance avoids the point-mass conditional data endpoint; here that endpoint is understood as a limit.</p>
+</div>
+</div>
+<section id="the-learning-objective-is-still-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="the-learning-objective-is-still-sampling">1. The learning objective is still sampling</h2>
+<p>We want a field <span class="math inline">\(v_\theta(x,t)\)</span> whose ODE transports <span class="math inline">\(p_0=p_{\mathrm{data}}\)</span> to a tractable <span class="math inline">\(p_1\)</span>. Once it is learned, draw <span class="math inline">\(X_1\sim p_1\)</span> and integrate backward.</p>
+<p>Score-based diffusion constructs a probability path by a forward SDE, learns its score, and then computes its velocity. Flow matching can instead specify a path through a directly sampleable interpolation and learn the velocity by regression. Neither approach requires solving the sampling ODE for every training example.</p>
+<p>We start in one dimension. The same formulas hold for vectors with squared Euclidean loss and vector-valued velocities.</p>
 </section>
-<section id="how-the-material-is-organised" class="level3">
-<h3 class="anchored" data-anchor-id="how-the-material-is-organised">How the material is organised</h3>
-<p><strong>Lecture Notes</strong> are the numbered spine, in reading order, and follow the lectures. <strong>Tutorials</strong> sit alongside and go deeper on one thing. <strong>Perspectives</strong> are optional reinterpretations — a transport reading of the whole subject, and the measure-theoretic foundations — and nothing in the lectures depends on them. The <a href="../curriculum.html">Curriculum</a> page lists the sequence and maps it to weeks.</p>
+<section id="construct-training-pairs-and-their-conditional-velocities" class="level2">
+<h2 class="anchored" data-anchor-id="construct-training-pairs-and-their-conditional-velocities">2. Construct training pairs and their conditional velocities</h2>
+<p>Draw independently</p>
+<p><span class="math display">\[X_0\sim p_{\mathrm{data}},\qquad X_1\sim\mathcal N(0,1).\]</span></p>
+<p>For these endpoint draws, define a straight interpolating trajectory</p>
+<p><span class="math display">\[\boxed{X_t=(1-t)X_0+tX_1,\qquad
+\frac{dX_t}{dt}=X_1-X_0.}\]</span></p>
+<p>At time zero the marginal is the data distribution, and at time one it is exactly standard normal. Between them, <span class="math inline">\(p_t\)</span> is the distribution of the interpolated random variable. It is <strong>not</strong> the density mixture <span class="math inline">\((1-t)p_0+tp_1\)</span>.</p>
+<p>We know the velocity label <span class="math inline">\(U=X_1-X_0\)</span> because both endpoints are available during training. The predictor receives only <span class="math inline">\((X_t,t)\)</span>, not both endpoints. For <span class="math inline">\(t&gt;0\)</span>, conditioning only on the clean endpoint gives</p>
+<p><span class="math display">\[X_t\mid X_0=x_0\sim\mathcal N((1-t)x_0,t^2),\]</span></p>
+<p>with conditional field</p>
+<p><span class="math display">\[u_t(x\mid x_0)=\frac{x-x_0}{t}.\]</span></p>
+<p>At a constructed training observation, <span class="math inline">\(u_t(X_t\mid X_0)=X_1-X_0\)</span>. The quotient therefore need not be evaluated in code.</p>
 </section>
-<section id="where-to-start" class="level3">
-<h3 class="anchored" data-anchor-id="where-to-start">Where to start</h3>
-<p>Read this note, then <a href="../tutorials/05-two-point-diffusion.html">01 · The World’s Smallest Diffusion Model</a>, which builds a complete working diffusion model on a dataset of two points, with every step in closed form. Nothing in it is approximated and nothing is learned — which makes it the clearest possible statement of <em>what we are trying to do in high dimensions</em>, and of exactly which step stops being computable once the data is images rather than two numbers.</p>
+<section id="why-velocity-regression-produces-the-marginal-transport" class="level2">
+<h2 class="anchored" data-anchor-id="why-velocity-regression-produces-the-marginal-transport">3. Why velocity regression produces the marginal transport</h2>
+<p>Train with</p>
+<p><span class="math display">\[\boxed{\mathcal L_{\mathrm{CFM}}(\theta)
+=\mathbb E_{t,X_0,X_1}
+[(v_\theta((1-t)X_0+tX_1,t)-(X_1-X_0))^2],}\]</span></p>
+<p>where <span class="math inline">\(t\sim\operatorname{Uniform}(0,1)\)</span> and the three draws are independent before constructing <span class="math inline">\(X_t\)</span>. Assume finite second moments for this loss. Squared-error regression gives</p>
+<p><span class="math display">\[\boxed{v_*(x,t)=\mathbb E[X_1-X_0\mid X_t=x,t].}\]</span></p>
+<p>This is the <strong>conditional flow-matching</strong> (CFM) loss. Direct regression onto the unavailable marginal velocity would use <span class="math inline">\(\mathcal L_{\mathrm{FM}}=\mathbb E_{t,X_t}[(v_\theta(X_t,t)-v_*(X_t,t))^2]\)</span>. The two losses differ by a parameter-independent conditional-variance term, so their population gradients and minimizers agree when differentiation is justified.</p>
+<p>The expectation is over endpoint pairs compatible with the fixed noisy/intermediate input. As in Part 03, individual labels differ from their conditional-mean prediction. The loss decomposes into a velocity-estimation error plus a conditional variance independent of the network.</p>
+<p>Why does this conditional mean transport the right density? Each endpoint pair supplies a trajectory with known velocity. Averaging its contribution to probability transport at a location gives precisely the field above. Appendix A verifies that the interpolation marginals satisfy</p>
+<p><span class="math display">\[\partial_tp_t=-\partial_x(p_tv_*).\]</span></p>
+<p>Under regularity ensuring the corresponding ODE is well posed and the density evolution is unique, its flow follows these marginals. Positive-time regularity does not automatically guarantee a smooth invertible map at a singular data endpoint.</p>
+<section id="individual-straight-paths-are-not-the-learned-ode-trajectories" class="level3">
+<h3 class="anchored" data-anchor-id="individual-straight-paths-are-not-the-learned-ode-trajectories">Individual straight paths are not the learned ODE trajectories</h3>
+<p>Different endpoint pairs can pass through the same position at the same time with different velocities. Their regression average defines a single field. Its trajectories generally differ from the individual training lines. The result concerns shared marginal densities, not recovery of the originally sampled endpoint coupling.</p>
+<p>Independent endpoint pairing is convenient, but it is not generally an optimal-transport coupling. Straight conditional paths do not imply globally optimal transport, straight marginal trajectories, or exact one-step sampling. Different couplings with the same endpoint marginals can give different paths and fields.</p>
 </section>
 </section>
-<section id="the-simplest-generative-model-there-is" class="level2">
-<h2 class="anchored" data-anchor-id="the-simplest-generative-model-there-is">The simplest generative model there is</h2>
-<p>The rest of this note presents one tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative sampler, diffusion included, is the second picture, once all of its random inputs are exposed, with a learned ingredient in place of the formula.</p>
+<section id="connection-to-the-posterior-mean-and-score" class="level2">
+<h2 class="anchored" data-anchor-id="connection-to-the-posterior-mean-and-score">4. Connection to the posterior mean and score</h2>
+<p>Let <span class="math inline">\(m_t(x)=\mathbb E[X_0\mid X_t=x]\)</span>. From the interpolation equation,</p>
+<p><span class="math display">\[X_1-X_0=\frac{X_t-X_0}{t},\]</span></p>
+<p>so</p>
+<p><span class="math display">\[\boxed{v_*(x,t)=\frac{x-m_t(x)}{t},\qquad t&gt;0.}\]</span></p>
+<p>The Gaussian conditional also gives the Tweedie identity</p>
+<p><span class="math display">\[s_t(x)=\frac{(1-t)m_t(x)-x}{t^2}.\]</span></p>
+<p>For <span class="math inline">\(0&lt;t&lt;1\)</span>, eliminate <span class="math inline">\(m_t(x)\)</span> to obtain</p>
+<p><span class="math display">\[\boxed{v_*(x,t)=-\frac{x+t\,s_t(x)}{1-t}.}\]</span></p>
+<p>This score-to-velocity formula belongs to this particular interpolation; it is <strong>not</strong> the VP formula. Here the clean amplitude is <span class="math inline">\(1-t\)</span> and the noise standard deviation is <span class="math inline">\(t\)</span>, so their squared sum is not generally one. The displayed division by <span class="math inline">\(1-t\)</span> should not be used at the terminal endpoint. Direct velocity prediction avoids that algebraic singularity; it does not guarantee an easy learning problem at all times.</p>
+<section id="recovering-the-vp-probability-flow-field" class="level3">
+<h3 class="anchored" data-anchor-id="recovering-the-vp-probability-flow-field">Recovering the VP probability-flow field</h3>
+<p>More generally, construct <span class="math inline">\(X_t=\alpha_tX_0+\sigma_t\varepsilon\)</span> with independent clean data and standard Gaussian noise, and differentiate the sample path using the same pair:</p>
+<p><span class="math display">\[U_t=\alpha_t'X_0+\sigma_t'\varepsilon.\]</span></p>
+<p>Conditional regression yields</p>
+<p><span class="math display">\[v_*(x,t)=\alpha_t' m_t(x)+\sigma_t'\mathbb E[\varepsilon\mid X_t=x].\]</span></p>
+<p>For a general Gaussian corruption, <span class="math inline">\(m_t(x)=(x+\sigma_t^2s_t(x))/\alpha_t\)</span> and <span class="math inline">\(\mathbb E[\varepsilon\mid X_t=x]=-\sigma_ts_t(x)\)</span>, by the same differentiation as in Part 03. Substitution gives, on positive-noise times with <span class="math inline">\(\alpha_t&gt;0\)</span>,</p>
+<p><span class="math display">\[v_*(x,t)=\frac{\alpha_t'}{\alpha_t}x+
+\left(\frac{\alpha_t'}{\alpha_t}\sigma_t^2-\sigma_t\sigma_t'\right)s_t(x).\]</span></p>
+<p>For VP, <span class="math inline">\(\alpha_t'/\alpha_t=-\beta(t)/2\)</span>, <span class="math inline">\(\sigma_t^2=1-\alpha_t^2\)</span>, and <span class="math inline">\(\sigma_t\sigma_t'=\beta(t)\alpha_t^2/2\)</span>. Consequently,</p>
+<p><span class="math display">\[\boxed{v_*(x,t)=-\frac{\beta(t)}2[x+s_t(x)].}\]</span></p>
+<p>Thus regression on conditional velocities can recover the same probability-flow field as score regression for the same Gaussian marginal path. Reusing one noise draw here defines a differentiable interpolation coupling, not a Brownian SDE trajectory. Finite VP schedules retain the terminal approximation discussed earlier. Also, the derivative label can grow near zero noise; finite-loss and optimization considerations can require a cutoff or weighting.</p>
 </section>
-<section id="view-1-conditional-generation-a-hierarchical-model" class="level2">
-<h2 class="anchored" data-anchor-id="view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</h2>
-<p>The simplest latent-variable model:</p>
-<p><span class="math display">\[
-\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
-x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
-\]</span></p>
-<p><strong>Ancestral sampling</strong> generates by following the arrows: draw the latent coin <span class="math inline">\(z\)</span>, then draw <span class="math inline">\(x\)</span> from the selected component. The observed marginal is obtained by summing out the latent:</p>
-<p><span class="math display">\[
-p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
-\;=\; \pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)
-\]</span></p>
-<p>— exactly the two-component mixture from the playground. A mixture is not just a formula; it is a <em>generative story</em>: population <span class="math inline">\(\to\)</span> subpopulation <span class="math inline">\(\to\)</span> individual.</p>
-<p><strong>Inference is the same hierarchy, run backwards.</strong> Given an observed <span class="math inline">\(x\)</span>, Bayes’ rule gives the posterior over the hidden coin:</p>
-<p><span class="math display">\[
-\mathbb{P}(z = 1 \mid x)
-= \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
-       {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
-\]</span></p>
-<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this equals <span class="math inline">\(\operatorname{sigmoid}(-2x/\sigma^2)\)</span>; its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is exactly the posterior W01 computed for the <span class="math inline">\(+1\)</span> component, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
 </section>
-<section id="view-2-the-coin-disappears-into-a-map" class="level2">
-<h2 class="anchored" data-anchor-id="view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</h2>
-<p><strong>Theorem (inverse-CDF / probability integral transform).</strong> Let <span class="math inline">\(F\)</span> be a CDF with generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
-<p><em>Proof.</em> <span class="math inline">\(\mathbb{P}(F^{-1}(U) \le x) = \mathbb{P}(U \le F(x)) = F(x)\)</span>, since <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span> by monotonicity. <span class="math inline">\(\square\)</span></p>
-<p>For our mixture, <span class="math inline">\(F(x) = \pi\,\Phi\!\big(\tfrac{x-\mu_1}{\sigma}\big) +
-(1-\pi)\,\Phi\!\big(\tfrac{x-\mu_2}{\sigma}\big)\)</span> is continuous and strictly increasing, so <span class="math inline">\(F^{-1}\)</span> is an honest function, and</p>
-<p><span class="math display">\[
-u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
-\]</span></p>
-<p>generates the mixture <strong>with no coin anywhere</strong> — the explicit coin has been marginalized out. One caution about where it went: under this map, the event <span class="math inline">\(u &lt; \pi\)</span> selects the lowest <span class="math inline">\(\pi\)</span>-fraction of the <em>mixture</em> distribution, which is <strong>not</strong> the same as the ancestral label <span class="math inline">\(z = 1\)</span> when the components overlap — both Gaussians have full support, so each contributes on both sides of any quantile. (In the well-separated limit <span class="math inline">\(\sigma \to 0\)</span> the two events do coincide, and the <em>packed</em> map below is the construction in which <span class="math inline">\(u &lt; \pi\)</span> genuinely encodes the coin.) Randomness in, structure out, everything in between deterministic.</p>
+<section id="a-solved-gaussian-example" class="level2">
+<h2 class="anchored" data-anchor-id="a-solved-gaussian-example">5. A solved Gaussian example</h2>
+<p>Take independent <span class="math inline">\(X_0\sim\mathcal N(\mu,V)\)</span> and <span class="math inline">\(X_1\sim\mathcal N(0,1)\)</span>, with <span class="math inline">\(V&gt;0\)</span>. Straight interpolation gives</p>
+<p><span class="math display">\[p_t=\mathcal N(m_t^{\mathrm{path}},V_t),\qquad
+m_t^{\mathrm{path}}=(1-t)\mu,\quad
+V_t=(1-t)^2V+t^2.\]</span></p>
+<p>Here <span class="math inline">\(m_t^{\mathrm{path}}\)</span> is the marginal mean, distinct from the posterior denoiser <span class="math inline">\(m_t(x)\)</span>. The marginal velocity is</p>
+<p><span class="math display">\[\boxed{v_*(x,t)=-\mu+
+\frac{t-(1-t)V}{V_t}[x-(1-t)\mu].}\]</span></p>
+<p>To verify it, keep a fixed <span class="math inline">\(Z\sim\mathcal N(0,1)\)</span> and define <span class="math inline">\(x_t=(1-t)\mu+\sqrt{V_t}Z\)</span>. Differentiation produces the displayed field because <span class="math inline">\(V_t'/2=t-(1-t)V\)</span>. Backward transport maps <span class="math inline">\(x_1=Z\)</span> to <span class="math inline">\(x_0=\mu+\sqrt VZ\)</span>.</p>
+<p>Even when <span class="math inline">\(\mu=0,V=1\)</span>, the interpolation variance falls to <span class="math inline">\(1/2\)</span> at <span class="math inline">\(t=1/2\)</span> and then rises to one. Equal endpoint distributions do not imply a stationary chosen path. This is another reason to assess the whole path rather than endpoint similarity alone.</p>
 </section>
-<section id="the-two-point-limit" class="level2">
-<h2 class="anchored" data-anchor-id="the-two-point-limit">The two-point limit</h2>
-<p>Send <span class="math inline">\(\sigma \to 0\)</span> with <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>. The CDF collapses to a staircase: a jump of height <span class="math inline">\(\pi\)</span> at <span class="math inline">\(-1\)</span>, a flat <strong>plateau</strong> at height <span class="math inline">\(\pi\)</span> across the empty middle, a jump to <span class="math inline">\(1\)</span> at <span class="math inline">\(+1\)</span>. The map becomes</p>
-<p><span class="math display">\[
-x = \begin{cases} -1, &amp; u &lt; \pi \\ +1, &amp; u &gt; \pi \end{cases}
-\qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
-\]</span></p>
-<p>W01’s dataset, generated by thresholding a uniform (almost surely: the single point <span class="math inline">\(u = \pi\)</span> has probability zero). The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a> proves this limit. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
+<section id="minimal-training-and-backward-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="minimal-training-and-backward-sampling">6. Minimal training and backward sampling</h2>
+<p>For a scalar network <code>velocity(x, t)</code> and a tensor <code>training_data</code>, the following is the training core. A vector model uses matching vector-shaped noise and averages squared coordinate errors.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># velocity is a time-conditioned neural network; optimizer updates its parameters.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> update <span class="kw">in</span> <span class="bu">range</span>(updates):</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    indices <span class="op">=</span> torch.randint(<span class="bu">len</span>(training_data), (batch_size,))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    x0 <span class="op">=</span> training_data[indices]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    x1 <span class="op">=</span> torch.randn_like(x0)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> torch.rand(<span class="bu">len</span>(x0), device<span class="op">=</span>x0.device)  <span class="co"># One time per example.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    t_broadcast <span class="op">=</span> t.view(<span class="op">-</span><span class="dv">1</span>, <span class="op">*</span>([<span class="dv">1</span>] <span class="op">*</span> (x0.ndim <span class="op">-</span> <span class="dv">1</span>)))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    xt <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> t_broadcast) <span class="op">*</span> x0 <span class="op">+</span> t_broadcast <span class="op">*</span> x1</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    target <span class="op">=</span> x1 <span class="op">-</span> x0</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    loss <span class="op">=</span> (velocity(xt, t) <span class="op">-</span> target).square().mean()</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    optimizer.zero_grad(set_to_none<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    loss.backward()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    optimizer.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Generation uses decreasing time and the same velocity convention:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="at">@torch.no_grad</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sample_flow(velocity, count<span class="op">=</span><span class="dv">1000</span>, steps<span class="op">=</span><span class="dv">1000</span>):</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    was_training <span class="op">=</span> velocity.training</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    velocity.<span class="bu">eval</span>()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> torch.randn(count)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    times <span class="op">=</span> torch.linspace(<span class="fl">1.0</span>, <span class="fl">0.0</span>, steps <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t, next_t <span class="kw">in</span> <span class="bu">zip</span>(times[:<span class="op">-</span><span class="dv">1</span>], times[<span class="dv">1</span>:]):</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        h <span class="op">=</span> t <span class="op">-</span> next_t</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x <span class="op">-</span> h <span class="op">*</span> velocity(x, torch.full_like(x, <span class="bu">float</span>(t)))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    velocity.train(was_training)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The scalar network takes position and time tensors of shape <code>(batch,)</code>, as does Part 06; a vector network must accept vector positions and one scalar time per example. These are CPU scalar sampling snippets, not a complete trained experiment. Near-endpoint network extrapolation and integration error still require checking; a finite dataset has an atomic empirical endpoint, while the desired population may be continuous. Compare held-out moments, mode mass, CDFs, and exact-field references where available, as in Part 06. A network trained with flow matching is not automatically accurate enough for one Euler step.</p>
 </section>
-<section id="maps-are-not-unique" class="level2">
-<h2 class="anchored" data-anchor-id="maps-are-not-unique">Maps are not unique</h2>
-<p><span class="math inline">\(F^{-1}\)</span> is the <em>monotone</em> map pushing <span class="math inline">\(\text{Uniform}(0,1)\)</span> to <span class="math inline">\(p\)</span>, but not the only map. The “packed” two-stage construction</p>
-<p><span class="math display">\[
-x = \begin{cases}
-\mu_1 + \sigma\, \Phi^{-1}\!\big(u/\pi\big), &amp; u &lt; \pi,\\[2pt]
-\mu_2 + \sigma\, \Phi^{-1}\!\big(\tfrac{u-\pi}{1-\pi}\big), &amp; u \ge \pi,
-\end{cases}
-\]</span></p>
-<p>also pushes uniform to the mixture (each branch rescales its segment of <span class="math inline">\([0,1]\)</span> back to a full uniform — Exercise 3), and it is <em>literally</em> ancestral sampling written as one formula. Different map, same distribution: what is canonical is the <em>distribution</em>, not the transport. (In higher dimensions, choosing among the many maps is its own subject — optimal transport — which we will brush against later.)</p>
-</section>
-<section id="the-claim-that-organizes-everything" class="level2">
-<h2 class="anchored" data-anchor-id="the-claim-that-organizes-everything">The claim that organizes everything</h2>
-<blockquote class="blockquote">
-<p><strong>Once all of its random draws are exposed, a generative sampler is a deterministic map from base randomness to a sample.</strong></p>
-</blockquote>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 18%">
-<col style="width: 24%">
-<col style="width: 32%">
-<col style="width: 26%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Model</th>
-<th>Random input(s)</th>
-<th>Sampling mechanism</th>
-<th>Typical fitting</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>This note</td>
-<td><span class="math inline">\(u \sim \text{U}(0,1)\)</span></td>
-<td>quantile <span class="math inline">\(F^{-1}(u)\)</span> (numerical in the demo)</td>
-<td>the CDF is known</td>
-</tr>
-<tr class="even">
-<td>GAN</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td><span class="math inline">\(G_\theta(z)\)</span>, a network</td>
-<td>adversarial objective</td>
-</tr>
-<tr class="odd">
-<td>VAE</td>
-<td><span class="math inline">\(z\)</span>, plus decoder noise <span class="math inline">\(\varepsilon\)</span></td>
-<td>sample <span class="math inline">\(p_\theta(x \mid z)\)</span>, i.e.&nbsp;<span class="math inline">\(T_\theta(z, \varepsilon)\)</span></td>
-<td>ELBO / variational learning</td>
-</tr>
-<tr class="even">
-<td>Normalizing flow</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td>invertible <span class="math inline">\(f_\theta(z)\)</span></td>
-<td>exact likelihood (change of variables)</td>
-</tr>
-<tr class="odd">
-<td><strong>Diffusion</strong></td>
-<td><span class="math inline">\(x_1 \sim \mathcal{N}\)</span>; step noise if stochastic</td>
-<td><strong>probability-flow ODE</strong> (deterministic) or reverse SDE</td>
-<td><strong>score/denoising objectives, ELBO</strong></td>
-</tr>
-</tbody>
-</table>
-<p>The outer skeleton is shared — simple randomness, a sampling mechanism, data — while the learned object, the structural constraints, and the sampler differ. For diffusion in particular, determinism is a <em>sampler choice</em>: the probability-flow ODE is a deterministic map from <span class="math inline">\(x_1\)</span>; the reverse SDE consumes fresh noise at every step and is a deterministic function only of <span class="math inline">\((x_1, \text{all step noises})\)</span>.</p>
-<p>In one dimension with a known CDF, the map is a formula. For images, the population law is unknown and no tractable multivariate inverse-CDF construction exists — so deep generative models learn a <em>transport, density, score, or other ingredient</em> of a sampler rather than writing the map down. And you have already run one: W01’s probability-flow ODE numerically transported a moment-matched Gaussian to within <span class="math inline">\(\approx \sigma_{\min}\)</span> of the two-point data (W01 lists the approximations involved); with the exact terminal law, score, and integration, it is an exact deterministic transport — an inverse-CDF-like map built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
-</section>
-<section id="exercises" class="level2">
-<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
-<ol type="1">
-<li>Complete the inverse-CDF proof for a general (possibly non-strictly-increasing) <span class="math inline">\(F\)</span> using the generalized inverse.</li>
-<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above, and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x)\)</span> equals W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span> posterior (mind which component carries the <span class="math inline">\(+\)</span> sign); compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
-<li>Verify the packed map: show that conditional on <span class="math inline">\(u &lt; \pi\)</span>, the rescaled variable <span class="math inline">\(u/\pi\)</span> is <span class="math inline">\(\text{Uniform}(0,1)\)</span>, and conclude that the branch produces <span class="math inline">\(\mathcal{N}(\mu_1, \sigma^2)\)</span> with the correct probability.</li>
-<li>Construct the inverse-CDF map for a <strong>three</strong>-component mixture and describe its staircase limit as <span class="math inline">\(\sigma \to 0\)</span>. How many plateaus, at what heights?</li>
-<li>The map <span class="math inline">\(x = F^{-1}(u)\)</span> is monotone increasing. Exhibit a <em>decreasing</em> map with the same pushforward, and a map that is neither monotone nor continuous. (Hint: <span class="math inline">\(1 - u\)</span> is also uniform.)</li>
-</ol>
+<section id="appendix-a.-why-the-averaged-velocity-follows-the-marginal-path" class="level2">
+<h2 class="anchored" data-anchor-id="appendix-a.-why-the-averaged-velocity-follows-the-marginal-path">Appendix A. Why the averaged velocity follows the marginal path</h2>
+<p>Let <span class="math inline">\(\varphi\)</span> be a smooth compactly supported test function. Under integrability allowing differentiation inside the expectation,</p>
+<p><span class="math display">\[\begin{aligned}
+\frac{d}{dt}\mathbb E[\varphi(X_t)]
+&amp;=\mathbb E[\varphi'(X_t)(X_1-X_0)]\\
+&amp;=\mathbb E[\varphi'(X_t)\mathbb E[X_1-X_0\mid X_t,t]]\\
+&amp;=\int\varphi'(x)v_*(x,t)p_t(x)\,dx\\
+&amp;=-\int\varphi(x)\partial_x[p_t(x)v_*(x,t)]\,dx.
+\end{aligned}\]</span></p>
+<p>The left side is <span class="math inline">\(\int\varphi(x)\partial_tp_t(x)\,dx\)</span>. The equality before integration by parts is the weak continuity equation. The final derivative can be interpreted distributionally; when <span class="math inline">\(p_tv_*\)</span> and <span class="math inline">\(p_t\)</span> have the needed smoothness, it gives the usual differential form. Replace <span class="math inline">\(\varphi'\)</span> by <span class="math inline">\(\nabla\varphi\)</span> and the product by an inner product to obtain the vector result. This is the mechanism behind conditional flow matching: known conditional velocities determine a learnable marginal velocity. <a href="https://arxiv.org/abs/2210.02747">Lipman et al., conditional flow matching</a></p>
 
 
 </section>
@@ -1153,13 +1177,13 @@ x = \begin{cases}
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../assignments.html" class="pagination-link" aria-label="Assignments">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Assignments</span>
+      <a href="../tutorials/36-probability-flow-ode-part-7.html" class="pagination-link" aria-label="07 · Neural ODEs and normalizing flows">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">07 · Neural ODEs and normalizing flows</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/01-probability-101.html" class="pagination-link" aria-label="02 · Probability &amp; Random Variables">
-        <span class="nav-page-text">02 · Probability &amp; Random Variables</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../materials/w01-deck-01-mechanics.html" class="pagination-link" aria-label="01 · Course Mechanics">
+        <span class="nav-page-text">01 · Course Mechanics</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

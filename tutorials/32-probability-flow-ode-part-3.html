@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>14 · Probability-Flow ODE - Part 3 – ID-5-02 (TO)</title>
+<title>03 · Learning the score – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -152,7 +152,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/32-probability-flow-ode-part-3.html">14 · Probability-Flow ODE - Part 3</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/32-probability-flow-ode-part-3.html">03 · Learning the score</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -217,13 +217,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Lecture Notes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
@@ -290,53 +290,76 @@ window.Quarto = {
  <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Probability-Flow ODE</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12 · Probability-Flow ODE - Part 1</span></a>
+ <span class="menu-text">01 · Transport in one dimension</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/31-probability-flow-ode-part-2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">13 · Probability-Flow ODE - Part 2</span></a>
+ <span class="menu-text">02 · Higher-dimensional transport</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/32-probability-flow-ode-part-3.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">14 · Probability-Flow ODE - Part 3</span></a>
+ <span class="menu-text">03 · Learning the score</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/33-probability-flow-ode-part-4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">15 · Probability-Flow ODE - Part 4</span></a>
+ <span class="menu-text">04 · One-dimensional experiments</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/34-probability-flow-ode-part-5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">16 · Probability-Flow ODE - Part 5</span></a>
+ <span class="menu-text">05 · Image-model recipe</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/35-probability-flow-ode-part-6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">17 · Probability-Flow ODE - Part 6</span></a>
+ <span class="menu-text">06 · Train and sample a mixture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/36-probability-flow-ode-part-7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Neural ODEs and normalizing flows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/37-probability-flow-ode-part-8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Flow matching</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
  <span class="menu-text">Decks</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
@@ -395,13 +418,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
@@ -418,13 +441,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
  <span class="menu-text">Perspectives</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
@@ -477,13 +500,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
  <span class="menu-text">Draft</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/21-one-estimator-many-parameterizations.html" class="sidebar-item-text sidebar-link">
@@ -524,13 +547,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
  <span class="menu-text">Retired</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
@@ -578,15 +601,23 @@ window.Quarto = {
   <li><a href="#the-forward-process-and-its-sde" id="toc-the-forward-process-and-its-sde" class="nav-link" data-scroll-target="#the-forward-process-and-its-sde">The forward process and its SDE</a></li>
   <li><a href="#constant-rate-in-part-1-linear-rate-in-the-paper" id="toc-constant-rate-in-part-1-linear-rate-in-the-paper" class="nav-link" data-scroll-target="#constant-rate-in-part-1-linear-rate-in-the-paper">Constant rate in Part 1; linear rate in the paper</a></li>
   </ul></li>
-  <li><a href="#the-score-estimation-objective-song-et-al.s-eq.-7" id="toc-the-score-estimation-objective-song-et-al.s-eq.-7" class="nav-link" data-scroll-target="#the-score-estimation-objective-song-et-al.s-eq.-7">2. The score-estimation objective: Song et al.’s Eq. (7)</a>
+  <li><a href="#start-with-supervised-denoising" id="toc-start-with-supervised-denoising" class="nav-link" data-scroll-target="#start-with-supervised-denoising">2. Start with supervised denoising</a>
   <ul class="collapse">
-  <li><a href="#constructing-the-conditional-score-target" id="toc-constructing-the-conditional-score-target" class="nav-link" data-scroll-target="#constructing-the-conditional-score-target">Constructing the conditional-score target</a></li>
-  <li><a href="#the-practical-positive-time-version" id="toc-the-practical-positive-time-version" class="nav-link" data-scroll-target="#the-practical-positive-time-version">The practical, positive-time version</a></li>
+  <li><a href="#generate-joint-pairs-using-the-forward-process" id="toc-generate-joint-pairs-using-the-forward-process" class="nav-link" data-scroll-target="#generate-joint-pairs-using-the-forward-process">Generate joint pairs using the forward process</a></li>
+  <li><a href="#learn-the-clean-value-from-the-noisy-input" id="toc-learn-the-clean-value-from-the-noisy-input" class="nav-link" data-scroll-target="#learn-the-clean-value-from-the-noisy-input">Learn the clean value from the noisy input</a></li>
   </ul></li>
-  <li><a href="#why-conditional-targets-recover-the-marginal-score" id="toc-why-conditional-targets-recover-the-marginal-score" class="nav-link" data-scroll-target="#why-conditional-targets-recover-the-marginal-score">3. Why conditional targets recover the marginal score</a>
+  <li><a href="#from-the-posterior-mean-to-the-score-required-by-the-ode" id="toc-from-the-posterior-mean-to-the-score-required-by-the-ode" class="nav-link" data-scroll-target="#from-the-posterior-mean-to-the-score-required-by-the-ode">3. From the posterior mean to the score required by the ODE</a>
   <ul class="collapse">
+  <li><a href="#tweedies-identity-supplies-the-conversion" id="toc-tweedies-identity-supplies-the-conversion" class="nav-link" data-scroll-target="#tweedies-identity-supplies-the-conversion">Tweedie’s identity supplies the conversion</a></li>
+  <li><a href="#additive-noise-notation-for-the-examples" id="toc-additive-noise-notation-for-the-examples" class="nav-link" data-scroll-target="#additive-noise-notation-for-the-examples">Additive-noise notation for the examples</a></li>
+  <li><a href="#two-solved-denoising-examples" id="toc-two-solved-denoising-examples" class="nav-link" data-scroll-target="#two-solved-denoising-examples">Two solved denoising examples</a></li>
+  <li><a href="#conditional-score-supervision-is-a-transformed-clean-data-label" id="toc-conditional-score-supervision-is-a-transformed-clean-data-label" class="nav-link" data-scroll-target="#conditional-score-supervision-is-a-transformed-clean-data-label">Conditional-score supervision is a transformed clean-data label</a></li>
+  <li><a href="#song-et-al.s-eq.-7-training-with-conditional-score-labels" id="toc-song-et-al.s-eq.-7-training-with-conditional-score-labels" class="nav-link" data-scroll-target="#song-et-al.s-eq.-7-training-with-conditional-score-labels">Song et al.’s Eq. (7): training with conditional-score labels</a></li>
+  <li><a href="#the-practical-positive-time-version" id="toc-the-practical-positive-time-version" class="nav-link" data-scroll-target="#the-practical-positive-time-version">The practical, positive-time version</a></li>
+  <li><a href="#the-regression-decomposition" id="toc-the-regression-decomposition" class="nav-link" data-scroll-target="#the-regression-decomposition">The regression decomposition</a></li>
   <li><a href="#why-the-noisy-position-must-be-an-input" id="toc-why-the-noisy-position-must-be-an-input" class="nav-link" data-scroll-target="#why-the-noisy-position-must-be-an-input">Why the noisy position must be an input</a></li>
   <li><a href="#a-zero-conditional-score-label-can-have-a-nonzero-optimal-prediction" id="toc-a-zero-conditional-score-label-can-have-a-nonzero-optimal-prediction" class="nav-link" data-scroll-target="#a-zero-conditional-score-label-can-have-a-nonzero-optimal-prediction">A zero conditional-score label can have a nonzero optimal prediction</a></li>
+  <li><a href="#alternative-explanation-each-observed-data-point-is-a-mixture-component" id="toc-alternative-explanation-each-observed-data-point-is-a-mixture-component" class="nav-link" data-scroll-target="#alternative-explanation-each-observed-data-point-is-a-mixture-component">Alternative explanation: each observed data point is a mixture component</a></li>
   </ul></li>
   <li><a href="#noise-prediction-as-a-parameterization-of-the-marginal-score" id="toc-noise-prediction-as-a-parameterization-of-the-marginal-score" class="nav-link" data-scroll-target="#noise-prediction-as-a-parameterization-of-the-marginal-score">4. Noise prediction as a parameterization of the marginal score</a>
   <ul class="collapse">
@@ -596,13 +627,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#pytorch-implementation" id="toc-pytorch-implementation" class="nav-link" data-scroll-target="#pytorch-implementation">PyTorch implementation</a></li>
   </ul></li>
-  <li><a href="#tweedies-formula-the-posterior-mean-denoiser" id="toc-tweedies-formula-the-posterior-mean-denoiser" class="nav-link" data-scroll-target="#tweedies-formula-the-posterior-mean-denoiser">6. Tweedie’s formula: the posterior mean denoiser</a></li>
-  <li><a href="#two-solved-denoising-examples" id="toc-two-solved-denoising-examples" class="nav-link" data-scroll-target="#two-solved-denoising-examples">7. Two solved denoising examples</a>
-  <ul class="collapse">
-  <li><a href="#a-gaussian-prior" id="toc-a-gaussian-prior" class="nav-link" data-scroll-target="#a-gaussian-prior">A Gaussian prior</a></li>
-  <li><a href="#two-equally-likely-clean-values" id="toc-two-equally-likely-clean-values" class="nav-link" data-scroll-target="#two-equally-likely-clean-values">Two equally likely clean values</a></li>
-  </ul></li>
-  <li><a href="#using-the-trained-model-for-generation" id="toc-using-the-trained-model-for-generation" class="nav-link" data-scroll-target="#using-the-trained-model-for-generation">8. Using the trained model for generation</a>
+  <li><a href="#using-the-trained-model-for-generation" id="toc-using-the-trained-model-for-generation" class="nav-link" data-scroll-target="#using-the-trained-model-for-generation">6. Using the trained model for generation</a>
   <ul class="collapse">
   <li><a href="#euler-sampler-using-the-schedule-and-network-from-section-5" id="toc-euler-sampler-using-the-schedule-and-network-from-section-5" class="nav-link" data-scroll-target="#euler-sampler-using-the-schedule-and-network-from-section-5">Euler sampler using the schedule and network from Section 5</a></li>
   <li><a href="#run-training-and-generation-end-to-end" id="toc-run-training-and-generation-end-to-end" class="nav-link" data-scroll-target="#run-training-and-generation-end-to-end">Run training and generation end to end</a></li>
@@ -616,15 +641,24 @@ window.Quarto = {
   <li><a href="#why-the-accumulated-amplitude-is-determined-by-the-rate" id="toc-why-the-accumulated-amplitude-is-determined-by-the-rate" class="nav-link" data-scroll-target="#why-the-accumulated-amplitude-is-determined-by-the-rate">Why the accumulated amplitude is determined by the rate</a></li>
   <li><a href="#checking-the-conditional-law-directly-from-the-sde" id="toc-checking-the-conditional-law-directly-from-the-sde" class="nav-link" data-scroll-target="#checking-the-conditional-law-directly-from-the-sde">Checking the conditional law directly from the SDE</a></li>
   </ul></li>
+  <li><a href="#sec-mixture-score-proof" id="toc-sec-mixture-score-proof" class="nav-link" data-scroll-target="#sec-mixture-score-proof">Appendix D. An alternative proof using mixture components</a>
+  <ul class="collapse">
+  <li><a href="#d.1.-a-finite-dataset-becomes-a-gaussian-mixture-after-corruption" id="toc-d.1.-a-finite-dataset-becomes-a-gaussian-mixture-after-corruption" class="nav-link" data-scroll-target="#d.1.-a-finite-dataset-becomes-a-gaussian-mixture-after-corruption">D.1. A finite dataset becomes a Gaussian mixture after corruption</a></li>
+  <li><a href="#d.2.-differentiate-the-mixture-and-identify-the-weights" id="toc-d.2.-differentiate-the-mixture-and-identify-the-weights" class="nav-link" data-scroll-target="#d.2.-differentiate-the-mixture-and-identify-the-weights">D.2. Differentiate the mixture and identify the weights</a></li>
+  <li><a href="#d.3.-the-posterior-mean-and-tweedies-formula" id="toc-d.3.-the-posterior-mean-and-tweedies-formula" class="nav-link" data-scroll-target="#d.3.-the-posterior-mean-and-tweedies-formula">D.3. The posterior mean and Tweedie’s formula</a></li>
+  <li><a href="#d.4.-a-zero-conditional-score-and-a-nonzero-marginal-score" id="toc-d.4.-a-zero-conditional-score-and-a-nonzero-marginal-score" class="nav-link" data-scroll-target="#d.4.-a-zero-conditional-score-and-a-nonzero-marginal-score">D.4. A zero conditional score and a nonzero marginal score</a></li>
+  <li><a href="#d.5.-from-a-finite-mixture-to-an-arbitrary-population" id="toc-d.5.-from-a-finite-mixture-to-an-arbitrary-population" class="nav-link" data-scroll-target="#d.5.-from-a-finite-mixture-to-an-arbitrary-population">D.5. From a finite mixture to an arbitrary population</a></li>
+  <li><a href="#d.6.-local-density-information-and-trajectory-history" id="toc-d.6.-local-density-information-and-trajectory-history" class="nav-link" data-scroll-target="#d.6.-local-density-information-and-trajectory-history">D.6. Local density information and trajectory history</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/32-probability-flow-ode-part-3.html">14 · Probability-Flow ODE - Part 3</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/32-probability-flow-ode-part-3.html">03 · Learning the score</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">14 · Probability-Flow ODE - Part 3</h1>
+<h1 class="title">03 · Learning the score</h1>
 </div>
 
 
@@ -651,7 +685,7 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>These lecture notes are in development and may be revised. <a href="../tutorials/07-probability-flow-ode.html">Part 1</a> established that a score and the forward schedule determine a sampling vector field; <a href="../tutorials/31-probability-flow-ode-part-2.html">Part 2</a> extended the construction to vectors. We now construct training targets from clean data and Gaussian noise. We first use scalars to make the conditional expectations explicit, then state the vector formulas.</p>
+<p>These lecture notes are in development and may be revised. <a href="../tutorials/07-probability-flow-ode.html">Part 1</a> established that a score and the forward schedule determine a sampling vector field; <a href="../tutorials/31-probability-flow-ode-part-2.html">Part 2</a> extended the construction to vectors. We begin with supervised denoising: predict a clean input from its noisy version. Squared-error regression learns the posterior mean, which supplies the score through Tweedie’s formula. We first use scalars to make the conditional expectations explicit, then state the vector formulas.</p>
 </div>
 </div>
 <div class="callout callout-style-simple callout-note callout-titled">
@@ -664,8 +698,8 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The primary reference is <a href="https://arxiv.org/abs/2011.13456v2">Song et al., <em>Score-Based Generative Modeling through Stochastic Differential Equations</em>, ICLR 2021, arXiv:2011.13456v2</a>. Use Section 3.3, Eq. (7), for training; Section 4.3, Eq. (13), for the probability-flow ODE; and Appendix B, Eqs. (32)–(33), for the linear VP schedule and its Gaussian transition law. The paper’s reverse SDE is Eq. (6), a different sampling dynamics from Eq. (13).</p>
-<p><strong>Sampling is the goal.</strong> Choose one forward schedule, generate noisy training examples from it, fit a time-dependent score, and insert that score into the corresponding vector field. Explicit Euler integration with decreasing time then generates approximate data samples. Training and sampling must use the same schedule and time convention.</p>
+<p>The primary reference is <a href="https://arxiv.org/abs/2011.13456v2">Song et al., <em>Score-Based Generative Modeling through Stochastic Differential Equations</em>, ICLR 2021, arXiv:2011.13456v2</a>. Use Section 3.3, Eq. (7), for training; Section 4.3, Eq. (13), for the probability-flow ODE; and Appendix B for the linear VP schedule and its Gaussian transition law. The paper’s reverse SDE is Eq. (6), a different sampling dynamics from Eq. (13).</p>
+<p><strong>Sampling is the goal.</strong> The sampler needs a score to evaluate its vector field. To learn that score, first consider an ordinary supervised problem: generate clean/noisy pairs and predict the clean value from the noisy input. Squared-error regression learns the posterior mean clean value. Tweedie’s formula converts this mean into the marginal score. Conditional-score and noise prediction are alternative parameterizations of this learning problem, with different time weightings unless the losses are adjusted. Explicit Euler integration with decreasing time then generates approximate data samples. Training and sampling must use the same schedule and time convention.</p>
 </div>
 </div>
 <section id="the-forward-process-sde-and-noise-schedule" class="level2">
@@ -673,14 +707,10 @@ window.Quarto = {
 <p>Generation requires evaluating a vector field at the current sample and time. For VP diffusion, the probability-flow field in one dimension is</p>
 <p><span class="math display">\[v(x,t)=-\frac{\beta(t)}2[x+s_t(x)],\qquad
 s_t(x)=\frac{d}{dx}\log p_t(x).\]</span></p>
-<p>The schedule is chosen by us; the marginal score is unknown. Our dataset contains observations <span class="math inline">\(X_0\sim p_{\mathrm{data}}\)</span>, not values of <span class="math inline">\(p_t\)</span> or its derivative. We therefore need a regression problem that can be constructed from those observations and whose population solution is the score.</p>
+<p>The schedule is chosen by us; the marginal score is unknown. Our dataset contains observations <span class="math inline">\(X_0\sim p_{\mathrm{data}}\)</span>, not values of <span class="math inline">\(p_t\)</span> or its derivative. We can construct a denoising regression problem from those observations. We will first identify its posterior-mean solution, then show how it determines the required score.</p>
 <section id="the-forward-process-and-its-sde" class="level3">
 <h3 class="anchored" data-anchor-id="the-forward-process-and-its-sde">The forward process and its SDE</h3>
-<p>Choose a nonnegative rate schedule <span class="math inline">\(\beta(t)\)</span> on <span class="math inline">\(0\le t\le1\)</span>. It specifies how rapidly each forward step contracts the particle and adds noise. For a small step <span class="math inline">\(h&gt;0\)</span>, at time <span class="math inline">\(t_k=kh\)</span> use</p>
-<p><span class="math display">\[\boxed{X_{t_{k+1}}=\sqrt{1-\beta(t_k)h}\,X_{t_k}
-+\sqrt{\beta(t_k)h}\,\varepsilon_k,\qquad
-\varepsilon_k\sim\mathcal N(0,1),\quad \beta(t_k)h&lt;1.}\]</span></p>
-<p>The noise draws are independent across steps and independent of the current particle. The one-step noise variance is <span class="math inline">\(\beta(t_k)h\)</span>. As the step size tends to zero, this construction gives the VP SDE</p>
+<p>Choose a nonnegative rate schedule <span class="math inline">\(\beta(t)\)</span> on <span class="math inline">\(0\le t\le1\)</span>. The forward VP process contracts positions and adds Gaussian noise. Its SDE is</p>
 <p><span class="math display">\[\boxed{dX_t=-\frac{\beta(t)}2X_t\,dt+\sqrt{\beta(t)}\,dW_t.}\]</span></p>
 <p>Define the cumulative signal amplitude by</p>
 <p><span class="math display">\[\boxed{\alpha_t=\exp\!\left[-\frac12\int_0^t\beta(u)\,du\right],
@@ -732,7 +762,7 @@ s_t(x)=\frac{d}{dx}\log p_t(x).\]</span></p>
 </section>
 <section id="constant-rate-in-part-1-linear-rate-in-the-paper" class="level3">
 <h3 class="anchored" data-anchor-id="constant-rate-in-part-1-linear-rate-in-the-paper">Constant rate in Part 1; linear rate in the paper</h3>
-<p>The existing teaching notebooks use <span class="math inline">\(\beta(t)=8\)</span>, hence <span class="math inline">\(\alpha_t=e^{-4t}\)</span> and conditional variance <span class="math inline">\(1-e^{-8t}\)</span>. Their training code and ODE both use this constant rate. It is a valid VP example, not the paper’s experimental linear schedule.</p>
+<p>The earlier Part 4 notebooks (including <code>03-learn-a-score.ipynb</code>) use <span class="math inline">\(\beta(t)=8\)</span>, hence <span class="math inline">\(\alpha_t=e^{-4t}\)</span> and conditional variance <span class="math inline">\(1-e^{-8t}\)</span>. Their training code and ODE both use this constant rate. It is a valid VP example, not the paper’s experimental linear schedule.</p>
 <p>For the paper’s linear VP schedule on <span class="math inline">\([0,1]\)</span>, write its endpoint rates in our notation as</p>
 <p><span class="math display">\[\beta(t)=\beta_{\min}+t(\beta_{\max}-\beta_{\min}),\qquad
 \beta_{\min}=0.1,\quad\beta_{\max}=20.\]</span></p>
@@ -742,30 +772,175 @@ s_t(x)=\frac{d}{dx}\log p_t(x).\]</span></p>
 <p>The forward training example is therefore</p>
 <p><span class="math display">\[X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,\]</span></p>
 <p>and its sampling field uses <span class="math inline">\(\beta(t)=0.1+19.9t\)</span>, evaluated at the current solver time. Replacing this coefficient by 8 while keeping the linear-schedule training data would give the wrong field for the learned density path.</p>
-<p>For this linear schedule, <span class="math inline">\(\alpha_1=e^{-5.025}\approx0.00657\)</span>. The terminal law generally retains a small data contribution; it is not exactly standard normal. Increasing the number of Euler steps does not reduce that terminal-prior approximation. The constant-rate notebooks likewise retain <span class="math inline">\(\alpha_1=e^{-4}\)</span>.</p>
+<p>For this linear schedule, <span class="math inline">\(\alpha_1=e^{-5.025}\approx0.00657\)</span>. The terminal law generally retains a small data contribution; it is not exactly standard normal. Increasing the number of Euler steps does not reduce that terminal-prior approximation. The constant-rate notebooks likewise retain <span class="math inline">\(\alpha_1=e^{-4}\)</span>. Part 6 uses the linear schedule developed here, with <span class="math inline">\(t_{\min}=0.001\)</span>.</p>
+</section>
+</section>
+<section id="start-with-supervised-denoising" class="level2">
+<h2 class="anchored" data-anchor-id="start-with-supervised-denoising">2. Start with supervised denoising</h2>
+<section id="generate-joint-pairs-using-the-forward-process" class="level3">
+<h3 class="anchored" data-anchor-id="generate-joint-pairs-using-the-forward-process">Generate joint pairs using the forward process</h3>
+<p>Fix a positive time <span class="math inline">\(t\)</span> with <span class="math inline">\(0&lt;\alpha_t&lt;1\)</span>. Draw independently</p>
+<p><span class="math display">\[X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),\]</span></p>
+<p>and construct</p>
+<p><span class="math display">\[X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon.\]</span></p>
+<p>We now have a supervised pair: the noisy input <span class="math inline">\(X_t\)</span> and its clean label <span class="math inline">\(X_0\)</span>. We know the realized noise because we generated the pair, not because <span class="math inline">\(X_t\)</span> alone determines that noise.</p>
+<p>The forward construction samples the joint distribution</p>
+<p><span class="math display">\[p(x_0,x_t)=p_{\mathrm{data}}(x_0)\,p_t(x_t\mid x_0).\]</span></p>
+<p>We need not know this joint density analytically: clean samples and a known forward conditional are enough to sample pairs. With finite data, sampling clean observations uniformly uses the empirical data distribution. In that case, the optimal regression function below is the posterior mean under the empirical law, not exactly the population law; Appendix D makes this distinction explicit.</p>
+</section>
+<section id="learn-the-clean-value-from-the-noisy-input" class="level3">
+<h3 class="anchored" data-anchor-id="learn-the-clean-value-from-the-noisy-input">Learn the clean value from the noisy input</h3>
+<p>Give the network only <span class="math inline">\((X_t,t)\)</span> and ask it to predict <span class="math inline">\(X_0\)</span>. At this fixed time, the objective is</p>
+<p><span class="math display">\[\boxed{\mathcal L_{D,t}(\theta)=
+\mathbb E_{X_0\sim p_{\mathrm{data}},\,\varepsilon\sim\mathcal N(0,1)}
+\left[(D_\theta(X_t,t)-X_0)^2\right].}\]</span></p>
+<p>Assume the clean distribution has a finite second moment. By the law of total expectation, the same loss is</p>
+<p><span class="math display">\[\mathcal L_{D,t}(\theta)=\mathbb E_{X_t\sim p_t}
+\left[\mathbb E_{X_0\mid X_t}
+\left[(D_\theta(X_t,t)-X_0)^2\right]\right].\]</span></p>
+<p>At a fixed noisy input <span class="math inline">\(x\)</span>, let <span class="math inline">\(m_t(x)=\mathbb E_{X_0\mid X_t=x}[X_0]\)</span>. For any proposed output <span class="math inline">\(a\)</span>,</p>
+<p><span class="math display">\[\mathbb E_{X_0\mid X_t=x}[(a-X_0)^2]
+=(a-m_t(x))^2+\operatorname{Var}(X_0\mid X_t=x).\]</span></p>
+<p>Only the first term depends on <span class="math inline">\(a\)</span>. Thus the unrestricted optimal denoiser is</p>
+<p><span class="math display">\[\boxed{D_*(x,t)=m_t(x)=\mathbb E_{X_0\mid X_t=x}[X_0].}\]</span></p>
+<p>This is the <strong>posterior mean</strong>, not the full posterior distribution and not necessarily the historical clean input used in a particular pair. Different clean values with different noise draws can produce the same noisy observation.</p>
 <div class="callout callout-style-simple callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Relating a discrete forward step to the continuous rate
+<span class="screen-reader-only">Note</span>Forward-generated pairs support reverse-direction estimation
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>For <span class="math inline">\(0\le u&lt;t\le1\)</span>, the exact VP transition is</p>
-<p><span class="math display">\[X_t\mid X_u=x\sim\mathcal N\!\left(
-\frac{\alpha_t}{\alpha_u}x,\ 1-\frac{\alpha_t^2}{\alpha_u^2}\right).\]</span></p>
-<p>In discrete DDPM notation, a step’s noise variance <span class="math inline">\(\beta_i\)</span> is related to the continuous rate by</p>
-<p><span class="math display">\[\beta_i=1-\exp\!\left[-\int_{t_{i-1}}^{t_i}\beta(u)\,du\right]
-\approx\beta(t_{i-1})(t_i-t_{i-1}).\]</span></p>
-<p>Our <span class="math inline">\(\alpha_{t_i}\)</span> is the cumulative <strong>amplitude</strong> <span class="math inline">\(\sqrt{\prod_{j=1}^i(1-\beta_j)}\)</span>. It is not the one-step retention <span class="math inline">\(1-\beta_i\)</span>. One-step noise variance, accumulated noise variance, and continuous-time rate must not be interchanged.</p>
+<p>Before corruption, <span class="math inline">\(X_0\)</span> and <span class="math inline">\(\varepsilon\)</span> are independent. Given <span class="math inline">\(X_t=x\)</span>, they are linked by</p>
+<p><span class="math display">\[\varepsilon=\frac{x-\alpha_tX_0}{\sqrt{1-\alpha_t^2}}.\]</span></p>
+<p>Training uses samples from their joint construction. Squared-error regression on the noisy input has a posterior conditional mean as its optimum. We do not evaluate the posterior density, draw posterior samples, or average independently over clean values after fixing <span class="math inline">\(x\)</span>. Nor do we need repeated training observations with exactly the same noisy value: a shared regression function is fitted across inputs.</p>
 </div>
 </div>
+<p>To train one network across time, additionally draw <span class="math inline">\(t\sim\operatorname{Uniform}[t_{\min},1]\)</span>, independently of <span class="math inline">\(X_0\)</span> and <span class="math inline">\(\varepsilon\)</span>, and minimize</p>
+<p><span class="math display">\[\mathcal L_D(\theta)=\mathbb E_{t,X_0,\varepsilon}
+[(D_\theta(X_t,t)-X_0)^2].\]</span></p>
+<p>The expectation uses exactly those three independent draws before forming <span class="math inline">\(X_t\)</span>. At the unrestricted optimum, the network gives the posterior mean at each trained time. Finite data, restricted networks, and optimization introduce approximation error.</p>
 </section>
 </section>
-<section id="the-score-estimation-objective-song-et-al.s-eq.-7" class="level2">
-<h2 class="anchored" data-anchor-id="the-score-estimation-objective-song-et-al.s-eq.-7">2. The score-estimation objective: Song et al.’s Eq. (7)</h2>
+<section id="from-the-posterior-mean-to-the-score-required-by-the-ode" class="level2">
+<h2 class="anchored" data-anchor-id="from-the-posterior-mean-to-the-score-required-by-the-ode">3. From the posterior mean to the score required by the ODE</h2>
+<section id="tweedies-identity-supplies-the-conversion" class="level3">
+<h3 class="anchored" data-anchor-id="tweedies-identity-supplies-the-conversion">Tweedie’s identity supplies the conversion</h3>
+<p>The denoiser answers a natural estimation question. We now connect its solution to the quantity needed for sampling. Let <span class="math inline">\(p_{\mathrm{data}}(u)\)</span> denote the clean-data density. At fixed positive time, differentiate the noisy marginal:</p>
+<p><span class="math display">\[\begin{aligned}
+p_t(x)&amp;=\int p_t(x\mid u)\,p_{\mathrm{data}}(u)\,du,\\
+\partial_xp_t(x)
+&amp;=\int \frac{\alpha_tu-x}{1-\alpha_t^2}\,p_t(x\mid u)\,p_{\mathrm{data}}(u)\,du.
+\end{aligned}\]</span></p>
+<p>Here <span class="math inline">\(u\)</span> is a possible clean value; the noisy observation <span class="math inline">\(x\)</span> and time <span class="math inline">\(t\)</span> are held fixed. First divide by the noisy marginal density, which is positive at positive Gaussian noise:</p>
+<p><span class="math display">\[\begin{aligned}
+s_t(x)
+&amp;=\frac{\partial_xp_t(x)}{p_t(x)}\\
+&amp;=\int\frac{\alpha_tu-x}{1-\alpha_t^2}
+\frac{p_t(x\mid u)}{p_t(x)}\,p_{\mathrm{data}}(u)\,du.
+\end{aligned}\]</span></p>
+<p>Bayes’ rule identifies the weighting explicitly:</p>
+<p><span class="math display">\[\boxed{p(u\mid X_t=x)
+=\frac{p_t(x\mid u)\,p_{\mathrm{data}}(u)}{p_t(x)},
+\qquad
+p_t(x)=\int p_t(x\mid u)\,p_{\mathrm{data}}(u)\,du.}\]</span></p>
+<p>The numerator weights each possible clean value by its prior density and the likelihood of the observed noisy value. The denominator normalizes those weights. Substituting into the score integral gives</p>
+<p><span class="math display">\[\begin{aligned}
+s_t(x)
+&amp;=\int\frac{\alpha_tu-x}{1-\alpha_t^2}
+\underbrace{\frac{p_t(x\mid u)p_{\mathrm{data}}(u)}{p_t(x)}}_{p(u\mid X_t=x)}\,du\\
+&amp;=\frac{1}{1-\alpha_t^2}
+\left[\alpha_t\int u\,p(u\mid X_t=x)\,du
+-x\int p(u\mid X_t=x)\,du\right]\\
+&amp;=\frac{1}{1-\alpha_t^2}
+\left[\alpha_t\,\mathbb E_{X_0\mid X_t=x}[X_0]-x\cdot1\right].
+\end{aligned}\]</span></p>
+<p>The first integral is the definition of the posterior mean; the second equals one because the posterior is a probability density. We can take <span class="math inline">\(x\)</span> outside the integral because it is the fixed observation, not the integration variable.</p>
+<p>For discrete or empirical clean data, replace the integrals by sums, as shown in Appendix D. Thus</p>
+<p><span class="math display">\[\boxed{s_t(x)=\partial_x\log p_t(x)
+=\frac{\alpha_t\mathbb E_{X_0\mid X_t=x}[X_0]-x}{1-\alpha_t^2}
+=\frac{\alpha_tD_*(x,t)-x}{1-\alpha_t^2}.}\]</span></p>
+<p>This is the VP form of Tweedie’s formula. The score is a scaled displacement involving the posterior mean; it is not itself that mean. Appendix A gives the standalone additive-noise derivation, and Appendix D gives an alternative proof using mixture components.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Interpretation: possible clean origins of a noisy observation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Fix the observed noisy position <span class="math inline">\(X_t=x\)</span>. Different clean values <span class="math inline">\(x_0\)</span>, combined with different noise realizations, could have produced this observation. For each candidate clean value, the required noise is</p>
+<p><span class="math display">\[\varepsilon=\frac{x-\alpha_tx_0}{\sqrt{1-\alpha_t^2}}.\]</span></p>
+<p>We weight these possible clean origins by their posterior probabilities: a candidate is more plausible when it is supported by the clean-data distribution and the required noise is plausible. The weights are proportional to <span class="math inline">\(p_{\mathrm{data}}(x_0)p_t(x\mid x_0)\)</span>, not equal across candidates.</p>
+<p>Their weighted mean is <span class="math inline">\(m_t(x)=\mathbb E[X_0\mid X_t=x]\)</span>. The score is the corresponding average conditional-score displacement:</p>
+<p><span class="math display">\[\boxed{s_t(x)=\mathbb E_{X_0\mid X_t=x}
+\left[\frac{\alpha_tX_0-x}{1-\alpha_t^2}\right]
+=\frac{\alpha_tm_t(x)-x}{1-\alpha_t^2}.}\]</span></p>
+<p>Thus the posterior mean of the possible clean origins <strong>determines</strong> the marginal score; the score is not the mean itself. The clean origins are scaled by <span class="math inline">\(\alpha_t\)</span> before subtracting the noisy position, and the displacement is divided by the noise variance.</p>
+<p>Forward-generated training pairs supply conditional-score labels <span class="math inline">\((\alpha_tX_0-X_t)/(1-\alpha_t^2)\)</span>, denoted <span class="math inline">\(U\)</span> below. Squared-error regression with <span class="math inline">\((X_t,t)\)</span> as input learns this posterior-weighted average at its unrestricted population optimum, without explicitly evaluating the posterior.</p>
+<p>These are possible origins under stochastic corruption, not terminal points of deterministic backward ODE trajectories. The probability-flow ODE uses the resulting score to transport the whole density; it need not recover the historical clean origin of an individual noisy observation. The local score reflects the originating distribution, but the sampler needs only the current position and time, not a stored trajectory. Appendix D.6 develops this distinction.</p>
+</div>
+</div>
+<p>A fitted denoiser therefore defines the estimates</p>
+<p><span class="math display">\[s_\theta(x,t)=\frac{\alpha_tD_\theta(x,t)-x}{1-\alpha_t^2},
+\qquad
+v_\theta(x,t)=-\frac{\beta(t)}2[x+s_\theta(x,t)].\]</span></p>
+<p>The second formula is precisely the probability-flow field from Part 1. Generating samples requires integrating this field backward from the terminal distribution. Applying <span class="math inline">\(D_\theta\)</span> once is not generally a sampling procedure: posterior means need not have the clean-data distribution.</p>
+</section>
+<section id="additive-noise-notation-for-the-examples" class="level3">
+<h3 class="anchored" data-anchor-id="additive-noise-notation-for-the-examples">Additive-noise notation for the examples</h3>
+<p>For the first example, use <span class="math inline">\(Y=X+\sigma\varepsilon\)</span> with independent <span class="math inline">\(X\sim p_X\)</span>, <span class="math inline">\(\varepsilon\sim\mathcal N(0,1)\)</span>, and <span class="math inline">\(\sigma&gt;0\)</span>. The same posterior-mean identity becomes</p>
+<p><span class="math display">\[D_*(y)=\mathbb E_{X\mid Y=y}[X]
+=y+\sigma^2\partial_y\log p_Y(y).\]</span></p>
+<p>Appendix A gives its standalone derivation. The second example uses the VP notation developed above.</p>
+</section>
+<section id="two-solved-denoising-examples" class="level3">
+<h3 class="anchored" data-anchor-id="two-solved-denoising-examples">Two solved denoising examples</h3>
+<section id="a-gaussian-prior" class="level4">
+<h4 class="anchored" data-anchor-id="a-gaussian-prior">A Gaussian prior</h4>
+<p>Let <span class="math inline">\(X\sim\mathcal N(\mu,V)\)</span> and <span class="math inline">\(Y=X+\sigma \varepsilon\)</span>. Then</p>
+<p><span class="math display">\[p_Y=\mathcal N(\mu,V+\sigma^2),\qquad
+\frac{d}{dy}\log p_Y(y)=-\frac{y-\mu}{V+\sigma^2}.\]</span></p>
+<p>Tweedie’s formula gives</p>
+<p><span class="math display">\[\mathbb E_{X\mid Y=y}[X]
+=\mu+\frac{V}{V+\sigma^2}(y-\mu).\]</span></p>
+<p>At small noise, the posterior mean stays close to <span class="math inline">\(y\)</span>. At large noise, it stays close to the prior mean. The posterior variance is <span class="math inline">\(V\sigma^2/(V+\sigma^2)\)</span>; the mean alone does not represent this remaining uncertainty.</p>
+</section>
+<section id="two-equally-likely-clean-values" class="level4">
+<h4 class="anchored" data-anchor-id="two-equally-likely-clean-values">Two equally likely clean values</h4>
+<p>Let <span class="math inline">\(P(X_0=1)=P(X_0=-1)=1/2\)</span>. At a positive diffusion time, Bayes’ rule gives posterior log odds</p>
+<p><span class="math display">\[\log\frac{P(X_0=1\mid X_t=x)}{P(X_0=-1\mid X_t=x)}
+=\frac{2\alpha_tx}{1-\alpha_t^2}.\]</span></p>
+<p>Consequently,</p>
+<p><span class="math display">\[\mathbb E_{X_0\mid X_t=x}[X_0]
+=\tanh\left(\frac{\alpha_tx}{1-\alpha_t^2}\right),\]</span></p>
+<p><span class="math display">\[s_t(x)=\frac{\alpha_t\tanh(\alpha_tx/(1-\alpha_t^2))-x}{1-\alpha_t^2}.\]</span></p>
+<p>At <span class="math inline">\(x=0\)</span>, the posterior mean is zero, although clean observations are only <span class="math inline">\(-1\)</span> or <span class="math inline">\(+1\)</span>. A posterior sample is one of those two values. This is why a single posterior-mean denoising operation generally does not generate the clean-data distribution.</p>
+<p>For each fixed nonzero <span class="math inline">\(x\)</span>, the posterior mean tends to <span class="math inline">\(\operatorname{sign}(x)\)</span> as noise vanishes. At <span class="math inline">\(x=0\)</span>, it remains zero by symmetry. This discrete clean distribution also illustrates why smooth invertible flow statements are made at positive noise or under appropriate endpoint regularity.</p>
+</section>
+</section>
+<section id="conditional-score-supervision-is-a-transformed-clean-data-label" class="level3">
+<h3 class="anchored" data-anchor-id="conditional-score-supervision-is-a-transformed-clean-data-label">Conditional-score supervision is a transformed clean-data label</h3>
+<p>For a forward-generated pair, define</p>
+<p><span class="math display">\[U=\frac{\alpha_tX_0-X_t}{1-\alpha_t^2}
+=\partial_{X_t}\log p_t(X_t\mid X_0).\]</span></p>
+<p>At fixed input <span class="math inline">\(X_t=x\)</span>, this label is an affine transformation of <span class="math inline">\(X_0\)</span>. Its squared-error-optimal prediction is therefore the same transformation of the posterior mean:</p>
+<p><span class="math display">\[\boxed{\mathbb E_{U\mid X_t=x}[U]
+=\frac{\alpha_tD_*(x,t)-x}{1-\alpha_t^2}=s_t(x).}\]</span></p>
+<p>This explains why we can supervise with a <strong>conditional score</strong> while predicting the <strong>marginal score</strong>. The known forward conditional provides the training label; regression on the noisy input performs the reverse-direction averaging.</p>
+<p>For predictions related by the denoiser-to-score conversion, the samplewise errors obey</p>
+<p><span class="math display">\[(s_\theta(X_t,t)-U)^2
+=\frac{\alpha_t^2}{(1-\alpha_t^2)^2}
+(D_\theta(X_t,t)-X_0)^2.\]</span></p>
+<p>At a fixed positive time this is a positive rescaling of the denoising loss. Across time it changes the weighting, so unweighted clean-data and score losses need not train a finite network identically. We can now interpret the paper’s objective as regression with these transformed labels.</p>
+</section>
+<section id="song-et-al.s-eq.-7-training-with-conditional-score-labels" class="level3">
+<h3 class="anchored" data-anchor-id="song-et-al.s-eq.-7-training-with-conditional-score-labels">Song et al.’s Eq. (7): training with conditional-score labels</h3>
 <p>With the paper’s terminal time normalized to 1, its population objective is</p>
 <p><span class="math display">\[\begin{aligned}
 \mathcal J_s^{\mathrm{paper}}(\theta)
@@ -782,21 +957,11 @@ s_t(x)=\frac{d}{dx}\log p_t(x).\]</span></p>
 <li>Draw a clean observation <span class="math inline">\(X_0\)</span> from <span class="math inline">\(p_{\mathrm{data}}\)</span>.</li>
 <li>Holding that time and clean observation fixed, draw <span class="math inline">\(X_t\)</span> from <span class="math inline">\(p_{0t}(\cdot\mid X_0)\)</span>.</li>
 </ol>
-<p>In particular, the innermost expectation is over the <strong>conditional forward distribution</strong>, not an independent draw from the marginal <span class="math inline">\(p_t\)</span>, and not the posterior <span class="math inline">\(p(X_0\mid X_t)\)</span>. The posterior appears in the regression identity in Section 3; the training pairs are drawn in the forward direction. With a finite dataset, the clean-data expectation is approximated by sampling observations from its empirical distribution.</p>
+<p>In particular, the innermost expectation is over the <strong>conditional forward distribution</strong>, not an independent draw from the marginal <span class="math inline">\(p_t\)</span>, and not the posterior <span class="math inline">\(p(X_0\mid X_t)\)</span>. The posterior characterizes the denoising solution in Section 2; the training pairs are drawn in the forward direction. With a finite dataset, the clean-data expectation is approximated by sampling observations from its empirical distribution.</p>
 <p>For VP diffusion,</p>
 <p><span class="math display">\[p_{0t}(\cdot\mid x_0)=\mathcal N(\alpha_t x_0,1-\alpha_t^2).\]</span></p>
 <p>Consequently, sampling independent <span class="math inline">\(\varepsilon\sim\mathcal N(0,1)\)</span> and forming <span class="math inline">\(X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\varepsilon\)</span> is exactly a reparameterization of that innermost conditional expectation. It is not a different training distribution.</p>
-<section id="constructing-the-conditional-score-target" class="level3">
-<h3 class="anchored" data-anchor-id="constructing-the-conditional-score-target">Constructing the conditional-score target</h3>
-<p>We can sample the exact conditional law at a selected time without simulating all intervening forward steps. For each minibatch, select a clean observation <span class="math inline">\(x_0\)</span>, a time <span class="math inline">\(t\)</span>, and independent standard-normal noise <span class="math inline">\(\varepsilon\)</span>. Construct</p>
-<p><span class="math display">\[x_t=\alpha_tx_0+\sqrt{1-\alpha_t^2}\,\varepsilon.\]</span></p>
-<p>The conditional Gaussian density is known, so its score is known:</p>
-<p><span class="math display">\[\frac{\partial}{\partial x}\log p_t(x\mid x_0)
-=-\frac{x-\alpha_tx_0}{1-\alpha_t^2}.\]</span></p>
-<p>At the generated observation, this becomes</p>
-<p><span class="math display">\[U=-\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}.\]</span></p>
-<p>The network sees <span class="math inline">\((x_t,t)\)</span> as input and <span class="math inline">\(U\)</span> as a target. It does not see <span class="math inline">\(x_0\)</span> as an input. Individual training targets are noisy: several <span class="math inline">\((x_0,\varepsilon)\)</span> pairs can produce similar <span class="math inline">\(x_t\)</span>.</p>
-<p><strong>Target and prediction represent different quantities.</strong> In direct score regression, the available label is the conditional score <span class="math inline">\(\partial_x\log p_t(x_t\mid x_0)\)</span> for a particular clean/noisy pair. The fitted function <span class="math inline">\(s_\theta(x_t,t)\)</span> estimates the marginal score <span class="math inline">\(\partial_x\log p_t(x_t)\)</span>. It can do so because squared-error regression averages labels conditional on the features <span class="math inline">\((x_t,t)\)</span>; it does not have to reproduce every individual label. Section 3 proves this statement.</p>
+<p>For the generated pair, the label defined above is <span class="math inline">\(U=-\varepsilon/\sqrt{1-\alpha_t^2}\)</span>. The network sees <span class="math inline">\((X_t,t)\)</span>, not the clean label <span class="math inline">\(X_0\)</span> as an input.</p>
 </section>
 <section id="the-practical-positive-time-version" class="level3">
 <h3 class="anchored" data-anchor-id="the-practical-positive-time-version">The practical, positive-time version</h3>
@@ -809,44 +974,21 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 <p>The resulting <strong>denoising score-matching</strong> loss is</p>
 <p><span class="math display">\[\boxed{\mathcal J_s(\theta)=\mathbb E_{t,X_0,\varepsilon}\left[
 \lambda(t)\left(s_\theta(X_t,t)+\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}\right)^2\right]}\]</span></p>
-<p>and we train by minimizing it over <span class="math inline">\(\theta\)</span>. Section 3 explains why it has the desired population solution <span class="math inline">\(s_\theta(x,t)=s_t(x)\)</span>, for positive weights on the times being trained and sufficient model capacity. Finite datasets, restricted networks, and optimization error make practical estimates approximate. This is the Gaussian reparameterization of <a href="https://arxiv.org/html/2011.13456v2#S3.E7">Song et al., Eq. (7)</a>, with the positive-time cutoff stated above.</p>
+<p>and we train by minimizing it over <span class="math inline">\(\theta\)</span>. The regression argument below explains why it has the desired population solution <span class="math inline">\(s_\theta(x,t)=s_t(x)\)</span>, for positive weights on the times being trained and sufficient model capacity. Finite datasets, restricted networks, and optimization error make practical estimates approximate. This is the Gaussian reparameterization of <a href="https://arxiv.org/html/2011.13456v2#S3.E7">Song et al., Eq. (7)</a>, with the positive-time cutoff stated above.</p>
 </section>
-</section>
-<section id="why-conditional-targets-recover-the-marginal-score" class="level2">
-<h2 class="anchored" data-anchor-id="why-conditional-targets-recover-the-marginal-score">3. Why conditional targets recover the marginal score</h2>
-<p>In the conditional expectations below, the time <span class="math inline">\(t\)</span> is fixed. The subscript states which conditional distribution is being averaged over: for example, <span class="math inline">\(\mathbb E_{X_0\mid X_t=x}[X_0]\)</span> averages possible clean values under the posterior distribution given the noisy observation. It does not average over <span class="math inline">\(x\)</span> or over time.</p>
-<p>The key identity is</p>
-<p><span class="math display">\[\boxed{s_t(x)=\mathbb E_{X_0\mid X_t=x}\left[
-\frac{\partial}{\partial x}\log p_t(x\mid X_0)\right]
-=-\frac{\mathbb E_{\varepsilon\mid X_t=x}[\varepsilon]}{\sqrt{1-\alpha_t^2}}.}\]</span></p>
-<p>To see why, differentiate the marginal mixture and divide by its density:</p>
-<p><span class="math display">\[\begin{aligned}
-\frac{p_t'(x)}{p_t(x)}
-&amp;=\int \frac{\partial_xp_t(x\mid x_0)}{p_t(x)}p_{\mathrm{data}}(x_0)\,dx_0\\
-&amp;=\int \partial_x\log p_t(x\mid x_0)\,p(x_0\mid X_t=x)\,dx_0.
-\end{aligned}\]</span></p>
-<p>The second line uses Bayes’ rule. The integral notation assumes a data density; an expectation with respect to the data distribution gives the same identity for discrete data after positive Gaussian corruption. Differentiation under the integral requires the usual integrability conditions.</p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>The unknown posterior is used in the proof, not in training
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The posterior <span class="math inline">\(p(x_0\mid X_t=x)\)</span> is generally unknown. Its appearance above does <strong>not</strong> give a directly computable formula for the marginal score. It identifies the function that we want regression to learn.</p>
-<p>Training uses forward samples: draw <span class="math inline">\(X_0\)</span> from the dataset, draw independent Gaussian noise, and construct <span class="math inline">\(X_t\)</span> and the known target <span class="math inline">\(U=-\varepsilon/\sqrt{1-\alpha_t^2}\)</span>. These pairs have the required joint distribution without evaluating its density or the posterior. A network minimizing squared prediction error learns the conditional average of <span class="math inline">\(U\)</span> given <span class="math inline">\((X_t,t)\)</span>; the identity above shows that this average is the marginal score.</p>
-<p>We therefore do not compute posterior probabilities or numerically integrate over <span class="math inline">\(p(x_0\mid X_t=x)\)</span>. Conditional expectation describes the population regression solution. A finite neural network fitted to finite data approximates it. In continuous space, training also does not require repeated observations with exactly the same noisy value: the shared regression function is fitted across noisy inputs.</p>
-</div>
-</div>
+<section id="the-regression-decomposition" class="level3">
+<h3 class="anchored" data-anchor-id="the-regression-decomposition">The regression decomposition</h3>
+<p>The posterior identity above can also be written in terms of noise:</p>
+<p><span class="math display">\[s_t(x)=\mathbb E_{X_0\mid X_t=x}[\partial_x\log p_t(x\mid X_0)]
+=-\frac{\mathbb E_{\varepsilon\mid X_t=x}[\varepsilon]}{\sqrt{1-\alpha_t^2}}.\]</span></p>
+<p>Time is fixed in these conditional expectations. The input <span class="math inline">\(x\)</span> is held fixed while compatible clean/noise pairs are averaged under their posterior law.</p>
 <p>Squared-error regression estimates the conditional mean of its target given the input. Here the input is <span class="math inline">\((X_t,t)\)</span>, the target is <span class="math inline">\(U\)</span>, and the identity above identifies that conditional mean with <span class="math inline">\(s_t(X_t)\)</span>. More explicitly, the loss decomposes as (see Appendix B for the conditional squared-error expansion)</p>
 <p><span class="math display">\[\mathcal J_s(\theta)
 =\mathbb E_{t,X_t}\left[\lambda(t)(s_\theta(X_t,t)-s_t(X_t))^2\right]
 +\mathbb E_{t,X_t}\left[\lambda(t)\operatorname{Var}(U\mid X_t,t)\right].\]</span></p>
 <p>Here <span class="math inline">\(\mathbb E_{t,X_t}\)</span> means first draw <span class="math inline">\(t\sim\operatorname{Uniform}[t_{\min},1]\)</span>, then <span class="math inline">\(X_t\sim p_t\)</span>. These two variables are generally dependent. Inside the conditional variance, <span class="math inline">\(X_t\)</span> and <span class="math inline">\(t\)</span> are held fixed and the remaining randomness is in <span class="math inline">\(U\)</span> (equivalently, the clean/noise pairs compatible with that observation).</p>
 <p>The second term does not depend on the network. Training against conditional targets minimizes the same parameter-dependent error as training against the unavailable marginal score.</p>
+</section>
 <section id="why-the-noisy-position-must-be-an-input" class="level3">
 <h3 class="anchored" data-anchor-id="why-the-noisy-position-must-be-an-input">Why the noisy position must be an input</h3>
 <p>Fix <span class="math inline">\(t\)</span> and a noisy input <span class="math inline">\(x\)</span>. If the predictor outputs a scalar <span class="math inline">\(a\)</span> there, its conditional risk is</p>
@@ -867,7 +1009,7 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 <h3 class="anchored" data-anchor-id="a-zero-conditional-score-label-can-have-a-nonzero-optimal-prediction">A zero conditional-score label can have a nonzero optimal prediction</h3>
 <p>Take <span class="math inline">\(X_0\sim\mathcal N(0,1)\)</span> and fix a positive time with <span class="math inline">\(\alpha_t=1/2\)</span>. Then</p>
 <p><span class="math display">\[X_t=\tfrac12X_0+\tfrac{\sqrt3}{2}\varepsilon,
-\qquad P_t=\mathcal N(0,1),\qquad s_t(x)=-x.\]</span></p>
+\qquad p_t(x)=\mathcal N(x;0,1),\qquad s_t(x)=-x.\]</span></p>
 <p>Consider the clean value <span class="math inline">\(x_0=2\)</span> and noisy value <span class="math inline">\(x_t=1\)</span>, corresponding to the noise value <span class="math inline">\(\varepsilon=0\)</span>. The conditional-score label for this pair is</p>
 <p><span class="math display">\[\left.\partial_x\log p_t(x\mid x_0=2)\right|_{x=1}
 =-\frac{1-\tfrac12(2)}{3/4}=0.\]</span></p>
@@ -880,6 +1022,11 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 =-\frac{1-\tfrac12(1/2)}{3/4}=-1.\]</span></p>
 <p>Thus zero is the label of one particular pair; <span class="math inline">\(-1\)</span> is the squared-error-optimal prediction using the available features. Exact point events have probability zero under continuous distributions; the example evaluates the score functions at a point. Nearby pairs have small conditional-score labels while their marginal scores remain close to <span class="math inline">\(-1\)</span>, so the distinction also holds on neighborhoods with positive probability.</p>
 <p>This does not say that an average of identically zero labels can be nonzero. Other clean values compatible with the same noisy observation have different labels. Also, because this example starts from standard normal, its VP probability-flow velocity is <span class="math inline">\(-\beta(t)[x+s_t(x)]/2=0\)</span>, even though its marginal score is nonzero away from the origin.</p>
+</section>
+<section id="alternative-explanation-each-observed-data-point-is-a-mixture-component" class="level3">
+<h3 class="anchored" data-anchor-id="alternative-explanation-each-observed-data-point-is-a-mixture-component">Alternative explanation: each observed data point is a mixture component</h3>
+<p>A finite dataset can be viewed as a mixture of point masses. Gaussian corruption turns it into a Gaussian mixture, with one component centered at each scaled observation. At a noisy input <span class="math inline">\(x\)</span>, the marginal score is the average of these component scores weighted by their posterior probabilities given <span class="math inline">\(x\)</span>. These input-dependent weights explain why one conditional-score label can be zero while the marginal-score prediction is not.</p>
+<p><a href="#sec-mixture-score-proof">Appendix D</a> develops this argument step by step: two clean points, a finite dataset, and an arbitrary population distribution. The same calculation gives Tweedie’s formula. It is an alternative explanation of the identity above, not an assumption that the clean population must be a finite Gaussian mixture.</p>
 </section>
 </section>
 <section id="noise-prediction-as-a-parameterization-of-the-marginal-score" class="level2">
@@ -905,11 +1052,16 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 </thead>
 <tbody>
 <tr class="odd">
+<td>Clean data</td>
+<td>Realized <span class="math inline">\(X_0\)</span></td>
+<td><span class="math inline">\(D_*(x,t)=\mathbb E[X_0\mid X_t=x,t]\)</span></td>
+</tr>
+<tr class="even">
 <td>Direct score</td>
 <td><span class="math inline">\(U=-\varepsilon/\sqrt{1-\alpha_t^2}\)</span>, the conditional score</td>
 <td><span class="math inline">\(\mathbb E[U\mid X_t=x,t]=s_t(x)\)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Noise</td>
 <td>Realized <span class="math inline">\(\varepsilon\)</span></td>
 <td><span class="math inline">\(\mathbb E[\varepsilon\mid X_t=x,t]=-\sqrt{1-\alpha_t^2}\,s_t(x)\)</span></td>
@@ -953,9 +1105,10 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 <li>Backpropagate this loss and update the parameters. Repeat with fresh times and noise.</li>
 <li>Evaluate on held-out observations; save the fitted parameters, schedule, and time range. At generation time, freeze the model and use <span class="math inline">\(s_\theta=-\varepsilon_\theta/\sqrt{1-\alpha_t^2}\)</span>.</li>
 </ol>
-<p>The network receives the noisy position and time, not the clean observation or the sampled noise. A minibatch average estimates the nested population expectation in Section 2; it is not an additional density-estimation step. No ODE solver is needed during this training procedure.</p>
+<p>The network receives the noisy position and time, not the clean observation or the sampled noise. A minibatch average estimates the noise-regression expectation in Section 4; it is not an additional density-estimation step. No ODE solver is needed during this training procedure.</p>
 <section id="pytorch-implementation" class="level3">
 <h3 class="anchored" data-anchor-id="pytorch-implementation">PyTorch implementation</h3>
+<p>This minimal network uses position and time directly. Part 6 adds fixed sinusoidal time features to the same inputs; these change the network representation, not the schedule or objective.</p>
 <p>The code below uses the paper’s linear VP schedule. Setting both endpoint rates to 8 recovers the teaching notebooks’ constant schedule. The data tensor has shape <code>[number_of_observations, 1]</code>; flattening images or vectors gives <code>[number_of_observations, data_dimension]</code>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1008,50 +1161,11 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 <span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()</span>
 <span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> model, history</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>For vectors, the Gaussian noise is <span class="math inline">\(\mathcal N(\mathbf0,I_d)\)</span> and the network predicts one noise component per data coordinate. The code averages over coordinates as well as observations; this differs from the squared Euclidean norm by the fixed factor <span class="math inline">\(1/d\)</span> and has the same minimizer. The vector score conversion is <span class="math inline">\(\mathbf s_\theta=-\boldsymbol\varepsilon_\theta/\sqrt{1-\alpha_t^2}\)</span>.</p>
-<p>The displayed cutoff <span class="math inline">\(10^{-3}\)</span> is a teaching choice; the existing notebook uses <span class="math inline">\(0.01\)</span>. Train and sample on compatible time ranges. In this code, <code>beta_min</code> and <code>beta_max</code> are globals read by both training and sampling; do not change them between those operations. Keep the schedule parameters with the saved model: changing the schedule after fitting changes the density associated with each time. An average noise loss need not approach zero because the noise is uncertain given <span class="math inline">\((X_t,t)\)</span>.</p>
-</section>
-</section>
-<section id="tweedies-formula-the-posterior-mean-denoiser" class="level2">
-<h2 class="anchored" data-anchor-id="tweedies-formula-the-posterior-mean-denoiser">6. Tweedie’s formula: the posterior mean denoiser</h2>
-<p>First consider the standalone additive-noise model</p>
-<p><span class="math display">\[Y=X+\sigma \varepsilon,\qquad \varepsilon\sim\mathcal N(0,1),\quad \sigma&gt;0.\]</span></p>
-<p>The denoising risk is <span class="math inline">\(\mathbb E_{X,\varepsilon}[(X-D(X+\sigma\varepsilon))^2]\)</span>, with independent <span class="math inline">\(X\sim p_X\)</span> and <span class="math inline">\(\varepsilon\sim\mathcal N(0,1)\)</span>. Among all functions <span class="math inline">\(D(y)\)</span>, its minimizer is</p>
-<p><span class="math display">\[D_*(y)=\mathbb E_{X\mid Y=y}[X].\]</span></p>
-<p>This conditional expectation averages <span class="math inline">\(X\)</span> under <span class="math inline">\(p(x\mid y)\)</span> with the observed <span class="math inline">\(y\)</span> held fixed. Tweedie’s formula expresses this optimal estimator through the noisy density:</p>
-<p><span class="math display">\[\boxed{D_*(y)=y+\sigma^2\frac{d}{dy}\log p_Y(y).}\]</span></p>
-<p>Equivalently, the score is the displacement from the observed value toward its posterior mean, divided by the noise variance. It describes the noisy <strong>marginal</strong> density, not the conditional likelihood for one particular clean observation. The complete Bayes-optimality argument and differentiation are in Appendix A.</p>
-<p>Apply this formula to <span class="math inline">\(Z=\alpha_tX_0\)</span>, with noise variance <span class="math inline">\(1-\alpha_t^2\)</span>:</p>
-<p><span class="math display">\[\boxed{\mathbb E_{X_0\mid X_t=x}[X_0]
-=\frac{x+(1-\alpha_t^2)s_t(x)}{\alpha_t}.}\]</span></p>
-<p>This also follows directly by taking conditional expectations in the forward corruption equation and using the noise–score identity. It connects the same three quantities: posterior mean clean data, conditional mean noise, and marginal score.</p>
-</section>
-<section id="two-solved-denoising-examples" class="level2">
-<h2 class="anchored" data-anchor-id="two-solved-denoising-examples">7. Two solved denoising examples</h2>
-<section id="a-gaussian-prior" class="level3">
-<h3 class="anchored" data-anchor-id="a-gaussian-prior">A Gaussian prior</h3>
-<p>Let <span class="math inline">\(X\sim\mathcal N(\mu,V)\)</span> and <span class="math inline">\(Y=X+\sigma \varepsilon\)</span>. Then</p>
-<p><span class="math display">\[p_Y=\mathcal N(\mu,V+\sigma^2),\qquad
-\frac{d}{dy}\log p_Y(y)=-\frac{y-\mu}{V+\sigma^2}.\]</span></p>
-<p>Tweedie’s formula gives</p>
-<p><span class="math display">\[\mathbb E_{X\mid Y=y}[X]
-=\mu+\frac{V}{V+\sigma^2}(y-\mu).\]</span></p>
-<p>At small noise, the posterior mean stays close to <span class="math inline">\(y\)</span>. At large noise, it stays close to the prior mean. The posterior variance is <span class="math inline">\(V\sigma^2/(V+\sigma^2)\)</span>; the mean alone does not represent this remaining uncertainty.</p>
-</section>
-<section id="two-equally-likely-clean-values" class="level3">
-<h3 class="anchored" data-anchor-id="two-equally-likely-clean-values">Two equally likely clean values</h3>
-<p>Let <span class="math inline">\(P(X_0=1)=P(X_0=-1)=1/2\)</span>. At a positive diffusion time, Bayes’ rule gives posterior log odds</p>
-<p><span class="math display">\[\log\frac{P(X_0=1\mid X_t=x)}{P(X_0=-1\mid X_t=x)}
-=\frac{2\alpha_tx}{1-\alpha_t^2}.\]</span></p>
-<p>Consequently,</p>
-<p><span class="math display">\[\mathbb E_{X_0\mid X_t=x}[X_0]
-=\tanh\left(\frac{\alpha_tx}{1-\alpha_t^2}\right),\]</span></p>
-<p><span class="math display">\[s_t(x)=\frac{\alpha_t\tanh(\alpha_tx/(1-\alpha_t^2))-x}{1-\alpha_t^2}.\]</span></p>
-<p>At <span class="math inline">\(x=0\)</span>, the posterior mean is zero, although clean observations are only <span class="math inline">\(-1\)</span> or <span class="math inline">\(+1\)</span>. A posterior sample is one of those two values. This is why a single posterior-mean denoising operation generally does not generate the clean-data distribution.</p>
-<p>For each fixed nonzero <span class="math inline">\(x\)</span>, the posterior mean tends to <span class="math inline">\(\operatorname{sign}(x)\)</span> as noise vanishes. At <span class="math inline">\(x=0\)</span>, it remains zero by symmetry. This discrete clean distribution also illustrates why smooth invertible flow statements are made at positive noise or under appropriate endpoint regularity.</p>
+<p>This code and Part 6 use cutoff <span class="math inline">\(10^{-3}\)</span>; the earlier Part 4 notebook <code>03-learn-a-score.ipynb</code> uses <span class="math inline">\(0.01\)</span>. Train and sample on compatible time ranges. In this code, <code>beta_min</code> and <code>beta_max</code> are globals read by both training and sampling; do not change them between those operations. Keep the schedule parameters with the saved model: changing the schedule after fitting changes the density associated with each time. An average noise loss need not approach zero because the noise is uncertain given <span class="math inline">\((X_t,t)\)</span>.</p>
 </section>
 </section>
 <section id="using-the-trained-model-for-generation" class="level2">
-<h2 class="anchored" data-anchor-id="using-the-trained-model-for-generation">8. Using the trained model for generation</h2>
+<h2 class="anchored" data-anchor-id="using-the-trained-model-for-generation">6. Using the trained model for generation</h2>
 <p>Freeze the network. At every solver evaluation, convert its output to a score and evaluate</p>
 <p><span class="math display">\[\mathbf v_\theta(\mathbf x,t)
 =-\frac{\beta(t)}2\left[\mathbf x-
@@ -1108,13 +1222,14 @@ X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>This comparison checks the complete procedure, not convergence to an exact solution. The intended output is <span class="math inline">\(p_{0.001}\)</span>; learned-score error, Gaussian terminal initialization, and finite Euler steps remain approximations. The more detailed fidelity checks are in Part 4.</p>
+<p>This comparison checks the complete procedure, not convergence to an exact solution. The intended output is <span class="math inline">\(p_{0.001}\)</span>; learned-score error, Gaussian terminal initialization, and finite Euler steps remain approximations. Part 6 provides the executed end-to-end experiment and detailed fidelity checks.</p>
 </section>
 <section id="analytic-check-of-the-schedule-and-solver" class="level3">
 <h3 class="anchored" data-anchor-id="analytic-check-of-the-schedule-and-solver">Analytic check of the schedule and solver</h3>
+<p>This Gaussian check tests the schedule and sign with a velocity independent of position; its Euler error is a quadrature error. Part 6 also checks state-dependent mixture dynamics against exact quantile transport.</p>
 <p>The probability-flow construction does not require a standard-normal terminal law. It requires that initialization match the terminal density of the forward process used to derive the score and velocity. Changing the terminal distribution alone generally breaks that match.</p>
 <p>For a fully matched Gaussian example, take <span class="math inline">\(P_0=\mathcal N(\mu,1)\)</span> and retain the VP schedule above. The forward corruption gives</p>
-<p><span class="math display">\[P_t=\mathcal N(\alpha_t\mu,1),\qquad
+<p><span class="math display">\[p_t(x)=\mathcal N(x;\alpha_t\mu,1),\qquad
 P_1=\mathcal N(\alpha_1\mu,1).\]</span></p>
 <p>The score and velocity of this same density path are</p>
 <p><span class="math display">\[s_t(x)=-(x-\alpha_t\mu),\qquad
@@ -1124,7 +1239,7 @@ v(x,t)=-\tfrac12\beta(t)\alpha_t\mu=\alpha_t'\mu.\]</span></p>
 <p>Integrating the ODE backward gives</p>
 <p><span class="math display">\[X_t=X_1+(\alpha_t-\alpha_1)\mu
 =\alpha_t\mu+\varepsilon.\]</span></p>
-<p>Consequently, <span class="math inline">\(X_t\sim P_t\)</span> at every time and <span class="math inline">\(X_0=\mu+\varepsilon\sim\mathcal N(\mu,1)\)</span> exactly for the exact flow. This example has no terminal-prior approximation. Comparing Euler endpoints with this trajectory isolates numerical error. For <span class="math inline">\(\mu=0\)</span>, the score is <span class="math inline">\(-x\)</span> and the probability-flow velocity is zero.</p>
+<p>Consequently, <span class="math inline">\(X_t\)</span> has density <span class="math inline">\(p_t\)</span> at every time and <span class="math inline">\(X_0=\mu+\varepsilon\sim\mathcal N(\mu,1)\)</span> exactly for the exact flow. This example has no terminal-prior approximation. Comparing Euler endpoints with this trajectory isolates numerical error. For <span class="math inline">\(\mu=0\)</span>, the score is <span class="math inline">\(-x\)</span> and the probability-flow velocity is zero.</p>
 <p><strong>A separate approximation experiment:</strong> if we replace this matched initialization by <span class="math inline">\(X_1\sim\mathcal N(0,1)\)</span> while leaving the field unchanged, the output at time zero is <span class="math inline">\(\mathcal N((1-\alpha_1)\mu,1)\)</span>, not <span class="math inline">\(P_0\)</span>. Its mean error is <span class="math inline">\(-\alpha_1\mu\)</span>. This quantifies the cost of substituting a convenient prior; it is not part of the exact derivation above.</p>
 <p>If sampling stops at <span class="math inline">\(t_{\min}\)</span>, its intended output law is <span class="math inline">\(p_{t_{\min}}\)</span>, not exactly <span class="math inline">\(p_0\)</span>. Applying a final posterior mean changes the output law again; it is not an exact substitute for the missing evolution. Evaluate separately:</p>
 <ul>
@@ -1133,7 +1248,7 @@ v(x,t)=-\tfrac12\beta(t)\alpha_t\mu=\alpha_t'\mu.\]</span></p>
 <li>estimation error: the learned field versus the exact field;</li>
 <li>endpoint choice: <span class="math inline">\(p_{t_{\min}}\)</span> versus clean data.</li>
 </ul>
-<p><a href="../tutorials/33-probability-flow-ode-part-4.html">Part 4</a> implements these comparisons on a Gaussian mixture where the reference score is known.</p>
+<p><a href="../tutorials/35-probability-flow-ode-part-6.html">Part 6</a> implements these comparisons on a Gaussian mixture where the reference score is known.</p>
 </section>
 </section>
 <section id="appendix-a.-bayes-optimality-and-a-standalone-derivation-of-tweedies-formula" class="level2">
@@ -1209,6 +1324,25 @@ V_{k+1}&amp;=(1-\beta(t_k)h)V_k+\beta(t_k)h,\\
 <p><span class="math display">\[\boxed{\alpha_t'=-\tfrac12\beta(t)\alpha_t,
 \qquad\beta(t)=-2\frac{d}{dt}\log\alpha_t.}\]</span></p>
 <p>The training-data schedule and the ODE rate are not independent choices. The same <span class="math inline">\(\beta(t)\)</span> produces the noisy densities and appears in <span class="math inline">\(v(x,t)=-\beta(t)[x+s_t(x)]/2\)</span>. Data are at time zero; the standard Gaussian used at time one approximates the actual terminal law for a finite-rate schedule.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Relating a discrete forward step to the continuous rate
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For <span class="math inline">\(0\le u&lt;t\le1\)</span>, the exact VP transition is</p>
+<p><span class="math display">\[X_t\mid X_u=x\sim\mathcal N\!\left(
+\frac{\alpha_t}{\alpha_u}x,\ 1-\frac{\alpha_t^2}{\alpha_u^2}\right).\]</span></p>
+<p>In discrete DDPM notation, a step’s noise variance <span class="math inline">\(\beta_i\)</span> is related to the continuous rate by</p>
+<p><span class="math display">\[\beta_i=1-\exp\!\left[-\int_{t_{i-1}}^{t_i}\beta(u)\,du\right]
+\approx\beta(t_{i-1})(t_i-t_{i-1}).\]</span></p>
+<p>Our <span class="math inline">\(\alpha_{t_i}\)</span> is the cumulative <strong>amplitude</strong> <span class="math inline">\(\sqrt{\prod_{j=1}^i(1-\beta_j)}\)</span>. It is not the one-step retention <span class="math inline">\(1-\beta_i\)</span>. One-step noise variance, accumulated noise variance, and continuous-time rate must not be interchanged.</p>
+</div>
+</div>
 </section>
 <section id="checking-the-conditional-law-directly-from-the-sde" class="level3">
 <h3 class="anchored" data-anchor-id="checking-the-conditional-law-directly-from-the-sde">Checking the conditional law directly from the SDE</h3>
@@ -1224,6 +1358,95 @@ V_{k+1}&amp;=(1-\beta(t_k)h)V_k+\beta(t_k)h,\\
 =-\partial_x\!\left[p_t\left(-\frac{\beta(t)}2[x+s_t(x)]\right)\right].\]</span></p>
 <p>Thus the same schedule that supplies the training pairs determines the probability-flow velocity. This is the VP specialization of the paper’s Eq. (13); the conditional kernel agrees with its Appendix B.</p>
 <p><a href="../tutorials/35-probability-flow-ode-part-6.html">Part 6</a> provides a complete executed notebook that trains a small network and samples the two-component example.</p>
+</section>
+</section>
+<section id="sec-mixture-score-proof" class="level2">
+<h2 class="anchored" data-anchor-id="sec-mixture-score-proof">Appendix D. An alternative proof using mixture components</h2>
+<section id="d.1.-a-finite-dataset-becomes-a-gaussian-mixture-after-corruption" class="level3">
+<h3 class="anchored" data-anchor-id="d.1.-a-finite-dataset-becomes-a-gaussian-mixture-after-corruption">D.1. A finite dataset becomes a Gaussian mixture after corruption</h3>
+<p>Let the observed clean values be <span class="math inline">\(x_1,\ldots,x_n\)</span>. Their empirical distribution is</p>
+<p><span class="math display">\[\widehat P_0=\sum_{i=1}^n w_i\delta_{x_i},\qquad
+w_i\geq0,\quad\sum_iw_i=1,\]</span></p>
+<p>where <span class="math inline">\(\delta_{x_i}\)</span> denotes a point mass at <span class="math inline">\(x_i\)</span> and usually <span class="math inline">\(w_i=1/n\)</span>. Select an index <span class="math inline">\(I\)</span> with probability <span class="math inline">\(w_i\)</span>, then set <span class="math inline">\(X_0=x_I\)</span>. This is an exact representation of the empirical distribution, not a fitted Gaussian-mixture assumption about the population.</p>
+<p>Fix a positive time. For this appendix, abbreviate the existing noise standard deviation by <span class="math inline">\(\sigma_t=\sqrt{1-\alpha_t^2}\)</span>. The forward corruption is</p>
+<p><span class="math display">\[X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
+\varepsilon\sim\mathcal N(0,1),\]</span></p>
+<p>with noise independent of the selected clean observation. Thus</p>
+<p><span class="math display">\[X_t\mid I=i\sim\mathcal N(\alpha_tx_i,\sigma_t^2),\qquad
+\boxed{\widehat p_t(x)=\sum_iw_i\mathcal N(x;\alpha_tx_i,\sigma_t^2).}\]</span></p>
+<p>Each <strong>clean point</strong> produces one noisy Gaussian component. If the clean distribution is instead a mixture of Gaussians with nonzero component variances, those variances also contribute to the noisy component variances, as in Part 6.</p>
+</section>
+<section id="d.2.-differentiate-the-mixture-and-identify-the-weights" class="level3">
+<h3 class="anchored" data-anchor-id="d.2.-differentiate-the-mixture-and-identify-the-weights">D.2. Differentiate the mixture and identify the weights</h3>
+<p>Write <span class="math inline">\(\phi_i(x)=\mathcal N(x;\alpha_tx_i,\sigma_t^2)\)</span>. The component derivative is</p>
+<p><span class="math display">\[\phi_i'(x)=\phi_i(x)\frac{\alpha_tx_i-x}{\sigma_t^2}.\]</span></p>
+<p>Divide the derivative of the mixture by its density:</p>
+<p><span class="math display">\[\begin{aligned}
+\widehat s_t(x)
+&amp;=\frac{\widehat p_t'(x)}{\widehat p_t(x)}\\
+&amp;=\frac{\sum_iw_i\phi_i(x)(\alpha_tx_i-x)/\sigma_t^2}
+{\sum_jw_j\phi_j(x)}\\
+&amp;=\sum_i r_i(x,t)\frac{\alpha_tx_i-x}{\sigma_t^2},
+\end{aligned}\]</span></p>
+<p>where Bayes’ rule gives</p>
+<p><span class="math display">\[\boxed{r_i(x,t)=\frac{w_i\phi_i(x)}{\sum_jw_j\phi_j(x)}
+=P(I=i\mid X_t=x).}\]</span></p>
+<p>These probabilities sum to one. They depend on the observed noisy position, unlike the original weights <span class="math inline">\(w_i\)</span>. Consequently,</p>
+<p><span class="math display">\[\boxed{\widehat s_t(x)=\mathbb E_{I\mid X_t=x}
+\left[\partial_x\log p_t(x\mid X_0=x_I)\right].}\]</span></p>
+<p>The expectation is over the possible clean-data indices conditional on the fixed noisy input. The network receives <span class="math inline">\((x,t)\)</span> because these features determine which clean origins are plausible. It does not receive the actual index used to construct a training pair.</p>
+</section>
+<section id="d.3.-the-posterior-mean-and-tweedies-formula" class="level3">
+<h3 class="anchored" data-anchor-id="d.3.-the-posterior-mean-and-tweedies-formula">D.3. The posterior mean and Tweedie’s formula</h3>
+<p>Collect the terms in the score expression:</p>
+<p><span class="math display">\[\widehat s_t(x)=\frac{\alpha_t\sum_i r_i(x,t)x_i-x}{\sigma_t^2}.\]</span></p>
+<p>Under the empirical data distribution,</p>
+<p><span class="math display">\[m_t(x):=\mathbb E_{\widehat P_0}[X_0\mid X_t=x]
+=\sum_i r_i(x,t)x_i.\]</span></p>
+<p>Therefore, for <span class="math inline">\(\alpha_t&gt;0\)</span>,</p>
+<p><span class="math display">\[\boxed{m_t(x)=\frac{x+\sigma_t^2\widehat s_t(x)}{\alpha_t}.}\]</span></p>
+<p>This is the VP form of Tweedie’s formula. To see its Bayes-optimal meaning, let <span class="math inline">\(a\)</span> be a proposed clean reconstruction. At the fixed noisy input,</p>
+<p><span class="math display">\[\mathbb E_{\widehat P_0}[(X_0-a)^2\mid X_t=x]
+=\operatorname{Var}_{\widehat P_0}(X_0\mid X_t=x)+(m_t(x)-a)^2.\]</span></p>
+<p>Only the second term depends on <span class="math inline">\(a\)</span>, so the posterior mean is the squared-error-optimal denoiser. This does not make a posterior mean a posterior sample.</p>
+</section>
+<section id="d.4.-a-zero-conditional-score-and-a-nonzero-marginal-score" class="level3">
+<h3 class="anchored" data-anchor-id="d.4.-a-zero-conditional-score-and-a-nonzero-marginal-score">D.4. A zero conditional score and a nonzero marginal score</h3>
+<p>Take equally weighted clean points <span class="math inline">\(x_1=0\)</span> and <span class="math inline">\(x_2=2\)</span>, and evaluate at noisy position <span class="math inline">\(x=0\)</span>. Assume <span class="math inline">\(\alpha_t&gt;0\)</span> and <span class="math inline">\(\sigma_t&gt;0\)</span>. Their conditional scores are</p>
+<p><span class="math display">\[\left.\partial_x\log p_t(x\mid X_0=0)\right|_{x=0}=0,
+\qquad
+\left.\partial_x\log p_t(x\mid X_0=2)\right|_{x=0}
+=\frac{2\alpha_t}{\sigma_t^2}.\]</span></p>
+<p>The posterior probability of the second clean point is</p>
+<p><span class="math display">\[r_2(0,t)=\frac{\exp(-2\alpha_t^2/\sigma_t^2)}
+{1+\exp(-2\alpha_t^2/\sigma_t^2)}&gt;0.\]</span></p>
+<p>Hence</p>
+<p><span class="math display">\[\boxed{\widehat s_t(0)=r_2(0,t)\frac{2\alpha_t}{\sigma_t^2}&gt;0.}\]</span></p>
+<p>The first clean point with zero corruption noise has a zero target, but the optimal prediction at that noisy input is positive. The second clean point remains a possible origin and contributes a positive conditional score. The calculation evaluates continuous score functions at a point; the distinction persists in nearby intervals, which have positive probability. It never asserts that an average of identically zero targets is nonzero.</p>
+</section>
+<section id="d.5.-from-a-finite-mixture-to-an-arbitrary-population" class="level3">
+<h3 class="anchored" data-anchor-id="d.5.-from-a-finite-mixture-to-an-arbitrary-population">D.5. From a finite mixture to an arbitrary population</h3>
+<p>For an arbitrary clean probability distribution <span class="math inline">\(P_0\)</span>, replace the sum by an integral with respect to that distribution:</p>
+<p><span class="math display">\[p_t(x)=\int\mathcal N(x;\alpha_tu,\sigma_t^2)\,dP_0(u).\]</span></p>
+<p>This is a continuous location mixture after corruption. The clean law may be discrete, continuous, or mixed; it need not have a density. No informal limit of an infinitely large dataset is required.</p>
+<p>Differentiating the Gaussian kernel under the integral and dividing by <span class="math inline">\(p_t(x)\)</span> gives</p>
+<p><span class="math display">\[\begin{aligned}
+s_t(x)
+&amp;=\int\frac{\alpha_tu-x}{\sigma_t^2}
+\frac{\mathcal N(x;\alpha_tu,\sigma_t^2)}{p_t(x)}\,dP_0(u)\\
+&amp;=\mathbb E_{X_0\mid X_t=x}
+\left[\frac{\alpha_tX_0-x}{\sigma_t^2}\right].
+\end{aligned}\]</span></p>
+<p>The measure multiplying the component score is precisely the posterior distribution of <span class="math inline">\(X_0\)</span> given <span class="math inline">\(X_t=x\)</span>. At positive noise and <span class="math inline">\(\alpha_t&gt;0\)</span>, the Gaussian kernel and its spatial derivative are bounded as functions of the clean location, locally uniformly in <span class="math inline">\(x\)</span>, which justifies this differentiation. For a global squared-error denoising risk, assume <span class="math inline">\(\mathbb E_{X_0\sim P_0}[X_0^2]&lt;\infty\)</span>.</p>
+<p>Rearranging yields the population Tweedie identity. The exact empirical-score transport approaches the discrete training distribution as the noise tends to zero. Model restrictions and regularization may help generalization, but do not guarantee it. A finite-data regression learns the score of the corrupted empirical distribution in its unrestricted optimum; approximating the population score additionally involves finite-data, model, and optimization errors.</p>
+<p>For the finite mixture, the posterior weights can actually be evaluated by summing over the dataset. This offers an exact empirical-score reference at positive time, but costs a sum over all <span class="math inline">\(n\)</span> observations per query. Neural regression approximates that function without enumerating the dataset during each sampling step. Training itself continues to use forward-generated pairs; it does not require calculating these posterior weights.</p>
+</section>
+<section id="d.6.-local-density-information-and-trajectory-history" class="level3">
+<h3 class="anchored" data-anchor-id="d.6.-local-density-information-and-trajectory-history">D.6. Local density information and trajectory history</h3>
+<p><strong>A local derivative that reflects the originating distribution.</strong> The score <span class="math inline">\(s_t(x)=\partial_x\log p_t(x)\)</span> describes the local spatial slope of the current log density. Yet that density combines contributions from the clean-data distribution:</p>
+<p><span class="math display">\[p_t(x)=\int p_t(x\mid x_0)\,p_{\mathrm{data}}(x_0)\,dx_0.\]</span></p>
+<p>Its local slope therefore reflects the possible clean origins and the forward corruption law. This is dependence on the originating <strong>distribution</strong>, not memory of an individual particle’s trajectory. Different histories that produce the same current density <span class="math inline">\(p_t\)</span> give the same score at that time.</p>
+<p>Once the time-dependent score field is specified, the sampler evaluates it using only the current position and time. The probability-flow ODE needs no stored trajectory history. The reverse SDE discussed in Part 2 is likewise a time-inhomogeneous Markov process. Posterior averaging over possible clean origins does not change this property.</p>
 
 
 </section>
@@ -1637,13 +1860,13 @@ V_{k+1}&amp;=(1-\beta(t_k)h)V_k+\beta(t_k)h,\\
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/31-probability-flow-ode-part-2.html" class="pagination-link" aria-label="13 · Probability-Flow ODE - Part 2">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">13 · Probability-Flow ODE - Part 2</span>
+      <a href="../tutorials/31-probability-flow-ode-part-2.html" class="pagination-link" aria-label="02 · Higher-dimensional transport">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">02 · Higher-dimensional transport</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/33-probability-flow-ode-part-4.html" class="pagination-link" aria-label="15 · Probability-Flow ODE - Part 4">
-        <span class="nav-page-text">15 · Probability-Flow ODE - Part 4</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/33-probability-flow-ode-part-4.html" class="pagination-link" aria-label="04 · One-dimensional experiments">
+        <span class="nav-page-text">04 · One-dimensional experiments</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>00 · Introduction and Motivation – ID-5-02 (TO)</title>
+<title>Probability-Flow ODE – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/01-probability-101.html" rel="next">
-<link href="../assignments.html" rel="prev">
+<link href="../tutorials/07-probability-flow-ode.html" rel="next">
+<link href="../tutorials/30-ddpm.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -76,35 +76,6 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -117,7 +88,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">Probability-Flow ODE</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -182,16 +153,16 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Lecture Notes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">00 · Introduction and Motivation</span></a>
   </div>
 </li>
@@ -259,13 +230,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+            <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Probability-Flow ODE</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
@@ -556,33 +527,15 @@ window.Quarto = {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#what-this-course-is-about" id="toc-what-this-course-is-about" class="nav-link active" data-scroll-target="#what-this-course-is-about">What this course is about</a>
-  <ul class="collapse">
-  <li><a href="#the-route-in-one-paragraph" id="toc-the-route-in-one-paragraph" class="nav-link" data-scroll-target="#the-route-in-one-paragraph">The route, in one paragraph</a></li>
-  <li><a href="#how-the-material-is-organised" id="toc-how-the-material-is-organised" class="nav-link" data-scroll-target="#how-the-material-is-organised">How the material is organised</a></li>
-  <li><a href="#where-to-start" id="toc-where-to-start" class="nav-link" data-scroll-target="#where-to-start">Where to start</a></li>
-  </ul></li>
-  <li><a href="#the-simplest-generative-model-there-is" id="toc-the-simplest-generative-model-there-is" class="nav-link" data-scroll-target="#the-simplest-generative-model-there-is">The simplest generative model there is</a></li>
-  <li><a href="#view-1-conditional-generation-a-hierarchical-model" id="toc-view-1-conditional-generation-a-hierarchical-model" class="nav-link" data-scroll-target="#view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</a></li>
-  <li><a href="#view-2-the-coin-disappears-into-a-map" id="toc-view-2-the-coin-disappears-into-a-map" class="nav-link" data-scroll-target="#view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</a></li>
-  <li><a href="#the-two-point-limit" id="toc-the-two-point-limit" class="nav-link" data-scroll-target="#the-two-point-limit">The two-point limit</a></li>
-  <li><a href="#maps-are-not-unique" id="toc-maps-are-not-unique" class="nav-link" data-scroll-target="#maps-are-not-unique">Maps are not unique</a></li>
-  <li><a href="#the-claim-that-organizes-everything" id="toc-the-claim-that-organizes-everything" class="nav-link" data-scroll-target="#the-claim-that-organizes-everything">The claim that organizes everything</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">00 · Introduction and Motivation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">00 · Introduction and Motivation</h1>
+<h1 class="title">Probability-Flow ODE</h1>
 </div>
 
 
@@ -599,151 +552,66 @@ window.Quarto = {
 </header>
 
 
-<p><em>The first note of the course. It says what the subject is, what the rest of the material is for, and then earns the claim that organises everything with the smallest possible example. Interactive version: <a href="../materials/sampling-as-a-map.html">Sampling as a Map</a>.</em></p>
-<section id="what-this-course-is-about" class="level2">
-<h2 class="anchored" data-anchor-id="what-this-course-is-about">What this course is about</h2>
-<p>A <strong>generative model</strong> is a thing that produces samples. Show it a pile of handwritten digits and it should produce new handwritten digits — not ones from the pile, and not noise, but plausible new members of the same population.</p>
-<p>The difficulty is that nobody hands you the population. You get a finite pile of examples, and from that pile you must build something that can generate more. Put formally: given samples <span class="math inline">\(x_1,\dots,x_n\)</span> drawn from an unknown <span class="math inline">\(p_{\text{data}}\)</span>, construct a procedure that draws fresh samples from something close to <span class="math inline">\(p_{\text{data}}\)</span>.</p>
-<p>Two observations shape everything that follows.</p>
-<p><strong>Sampling is not the same as knowing the density.</strong> You do not need a formula for <span class="math inline">\(p_{\text{data}}(x)\)</span> in order to draw from it, and — as the course will show — for images you could not write one down anyway. What you need is a <em>procedure</em>.</p>
-<p><strong>Every such procedure turns simple randomness into structured output.</strong> Somewhere in the machine there is a coin flip, a uniform draw, or a burst of Gaussian noise, and everything downstream of it is arithmetic. That is the picture this note builds, and the rest of the course is about how to <em>learn</em> the arithmetic when the target is complicated.</p>
-<section id="the-route-in-one-paragraph" class="level3">
-<h3 class="anchored" data-anchor-id="the-route-in-one-paragraph">The route, in one paragraph</h3>
-<p>We start with probability itself — random variables, joints, conditionals, Bayes — because generation runs forward from a latent cause to an observation while inference runs backward, and Bayes is the bridge. Then distributions and maximum likelihood in one dimension, where fitting has closed forms. Then the multivariate Gaussian, the one family closed under everything linear, which is why every tractable calculation in this subject goes through it. Then the wall: in high dimension, estimating a density directly stops working, even with structure. That failure is what forces the modern approach — stop describing distributions and start <strong>comparing</strong> them, which is why distances and divergences become central. Diffusion models are then one particular, very effective answer.</p>
-</section>
-<section id="how-the-material-is-organised" class="level3">
-<h3 class="anchored" data-anchor-id="how-the-material-is-organised">How the material is organised</h3>
-<p><strong>Lecture Notes</strong> are the numbered spine, in reading order, and follow the lectures. <strong>Tutorials</strong> sit alongside and go deeper on one thing. <strong>Perspectives</strong> are optional reinterpretations — a transport reading of the whole subject, and the measure-theoretic foundations — and nothing in the lectures depends on them. The <a href="../curriculum.html">Curriculum</a> page lists the sequence and maps it to weeks.</p>
-</section>
-<section id="where-to-start" class="level3">
-<h3 class="anchored" data-anchor-id="where-to-start">Where to start</h3>
-<p>Read this note, then <a href="../tutorials/05-two-point-diffusion.html">01 · The World’s Smallest Diffusion Model</a>, which builds a complete working diffusion model on a dataset of two points, with every step in closed form. Nothing in it is approximated and nothing is learned — which makes it the clearest possible statement of <em>what we are trying to do in high dimensions</em>, and of exactly which step stops being computable once the data is images rather than two numbers.</p>
-</section>
-</section>
-<section id="the-simplest-generative-model-there-is" class="level2">
-<h2 class="anchored" data-anchor-id="the-simplest-generative-model-there-is">The simplest generative model there is</h2>
-<p>The rest of this note presents one tiny generator twice — first as a <strong>hierarchy you sample conditionally</strong> (a Bayesian model), then as a <strong>deterministic map applied to uniform randomness</strong> — and then makes the claim that carries the rest of the course: every modern generative sampler, diffusion included, is the second picture, once all of its random inputs are exposed, with a learned ingredient in place of the formula.</p>
-</section>
-<section id="view-1-conditional-generation-a-hierarchical-model" class="level2">
-<h2 class="anchored" data-anchor-id="view-1-conditional-generation-a-hierarchical-model">View 1: conditional generation (a hierarchical model)</h2>
-<p>The simplest latent-variable model:</p>
-<p><span class="math display">\[
-\mathbb{P}(z = 1) = \pi, \quad \mathbb{P}(z = 2) = 1 - \pi, \qquad
-x \mid z \;\sim\; \mathcal{N}(\mu_z,\, \sigma^2).
-\]</span></p>
-<p><strong>Ancestral sampling</strong> generates by following the arrows: draw the latent coin <span class="math inline">\(z\)</span>, then draw <span class="math inline">\(x\)</span> from the selected component. The observed marginal is obtained by summing out the latent:</p>
-<p><span class="math display">\[
-p(x) \;=\; \sum_{z} p(z)\, p(x \mid z)
-\;=\; \pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)
-\]</span></p>
-<p>— exactly the two-component mixture from the playground. A mixture is not just a formula; it is a <em>generative story</em>: population <span class="math inline">\(\to\)</span> subpopulation <span class="math inline">\(\to\)</span> individual.</p>
-<p><strong>Inference is the same hierarchy, run backwards.</strong> Given an observed <span class="math inline">\(x\)</span>, Bayes’ rule gives the posterior over the hidden coin:</p>
-<p><span class="math display">\[
-\mathbb{P}(z = 1 \mid x)
-= \frac{\pi\, \mathcal{N}(x; \mu_1, \sigma^2)}
-       {\pi\, \mathcal{N}(x; \mu_1, \sigma^2) + (1-\pi)\, \mathcal{N}(x; \mu_2, \sigma^2)} .
-\]</span></p>
-<p>For <span class="math inline">\(\mu_{1,2} = \mp 1\)</span> and <span class="math inline">\(\pi = \tfrac12\)</span> this equals <span class="math inline">\(\operatorname{sigmoid}(-2x/\sigma^2)\)</span>; its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x) = \operatorname{sigmoid}(2x/\sigma^2)\)</span> is exactly the posterior W01 computed for the <span class="math inline">\(+1\)</span> component, and the posterior mean of <span class="math inline">\(\mu_z\)</span> is the tanh denoiser: <strong>W01’s denoising step was latent-variable inference all along.</strong> Generation and inference are the two directions of one arrow.</p>
-</section>
-<section id="view-2-the-coin-disappears-into-a-map" class="level2">
-<h2 class="anchored" data-anchor-id="view-2-the-coin-disappears-into-a-map">View 2: the coin disappears into a map</h2>
-<p><strong>Theorem (inverse-CDF / probability integral transform).</strong> Let <span class="math inline">\(F\)</span> be a CDF with generalized inverse <span class="math inline">\(F^{-1}(u) = \inf\{x : F(x) \ge u\}\)</span>, and let <span class="math inline">\(U \sim \text{Uniform}(0,1)\)</span>. Then <span class="math inline">\(X = F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
-<p><em>Proof.</em> <span class="math inline">\(\mathbb{P}(F^{-1}(U) \le x) = \mathbb{P}(U \le F(x)) = F(x)\)</span>, since <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span> by monotonicity. <span class="math inline">\(\square\)</span></p>
-<p>For our mixture, <span class="math inline">\(F(x) = \pi\,\Phi\!\big(\tfrac{x-\mu_1}{\sigma}\big) +
-(1-\pi)\,\Phi\!\big(\tfrac{x-\mu_2}{\sigma}\big)\)</span> is continuous and strictly increasing, so <span class="math inline">\(F^{-1}\)</span> is an honest function, and</p>
-<p><span class="math display">\[
-u \sim \text{Uniform}(0,1), \qquad x = F^{-1}(u)
-\]</span></p>
-<p>generates the mixture <strong>with no coin anywhere</strong> — the explicit coin has been marginalized out. One caution about where it went: under this map, the event <span class="math inline">\(u &lt; \pi\)</span> selects the lowest <span class="math inline">\(\pi\)</span>-fraction of the <em>mixture</em> distribution, which is <strong>not</strong> the same as the ancestral label <span class="math inline">\(z = 1\)</span> when the components overlap — both Gaussians have full support, so each contributes on both sides of any quantile. (In the well-separated limit <span class="math inline">\(\sigma \to 0\)</span> the two events do coincide, and the <em>packed</em> map below is the construction in which <span class="math inline">\(u &lt; \pi\)</span> genuinely encodes the coin.) Randomness in, structure out, everything in between deterministic.</p>
-</section>
-<section id="the-two-point-limit" class="level2">
-<h2 class="anchored" data-anchor-id="the-two-point-limit">The two-point limit</h2>
-<p>Send <span class="math inline">\(\sigma \to 0\)</span> with <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>. The CDF collapses to a staircase: a jump of height <span class="math inline">\(\pi\)</span> at <span class="math inline">\(-1\)</span>, a flat <strong>plateau</strong> at height <span class="math inline">\(\pi\)</span> across the empty middle, a jump to <span class="math inline">\(1\)</span> at <span class="math inline">\(+1\)</span>. The map becomes</p>
-<p><span class="math display">\[
-x = \begin{cases} -1, &amp; u &lt; \pi \\ +1, &amp; u &gt; \pi \end{cases}
-\qquad\text{i.e.}\quad x = \operatorname{sign}(u - \pi),
-\]</span></p>
-<p>W01’s dataset, generated by thresholding a uniform (almost surely: the single point <span class="math inline">\(u = \pi\)</span> has probability zero). The plateau is the geometric image of the empty region: no value of <span class="math inline">\(u\)</span> lands there. <a href="../tutorials/06-map-proved.html">The Deterministic Map, Proved</a> proves this limit. (In the demo, slide <span class="math inline">\(\sigma\)</span> down and watch the staircase form.)</p>
-</section>
-<section id="maps-are-not-unique" class="level2">
-<h2 class="anchored" data-anchor-id="maps-are-not-unique">Maps are not unique</h2>
-<p><span class="math inline">\(F^{-1}\)</span> is the <em>monotone</em> map pushing <span class="math inline">\(\text{Uniform}(0,1)\)</span> to <span class="math inline">\(p\)</span>, but not the only map. The “packed” two-stage construction</p>
-<p><span class="math display">\[
-x = \begin{cases}
-\mu_1 + \sigma\, \Phi^{-1}\!\big(u/\pi\big), &amp; u &lt; \pi,\\[2pt]
-\mu_2 + \sigma\, \Phi^{-1}\!\big(\tfrac{u-\pi}{1-\pi}\big), &amp; u \ge \pi,
-\end{cases}
-\]</span></p>
-<p>also pushes uniform to the mixture (each branch rescales its segment of <span class="math inline">\([0,1]\)</span> back to a full uniform — Exercise 3), and it is <em>literally</em> ancestral sampling written as one formula. Different map, same distribution: what is canonical is the <em>distribution</em>, not the transport. (In higher dimensions, choosing among the many maps is its own subject — optimal transport — which we will brush against later.)</p>
-</section>
-<section id="the-claim-that-organizes-everything" class="level2">
-<h2 class="anchored" data-anchor-id="the-claim-that-organizes-everything">The claim that organizes everything</h2>
-<blockquote class="blockquote">
-<p><strong>Once all of its random draws are exposed, a generative sampler is a deterministic map from base randomness to a sample.</strong></p>
-</blockquote>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Draft topic
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This eight-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–08, and can be read in sequence. The notes and worked examples are in development.</p>
+</div>
+</div>
+<p>Start with particle trajectories and density evolution in one dimension. Then extend the construction to vectors, learn the score from clean/noisy pairs, and implement sampling. The later parts provide experiments and an image-model recipe, then connect probability-flow ODEs to Neural ODEs, normalizing flows, and flow matching.</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 18%">
-<col style="width: 24%">
-<col style="width: 32%">
-<col style="width: 26%">
-</colgroup>
 <thead>
 <tr class="header">
-<th>Model</th>
-<th>Random input(s)</th>
-<th>Sampling mechanism</th>
-<th>Typical fitting</th>
+<th>Part</th>
+<th>Focus</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>This note</td>
-<td><span class="math inline">\(u \sim \text{U}(0,1)\)</span></td>
-<td>quantile <span class="math inline">\(F^{-1}(u)\)</span> (numerical in the demo)</td>
-<td>the CDF is known</td>
+<td><a href="../tutorials/07-probability-flow-ode.html">01 · Transport in one dimension</a></td>
+<td>Build a density path and its probability-flow ODE.</td>
 </tr>
 <tr class="even">
-<td>GAN</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td><span class="math inline">\(G_\theta(z)\)</span>, a network</td>
-<td>adversarial objective</td>
+<td><a href="../tutorials/31-probability-flow-ode-part-2.html">02 · Higher-dimensional transport</a></td>
+<td>Extend the notation and main results to vectors.</td>
 </tr>
 <tr class="odd">
-<td>VAE</td>
-<td><span class="math inline">\(z\)</span>, plus decoder noise <span class="math inline">\(\varepsilon\)</span></td>
-<td>sample <span class="math inline">\(p_\theta(x \mid z)\)</span>, i.e.&nbsp;<span class="math inline">\(T_\theta(z, \varepsilon)\)</span></td>
-<td>ELBO / variational learning</td>
+<td><a href="../tutorials/32-probability-flow-ode-part-3.html">03 · Learning the score</a></td>
+<td>Learn a denoiser, recover the score, and construct the sampling field.</td>
 </tr>
 <tr class="even">
-<td>Normalizing flow</td>
-<td><span class="math inline">\(z \sim \mathcal{N}(0, I)\)</span></td>
-<td>invertible <span class="math inline">\(f_\theta(z)\)</span></td>
-<td>exact likelihood (change of variables)</td>
+<td><a href="../tutorials/33-probability-flow-ode-part-4.html">04 · One-dimensional experiments</a></td>
+<td>Explore four executed notebooks on transport, sampling, training, and denoising.</td>
 </tr>
 <tr class="odd">
-<td><strong>Diffusion</strong></td>
-<td><span class="math inline">\(x_1 \sim \mathcal{N}\)</span>; step noise if stochastic</td>
-<td><strong>probability-flow ODE</strong> (deterministic) or reverse SDE</td>
-<td><strong>score/denoising objectives, ELBO</strong></td>
+<td><a href="../tutorials/34-probability-flow-ode-part-5.html">05 · Image-model recipe</a></td>
+<td>Connect the equations to an annotated MNIST implementation.</td>
+</tr>
+<tr class="even">
+<td><a href="../tutorials/35-probability-flow-ode-part-6.html">06 · Train and sample a mixture</a></td>
+<td>Work through neural score estimation and generation in an executed notebook.</td>
+</tr>
+<tr class="odd">
+<td><a href="../tutorials/36-probability-flow-ode-part-7.html">07 · Neural ODEs and normalizing flows</a></td>
+<td>Connect velocity models, invertible transport, and likelihood.</td>
+</tr>
+<tr class="even">
+<td><a href="../tutorials/37-probability-flow-ode-part-8.html">08 · Flow matching</a></td>
+<td>Learn the velocity directly from conditional-path regression.</td>
 </tr>
 </tbody>
 </table>
-<p>The outer skeleton is shared — simple randomness, a sampling mechanism, data — while the learned object, the structural constraints, and the sampler differ. For diffusion in particular, determinism is a <em>sampler choice</em>: the probability-flow ODE is a deterministic map from <span class="math inline">\(x_1\)</span>; the reverse SDE consumes fresh noise at every step and is a deterministic function only of <span class="math inline">\((x_1, \text{all step noises})\)</span>.</p>
-<p>In one dimension with a known CDF, the map is a formula. For images, the population law is unknown and no tractable multivariate inverse-CDF construction exists — so deep generative models learn a <em>transport, density, score, or other ingredient</em> of a sampler rather than writing the map down. And you have already run one: W01’s probability-flow ODE numerically transported a moment-matched Gaussian to within <span class="math inline">\(\approx \sigma_{\min}\)</span> of the two-point data (W01 lists the approximations involved); with the exact terminal law, score, and integration, it is an exact deterministic transport — an inverse-CDF-like map built not from the CDF but from the <strong>score</strong>, which is exactly the object a neural network can learn in high dimension. That construction, done properly, is Modules 4–6.</p>
-</section>
-<section id="exercises" class="level2">
-<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
-<ol type="1">
-<li>Complete the inverse-CDF proof for a general (possibly non-strictly-increasing) <span class="math inline">\(F\)</span> using the generalized inverse.</li>
-<li>Derive <span class="math inline">\(\mathbb{P}(z = 1 \mid x)\)</span> above, and show that for <span class="math inline">\(\mu_{1,2} = \mp 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>, <span class="math inline">\(\pi = \tfrac12\)</span> its companion <span class="math inline">\(\mathbb{P}(z = 2 \mid x)\)</span> equals W01’s <span class="math inline">\(\operatorname{sigmoid}(2x)\)</span> posterior (mind which component carries the <span class="math inline">\(+\)</span> sign); compute the posterior mean of <span class="math inline">\(\mu_z\)</span>.</li>
-<li>Verify the packed map: show that conditional on <span class="math inline">\(u &lt; \pi\)</span>, the rescaled variable <span class="math inline">\(u/\pi\)</span> is <span class="math inline">\(\text{Uniform}(0,1)\)</span>, and conclude that the branch produces <span class="math inline">\(\mathcal{N}(\mu_1, \sigma^2)\)</span> with the correct probability.</li>
-<li>Construct the inverse-CDF map for a <strong>three</strong>-component mixture and describe its staircase limit as <span class="math inline">\(\sigma \to 0\)</span>. How many plateaus, at what heights?</li>
-<li>The map <span class="math inline">\(x = F^{-1}(u)\)</span> is monotone increasing. Exhibit a <em>decreasing</em> map with the same pushforward, and a map that is neither monotone nor continuous. (Hint: <span class="math inline">\(1 - u\)</span> is also uniform.)</li>
-</ol>
+<p>Parts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Parts 07–08 connect the construction to other continuous generative models.</p>
+<p><a href="../materials/probability-flow/probability-flow-code.zip">Download all notebooks and code</a>.</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1153,13 +1021,13 @@ x = \begin{cases}
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../assignments.html" class="pagination-link" aria-label="Assignments">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Assignments</span>
+      <a href="../tutorials/30-ddpm.html" class="pagination-link" aria-label="11 · Denoising Diffusion Probabilistic Models (DDPM)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/01-probability-101.html" class="pagination-link" aria-label="02 · Probability &amp; Random Variables">
-        <span class="nav-page-text">02 · Probability &amp; Random Variables</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/07-probability-flow-ode.html" class="pagination-link" aria-label="01 · Transport in one dimension">
+        <span class="nav-page-text">01 · Transport in one dimension</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
