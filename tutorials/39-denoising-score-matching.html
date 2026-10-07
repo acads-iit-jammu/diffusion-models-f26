@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Score-Based Diffusion: A One-Dimensional Learning Sequence – ID-5-02 (TO)</title>
+<title>Denoising Score Matching – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/25-learning-the-score.html" rel="next">
-<link href="../resources.html" rel="prev">
+<link href="../tutorials/40-reverse-sde-sampling.html" rel="next">
+<link href="../tutorials/30-ddpm.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Retired</a></li><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion: A One-Dimensional Learning Sequence</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">Score Matching and Stochastic Sampling</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">Denoising Score Matching</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -259,16 +259,16 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
  <span class="menu-text">Score Matching and Stochastic Sampling</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
+  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Denoising Score Matching</span></a>
   </div>
 </li>
@@ -541,16 +541,16 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
  <span class="menu-text">Retired</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link active">
+  <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Score-Based Diffusion: A One-Dimensional Learning Sequence</span></a>
   </div>
 </li>
@@ -590,20 +590,21 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#archived-reading-order" id="toc-archived-reading-order" class="nav-link active" data-scroll-target="#archived-reading-order">Archived reading order</a></li>
-  <li><a href="#shared-symbols" id="toc-shared-symbols" class="nav-link" data-scroll-target="#shared-symbols">Shared symbols</a></li>
-  <li><a href="#time-and-sign-conventions" id="toc-time-and-sign-conventions" class="nav-link" data-scroll-target="#time-and-sign-conventions">Time and sign conventions</a></li>
-  <li><a href="#three-distinctions-to-carry-through-the-series" id="toc-three-distinctions-to-carry-through-the-series" class="nav-link" data-scroll-target="#three-distinctions-to-carry-through-the-series">Three distinctions to carry through the series</a></li>
-  <li><a href="#additional-practice" id="toc-additional-practice" class="nav-link" data-scroll-target="#additional-practice">Additional practice</a></li>
+  <li><a href="#learn-from-cleannoisy-pairs" id="toc-learn-from-cleannoisy-pairs" class="nav-link active" data-scroll-target="#learn-from-cleannoisy-pairs">1. Learn from clean/noisy pairs</a></li>
+  <li><a href="#denoising-score-matching" id="toc-denoising-score-matching" class="nav-link" data-scroll-target="#denoising-score-matching">2. Denoising score matching</a></li>
+  <li><a href="#once-a-fixed-score-is-known-langevin-sampling" id="toc-once-a-fixed-score-is-known-langevin-sampling" class="nav-link" data-scroll-target="#once-a-fixed-score-is-known-langevin-sampling">3. Once a fixed score is known: Langevin sampling</a></li>
+  <li><a href="#first-solved-check-a-standard-gaussian" id="toc-first-solved-check-a-standard-gaussian" class="nav-link" data-scroll-target="#first-solved-check-a-standard-gaussian">4. First solved check: a standard Gaussian</a></li>
+  <li><a href="#several-noise-levels-and-annealed-langevin-dynamics" id="toc-several-noise-levels-and-annealed-langevin-dynamics" class="nav-link" data-scroll-target="#several-noise-levels-and-annealed-langevin-dynamics">5. Several noise levels and annealed Langevin dynamics</a></li>
+  <li><a href="#appendix-outline-stationarity-from-density-evolution" id="toc-appendix-outline-stationarity-from-density-evolution" class="nav-link" data-scroll-target="#appendix-outline-stationarity-from-density-evolution">Appendix outline: stationarity from density evolution</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Retired</a></li><li class="breadcrumb-item"><a href="../tutorials/score-based-diffusion-guide.html">Score-Based Diffusion: A One-Dimensional Learning Sequence</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">Score Matching and Stochastic Sampling</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">Denoising Score Matching</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Score-Based Diffusion: A One-Dimensional Learning Sequence</h1>
+<h1 class="title">Denoising Score Matching</h1>
 </div>
 
 
@@ -626,186 +627,66 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Retired material
+<span class="screen-reader-only">Note</span>Draft — Standalone topic outline
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This earlier tutorial sequence is retained for reference. The current teaching sequence is <a href="../tutorials/07-probability-flow-ode.html">Probability-Flow ODE, Parts 1–5</a> (Lectures 12–16). Follow those lectures for the current notation, derivations, and notebook exercises. These older notes contain additional background but are no longer part of the main reading sequence.</p>
+<p>This topic develops score estimation and Langevin sampling independently of probability-flow ODEs. The aim is to learn a score from samples, then use it to sample a fixed density. Start with one dimension; vector formulas replace derivatives by gradients. The sections below establish the main results and the planned teaching sequence.</p>
 </div>
 </div>
-<p>Begin with particles on a line. Derive how their motion transports probability, then add random motion and study its effect on the density. Only after solving these problems do we learn an unknown score or introduce higher dimensions.</p>
-<p>The entry prerequisites are derivatives, integrals, Taylor expansion, elementary probability, and Gaussian distributions. No prior SDE, stochastic-calculus, PDE, or fluid-mechanics course is assumed. The ODE and SDE tutorials are stand-alone; the SDE tutorial includes the deterministic recap it needs.</p>
-<section id="archived-reading-order" class="level2">
-<h2 class="anchored" data-anchor-id="archived-reading-order">Archived reading order</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Part</th>
-<th>Tutorial</th>
-<th>Central question</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td><a href="../tutorials/25-learning-the-score.html">ODEs in One Dimension: Particles, Flows, and Densities</a></td>
-<td>How does a local velocity move each particle and its population density?</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td><a href="../tutorials/26-probability-flow-sampling.html">SDEs in One Dimension: Brownian Motion, Itô Calculus, and Langevin Sampling</a></td>
-<td>How do random kicks change conservation, and why does balanced noise make score-based sampling possible?</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td><a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html">Score-Based Diffusion in One Dimension: Corruption, Sampling, and Denoising</a></td>
-<td>How can the score reverse a prescribed density path, and how can we learn it?</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td><a href="../tutorials/28-langevin-dynamics.html">From One-Dimensional Transport to Neural ODEs and Higher Dimensions</a></td>
-<td>How do these transports connect to normalizing flows, and what changes in several dimensions?</td>
-</tr>
-</tbody>
-</table>
-<p>Each worked model links <strong>particle dynamics, its solution, the density, and a conservation/Fokker–Planck check</strong>. The examples repeat deliberately: standard normal, shifted normal, arbitrary Gaussian variance, and a smooth two-Gaussian mixture. Long calculations are derivation subsections; optional connections are identified as such. Exact Gaussian solutions precede numerical mixtures.</p>
-<p>The figures show arrows, paths, and population densities. The reproducible <a href="../materials/one-dimensional-score-examples.py">simulation script</a> generates the four figures and checks the Gaussian formulas. Existing interactive practice is available in the <a href="../materials/score-flow-lab.html">score-flow lab</a>.</p>
+<section id="learn-from-cleannoisy-pairs" class="level2">
+<h2 class="anchored" data-anchor-id="learn-from-cleannoisy-pairs">1. Learn from clean/noisy pairs</h2>
+<p>Draw <span class="math inline">\(X_0\sim p_{\mathrm{data}}\)</span> and independent <span class="math inline">\(\varepsilon\sim\mathcal N(0,1)\)</span>. At a fixed noise scale <span class="math inline">\(\sigma&gt;0\)</span>, form</p>
+<p><span class="math display">\[Y=X_0+\sigma\varepsilon,\qquad
+p_\sigma(y)=\int\mathcal N(y;x_0,\sigma^2)p_{\mathrm{data}}(x_0)\,dx_0.\]</span></p>
+<p>A denoiser trained with squared error estimates <span class="math inline">\(D_*(y,\sigma)=\mathbb E[X_0\mid Y=y]\)</span>. Tweedie’s formula connects it to the noisy marginal score:</p>
+<p><span class="math display">\[s_\sigma(y)=\partial_y\log p_\sigma(y)
+=\frac{D_*(y,\sigma)-y}{\sigma^2}.\]</span></p>
+<p>The regression averages possible clean origins conditional on the noisy input. It does not recover the particular noise realization of every pair. The score is a property of the smoothed density <span class="math inline">\(p_\sigma\)</span>, not exactly the original clean density at finite <span class="math inline">\(\sigma\)</span>.</p>
 </section>
-<section id="shared-symbols" class="level2">
-<h2 class="anchored" data-anchor-id="shared-symbols">Shared symbols</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Symbol</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(x_t\)</span>, <span class="math inline">\(X_t\)</span></td>
-<td>One trajectory, and a random state respectively</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(q_t(x)\)</span></td>
-<td>Current population or generic sampler density</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(p(x)\)</span></td>
-<td>One fixed target density</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(p_t(x)\)</span></td>
-<td>Prescribed forward-corruption density in Tutorial 3</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(s(x)=\partial_x\log p(x)\)</span>, <span class="math inline">\(s_t(x)=\partial_x\log p_t(x)\)</span></td>
-<td>Fixed-target and time-dependent scores</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(v(x,t)\)</span></td>
-<td>ODE velocity</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(f(x,t)\)</span>, <span class="math inline">\(g(t)\)</span></td>
-<td>SDE drift and spatially constant noise amplitude</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(W_t\)</span></td>
-<td>Standard Brownian motion</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\Psi_{r\to t}\)</span></td>
-<td>Flow map from time <span class="math inline">\(r\)</span> to time <span class="math inline">\(t\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(J(x,t)\)</span></td>
-<td>Signed probability flux</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(m_t\)</span>, <span class="math inline">\(V_t\)</span>, <span class="math inline">\(a_t=\sqrt{V_t}\)</span></td>
-<td>Gaussian population mean, variance, standard deviation</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\mu\)</span>, <span class="math inline">\(a^2\)</span></td>
-<td>Fixed Gaussian target mean and variance</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\alpha_t\)</span>, <span class="math inline">\(\sigma_t^2\)</span></td>
-<td>Corruption signal coefficient and conditional noise variance</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\epsilon\)</span>, <span class="math inline">\(\xi_k\)</span></td>
-<td>Noise in one corruption observation; fresh numerical-step noises</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\Phi\)</span></td>
-<td>Standard normal CDF; never a flow map</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(F_t\)</span></td>
-<td>CDF of <span class="math inline">\(p_t\)</span>; never a flow map</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\beta(t)\)</span></td>
-<td>VP corruption schedule</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\tau=T-t\)</span></td>
-<td>Increasing generation clock</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(u\)</span>, <span class="math inline">\(B_u\)</span></td>
-<td>Fixed-level Langevin clock and its Brownian motion</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(s_\theta(x,t)\)</span></td>
-<td>Learned marginal-score approximation</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\pi_T\)</span></td>
-<td>Chosen terminal law, potentially approximating <span class="math inline">\(p_T\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\lambda(t)\)</span></td>
-<td>Positive weight on a time-indexed training loss</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\widehat X_k\)</span></td>
-<td>Numerical approximation to an SDE state</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\widehat x_0(x,t)\)</span></td>
-<td>Posterior-mean clean-data denoiser</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(DF\)</span></td>
-<td>Jacobian matrix of a map, introduced only in the final extension</td>
-</tr>
-</tbody>
-</table>
-<p>The first three tutorials use scalar states and <span class="math inline">\(\partial_x\)</span>, never vector notation. Tutorial 4 explicitly introduces <span class="math inline">\(d\)</span>-dimensional vectors, gradient, divergence, and Laplacian after completing its one-dimensional discussion.</p>
+<section id="denoising-score-matching" class="level2">
+<h2 class="anchored" data-anchor-id="denoising-score-matching">2. Denoising score matching</h2>
+<p>The conditional Gaussian score is available for every constructed pair:</p>
+<p><span class="math display">\[U=\partial_y\log p(Y\mid X_0)
+=-\frac{Y-X_0}{\sigma^2}=-\frac{\varepsilon}{\sigma}.\]</span></p>
+<p>Minimize</p>
+<p><span class="math display">\[\mathcal L_{\mathrm{DSM}}(\theta;\sigma)
+=\mathbb E_{X_0\sim p_{\mathrm{data}},\,\varepsilon\sim\mathcal N(0,1)}
+[(s_\theta(X_0+\sigma\varepsilon,\sigma)+\varepsilon/\sigma)^2].\]</span></p>
+<p>At the unrestricted optimum, <span class="math inline">\(s_*(y,\sigma)=\mathbb E[U\mid Y=y]=s_\sigma(y)\)</span>. The conditional target is known even though the marginal score is not. The loss differs from marginal-score regression by a conditional-variance term independent of the predictor. This is the denoising/score-matching connection developed by <a href="https://gwern.net/doc/ai/nn/diffusion/2011-vincent.pdf">Vincent (2011)</a>.</p>
+<p>Planned derivation: expand the conditional squared error, differentiate the Gaussian convolution, and show explicitly why the posterior mean appears. Finite-data training targets the corrupted empirical law at its unrestricted optimum.</p>
 </section>
-<section id="time-and-sign-conventions" class="level2">
-<h2 class="anchored" data-anchor-id="time-and-sign-conventions">Time and sign conventions</h2>
-<p>In Tutorial 1, <span class="math inline">\(t\)</span> is ordinary ODE evolution time. In Tutorial 2 it is SDE or Langevin algorithmic time; the Langevin target <span class="math inline">\(p\)</span> stays fixed. In Tutorial 3, <span class="math inline">\(t\)</span> labels <strong>forward corruption from data to noise</strong>, and <span class="math inline">\(\tau=T-t\)</span> is an increasing clock for generation. A separate <span class="math inline">\(u\)</span> is used only when running a fixed-target Langevin corrector while holding the corruption level <span class="math inline">\(t\)</span> fixed.</p>
-<p>The straight-path flow-matching example in Tutorial 4 explicitly uses source-to-data time and then switches back to the corruption convention for Gaussian paths.</p>
-<p>Every numerical step magnitude <span class="math inline">\(h\)</span> is positive. Backward ODE integration uses <span class="math inline">\(-h v\)</span>; reverse-SDE noise has scale <span class="math inline">\(g\sqrt h\)</span>. The <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html#song-sde-conventions">Song convention comparison</a> explains how this relates to a reverse SDE written with negative <span class="math inline">\(dt\)</span>.</p>
+<section id="once-a-fixed-score-is-known-langevin-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="once-a-fixed-score-is-known-langevin-sampling">3. Once a fixed score is known: Langevin sampling</h2>
+<p>Let <span class="math inline">\(p\)</span> be a smooth positive target density and <span class="math inline">\(s=\partial_x\log p\)</span>. Use sampling time <span class="math inline">\(\tau\)</span>, with <span class="math inline">\(p\)</span> held fixed:</p>
+<p><span class="math display">\[dX_\tau=s(X_\tau)\,d\tau+\sqrt2\,dW_\tau.\]</span></p>
+<p>Brownian increments over an interval of length <span class="math inline">\(\eta\)</span> are independent Gaussians with variance <span class="math inline">\(\eta\)</span>. Euler–Maruyama therefore gives</p>
+<p><span class="math display">\[\boxed{x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k,
+\qquad z_k\overset{\mathrm{iid}}{\sim}\mathcal N(0,1).}\]</span></p>
+<p>Score-directed drift and random spreading balance at the target distribution. For the continuous SDE, <span class="math inline">\(p\)</span> is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error.</p>
+<p>If the learned score is <span class="math inline">\(s_\sigma\)</span>, the intended stationary target is <span class="math inline">\(p_\sigma\)</span>. Langevin does not remove the smoothing merely by running longer. Its sampling clock is not a schedule that automatically reduces <span class="math inline">\(\sigma\)</span>.</p>
 </section>
-<section id="three-distinctions-to-carry-through-the-series" class="level2">
-<h2 class="anchored" data-anchor-id="three-distinctions-to-carry-through-the-series">Three distinctions to carry through the series</h2>
-<ol type="1">
-<li>Increasing density at an individual particle’s location is not the same as producing the correct population distribution. A bare Gaussian score ODE contracts; an appropriately designed ODE can transport the entire distribution.</li>
-<li>A fixed density being stationary under an SDE does not by itself prove convergence from another initial distribution or accuracy of a finite-step sampler.</li>
-<li>Equal one-time marginal densities do not mean equal paths or equal endpoint couplings. This is the link between stochastic diffusion and deterministic flow.</li>
-</ol>
+<section id="first-solved-check-a-standard-gaussian" class="level2">
+<h2 class="anchored" data-anchor-id="first-solved-check-a-standard-gaussian">4. First solved check: a standard Gaussian</h2>
+<p>For <span class="math inline">\(p=\mathcal N(0,1)\)</span>, <span class="math inline">\(s(x)=-x\)</span>. Deterministic score ascent <span class="math inline">\(\dot x=-x\)</span> collapses toward zero. Langevin instead gives</p>
+<p><span class="math display">\[x_{k+1}=(1-\eta)x_k+\sqrt{2\eta}\,z_k.\]</span></p>
+<p>For <span class="math inline">\(0&lt;\eta&lt;2\)</span>, the discrete chain’s stationary variance solves</p>
+<p><span class="math display">\[V=(1-\eta)^2V+2\eta,
+\qquad V=\frac1{1-\eta/2}.\]</span></p>
+<p>It approaches the target variance 1 as <span class="math inline">\(\eta\to0\)</span>, but is not exactly 1 at a finite step. This will anchor simulations of step-size bias, convergence, and multimodal mixing.</p>
 </section>
-<section id="additional-practice" class="level2">
-<h2 class="anchored" data-anchor-id="additional-practice">Additional practice</h2>
-<p><a href="../tutorials/22-vector-fields-to-score-diffusion.html">From Local Arrows</a> and <a href="../tutorials/24-sampling-with-scores.html">Sampling with Scores</a> provide earlier geometric and worked-example perspectives. <a href="../tutorials/23-tweedie-bayes-denoising.html">Tweedie’s Formula</a> is a stand-alone statistical derivation. The present sequence supplies the ordered ODE/SDE foundations and uses its own common notation throughout.</p>
+<section id="several-noise-levels-and-annealed-langevin-dynamics" class="level2">
+<h2 class="anchored" data-anchor-id="several-noise-levels-and-annealed-langevin-dynamics">5. Several noise levels and annealed Langevin dynamics</h2>
+<p>Train <span class="math inline">\(s_\theta(x,\sigma)\)</span> at a decreasing sequence <span class="math inline">\(\sigma_1&gt;\cdots&gt;\sigma_L&gt;0\)</span>, averaging the DSM loss over a stated distribution of noise levels with positive weights. At each level, perform several Langevin steps targeting <span class="math inline">\(p_{\sigma_i}\)</span>, then lower the noise scale. Large smoothing can make movement between modes easier; short runs at each level do not guarantee equilibrium.</p>
+<p>This is the approach of <a href="https://arxiv.org/abs/1907.05600">Song and Ermon (2019)</a>. It differs from a reverse diffusion SDE designed to follow prescribed changing marginals without equilibrating at every level. The final positive noise level retains smoothing error.</p>
+</section>
+<section id="appendix-outline-stationarity-from-density-evolution" class="level2">
+<h2 class="anchored" data-anchor-id="appendix-outline-stationarity-from-density-evolution">Appendix outline: stationarity from density evolution</h2>
+<p>If <span class="math inline">\(r_\tau\)</span> is the current sampler density, its Fokker–Planck equation is</p>
+<p><span class="math display">\[\partial_\tau r_\tau=-\partial_x(r_\tau s)+\partial_{xx}r_\tau.\]</span></p>
+<p>At <span class="math inline">\(r_\tau=p\)</span>, <span class="math inline">\(ps=\partial_xp\)</span>, so the two terms cancel. This proves invariance subject to the relevant boundary and regularity conditions; it does not establish a mixing rate. The full appendix will develop the fixed-interval probability balance and distinguish invariance, convergence, and discretization bias.</p>
+<p>For a different use of a time-dependent score—deterministic transport through a prescribed density path—see the separate <a href="../tutorials/probability-flow-ode.html">Probability-Flow ODE topic</a>.</p>
+<p><a href="../tutorials/40-reverse-sde-sampling.html">Continue to Reverse-SDE sampling</a> to follow a changing density path rather than equilibrate at one noise level.</p>
 
 
 </section>
@@ -1218,13 +1099,13 @@ window.Quarto = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../resources.html" class="pagination-link" aria-label="Resources">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Resources</span>
+      <a href="../tutorials/30-ddpm.html" class="pagination-link" aria-label="11 · Denoising Diffusion Probabilistic Models (DDPM)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/25-learning-the-score.html" class="pagination-link" aria-label="ODEs in One Dimension: Particles, Flows, and Densities">
-        <span class="nav-page-text">ODEs in One Dimension: Particles, Flows, and Densities</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/40-reverse-sde-sampling.html" class="pagination-link" aria-label="Reverse-SDE sampling">
+        <span class="nav-page-text">Reverse-SDE sampling</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -1439,11 +1439,143 @@
     ]
   },
   {
+    "objectID": "tutorials/39-denoising-score-matching.html",
+    "href": "tutorials/39-denoising-score-matching.html",
+    "title": "Denoising Score Matching",
+    "section": "",
+    "text": "1. Learn from clean/noisy pairs\nDraw \\(X_0\\sim p_{\\mathrm{data}}\\) and independent \\(\\varepsilon\\sim\\mathcal N(0,1)\\). At a fixed noise scale \\(\\sigma&gt;0\\), form\n\\[Y=X_0+\\sigma\\varepsilon,\\qquad\np_\\sigma(y)=\\int\\mathcal N(y;x_0,\\sigma^2)p_{\\mathrm{data}}(x_0)\\,dx_0.\\]\nA denoiser trained with squared error estimates \\(D_*(y,\\sigma)=\\mathbb E[X_0\\mid Y=y]\\). Tweedie’s formula connects it to the noisy marginal score:\n\\[s_\\sigma(y)=\\partial_y\\log p_\\sigma(y)\n=\\frac{D_*(y,\\sigma)-y}{\\sigma^2}.\\]\nThe regression averages possible clean origins conditional on the noisy input. It does not recover the particular noise realization of every pair. The score is a property of the smoothed density \\(p_\\sigma\\), not exactly the original clean density at finite \\(\\sigma\\).",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#denoising-score-matching",
+    "href": "tutorials/39-denoising-score-matching.html#denoising-score-matching",
+    "title": "Denoising Score Matching",
+    "section": "2. Denoising score matching",
+    "text": "2. Denoising score matching\nThe conditional Gaussian score is available for every constructed pair:\n\\[U=\\partial_y\\log p(Y\\mid X_0)\n=-\\frac{Y-X_0}{\\sigma^2}=-\\frac{\\varepsilon}{\\sigma}.\\]\nMinimize\n\\[\\mathcal L_{\\mathrm{DSM}}(\\theta;\\sigma)\n=\\mathbb E_{X_0\\sim p_{\\mathrm{data}},\\,\\varepsilon\\sim\\mathcal N(0,1)}\n[(s_\\theta(X_0+\\sigma\\varepsilon,\\sigma)+\\varepsilon/\\sigma)^2].\\]\nAt the unrestricted optimum, \\(s_*(y,\\sigma)=\\mathbb E[U\\mid Y=y]=s_\\sigma(y)\\). The conditional target is known even though the marginal score is not. The loss differs from marginal-score regression by a conditional-variance term independent of the predictor. This is the denoising/score-matching connection developed by Vincent (2011).\nPlanned derivation: expand the conditional squared error, differentiate the Gaussian convolution, and show explicitly why the posterior mean appears. Finite-data training targets the corrupted empirical law at its unrestricted optimum.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#once-a-fixed-score-is-known-langevin-sampling",
+    "href": "tutorials/39-denoising-score-matching.html#once-a-fixed-score-is-known-langevin-sampling",
+    "title": "Denoising Score Matching",
+    "section": "3. Once a fixed score is known: Langevin sampling",
+    "text": "3. Once a fixed score is known: Langevin sampling\nLet \\(p\\) be a smooth positive target density and \\(s=\\partial_x\\log p\\). Use sampling time \\(\\tau\\), with \\(p\\) held fixed:\n\\[dX_\\tau=s(X_\\tau)\\,d\\tau+\\sqrt2\\,dW_\\tau.\\]\nBrownian increments over an interval of length \\(\\eta\\) are independent Gaussians with variance \\(\\eta\\). Euler–Maruyama therefore gives\n\\[\\boxed{x_{k+1}=x_k+\\eta s(x_k)+\\sqrt{2\\eta}\\,z_k,\n\\qquad z_k\\overset{\\mathrm{iid}}{\\sim}\\mathcal N(0,1).}\\]\nScore-directed drift and random spreading balance at the target distribution. For the continuous SDE, \\(p\\) is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error.\nIf the learned score is \\(s_\\sigma\\), the intended stationary target is \\(p_\\sigma\\). Langevin does not remove the smoothing merely by running longer. Its sampling clock is not a schedule that automatically reduces \\(\\sigma\\).",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#first-solved-check-a-standard-gaussian",
+    "href": "tutorials/39-denoising-score-matching.html#first-solved-check-a-standard-gaussian",
+    "title": "Denoising Score Matching",
+    "section": "4. First solved check: a standard Gaussian",
+    "text": "4. First solved check: a standard Gaussian\nFor \\(p=\\mathcal N(0,1)\\), \\(s(x)=-x\\). Deterministic score ascent \\(\\dot x=-x\\) collapses toward zero. Langevin instead gives\n\\[x_{k+1}=(1-\\eta)x_k+\\sqrt{2\\eta}\\,z_k.\\]\nFor \\(0&lt;\\eta&lt;2\\), the discrete chain’s stationary variance solves\n\\[V=(1-\\eta)^2V+2\\eta,\n\\qquad V=\\frac1{1-\\eta/2}.\\]\nIt approaches the target variance 1 as \\(\\eta\\to0\\), but is not exactly 1 at a finite step. This will anchor simulations of step-size bias, convergence, and multimodal mixing.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#several-noise-levels-and-annealed-langevin-dynamics",
+    "href": "tutorials/39-denoising-score-matching.html#several-noise-levels-and-annealed-langevin-dynamics",
+    "title": "Denoising Score Matching",
+    "section": "5. Several noise levels and annealed Langevin dynamics",
+    "text": "5. Several noise levels and annealed Langevin dynamics\nTrain \\(s_\\theta(x,\\sigma)\\) at a decreasing sequence \\(\\sigma_1&gt;\\cdots&gt;\\sigma_L&gt;0\\), averaging the DSM loss over a stated distribution of noise levels with positive weights. At each level, perform several Langevin steps targeting \\(p_{\\sigma_i}\\), then lower the noise scale. Large smoothing can make movement between modes easier; short runs at each level do not guarantee equilibrium.\nThis is the approach of Song and Ermon (2019). It differs from a reverse diffusion SDE designed to follow prescribed changing marginals without equilibrating at every level. The final positive noise level retains smoothing error.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/39-denoising-score-matching.html#appendix-outline-stationarity-from-density-evolution",
+    "href": "tutorials/39-denoising-score-matching.html#appendix-outline-stationarity-from-density-evolution",
+    "title": "Denoising Score Matching",
+    "section": "Appendix outline: stationarity from density evolution",
+    "text": "Appendix outline: stationarity from density evolution\nIf \\(r_\\tau\\) is the current sampler density, its Fokker–Planck equation is\n\\[\\partial_\\tau r_\\tau=-\\partial_x(r_\\tau s)+\\partial_{xx}r_\\tau.\\]\nAt \\(r_\\tau=p\\), \\(ps=\\partial_xp\\), so the two terms cancel. This proves invariance subject to the relevant boundary and regularity conditions; it does not establish a mixing rate. The full appendix will develop the fixed-interval probability balance and distinguish invariance, convergence, and discretization bias.\nFor a different use of a time-dependent score—deterministic transport through a prescribed density path—see the separate Probability-Flow ODE topic.\nContinue to Reverse-SDE sampling to follow a changing density path rather than equilibrate at one noise level.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Denoising Score Matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html",
+    "href": "tutorials/40-reverse-sde-sampling.html",
+    "title": "Reverse-SDE sampling",
+    "section": "",
+    "text": "1. From a fixed target to a prescribed density path\nOrdinary Langevin dynamics uses the score of one fixed target and attempts to approach its stationary distribution. Reverse diffusion instead follows a time-dependent sequence of target densities, \\(p_1,p_{1-h},\\ldots,p_0\\). It does not wait for equilibrium at each noise level.\nChoose a forward process\n\\[dX_t=f(X_t,t)\\,dt+g(t)\\,dW_t,\\]\nand let \\(p_t\\) be its marginal density. A one-step Euler–Maruyama approximation adds deterministic drift \\(h f\\) and independent Gaussian noise with standard deviation \\(g\\sqrt h\\). Brownian increments scale with \\(\\sqrt h\\), not \\(h\\).\nLearn \\(s_\\theta(x,t)\\approx\\partial_x\\log p_t(x)\\) using known conditional corruption kernels. The distinction between conditional labels and marginal predictions is the same as in the preceding topic.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#reverse-the-stochastic-process",
+    "href": "tutorials/40-reverse-sde-sampling.html#reverse-the-stochastic-process",
+    "title": "Reverse-SDE sampling",
+    "section": "2. Reverse the stochastic process",
+    "text": "2. Reverse the stochastic process\nWrite \\(Y_\\tau=X_{1-\\tau}\\) for the time-reversed process in law. Under the usual smoothness and time-reversal conditions, and with diffusion coefficient independent of position,\n\\[\\boxed{dY_\\tau=\n[-f(Y_\\tau,t)+g(t)^2s_t(Y_\\tau)]\\,d\\tau\n+g(t)\\,d\\overline W_\\tau,\\qquad t=1-\\tau.}\\]\nThe Brownian motion is defined with respect to the reverse-time information; it is not obtained by simply negating the original Brownian increments. The formula above applies to scalar \\(g(t)\\); state-dependent diffusion requires additional derivative terms.\nIn the original decreasing clock, the same reverse dynamics is often written\n\\[dX_t=[f(X_t,t)-g(t)^2s_t(X_t)]\\,dt+g(t)\\,d\\overline W_t,\n\\qquad dt&lt;0.\\]\nNoise increments in this notation have variance proportional to \\(|dt|\\). We use the increasing reverse clock to avoid negative-variance interpretations. The primary reference is Song et al., Eq. (6); Yang Song’s blog explains the forward and reverse SDEs as separate processes.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#vp-diffusion-and-an-explicit-sampler",
+    "href": "tutorials/40-reverse-sde-sampling.html#vp-diffusion-and-an-explicit-sampler",
+    "title": "Reverse-SDE sampling",
+    "section": "3. VP diffusion and an explicit sampler",
+    "text": "3. VP diffusion and an explicit sampler\nFor the VP forward process,\n\\[f(x,t)=-\\tfrac12\\beta(t)x,\\qquad g(t)=\\sqrt{\\beta(t)},\\]\nwith the same schedule relation as before:\n\\[\\alpha_t=\\exp\\left[-\\tfrac12\\int_0^t\\beta(u)\\,du\\right],\n\\qquad X_t\\mid X_0=x_0\\sim\\mathcal N(\\alpha_tx_0,1-\\alpha_t^2).\\]\nThe reverse SDE is\n\\[dY_\\tau=\\beta(t)[\\tfrac12Y_\\tau+s_t(Y_\\tau)]\\,d\\tau\n+\\sqrt{\\beta(t)}\\,d\\overline W_\\tau.\\]\nFor \\(h=t_k-t_{k+1}&gt;0\\), generate with\n\\[\\boxed{x_{k+1}=x_k+h\\beta(t_k)[\\tfrac12x_k+s_\\theta(x_k,t_k)]\n+\\sqrt{h\\beta(t_k)}\\,z_k,\\qquad z_k\\sim\\mathcal N(0,1).}\\]\nStart from the actual \\(p_1\\) if available, or a justified approximation such as standard normal after sufficient corruption. Draw fresh independent noise at each step. Stop at a positive cutoff compatible with the trained score if the endpoint is singular. The exact continuous process has the required marginals with the exact score and matched initialization; a learned score, finite steps, and approximate prior introduce errors.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#why-this-is-not-an-ode-with-noise-simply-added",
+    "href": "tutorials/40-reverse-sde-sampling.html#why-this-is-not-an-ode-with-noise-simply-added",
+    "title": "Reverse-SDE sampling",
+    "section": "4. Why this is not an ODE with noise simply added",
+    "text": "4. Why this is not an ODE with noise simply added\nIn increasing reverse time, the probability-flow ODE uses\n\\[b_{\\mathrm{ODE}}=-f+\\tfrac12g^2s_t,\\]\nwhile the reverse SDE uses\n\\[b_{\\mathrm{SDE}}=-f+g^2s_t.\\]\nTherefore\n\\[b_{\\mathrm{SDE}}=b_{\\mathrm{ODE}}+\\tfrac12g^2s_t.\\]\nThe extra score drift compensates for the Brownian spreading. Adding \\(g\\,dW\\) to the probability-flow ODE without that drift correction changes the density evolution. Appendix A checks the factors explicitly.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#a-gaussian-example-checks-the-sign-and-coefficient",
+    "href": "tutorials/40-reverse-sde-sampling.html#a-gaussian-example-checks-the-sign-and-coefficient",
+    "title": "Reverse-SDE sampling",
+    "section": "5. A Gaussian example checks the sign and coefficient",
+    "text": "5. A Gaussian example checks the sign and coefficient\nIf the clean law is standard normal, VP preserves it and \\(s_t(x)=-x\\). The reverse SDE becomes\n\\[dY_\\tau=-\\tfrac12\\beta(t)Y_\\tau\\,d\\tau\n+\\sqrt{\\beta(t)}\\,d\\overline W_\\tau.\\]\nAt mean zero and variance one, the instantaneous mean and variance derivatives are zero. The density stays standard normal although particles move randomly. The corresponding probability-flow ODE has zero velocity, so its particles remain fixed. The two processes agree on marginals, not trajectories.\nFor constant \\(\\beta\\) and Euler step \\(h\\), the stochastic update has stationary variance \\(1/(1-h\\beta/4)\\) when \\(0&lt;h\\beta&lt;4\\). Its deviation from one is a discretization effect, not a failure of the continuous reverse-SDE formula.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
+    "objectID": "tutorials/40-reverse-sde-sampling.html#appendix-a.-check-the-reversed-density-evolution",
+    "href": "tutorials/40-reverse-sde-sampling.html#appendix-a.-check-the-reversed-density-evolution",
+    "title": "Reverse-SDE sampling",
+    "section": "Appendix A. Check the reversed density evolution",
+    "text": "Appendix A. Check the reversed density evolution\nThe forward Fokker–Planck equation is\n\\[\\partial_tp_t=-\\partial_x(fp_t)+\\tfrac12g^2\\partial_{xx}p_t.\\]\nSet \\(r_\\tau=p_{1-\\tau}\\). Then\n\\[\\partial_\\tau r_\\tau=\\partial_x(fr_\\tau)-\\tfrac12g^2\\partial_{xx}r_\\tau,\\]\nwhere coefficients and scores are evaluated at \\(t=1-\\tau\\). The proposed reverse SDE gives\n\\[\\begin{aligned}\n-\\partial_x[(-f+g^2s_t)r_\\tau]+\\tfrac12g^2\\partial_{xx}r_\\tau\n&=\\partial_x(fr_\\tau)-g^2\\partial_x(r_\\tau s_t)\n+\\tfrac12g^2\\partial_{xx}r_\\tau\\\\\n&=\\partial_x(fr_\\tau)-\\tfrac12g^2\\partial_{xx}r_\\tau,\n\\end{aligned}\\]\nbecause \\(r_\\tau s_t=\\partial_xr_\\tau\\). This verifies the marginal equation. Identifying the full reversed path law requires the time-reversal result cited above; the marginal calculation alone does not establish that joint law.\nFor comparison, the ODE flux with \\(-f+g^2s_t/2\\) gives the same marginal equation without a diffusion term. See Probability-Flow ODE, Part 09 for the connection to DDPM and DDIM.",
+    "crumbs": [
+      "Score Matching and Stochastic Sampling",
+      "Reverse-SDE sampling"
+    ]
+  },
+  {
     "objectID": "tutorials/probability-flow-ode.html",
     "href": "tutorials/probability-flow-ode.html",
     "title": "Probability-Flow ODE",
     "section": "",
-    "text": "NoteDraft topic\n\n\n\nThis eight-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–08, and can be read in sequence. The notes and worked examples are in development.\n\n\nStart with particle trajectories and density evolution in one dimension. Then extend the construction to vectors, learn the score from clean/noisy pairs, and implement sampling. The later parts provide experiments and an image-model recipe, then connect probability-flow ODEs to Neural ODEs, normalizing flows, and flow matching.\n\n\n\nPart\nFocus\n\n\n\n\n01 · Transport in one dimension\nBuild a density path and its probability-flow ODE.\n\n\n02 · Higher-dimensional transport\nExtend the notation and main results to vectors.\n\n\n03 · Learning the score\nLearn a denoiser, recover the score, and construct the sampling field.\n\n\n04 · One-dimensional experiments\nExplore four executed notebooks on transport, sampling, training, and denoising.\n\n\n05 · Image-model recipe\nConnect the equations to an annotated MNIST implementation.\n\n\n06 · Train and sample a mixture\nWork through neural score estimation and generation in an executed notebook.\n\n\n07 · Neural ODEs and normalizing flows\nConnect velocity models, invertible transport, and likelihood.\n\n\n08 · Flow matching\nLearn the velocity directly from conditional-path regression.\n\n\n\nParts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Parts 07–08 connect the construction to other continuous generative models.\nDownload all notebooks and code.",
+    "text": "NoteDraft topic\n\n\n\nThis nine-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–09, and can be read in sequence. The notes and worked examples are in development.\n\n\nStart with particle trajectories and density evolution in one dimension. Then extend the construction to vectors, learn the score from clean/noisy pairs, and implement sampling. The later parts provide experiments and an image-model recipe, then connect probability-flow ODEs to Neural ODEs, normalizing flows, and flow matching.\n\n\n\nPart\nFocus\n\n\n\n\n01 · Transport in one dimension\nBuild a density path and its probability-flow ODE.\n\n\n02 · Higher-dimensional transport\nExtend the notation and main results to vectors.\n\n\n03 · Learning the score\nLearn a denoiser, recover the score, and construct the sampling field.\n\n\n04 · One-dimensional experiments\nExplore four executed notebooks on transport, sampling, training, and denoising.\n\n\n05 · Image-model recipe\nConnect the equations to an annotated MNIST implementation.\n\n\n06 · Train and sample a mixture\nWork through neural score estimation and generation in an executed notebook.\n\n\n07 · Neural ODEs and normalizing flows\nConnect velocity models, invertible transport, and likelihood.\n\n\n08 · Flow matching\nLearn the velocity directly from conditional-path regression.\n\n\n09 · DDPM, DDIM, and probability flow\nRelate discrete samplers to the reverse SDE and probability-flow ODE.\n\n\n\nParts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Parts 07–08 connect the construction to other continuous generative models.\nDownload all notebooks and code.",
     "crumbs": [
       "Probability-Flow ODE"
     ]
@@ -1981,7 +2113,7 @@
     "href": "tutorials/36-probability-flow-ode-part-7.html#normalizing-flows-track-density-as-well-as-position",
     "title": "07 · Neural ODEs and normalizing flows",
     "section": "3. Normalizing flows track density as well as position",
-    "text": "3. Normalizing flows track density as well as position\nA discrete normalizing flow applies an invertible map \\(x=F(z)\\) to a tractable random variable. In one dimension,\n\\[\\log p_X(F(z))=\\log p_Z(z)-\\log|F'(z)|.\\]\nThe derivative measures local stretching: an interval that grows spreads its probability over a greater length. In \\(d\\) dimensions, the corresponding factor is the absolute Jacobian determinant:\n\\[\\log p_X(F(z))=\\log p_Z(z)-\\log|\\det J_F(z)|.\\]\nA continuous normalizing flow (CNF) uses an ODE flow for this map. Along its trajectory,\n\\[\\boxed{\\frac{d}{dt}\\log p_t(x_t)=-\\partial_xv_\\theta(x_t,t).}\\]\nIn vector notation,\n\\[\\boxed{\\frac{d}{dt}\\log p_t(\\mathbf x_t)\n=-\\nabla\\cdot\\mathbf v_\\theta(\\mathbf x_t,t)\n=-\\operatorname{tr}J_{\\mathbf v_\\theta}(\\mathbf x_t,t).}\\]\nThis is the instantaneous change-of-variables formula. Its short derivation from the continuity equation is in Appendix A. Divergence is a scalar measuring the rate of local volume expansion, not the magnitude of the velocity. Chen et al., Theorem 1\n\nCheck with a contraction\nFor \\(v(x)=-x\\), \\(\\partial_xv=-1\\), so along each trajectory,\n\\[\\log p_t(x_t)=\\log p_0(x_0)+t.\\]\nIndeed, \\(x_t=e^{-t}x_0\\) gives \\(p_t(x)=e^tp_0(e^tx)\\). Density grows while occupied lengths shrink; total probability remains one.",
+    "text": "3. Normalizing flows track density as well as position\nA discrete normalizing flow applies an invertible map \\(x=F(z)\\) to a tractable random variable. In one dimension,\n\\[\\log p_X(F(z))=\\log p_Z(z)-\\log|F'(z)|.\\]\nThe derivative measures local stretching: an interval that grows spreads its probability over a greater length. In \\(d\\) dimensions, the corresponding factor is the absolute Jacobian determinant:\n\\[\\log p_X(F(z))=\\log p_Z(z)-\\log|\\det J_F(z)|.\\]\nA continuous normalizing flow (CNF) uses an ODE flow for this map. To connect the discrete formula to continuous time, consider one small step \\(F_h(x)=x+h v(x,t)\\). In one dimension,\n\\[F_h'(x)=1+h\\partial_xv(x,t),\\qquad\n\\log|F_h'(x)|=h\\partial_xv(x,t)+O(h^2).\\]\nThe change-of-variables correction per unit time therefore tends to \\(-\\partial_xv\\). For vectors, the same expansion is\n\\[\\log|\\det(I+hJ_{\\mathbf v})|\n=h\\operatorname{tr}J_{\\mathbf v}+O(h^2).\\]\nThese expansions hold locally for sufficiently small steps and bounded derivatives. They explain how the discrete log determinant becomes a continuous divergence. Along the exact trajectory,\n\\[\\boxed{\\frac{d}{dt}\\log p_t(x_t)=-\\partial_xv_\\theta(x_t,t).}\\]\nIn vector notation,\n\\[\\boxed{\\frac{d}{dt}\\log p_t(\\mathbf x_t)\n=-\\nabla\\cdot\\mathbf v_\\theta(\\mathbf x_t,t)\n=-\\operatorname{tr}J_{\\mathbf v_\\theta}(\\mathbf x_t,t).}\\]\nThis is the instantaneous change-of-variables formula. Its short derivation from the continuity equation is in Appendix A. Divergence is a scalar measuring the rate of local volume expansion, not the magnitude of the velocity. Chen et al., Theorem 1\n\nCheck with a contraction\nFor \\(v(x)=-x\\), \\(\\partial_xv=-1\\), so along each trajectory,\n\\[\\log p_t(x_t)=\\log p_0(x_0)+t.\\]\nIndeed, \\(x_t=e^{-t}x_0\\) gives \\(p_t(x)=e^tp_0(e^tx)\\). Density grows while occupied lengths shrink; total probability remains one.",
     "crumbs": [
       "Probability-Flow ODE",
       "07 · Neural ODEs and normalizing flows"
@@ -1992,7 +2124,7 @@
     "href": "tutorials/36-probability-flow-ode-part-7.html#generation-and-likelihood-use-the-same-flow",
     "title": "07 · Neural ODEs and normalizing flows",
     "section": "4. Generation and likelihood use the same flow",
-    "text": "4. Generation and likelihood use the same flow\nLet the chosen terminal prior be \\(p_1=\\mathcal N(0,1)\\). To generate, draw \\(X_1\\sim p_1\\) and integrate \\(v_\\theta\\) from 1 to 0. This defines a model distribution at time zero.\nTo evaluate that model’s density at an observed \\(x_0\\), integrate forward to \\(x_1\\) and accumulate divergence:\n\\[\\boxed{\\log p_0^{\\mathrm{model}}(x_0)\n=\\log p_1(x_1)+\\int_0^1\\partial_xv_\\theta(x_t,t)\\,dt.}\\]\nIn higher dimensions, use \\(\\nabla\\cdot\\mathbf v_\\theta\\). The sign follows by integrating the preceding log-density ODE. This formula is exact for the exact regular flow; numerical integration and approximate trace estimation introduce computational error.\nIf the sampler stops at \\(t_{\\min}&gt;0\\), replace the lower integration limit by \\(t_{\\min}\\): the resulting likelihood is for the positive-time model density, not the clean endpoint.\nOne way to train a CNF is maximum likelihood using this formula. It generally involves solving the ODE during training and differentiating the loss through its solution. Adjoint methods are one option; differentiating through solver steps is another. A Neural ODE does not require one specific gradient method. Flow matching, introduced in Part 08, trains the velocity by regression instead.",
+    "text": "4. Generation and likelihood use the same flow\nLet the chosen terminal prior be \\(p_1=\\mathcal N(0,1)\\). To generate, draw \\(X_1\\sim p_1\\) and integrate \\(v_\\theta\\) from 1 to 0. This defines a model distribution at time zero.\nTo evaluate that model’s density at an observed \\(x_0\\), integrate forward to \\(x_1\\) and accumulate divergence:\n\\[\\boxed{\\log p_0^{\\mathrm{model}}(x_0)\n=\\log p_1(x_1)+\\int_0^1\\partial_xv_\\theta(x_t,t)\\,dt.}\\]\nIn higher dimensions, use \\(\\nabla\\cdot\\mathbf v_\\theta\\). The sign follows by integrating the preceding log-density ODE. This formula is exact for the exact regular flow; numerical integration and approximate trace estimation introduce computational error.\nFor large vector states, one may estimate the divergence using a random probe \\(\\xi\\) with \\(\\mathbb E[\\xi\\xi^\\top]=I\\):\n\\[\\operatorname{tr}J_{\\mathbf v}=\\mathbb E_\\xi[\\xi^\\top J_{\\mathbf v}\\xi].\\]\nA Jacobian-vector or vector-Jacobian product computes a probe value without forming the full Jacobian. A finite number of probes introduces estimation variability; in one dimension the derivative can usually be computed directly. This density calculation is not needed merely to draw ODE samples.\nIf the sampler stops at \\(t_{\\min}&gt;0\\), replace the lower integration limit by \\(t_{\\min}\\): the resulting likelihood is for the positive-time model density, not the clean endpoint.\nOne way to train a CNF is maximum likelihood using this formula. It generally involves solving the ODE during training and differentiating the loss through its solution. Adjoint methods are one option; differentiating through solver steps is another. A Neural ODE does not require one specific gradient method. Flow matching, introduced in Part 08, trains the velocity by regression instead.",
     "crumbs": [
       "Probability-Flow ODE",
       "07 · Neural ODEs and normalizing flows"
@@ -2025,7 +2157,7 @@
     "href": "tutorials/36-probability-flow-ode-part-7.html#appendix-a.-density-change-along-a-trajectory",
     "title": "07 · Neural ODEs and normalizing flows",
     "section": "Appendix A. Density change along a trajectory",
-    "text": "Appendix A. Density change along a trajectory\nThe continuity equation is\n\\[\\partial_tp_t=-\\partial_x(p_tv)\n=-v\\partial_xp_t-p_t\\partial_xv.\\]\nAlong \\(\\dot x_t=v(x_t,t)\\), the chain rule gives\n\\[\\begin{aligned}\n\\frac{d}{dt}\\log p_t(x_t)\n&=\\frac{\\partial_tp_t(x_t)}{p_t(x_t)}\n+v(x_t,t)\\frac{\\partial_xp_t(x_t)}{p_t(x_t)}\\\\\n&=-\\partial_xv(x_t,t).\n\\end{aligned}\\]\nIn \\(d\\) dimensions, expand \\(\\nabla\\cdot(p_t\\mathbf v)=\\mathbf v\\cdot\\nabla p_t+p_t\\nabla\\cdot\\mathbf v\\). The same cancellation yields the divergence formula.\nContinue to 08 · Flow matching.",
+    "text": "Appendix A. Density change along a trajectory\nThe continuity equation is\n\\[\\partial_tp_t=-\\partial_x(p_tv)\n=-v\\partial_xp_t-p_t\\partial_xv.\\]\nAlong \\(\\dot x_t=v(x_t,t)\\), the chain rule gives\n\\[\\begin{aligned}\n\\frac{d}{dt}\\log p_t(x_t)\n&=\\frac{\\partial_tp_t(x_t)}{p_t(x_t)}\n+v(x_t,t)\\frac{\\partial_xp_t(x_t)}{p_t(x_t)}\\\\\n&=\\left.\\frac{-v\\partial_xp_t-p_t\\partial_xv+v\\partial_xp_t}{p_t}\\right|_{x=x_t}\\\\\n&=-\\partial_xv(x_t,t).\n\\end{aligned}\\]\nIn \\(d\\) dimensions, expand \\(\\nabla\\cdot(p_t\\mathbf v)=\\mathbf v\\cdot\\nabla p_t+p_t\\nabla\\cdot\\mathbf v\\). The same cancellation yields the divergence formula.\nContinue to 08 · Flow matching.",
     "crumbs": [
       "Probability-Flow ODE",
       "07 · Neural ODEs and normalizing flows"
@@ -2058,7 +2190,7 @@
     "href": "tutorials/37-probability-flow-ode-part-8.html#why-velocity-regression-produces-the-marginal-transport",
     "title": "08 · Flow matching",
     "section": "3. Why velocity regression produces the marginal transport",
-    "text": "3. Why velocity regression produces the marginal transport\nTrain with\n\\[\\boxed{\\mathcal L_{\\mathrm{CFM}}(\\theta)\n=\\mathbb E_{t,X_0,X_1}\n[(v_\\theta((1-t)X_0+tX_1,t)-(X_1-X_0))^2],}\\]\nwhere \\(t\\sim\\operatorname{Uniform}(0,1)\\) and the three draws are independent before constructing \\(X_t\\). Assume finite second moments for this loss. Squared-error regression gives\n\\[\\boxed{v_*(x,t)=\\mathbb E[X_1-X_0\\mid X_t=x,t].}\\]\nThis is the conditional flow-matching (CFM) loss. Direct regression onto the unavailable marginal velocity would use \\(\\mathcal L_{\\mathrm{FM}}=\\mathbb E_{t,X_t}[(v_\\theta(X_t,t)-v_*(X_t,t))^2]\\). The two losses differ by a parameter-independent conditional-variance term, so their population gradients and minimizers agree when differentiation is justified.\nThe expectation is over endpoint pairs compatible with the fixed noisy/intermediate input. As in Part 03, individual labels differ from their conditional-mean prediction. The loss decomposes into a velocity-estimation error plus a conditional variance independent of the network.\nWhy does this conditional mean transport the right density? Each endpoint pair supplies a trajectory with known velocity. Averaging its contribution to probability transport at a location gives precisely the field above. Appendix A verifies that the interpolation marginals satisfy\n\\[\\partial_tp_t=-\\partial_x(p_tv_*).\\]\nUnder regularity ensuring the corresponding ODE is well posed and the density evolution is unique, its flow follows these marginals. Positive-time regularity does not automatically guarantee a smooth invertible map at a singular data endpoint.\n\nIndividual straight paths are not the learned ODE trajectories\nDifferent endpoint pairs can pass through the same position at the same time with different velocities. Their regression average defines a single field. Its trajectories generally differ from the individual training lines. The result concerns shared marginal densities, not recovery of the originally sampled endpoint coupling.\nIndependent endpoint pairing is convenient, but it is not generally an optimal-transport coupling. Straight conditional paths do not imply globally optimal transport, straight marginal trajectories, or exact one-step sampling. Different couplings with the same endpoint marginals can give different paths and fields.",
+    "text": "3. Why velocity regression produces the marginal transport\nTrain with\n\\[\\boxed{\\mathcal L_{\\mathrm{CFM}}(\\theta)\n=\\mathbb E_{t,X_0,X_1}\n[(v_\\theta((1-t)X_0+tX_1,t)-(X_1-X_0))^2],}\\]\nwhere \\(t\\sim\\operatorname{Uniform}(0,1)\\) and the three draws are independent before constructing \\(X_t\\). Assume finite second moments for this loss. Squared-error regression gives\n\\[\\boxed{v_*(x,t)=\\mathbb E[X_1-X_0\\mid X_t=x,t].}\\]\nThis is the conditional flow-matching (CFM) loss. Direct regression onto the unavailable marginal velocity would use \\(\\mathcal L_{\\mathrm{FM}}=\\mathbb E_{t,X_t}[(v_\\theta(X_t,t)-v_*(X_t,t))^2]\\). The two losses differ by a parameter-independent conditional-variance term, so their population gradients and minimizers agree when differentiation is justified.\nMore explicitly, at a fixed input \\(x\\) and time \\(t\\), write \\(U=X_1-X_0\\) and \\(v_*(x,t)=\\mathbb E[U\\mid X_t=x,t]\\). Expanding the square gives\n\\[\\begin{aligned}\n\\mathbb E[(v_\\theta(x,t)-U)^2\\mid X_t=x,t]\n&=(v_\\theta(x,t)-v_*(x,t))^2\\\\\n&\\quad+\\operatorname{Var}(U\\mid X_t=x,t).\n\\end{aligned}\\]\nAveraging over the time and interpolation marginals proves the loss relationship. The posterior averaging is supplied by regression on joint endpoint/interpolation samples; no posterior density is evaluated.\nThe expectation is over endpoint pairs compatible with the fixed noisy/intermediate input. As in Part 03, individual labels differ from their conditional-mean prediction. The loss decomposes into a velocity-estimation error plus a conditional variance independent of the network.\nWhy does this conditional mean transport the right density? Each endpoint pair supplies a trajectory with known velocity. Averaging its contribution to probability transport at a location gives precisely the field above. Appendix A verifies that the interpolation marginals satisfy\n\\[\\partial_tp_t=-\\partial_x(p_tv_*).\\]\nUnder regularity ensuring the corresponding ODE is well posed and the density evolution is unique, its flow follows these marginals. Positive-time regularity does not automatically guarantee a smooth invertible map at a singular data endpoint.\n\nIndividual straight paths are not the learned ODE trajectories\nDifferent endpoint pairs can pass through the same position at the same time with different velocities. Their regression average defines a single field. Its trajectories generally differ from the individual training lines. The result concerns shared marginal densities, not recovery of the originally sampled endpoint coupling.\nIndependent endpoint pairing is convenient, but it is not generally an optimal-transport coupling. Straight conditional paths do not imply globally optimal transport, straight marginal trajectories, or exact one-step sampling. Different couplings with the same endpoint marginals can give different paths and fields.",
     "crumbs": [
       "Probability-Flow ODE",
       "08 · Flow matching"
@@ -2080,7 +2212,7 @@
     "href": "tutorials/37-probability-flow-ode-part-8.html#a-solved-gaussian-example",
     "title": "08 · Flow matching",
     "section": "5. A solved Gaussian example",
-    "text": "5. A solved Gaussian example\nTake independent \\(X_0\\sim\\mathcal N(\\mu,V)\\) and \\(X_1\\sim\\mathcal N(0,1)\\), with \\(V&gt;0\\). Straight interpolation gives\n\\[p_t=\\mathcal N(m_t^{\\mathrm{path}},V_t),\\qquad\nm_t^{\\mathrm{path}}=(1-t)\\mu,\\quad\nV_t=(1-t)^2V+t^2.\\]\nHere \\(m_t^{\\mathrm{path}}\\) is the marginal mean, distinct from the posterior denoiser \\(m_t(x)\\). The marginal velocity is\n\\[\\boxed{v_*(x,t)=-\\mu+\n\\frac{t-(1-t)V}{V_t}[x-(1-t)\\mu].}\\]\nTo verify it, keep a fixed \\(Z\\sim\\mathcal N(0,1)\\) and define \\(x_t=(1-t)\\mu+\\sqrt{V_t}Z\\). Differentiation produces the displayed field because \\(V_t'/2=t-(1-t)V\\). Backward transport maps \\(x_1=Z\\) to \\(x_0=\\mu+\\sqrt VZ\\).\nEven when \\(\\mu=0,V=1\\), the interpolation variance falls to \\(1/2\\) at \\(t=1/2\\) and then rises to one. Equal endpoint distributions do not imply a stationary chosen path. This is another reason to assess the whole path rather than endpoint similarity alone.",
+    "text": "5. A solved Gaussian example\nTake independent \\(X_0\\sim\\mathcal N(\\mu,V)\\) and \\(X_1\\sim\\mathcal N(0,1)\\), with \\(V&gt;0\\). Straight interpolation gives\n\\[p_t=\\mathcal N(m_t^{\\mathrm{path}},V_t),\\qquad\nm_t^{\\mathrm{path}}=(1-t)\\mu,\\quad\nV_t=(1-t)^2V+t^2.\\]\nHere \\(m_t^{\\mathrm{path}}\\) is the marginal mean, distinct from the posterior denoiser \\(m_t(x)\\). The marginal velocity is\n\\[\\boxed{v_*(x,t)=-\\mu+\n\\frac{t-(1-t)V}{V_t}[x-(1-t)\\mu].}\\]\nTo verify it, keep a fixed \\(Z\\sim\\mathcal N(0,1)\\) and define \\(x_t=(1-t)\\mu+\\sqrt{V_t}Z\\). Differentiation produces the displayed field because \\(V_t'/2=t-(1-t)V\\). Backward transport maps \\(x_1=Z\\) to \\(x_0=\\mu+\\sqrt VZ\\).\nEven when \\(\\mu=0,V=1\\), the interpolation variance falls to \\(1/2\\) at \\(t=1/2\\) and then rises to one. Equal endpoint distributions do not imply a stationary chosen path. This is another reason to assess the whole path rather than endpoint similarity alone.\n\nCheck the score-to-velocity conversion\nThe score of this Gaussian path is\n\\[s_t(x)=-\\frac{x-(1-t)\\mu}{V_t}.\\]\nFor \\(0&lt;t&lt;1\\), substituting it into the general straight-path formula gives\n\\[\\begin{aligned}\n-\\frac{x+t s_t(x)}{1-t}\n&=\\frac{(t-V_t)x-t(1-t)\\mu}{(1-t)V_t}\\\\\n&=\\frac{t-(1-t)V}{V_t}x-\\frac{t\\mu}{V_t}\\\\\n&=-\\mu+\\frac{t-(1-t)V}{V_t}[x-(1-t)\\mu].\n\\end{aligned}\\]\nHere \\(t-V_t=(1-t)[t-(1-t)V]\\). The expression agrees with the field obtained by differentiating the exact trajectory. Unlike the score conversion with its apparent endpoint division, the final Gaussian expression is well defined at both endpoints because \\(V&gt;0\\).",
     "crumbs": [
       "Probability-Flow ODE",
       "08 · Flow matching"
@@ -2106,6 +2238,116 @@
     "crumbs": [
       "Probability-Flow ODE",
       "08 · Flow matching"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html",
+    "href": "tutorials/38-probability-flow-ode-part-9.html",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "",
+    "text": "1. Start from the common training problem\nFor the VP schedule used in Part 03,\n\\[X_t=\\alpha_tX_0+\\sigma_t\\varepsilon,\\qquad\n\\sigma_t=\\sqrt{1-\\alpha_t^2},\\qquad\n\\alpha_t=\\exp\\left[-\\frac12\\int_0^t\\beta(u)\\,du\\right].\\]\nHere \\(\\varepsilon\\sim\\mathcal N(0,1)\\) is independent of clean data. Squared-error noise regression estimates \\(\\mathbb E[\\varepsilon\\mid X_t=x]\\), so\n\\[s_\\theta(x,t)=-\\frac{\\varepsilon_\\theta(x,t)}{\\sigma_t},\n\\qquad\nD_\\theta(x,t)=\\frac{x-\\sigma_t\\varepsilon_\\theta(x,t)}{\\alpha_t}.\\]\nThese are the same conversions used earlier. A trained noise predictor can therefore supply either a score or a clean-data estimate. The sampling algorithm is an additional choice.\nThe primary framework is Yang Song et al., Score-Based Generative Modeling through SDEs, especially the reverse SDE, training objective, and probability-flow ODE. Yang Song’s explanatory blog separates the stochastic reverse process from its deterministic counterpart. For the discrete methods, use Ho, Jain, and Abbeel, DDPM and Jiaming Song, Meng, and Ermon, DDIM. Yang Song’s SDE paper and Jiaming Song’s DDIM paper have different first authors.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html#translate-discrete-notation-before-comparing-formulas",
+    "href": "tutorials/38-probability-flow-ode-part-9.html#translate-discrete-notation-before-comparing-formulas",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "2. Translate discrete notation before comparing formulas",
+    "text": "2. Translate discrete notation before comparing formulas\nLet \\(0=t_0&lt;t_1&lt;\\cdots&lt;t_N=1\\). We retain \\(\\alpha_{t_i}\\) for the cumulative signal amplitude. Write the one-step noise variance as \\(b_i\\) to distinguish it from the continuous rate \\(\\beta(t)\\):\n\\[b_i=1-\\frac{\\alpha_{t_i}^2}{\\alpha_{t_{i-1}}^2},\\qquad\nX_{t_i}=\\sqrt{1-b_i}\\,X_{t_{i-1}}+\\sqrt{b_i}\\,Z_i.\\]\nHere the \\(Z_i\\) are independent standard normals. For a VP SDE sampled exactly on this grid,\n\\[b_i=1-\\exp\\left[-\\int_{t_{i-1}}^{t_i}\\beta(u)\\,du\\right].\\]\n\n\n\n\n\n\n\n\nThese notes\nCommon DDPM notation\nMeaning\n\n\n\n\n\\(b_i\\)\n\\(\\beta_i\\)\nOne-step noise variance\n\n\n\\(1-b_i\\)\n\\(\\alpha_i\\)\nOne-step signal variance retention\n\n\n\\(\\alpha_{t_i}^2=\\prod_{j=1}^i(1-b_j)\\)\n\\(\\bar\\alpha_i\\)\nCumulative signal variance retention\n\n\n\\(\\alpha_{t_i}\\)\n\\(\\sqrt{\\bar\\alpha_i}\\)\nCumulative signal amplitude\n\n\n\\(\\sigma_{t_i}^2\\)\n\\(1-\\bar\\alpha_i\\)\nCumulative conditional noise variance\n\n\n\nThe DDIM paper uses its own \\(\\alpha_i\\) for cumulative variance retention. Translate it to our \\(\\alpha_{t_i}^2\\), not our amplitude. This notation difference changes square roots throughout the updates.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html#two-continuous-samplers-from-the-same-score",
+    "href": "tutorials/38-probability-flow-ode-part-9.html#two-continuous-samplers-from-the-same-score",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "3. Two continuous samplers from the same score",
+    "text": "3. Two continuous samplers from the same score\nIn increasing reverse time \\(\\tau=1-t\\), the reverse VP SDE is\n\\[dY_\\tau=\n\\left[\\frac{\\beta(t)}2Y_\\tau+\\beta(t)s_t(Y_\\tau)\\right]d\\tau\n+\\sqrt{\\beta(t)}\\,d\\overline W_\\tau,\\qquad t=1-\\tau.\\]\nThe probability-flow ODE, in the same reverse clock, is\n\\[\\frac{dy}{d\\tau}=\\frac{\\beta(t)}2[y+s_t(y)].\\]\nThe score coefficient differs by a factor of two. The SDE retains Brownian spreading; the ODE’s velocity reproduces its marginal evolution without fresh noise. With the exact score, appropriate regularity, and matching terminal law, both have the prescribed marginals. Their trajectories and couplings differ. This is the distinction made in Song et al.’s Eqs. (6) and (13), and in the blog’s reverse-SDE and probability-flow sections.\nFor a decreasing-time step from \\(t\\) to \\(t-h\\), Euler–Maruyama gives\n\\[x_{t-h}\\approx x_t+h\\beta(t)\\left[\\tfrac12x_t+s_\\theta(x_t,t)\\right]\n+\\sqrt{h\\beta(t)}\\,z,\\]\nwhereas Euler for the ODE gives\n\\[x_{t-h}\\approx x_t+\\tfrac12h\\beta(t)[x_t+s_\\theta(x_t,t)].\\]\nDeleting noise from the reverse-SDE update does not produce the probability-flow ODE. Its drift must also change.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html#ddpm-the-discrete-stochastic-branch",
+    "href": "tutorials/38-probability-flow-ode-part-9.html#ddpm-the-discrete-stochastic-branch",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "4. DDPM: the discrete stochastic branch",
+    "text": "4. DDPM: the discrete stochastic branch\nA standard DDPM reverse mean written in our notation is\n\\[\\mu_\\theta(x_{t_i},i)\n=\\frac{1}{\\sqrt{1-b_i}}\n\\left[x_{t_i}-\\frac{b_i}{\\sigma_{t_i}}\\varepsilon_\\theta(x_{t_i},t_i)\\right]\n=\\frac{x_{t_i}+b_i s_\\theta(x_{t_i},t_i)}{\\sqrt{1-b_i}}.\\]\nThe sampler adds Gaussian noise:\n\\[x_{t_{i-1}}=\\mu_\\theta(x_{t_i},i)+\\sqrt{\\nu_i}\\,z_i.\\]\nCommon fixed choices are \\(\\nu_i=b_i\\) or the forward posterior variance\n\\[\\widetilde b_i=b_i\\frac{1-\\alpha_{t_{i-1}}^2}{1-\\alpha_{t_i}^2}.\n\\]\nThese choices are not identical at finite step sizes. The final data reconstruction step has special handling, usually no new noise in the sampling algorithm. Learned-variance variants also exist; this section compares the basic fixed-variance constructions.\nFor \\(h=t_i-t_{i-1}\\) small, away from the zero-noise endpoint, \\(b_i=\\beta(t_i)h+O(h^2)\\). Expanding the mean,\n\\[\\mu_\\theta(x,i)\n=x+b_i\\left[\\tfrac12x+s_\\theta(x,t_i)\\right]+O(b_i^2).\\]\nBoth variance choices above have leading term \\(\\beta(t_i)h\\) at fixed positive time. Thus the small-step update agrees with reverse VP Euler–Maruyama to leading order. It is not generally the exact Euler–Maruyama formula on a finite grid.\nEven with a perfect noise predictor, a finite-step Gaussian reverse kernel need not equal the true reverse conditional for non-Gaussian data. The exact reverse conditional is generally a mixture. The small-step SDE connection does not remove this finite-step approximation. The DDPM mean and variance formulas are given in Ho et al., Eqs. (7), (11), and Algorithm 2.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html#ddim-a-deterministic-update-from-the-same-predictor",
+    "href": "tutorials/38-probability-flow-ode-part-9.html#ddim-a-deterministic-update-from-the-same-predictor",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "5. DDIM: a deterministic update from the same predictor",
+    "text": "5. DDIM: a deterministic update from the same predictor\nChoose two grid times \\(u&lt;t\\), possibly skipping intermediate indices. At the current input, compute\n\\[\\widehat x_0=D_\\theta(x_t,t)\n=\\frac{x_t-\\sigma_t\\varepsilon_\\theta(x_t,t)}{\\alpha_t}.\\]\nThe deterministic DDIM update is\n\\[\\boxed{x_u=\\alpha_u\\widehat x_0+\\sigma_u\\varepsilon_\\theta(x_t,t).}\\]\nEquivalently,\n\\[x_u=\\frac{\\alpha_u}{\\alpha_t}x_t+\n\\left(\\sigma_u-\\frac{\\alpha_u}{\\alpha_t}\\sigma_t\\right)\n\\varepsilon_\\theta(x_t,t).\\]\nThe update holds the current predicted clean value and predicted noise fixed over this step, then recombines them at the next noise level. At the next step the predictions are recomputed. It does not recover the particular forward noise realization of an observed image. Randomness comes from the initial terminal sample; no fresh noise is added in this deterministic update.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html#why-deterministic-ddim-is-an-ode-discretization",
+    "href": "tutorials/38-probability-flow-ode-part-9.html#why-deterministic-ddim-is-an-ode-discretization",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "6. Why deterministic DDIM is an ODE discretization",
+    "text": "6. Why deterministic DDIM is an ODE discretization\nFirst, at a fixed positive time away from the zero-noise endpoint, a small-step expansion in ordinary time gives\n\\[x_{t-h}-x_t\n=h\\left[-\\frac{\\alpha_t'}{\\alpha_t}x_t+\n\\left(\\frac{\\alpha_t'}{\\alpha_t}\\sigma_t-\\sigma_t'\\right)\n\\varepsilon_\\theta(x_t,t)\\right]+O(h^2).\\]\nFor VP, use \\(\\alpha_t'/\\alpha_t=-\\beta(t)/2\\) and \\(\\sigma_t\\sigma_t'=\\beta(t)\\alpha_t^2/2\\). The update becomes\n\\[x_{t-h}-x_t\n=\\frac{h\\beta(t)}2\n\\left[x_t-\\frac{\\varepsilon_\\theta(x_t,t)}{\\sigma_t}\\right]+O(h^2)\n=\\frac{h\\beta(t)}2[x_t+s_\\theta(x_t,t)]+O(h^2).\\]\nThis is the probability-flow ODE’s backward velocity. There is an even stronger numerical interpretation. Define\n\\[y_t=\\frac{x_t}{\\alpha_t},\\qquad r_t=\\frac{\\sigma_t}{\\alpha_t}.\\]\nThe transformed corruption is \\(y_t=X_0+r_t\\varepsilon\\). Dividing out signal contraction leaves additive Gaussian noise with standard deviation \\(r_t\\), which motivates these coordinates. This is a statement about the conditional laws; it does not equate a fixed-noise interpolation with a Brownian trajectory.\nFor positive noise, \\(\\alpha_t&gt;0\\), and a strictly increasing noise ratio, Appendix A derives\n\\[\\boxed{\\frac{dy}{dr}=\\varepsilon_\\theta(\\alpha_t y,t),\\qquad t=t(r).}\\]\nDivide the deterministic DDIM update by \\(\\alpha_u\\):\n\\[\\boxed{y_u=y_t+(r_u-r_t)\\varepsilon_\\theta(x_t,t).}\\]\nThat is exactly an explicit Euler step for this transformed ODE, with \\(r\\) decreasing during generation. DDIM is not generally the same finite update as Euler in the original \\(x,t\\) coordinates. Neither method is generally the exact ODE solution for a finite step. The ODE connection appears in DDIM, Section 4.3.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html#a-family-connecting-deterministic-and-stochastic-updates",
+    "href": "tutorials/38-probability-flow-ode-part-9.html#a-family-connecting-deterministic-and-stochastic-updates",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "7. A family connecting deterministic and stochastic updates",
+    "text": "7. A family connecting deterministic and stochastic updates\nLet \\(0\\leq\\eta\\leq1\\) and define a step-noise standard deviation\n\\[\\gamma_{t\\to u}\n=\\eta\\frac{\\sigma_u}{\\sigma_t}\n\\sqrt{1-\\frac{\\alpha_t^2}{\\alpha_u^2}}.\\]\nThe generalized update is\n\\[x_u=\\alpha_u\\widehat x_0+\n\\sqrt{\\sigma_u^2-\\gamma_{t\\to u}^2}\\,\\varepsilon_\\theta(x_t,t)\n+\\gamma_{t\\to u}z.\\]\n\n\\(\\eta=0\\) gives deterministic DDIM.\n\\(\\eta=1\\) on adjacent grid times gives the DDPM posterior-variance choice \\(\\nu_i=\\widetilde b_i\\), with the same noise-prediction mean.\n\\(\\eta=1\\) is not the \\(\\nu_i=b_i\\) variance choice at finite steps. For skipped times, it describes a coarsened transition rather than replaying all original adjacent steps.\n\nFor any \\(\\eta&gt;0\\) on a step with positive destination noise, it is a stochastic sampler, not a deterministic probability-flow ODE solver. The common conditional corruption marginals allow reuse of the trained predictor; they do not imply that all finite-step generated marginals are exact. This family is developed in DDIM, Eqs. (12) and (16), and Appendix C.1.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html#a-gaussian-check-that-separates-exact-flows-from-discretizations",
+    "href": "tutorials/38-probability-flow-ode-part-9.html#a-gaussian-check-that-separates-exact-flows-from-discretizations",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "8. A Gaussian check that separates exact flows from discretizations",
+    "text": "8. A Gaussian check that separates exact flows from discretizations\nTake \\(p_0=\\mathcal N(0,1)\\). VP leaves this density unchanged, so\n\\[s_t(x)=-x,\\qquad\\varepsilon_*(x,t)=\\sigma_t x.\\]\nThe exact probability-flow velocity is zero, hence every ODE particle stays fixed. The reverse SDE is stationary Ornstein–Uhlenbeck dynamics: particles fluctuate but the density remains standard normal.\nDeterministic DDIM instead gives the finite step\n\\[x_u=(\\alpha_u\\alpha_t+\\sigma_u\\sigma_t)x_t.\\]\nThe coefficient is the inner product of two unit vectors \\((\\alpha_u,\\sigma_u)\\) and \\((\\alpha_t,\\sigma_t)\\). It is less than one for distinct noise levels, so this finite step multiplies the variance by \\((\\alpha_u\\alpha_t+\\sigma_u\\sigma_t)^2\\), even with the exact predictor. The contraction can be severe: a single step to \\(u=0\\) gives \\(x_0=\\alpha_t x_t\\), nearly collapsing the cloud when \\(\\alpha_t\\) is small. Direct Euler in \\((x,t)\\) is exact for this zero-velocity example. As step sizes shrink, that discretization effect vanishes on regular intervals. This example shows why “same continuous ODE” must not be replaced by “identical finite samples.”\n\nThe variance choice matters even with an exact predictor\nFor this stationary Gaussian example, the true adjacent reverse conditional is\n\\[X_{t_{i-1}}\\mid X_{t_i}=x\n\\sim\\mathcal N(\\sqrt{1-b_i}\\,x,b_i).\\]\nThe DDPM mean gives exactly \\(\\sqrt{1-b_i}\\,x\\). Thus the Gaussian reverse kernel with variance \\(b_i\\) is exact in this example. Using \\(\\widetilde b_i\\) instead gives one-step variance \\(1-b_i+\\widetilde b_i&lt;1\\) when starting from the correct unit-variance marginal. This statement concerns the kernel; the common final-step convention of suppressing fresh noise is an additional modification.\nFor a complementary case, take clean data to be a fixed point \\(c\\). Then \\(D_*(x,t)=c\\) and the exact positive-time ODE paths are \\(x_t=\\alpha_tc+\\sigma_te\\) for a fixed Gaussian label \\(e\\). Deterministic DDIM maps these paths exactly between noise levels, while direct Euler in \\((x,t)\\) is generally approximate. The reverse conditional variance is now \\(\\widetilde b_i\\), so that DDPM choice is exact. The point-mass data endpoint is a singular limit, not a regular invertible flow endpoint.\n\n\n\n\n\n\n\n\nMethod\nNew noise each step?\nContinuous connection\n\n\n\n\nBasic DDPM\nYes, except final reconstruction\nReverse VP SDE in the small-step limit\n\n\nDeterministic DDIM\nNo\nEuler for the probability-flow ODE in \\((y,r)\\) coordinates\n\n\nProbability-flow Euler in \\((x,t)\\)\nNo\nDirect discretization of the same ODE\n\n\n\nAll require a matching schedule, an adequate learned predictor, a suitable terminal approximation, and numerical checks. In higher dimensions, use the same scalar coefficients with vector states, vector predictions, and independent standard Gaussian vector noise.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html#appendix-a.-deriving-the-transformed-ode",
+    "href": "tutorials/38-probability-flow-ode-part-9.html#appendix-a.-deriving-the-transformed-ode",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "Appendix A. Deriving the transformed ODE",
+    "text": "Appendix A. Deriving the transformed ODE\nWrite the forward-clock probability-flow ODE using noise prediction:\n\\[\\dot x=-\\frac\\beta2x+\\frac\\beta{2\\sigma}\\varepsilon_\\theta(x,t).\\]\nSince \\(\\dot\\alpha/\\alpha=-\\beta/2\\), differentiation of \\(y=x/\\alpha\\) cancels the linear drift:\n\\[\\dot y=\\frac{\\dot x}{\\alpha}-\\frac{x\\dot\\alpha}{\\alpha^2}\n=\\frac{\\beta}{2\\alpha\\sigma}\\varepsilon_\\theta(x,t).\\]\nAlso,\n\\[\\begin{aligned}\n\\dot r&=\\frac{\\dot\\sigma}{\\alpha}-\\frac{\\sigma\\dot\\alpha}{\\alpha^2}\\\\\n&=\\frac{\\beta\\alpha}{2\\sigma}+\\frac{\\beta\\sigma}{2\\alpha}\n=\\frac{\\beta}{2\\alpha\\sigma},\n\\end{aligned}\\]\nusing \\(\\alpha^2+\\sigma^2=1\\). Dividing gives \\(dy/dr=\\varepsilon_\\theta(\\alpha_t y,t)\\). Where \\(\\beta&gt;0\\) the noise ratio is strictly increasing and can parameterize the ODE. For a positive initial rate, \\(\\dot r\\) diverges at zero noise, although the transformed equation need not be singular when its predictor extends regularly to \\(r=0\\). The derivation at the endpoint requires a limiting interpretation; the finite DDIM formula itself avoids dividing by \\(\\sigma_u\\) at its destination.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
+    ]
+  },
+  {
+    "objectID": "tutorials/38-probability-flow-ode-part-9.html#appendix-b.-checking-the-stochastic-ddim-connection",
+    "href": "tutorials/38-probability-flow-ode-part-9.html#appendix-b.-checking-the-stochastic-ddim-connection",
+    "title": "09 · DDPM, DDIM, and probability flow",
+    "section": "Appendix B. Checking the stochastic DDIM connection",
+    "text": "Appendix B. Checking the stochastic DDIM connection\nFor adjacent times \\(u=t_{i-1}\\) and \\(t=t_i\\), put \\(b=b_i=1-\\alpha_t^2/\\alpha_u^2\\). At \\(\\eta=1\\),\n\\[\\gamma^2=b\\frac{\\sigma_u^2}{\\sigma_t^2}=\\widetilde b_i.\\]\nAlso \\(\\sigma_t^2-b=\\alpha_t^2\\sigma_u^2/\\alpha_u^2\\), giving\n\\[\\sqrt{\\sigma_u^2-\\gamma^2}\n=\\frac{\\alpha_t\\sigma_u^2}{\\alpha_u\\sigma_t}.\\]\nSubstitute \\(\\widehat x_0=(x_t-\\sigma_t\\varepsilon_\\theta)/\\alpha_t\\) into the generalized mean. The coefficient of \\(\\varepsilon_\\theta\\) simplifies to\n\\[-\\frac{\\alpha_u\\sigma_t}{\\alpha_t}\n+\\frac{\\alpha_t\\sigma_u^2}{\\alpha_u\\sigma_t}\n=-\\frac{\\alpha_u}{\\alpha_t}\\frac b{\\sigma_t}.\\]\nSince \\(\\alpha_u/\\alpha_t=1/\\sqrt{1-b}\\), the resulting mean and variance are exactly the stated DDPM posterior-variance update. This is a finite-step algebraic identity, unlike the limiting SDE correspondence.",
+    "crumbs": [
+      "Probability-Flow ODE",
+      "09 · DDPM, DDIM, and probability flow"
     ]
   },
   {
