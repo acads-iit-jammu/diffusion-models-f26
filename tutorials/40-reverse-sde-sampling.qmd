@@ -1,0 +1,109 @@
+# Reverse-SDE sampling {.unnumbered}
+
+::: {.callout-note}
+## Draft — Stochastic generation from a learned score
+
+This is the next topic after [Denoising Score Matching and Langevin sampling](./39-denoising-score-matching.qmd). The goal is to transport a terminal distribution back to data using a stochastic process. Data are at $t=0$ and the terminal prior is at $t=1$. The additional clock $\tau=1-t$ increases during generation.
+:::
+
+## 1. From a fixed target to a prescribed density path
+
+Ordinary Langevin dynamics uses the score of one fixed target and attempts to approach its stationary distribution. Reverse diffusion instead follows a time-dependent sequence of target densities, $p_1,p_{1-h},\ldots,p_0$. It does not wait for equilibrium at each noise level.
+
+Choose a forward process
+
+$$dX_t=f(X_t,t)\,dt+g(t)\,dW_t,$$
+
+and let $p_t$ be its marginal density. A one-step Euler–Maruyama approximation adds deterministic drift $h f$ and independent Gaussian noise with standard deviation $g\sqrt h$. Brownian increments scale with $\sqrt h$, not $h$.
+
+Learn $s_\theta(x,t)\approx\partial_x\log p_t(x)$ using known conditional corruption kernels. The distinction between conditional labels and marginal predictions is the same as in the preceding topic.
+
+## 2. Reverse the stochastic process
+
+Write $Y_\tau=X_{1-\tau}$ for the time-reversed process in law. Under the usual smoothness and time-reversal conditions, and with diffusion coefficient independent of position,
+
+$$\boxed{dY_\tau=
+[-f(Y_\tau,t)+g(t)^2s_t(Y_\tau)]\,d\tau
++g(t)\,d\overline W_\tau,\qquad t=1-\tau.}$$
+
+The Brownian motion is defined with respect to the reverse-time information; it is not obtained by simply negating the original Brownian increments. The formula above applies to scalar $g(t)$; state-dependent diffusion requires additional derivative terms.
+
+In the original decreasing clock, the same reverse dynamics is often written
+
+$$dX_t=[f(X_t,t)-g(t)^2s_t(X_t)]\,dt+g(t)\,d\overline W_t,
+\qquad dt<0.$$
+
+Noise increments in this notation have variance proportional to $|dt|$. We use the increasing reverse clock to avoid negative-variance interpretations. The primary reference is [Song et al., Eq. (6)](https://arxiv.org/abs/2011.13456v2); [Yang Song's blog](https://yang-song.net/blog/2021/score/) explains the forward and reverse SDEs as separate processes.
+
+## 3. VP diffusion and an explicit sampler
+
+For the VP forward process,
+
+$$f(x,t)=-\tfrac12\beta(t)x,\qquad g(t)=\sqrt{\beta(t)},$$
+
+with the same schedule relation as before:
+
+$$\alpha_t=\exp\left[-\tfrac12\int_0^t\beta(u)\,du\right],
+\qquad X_t\mid X_0=x_0\sim\mathcal N(\alpha_tx_0,1-\alpha_t^2).$$
+
+The reverse SDE is
+
+$$dY_\tau=\beta(t)[\tfrac12Y_\tau+s_t(Y_\tau)]\,d\tau
++\sqrt{\beta(t)}\,d\overline W_\tau.$$
+
+For $h=t_k-t_{k+1}>0$, generate with
+
+$$\boxed{x_{k+1}=x_k+h\beta(t_k)[\tfrac12x_k+s_\theta(x_k,t_k)]
++\sqrt{h\beta(t_k)}\,z_k,\qquad z_k\sim\mathcal N(0,1).}$$
+
+Start from the actual $p_1$ if available, or a justified approximation such as standard normal after sufficient corruption. Draw fresh independent noise at each step. Stop at a positive cutoff compatible with the trained score if the endpoint is singular. The exact continuous process has the required marginals with the exact score and matched initialization; a learned score, finite steps, and approximate prior introduce errors.
+
+## 4. Why this is not an ODE with noise simply added
+
+In increasing reverse time, the probability-flow ODE uses
+
+$$b_{\mathrm{ODE}}=-f+\tfrac12g^2s_t,$$
+
+while the reverse SDE uses
+
+$$b_{\mathrm{SDE}}=-f+g^2s_t.$$
+
+Therefore
+
+$$b_{\mathrm{SDE}}=b_{\mathrm{ODE}}+\tfrac12g^2s_t.$$
+
+The extra score drift compensates for the Brownian spreading. Adding $g\,dW$ to the probability-flow ODE without that drift correction changes the density evolution. Appendix A checks the factors explicitly.
+
+## 5. A Gaussian example checks the sign and coefficient
+
+If the clean law is standard normal, VP preserves it and $s_t(x)=-x$. The reverse SDE becomes
+
+$$dY_\tau=-\tfrac12\beta(t)Y_\tau\,d\tau
++\sqrt{\beta(t)}\,d\overline W_\tau.$$
+
+At mean zero and variance one, the instantaneous mean and variance derivatives are zero. The density stays standard normal although particles move randomly. The corresponding probability-flow ODE has zero velocity, so its particles remain fixed. The two processes agree on marginals, not trajectories.
+
+For constant $\beta$ and Euler step $h$, the stochastic update has stationary variance $1/(1-h\beta/4)$ when $0<h\beta<4$. Its deviation from one is a discretization effect, not a failure of the continuous reverse-SDE formula.
+
+## Appendix A. Check the reversed density evolution
+
+The forward Fokker–Planck equation is
+
+$$\partial_tp_t=-\partial_x(fp_t)+\tfrac12g^2\partial_{xx}p_t.$$
+
+Set $r_\tau=p_{1-\tau}$. Then
+
+$$\partial_\tau r_\tau=\partial_x(fr_\tau)-\tfrac12g^2\partial_{xx}r_\tau,$$
+
+where coefficients and scores are evaluated at $t=1-\tau$. The proposed reverse SDE gives
+
+$$\begin{aligned}
+-\partial_x[(-f+g^2s_t)r_\tau]+\tfrac12g^2\partial_{xx}r_\tau
+&=\partial_x(fr_\tau)-g^2\partial_x(r_\tau s_t)
++\tfrac12g^2\partial_{xx}r_\tau\\
+&=\partial_x(fr_\tau)-\tfrac12g^2\partial_{xx}r_\tau,
+\end{aligned}$$
+
+because $r_\tau s_t=\partial_xr_\tau$. This verifies the marginal equation. Identifying the full reversed path law requires the time-reversal result cited above; the marginal calculation alone does not establish that joint law.
+
+For comparison, the ODE flux with $-f+g^2s_t/2$ gives the same marginal equation without a diffusion term. See [Probability-Flow ODE, Part 09](./38-probability-flow-ode-part-9.qmd) for the connection to DDPM and DDIM.

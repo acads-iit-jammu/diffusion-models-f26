@@ -45,7 +45,17 @@ The derivative measures local stretching: an interval that grows spreads its pro
 
 $$\log p_X(F(z))=\log p_Z(z)-\log|\det J_F(z)|.$$
 
-A **continuous normalizing flow (CNF)** uses an ODE flow for this map. Along its trajectory,
+A **continuous normalizing flow (CNF)** uses an ODE flow for this map. To connect the discrete formula to continuous time, consider one small step $F_h(x)=x+h v(x,t)$. In one dimension,
+
+$$F_h'(x)=1+h\partial_xv(x,t),\qquad
+\log|F_h'(x)|=h\partial_xv(x,t)+O(h^2).$$
+
+The change-of-variables correction per unit time therefore tends to $-\partial_xv$. For vectors, the same expansion is
+
+$$\log|\det(I+hJ_{\mathbf v})|
+=h\operatorname{tr}J_{\mathbf v}+O(h^2).$$
+
+These expansions hold locally for sufficiently small steps and bounded derivatives. They explain how the discrete log determinant becomes a continuous divergence. Along the exact trajectory,
 
 $$\boxed{\frac{d}{dt}\log p_t(x_t)=-\partial_xv_\theta(x_t,t).}$$
 
@@ -75,6 +85,12 @@ $$\boxed{\log p_0^{\mathrm{model}}(x_0)
 =\log p_1(x_1)+\int_0^1\partial_xv_\theta(x_t,t)\,dt.}$$
 
 In higher dimensions, use $\nabla\cdot\mathbf v_\theta$. The sign follows by integrating the preceding log-density ODE. This formula is exact for the exact regular flow; numerical integration and approximate trace estimation introduce computational error.
+
+For large vector states, one may estimate the divergence using a random probe $\xi$ with $\mathbb E[\xi\xi^\top]=I$:
+
+$$\operatorname{tr}J_{\mathbf v}=\mathbb E_\xi[\xi^\top J_{\mathbf v}\xi].$$
+
+A Jacobian-vector or vector-Jacobian product computes a probe value without forming the full Jacobian. A finite number of probes introduces estimation variability; in one dimension the derivative can usually be computed directly. This density calculation is not needed merely to draw ODE samples.
 
 If the sampler stops at $t_{\min}>0$, replace the lower integration limit by $t_{\min}$: the resulting likelihood is for the positive-time model density, not the clean endpoint.
 
@@ -124,6 +140,7 @@ $$\begin{aligned}
 \frac{d}{dt}\log p_t(x_t)
 &=\frac{\partial_tp_t(x_t)}{p_t(x_t)}
 +v(x_t,t)\frac{\partial_xp_t(x_t)}{p_t(x_t)}\\
+&=\left.\frac{-v\partial_xp_t-p_t\partial_xv+v\partial_xp_t}{p_t}\right|_{x=x_t}\\
 &=-\partial_xv(x_t,t).
 \end{aligned}$$
 

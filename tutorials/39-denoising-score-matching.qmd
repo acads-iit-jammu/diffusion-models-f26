@@ -1,0 +1,84 @@
+# Denoising Score Matching {.unnumbered}
+
+::: {.callout-note}
+## Draft — Standalone topic outline
+
+This topic develops score estimation and Langevin sampling independently of probability-flow ODEs. The aim is to learn a score from samples, then use it to sample a fixed density. Start with one dimension; vector formulas replace derivatives by gradients. The sections below establish the main results and the planned teaching sequence.
+:::
+
+## 1. Learn from clean/noisy pairs
+
+Draw $X_0\sim p_{\mathrm{data}}$ and independent $\varepsilon\sim\mathcal N(0,1)$. At a fixed noise scale $\sigma>0$, form
+
+$$Y=X_0+\sigma\varepsilon,\qquad
+p_\sigma(y)=\int\mathcal N(y;x_0,\sigma^2)p_{\mathrm{data}}(x_0)\,dx_0.$$
+
+A denoiser trained with squared error estimates $D_*(y,\sigma)=\mathbb E[X_0\mid Y=y]$. Tweedie's formula connects it to the noisy marginal score:
+
+$$s_\sigma(y)=\partial_y\log p_\sigma(y)
+=\frac{D_*(y,\sigma)-y}{\sigma^2}.$$
+
+The regression averages possible clean origins conditional on the noisy input. It does not recover the particular noise realization of every pair. The score is a property of the smoothed density $p_\sigma$, not exactly the original clean density at finite $\sigma$.
+
+## 2. Denoising score matching
+
+The conditional Gaussian score is available for every constructed pair:
+
+$$U=\partial_y\log p(Y\mid X_0)
+=-\frac{Y-X_0}{\sigma^2}=-\frac{\varepsilon}{\sigma}.$$
+
+Minimize
+
+$$\mathcal L_{\mathrm{DSM}}(\theta;\sigma)
+=\mathbb E_{X_0\sim p_{\mathrm{data}},\,\varepsilon\sim\mathcal N(0,1)}
+[(s_\theta(X_0+\sigma\varepsilon,\sigma)+\varepsilon/\sigma)^2].$$
+
+At the unrestricted optimum, $s_*(y,\sigma)=\mathbb E[U\mid Y=y]=s_\sigma(y)$. The conditional target is known even though the marginal score is not. The loss differs from marginal-score regression by a conditional-variance term independent of the predictor. This is the denoising/score-matching connection developed by [Vincent (2011)](https://gwern.net/doc/ai/nn/diffusion/2011-vincent.pdf).
+
+Planned derivation: expand the conditional squared error, differentiate the Gaussian convolution, and show explicitly why the posterior mean appears. Finite-data training targets the corrupted empirical law at its unrestricted optimum.
+
+## 3. Once a fixed score is known: Langevin sampling
+
+Let $p$ be a smooth positive target density and $s=\partial_x\log p$. Use sampling time $\tau$, with $p$ held fixed:
+
+$$dX_\tau=s(X_\tau)\,d\tau+\sqrt2\,dW_\tau.$$
+
+Brownian increments over an interval of length $\eta$ are independent Gaussians with variance $\eta$. Euler–Maruyama therefore gives
+
+$$\boxed{x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k,
+\qquad z_k\overset{\mathrm{iid}}{\sim}\mathcal N(0,1).}$$
+
+Score-directed drift and random spreading balance at the target distribution. For the continuous SDE, $p$ is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error.
+
+If the learned score is $s_\sigma$, the intended stationary target is $p_\sigma$. Langevin does not remove the smoothing merely by running longer. Its sampling clock is not a schedule that automatically reduces $\sigma$.
+
+## 4. First solved check: a standard Gaussian
+
+For $p=\mathcal N(0,1)$, $s(x)=-x$. Deterministic score ascent $\dot x=-x$ collapses toward zero. Langevin instead gives
+
+$$x_{k+1}=(1-\eta)x_k+\sqrt{2\eta}\,z_k.$$
+
+For $0<\eta<2$, the discrete chain's stationary variance solves
+
+$$V=(1-\eta)^2V+2\eta,
+\qquad V=\frac1{1-\eta/2}.$$
+
+It approaches the target variance 1 as $\eta\to0$, but is not exactly 1 at a finite step. This will anchor simulations of step-size bias, convergence, and multimodal mixing.
+
+## 5. Several noise levels and annealed Langevin dynamics
+
+Train $s_\theta(x,\sigma)$ at a decreasing sequence $\sigma_1>\cdots>\sigma_L>0$, averaging the DSM loss over a stated distribution of noise levels with positive weights. At each level, perform several Langevin steps targeting $p_{\sigma_i}$, then lower the noise scale. Large smoothing can make movement between modes easier; short runs at each level do not guarantee equilibrium.
+
+This is the approach of [Song and Ermon (2019)](https://arxiv.org/abs/1907.05600). It differs from a reverse diffusion SDE designed to follow prescribed changing marginals without equilibrating at every level. The final positive noise level retains smoothing error.
+
+## Appendix outline: stationarity from density evolution
+
+If $r_\tau$ is the current sampler density, its Fokker–Planck equation is
+
+$$\partial_\tau r_\tau=-\partial_x(r_\tau s)+\partial_{xx}r_\tau.$$
+
+At $r_\tau=p$, $ps=\partial_xp$, so the two terms cancel. This proves invariance subject to the relevant boundary and regularity conditions; it does not establish a mixing rate. The full appendix will develop the fixed-interval probability balance and distinguish invariance, convergence, and discretization bias.
+
+For a different use of a time-dependent score—deterministic transport through a prescribed density path—see the separate [Probability-Flow ODE topic](./probability-flow-ode.qmd).
+
+[Continue to Reverse-SDE sampling](./40-reverse-sde-sampling.qmd) to follow a changing density path rather than equilibrate at one noise level.

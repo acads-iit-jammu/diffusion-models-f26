@@ -53,6 +53,16 @@ $$\boxed{v_*(x,t)=\mathbb E[X_1-X_0\mid X_t=x,t].}$$
 
 This is the **conditional flow-matching** (CFM) loss. Direct regression onto the unavailable marginal velocity would use $\mathcal L_{\mathrm{FM}}=\mathbb E_{t,X_t}[(v_\theta(X_t,t)-v_*(X_t,t))^2]$. The two losses differ by a parameter-independent conditional-variance term, so their population gradients and minimizers agree when differentiation is justified.
 
+More explicitly, at a fixed input $x$ and time $t$, write $U=X_1-X_0$ and $v_*(x,t)=\mathbb E[U\mid X_t=x,t]$. Expanding the square gives
+
+$$\begin{aligned}
+\mathbb E[(v_\theta(x,t)-U)^2\mid X_t=x,t]
+&=(v_\theta(x,t)-v_*(x,t))^2\\
+&\quad+\operatorname{Var}(U\mid X_t=x,t).
+\end{aligned}$$
+
+Averaging over the time and interpolation marginals proves the loss relationship. The posterior averaging is supplied by regression on joint endpoint/interpolation samples; no posterior density is evaluated.
+
 The expectation is over endpoint pairs compatible with the fixed noisy/intermediate input. As in Part 03, individual labels differ from their conditional-mean prediction. The loss decomposes into a velocity-estimation error plus a conditional variance independent of the network.
 
 Why does this conditional mean transport the right density? Each endpoint pair supplies a trajectory with known velocity. Averaging its contribution to probability transport at a location gives precisely the field above. Appendix A verifies that the interpolation marginals satisfy
@@ -124,6 +134,23 @@ $$\boxed{v_*(x,t)=-\mu+
 To verify it, keep a fixed $Z\sim\mathcal N(0,1)$ and define $x_t=(1-t)\mu+\sqrt{V_t}Z$. Differentiation produces the displayed field because $V_t'/2=t-(1-t)V$. Backward transport maps $x_1=Z$ to $x_0=\mu+\sqrt VZ$.
 
 Even when $\mu=0,V=1$, the interpolation variance falls to $1/2$ at $t=1/2$ and then rises to one. Equal endpoint distributions do not imply a stationary chosen path. This is another reason to assess the whole path rather than endpoint similarity alone.
+
+### Check the score-to-velocity conversion
+
+The score of this Gaussian path is
+
+$$s_t(x)=-\frac{x-(1-t)\mu}{V_t}.$$
+
+For $0<t<1$, substituting it into the general straight-path formula gives
+
+$$\begin{aligned}
+-\frac{x+t s_t(x)}{1-t}
+&=\frac{(t-V_t)x-t(1-t)\mu}{(1-t)V_t}\\
+&=\frac{t-(1-t)V}{V_t}x-\frac{t\mu}{V_t}\\
+&=-\mu+\frac{t-(1-t)V}{V_t}[x-(1-t)\mu].
+\end{aligned}$$
+
+Here $t-V_t=(1-t)[t-(1-t)V]$. The expression agrees with the field obtained by differentiating the exact trajectory. Unlike the score conversion with its apparent endpoint division, the final Gaussian expression is well defined at both endpoints because $V>0$.
 
 ## 6. Minimal training and backward sampling
 

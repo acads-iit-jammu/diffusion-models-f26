@@ -1,0 +1,246 @@
+# 09 · DDPM, DDIM, and probability flow {.unnumbered}
+
+::: {.callout-note}
+## Draft — One learned score, different sampling dynamics
+
+Keep data at $t=0$ and the terminal prior at $t=1$. DDPM and DDIM fit within the score-based framework, but they are not both special cases of a deterministic ODE. **DDPM connects to the reverse VP SDE; deterministic DDIM discretizes the associated probability-flow ODE in transformed coordinates.** Finite steps, score error, and terminal initialization affect the resulting distributions.
+:::
+
+## 1. Start from the common training problem
+
+For the VP schedule used in Part 03,
+
+$$X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
+\sigma_t=\sqrt{1-\alpha_t^2},\qquad
+\alpha_t=\exp\left[-\frac12\int_0^t\beta(u)\,du\right].$$
+
+Here $\varepsilon\sim\mathcal N(0,1)$ is independent of clean data. Squared-error noise regression estimates $\mathbb E[\varepsilon\mid X_t=x]$, so
+
+$$s_\theta(x,t)=-\frac{\varepsilon_\theta(x,t)}{\sigma_t},
+\qquad
+D_\theta(x,t)=\frac{x-\sigma_t\varepsilon_\theta(x,t)}{\alpha_t}.$$
+
+These are the same conversions used earlier. A trained noise predictor can therefore supply either a score or a clean-data estimate. The sampling algorithm is an additional choice.
+
+The primary framework is [Yang Song et al., Score-Based Generative Modeling through SDEs](https://arxiv.org/abs/2011.13456v2), especially the reverse SDE, training objective, and probability-flow ODE. [Yang Song's explanatory blog](https://yang-song.net/blog/2021/score/) separates the stochastic reverse process from its deterministic counterpart. For the discrete methods, use [Ho, Jain, and Abbeel, DDPM](https://arxiv.org/abs/2006.11239) and [Jiaming Song, Meng, and Ermon, DDIM](https://arxiv.org/abs/2010.02502v4). Yang Song's SDE paper and Jiaming Song's DDIM paper have different first authors.
+
+## 2. Translate discrete notation before comparing formulas
+
+Let $0=t_0<t_1<\cdots<t_N=1$. We retain $\alpha_{t_i}$ for the cumulative **signal amplitude**. Write the one-step noise variance as $b_i$ to distinguish it from the continuous rate $\beta(t)$:
+
+$$b_i=1-\frac{\alpha_{t_i}^2}{\alpha_{t_{i-1}}^2},\qquad
+X_{t_i}=\sqrt{1-b_i}\,X_{t_{i-1}}+\sqrt{b_i}\,Z_i.$$
+
+Here the $Z_i$ are independent standard normals. For a VP SDE sampled exactly on this grid,
+
+$$b_i=1-\exp\left[-\int_{t_{i-1}}^{t_i}\beta(u)\,du\right].$$
+
+| These notes | Common DDPM notation | Meaning |
+|---|---|---|
+| $b_i$ | $\beta_i$ | One-step noise variance |
+| $1-b_i$ | $\alpha_i$ | One-step signal variance retention |
+| $\alpha_{t_i}^2=\prod_{j=1}^i(1-b_j)$ | $\bar\alpha_i$ | Cumulative signal variance retention |
+| $\alpha_{t_i}$ | $\sqrt{\bar\alpha_i}$ | Cumulative signal amplitude |
+| $\sigma_{t_i}^2$ | $1-\bar\alpha_i$ | Cumulative conditional noise variance |
+
+The DDIM paper uses its own $\alpha_i$ for cumulative variance retention. Translate it to our $\alpha_{t_i}^2$, not our amplitude. This notation difference changes square roots throughout the updates.
+
+## 3. Two continuous samplers from the same score
+
+In increasing reverse time $\tau=1-t$, the reverse VP SDE is
+
+$$dY_\tau=
+\left[\frac{\beta(t)}2Y_\tau+\beta(t)s_t(Y_\tau)\right]d\tau
++\sqrt{\beta(t)}\,d\overline W_\tau,\qquad t=1-\tau.$$
+
+The probability-flow ODE, in the same reverse clock, is
+
+$$\frac{dy}{d\tau}=\frac{\beta(t)}2[y+s_t(y)].$$
+
+The score coefficient differs by a factor of two. The SDE retains Brownian spreading; the ODE's velocity reproduces its marginal evolution without fresh noise. With the exact score, appropriate regularity, and matching terminal law, both have the prescribed marginals. Their trajectories and couplings differ. This is the distinction made in Song et al.'s Eqs. (6) and (13), and in the blog's reverse-SDE and probability-flow sections.
+
+For a decreasing-time step from $t$ to $t-h$, Euler–Maruyama gives
+
+$$x_{t-h}\approx x_t+h\beta(t)\left[\tfrac12x_t+s_\theta(x_t,t)\right]
++\sqrt{h\beta(t)}\,z,$$
+
+whereas Euler for the ODE gives
+
+$$x_{t-h}\approx x_t+\tfrac12h\beta(t)[x_t+s_\theta(x_t,t)].$$
+
+**Deleting noise from the reverse-SDE update does not produce the probability-flow ODE.** Its drift must also change.
+
+## 4. DDPM: the discrete stochastic branch
+
+A standard DDPM reverse mean written in our notation is
+
+$$\mu_\theta(x_{t_i},i)
+=\frac{1}{\sqrt{1-b_i}}
+\left[x_{t_i}-\frac{b_i}{\sigma_{t_i}}\varepsilon_\theta(x_{t_i},t_i)\right]
+=\frac{x_{t_i}+b_i s_\theta(x_{t_i},t_i)}{\sqrt{1-b_i}}.$$
+
+The sampler adds Gaussian noise:
+
+$$x_{t_{i-1}}=\mu_\theta(x_{t_i},i)+\sqrt{\nu_i}\,z_i.$$
+
+Common fixed choices are $\nu_i=b_i$ or the forward posterior variance
+
+$$\widetilde b_i=b_i\frac{1-\alpha_{t_{i-1}}^2}{1-\alpha_{t_i}^2}.
+$$
+
+These choices are not identical at finite step sizes. The final data reconstruction step has special handling, usually no new noise in the sampling algorithm. Learned-variance variants also exist; this section compares the basic fixed-variance constructions.
+
+For $h=t_i-t_{i-1}$ small, away from the zero-noise endpoint, $b_i=\beta(t_i)h+O(h^2)$. Expanding the mean,
+
+$$\mu_\theta(x,i)
+=x+b_i\left[\tfrac12x+s_\theta(x,t_i)\right]+O(b_i^2).$$
+
+Both variance choices above have leading term $\beta(t_i)h$ at fixed positive time. Thus the small-step update agrees with reverse VP Euler–Maruyama to leading order. It is not generally the exact Euler–Maruyama formula on a finite grid.
+
+Even with a perfect noise predictor, a finite-step Gaussian reverse kernel need not equal the true reverse conditional for non-Gaussian data. The exact reverse conditional is generally a mixture. The small-step SDE connection does not remove this finite-step approximation. The DDPM mean and variance formulas are given in [Ho et al., Eqs. (7), (11), and Algorithm 2](https://arxiv.org/pdf/2006.11239).
+
+## 5. DDIM: a deterministic update from the same predictor
+
+Choose two grid times $u<t$, possibly skipping intermediate indices. At the current input, compute
+
+$$\widehat x_0=D_\theta(x_t,t)
+=\frac{x_t-\sigma_t\varepsilon_\theta(x_t,t)}{\alpha_t}.$$
+
+The deterministic DDIM update is
+
+$$\boxed{x_u=\alpha_u\widehat x_0+\sigma_u\varepsilon_\theta(x_t,t).}$$
+
+Equivalently,
+
+$$x_u=\frac{\alpha_u}{\alpha_t}x_t+
+\left(\sigma_u-\frac{\alpha_u}{\alpha_t}\sigma_t\right)
+\varepsilon_\theta(x_t,t).$$
+
+The update holds the current predicted clean value and predicted noise fixed over this step, then recombines them at the next noise level. At the next step the predictions are recomputed. It does not recover the particular forward noise realization of an observed image. Randomness comes from the initial terminal sample; no fresh noise is added in this deterministic update.
+
+## 6. Why deterministic DDIM is an ODE discretization
+
+First, at a fixed positive time away from the zero-noise endpoint, a small-step expansion in ordinary time gives
+
+$$x_{t-h}-x_t
+=h\left[-\frac{\alpha_t'}{\alpha_t}x_t+
+\left(\frac{\alpha_t'}{\alpha_t}\sigma_t-\sigma_t'\right)
+\varepsilon_\theta(x_t,t)\right]+O(h^2).$$
+
+For VP, use $\alpha_t'/\alpha_t=-\beta(t)/2$ and
+$\sigma_t\sigma_t'=\beta(t)\alpha_t^2/2$. The update becomes
+
+$$x_{t-h}-x_t
+=\frac{h\beta(t)}2
+\left[x_t-\frac{\varepsilon_\theta(x_t,t)}{\sigma_t}\right]+O(h^2)
+=\frac{h\beta(t)}2[x_t+s_\theta(x_t,t)]+O(h^2).$$
+
+This is the probability-flow ODE's backward velocity. There is an even stronger numerical interpretation. Define
+
+$$y_t=\frac{x_t}{\alpha_t},\qquad r_t=\frac{\sigma_t}{\alpha_t}.$$
+
+The transformed corruption is $y_t=X_0+r_t\varepsilon$. Dividing out signal contraction leaves additive Gaussian noise with standard deviation $r_t$, which motivates these coordinates. This is a statement about the conditional laws; it does not equate a fixed-noise interpolation with a Brownian trajectory.
+
+For positive noise, $\alpha_t>0$, and a strictly increasing noise ratio, Appendix A derives
+
+$$\boxed{\frac{dy}{dr}=\varepsilon_\theta(\alpha_t y,t),\qquad t=t(r).}$$
+
+Divide the deterministic DDIM update by $\alpha_u$:
+
+$$\boxed{y_u=y_t+(r_u-r_t)\varepsilon_\theta(x_t,t).}$$
+
+That is exactly an explicit Euler step for this **transformed ODE**, with $r$ decreasing during generation. DDIM is not generally the same finite update as Euler in the original $x,t$ coordinates. Neither method is generally the exact ODE solution for a finite step. The ODE connection appears in [DDIM, Section 4.3](https://arxiv.org/html/2010.02502v4#S4.SS3).
+
+## 7. A family connecting deterministic and stochastic updates
+
+Let $0\leq\eta\leq1$ and define a step-noise standard deviation
+
+$$\gamma_{t\to u}
+=\eta\frac{\sigma_u}{\sigma_t}
+\sqrt{1-\frac{\alpha_t^2}{\alpha_u^2}}.$$
+
+The generalized update is
+
+$$x_u=\alpha_u\widehat x_0+
+\sqrt{\sigma_u^2-\gamma_{t\to u}^2}\,\varepsilon_\theta(x_t,t)
++\gamma_{t\to u}z.$$
+
+- $\eta=0$ gives deterministic DDIM.
+- $\eta=1$ on adjacent grid times gives the DDPM posterior-variance choice $\nu_i=\widetilde b_i$, with the same noise-prediction mean.
+- $\eta=1$ is not the $\nu_i=b_i$ variance choice at finite steps. For skipped times, it describes a coarsened transition rather than replaying all original adjacent steps.
+
+For any $\eta>0$ on a step with positive destination noise, it is a stochastic sampler, not a deterministic probability-flow ODE solver. The common conditional corruption marginals allow reuse of the trained predictor; they do not imply that all finite-step generated marginals are exact. This family is developed in [DDIM, Eqs. (12) and (16), and Appendix C.1](https://arxiv.org/abs/2010.02502v4).
+
+## 8. A Gaussian check that separates exact flows from discretizations
+
+Take $p_0=\mathcal N(0,1)$. VP leaves this density unchanged, so
+
+$$s_t(x)=-x,\qquad\varepsilon_*(x,t)=\sigma_t x.$$
+
+The exact probability-flow velocity is zero, hence every ODE particle stays fixed. The reverse SDE is stationary Ornstein–Uhlenbeck dynamics: particles fluctuate but the density remains standard normal.
+
+Deterministic DDIM instead gives the finite step
+
+$$x_u=(\alpha_u\alpha_t+\sigma_u\sigma_t)x_t.$$
+
+The coefficient is the inner product of two unit vectors $(\alpha_u,\sigma_u)$ and $(\alpha_t,\sigma_t)$. It is less than one for distinct noise levels, so this finite step multiplies the variance by $(\alpha_u\alpha_t+\sigma_u\sigma_t)^2$, even with the exact predictor. The contraction can be severe: a single step to $u=0$ gives $x_0=\alpha_t x_t$, nearly collapsing the cloud when $\alpha_t$ is small. Direct Euler in $(x,t)$ is exact for this zero-velocity example. As step sizes shrink, that discretization effect vanishes on regular intervals. This example shows why “same continuous ODE” must not be replaced by “identical finite samples.”
+
+### The variance choice matters even with an exact predictor
+
+For this stationary Gaussian example, the true adjacent reverse conditional is
+
+$$X_{t_{i-1}}\mid X_{t_i}=x
+\sim\mathcal N(\sqrt{1-b_i}\,x,b_i).$$
+
+The DDPM mean gives exactly $\sqrt{1-b_i}\,x$. Thus the Gaussian reverse kernel with variance $b_i$ is exact in this example. Using $\widetilde b_i$ instead gives one-step variance $1-b_i+\widetilde b_i<1$ when starting from the correct unit-variance marginal. This statement concerns the kernel; the common final-step convention of suppressing fresh noise is an additional modification.
+
+For a complementary case, take clean data to be a fixed point $c$. Then $D_*(x,t)=c$ and the exact positive-time ODE paths are $x_t=\alpha_tc+\sigma_te$ for a fixed Gaussian label $e$. Deterministic DDIM maps these paths exactly between noise levels, while direct Euler in $(x,t)$ is generally approximate. The reverse conditional variance is now $\widetilde b_i$, so that DDPM choice is exact. The point-mass data endpoint is a singular limit, not a regular invertible flow endpoint.
+
+| Method | New noise each step? | Continuous connection |
+|---|---|---|
+| Basic DDPM | Yes, except final reconstruction | Reverse VP SDE in the small-step limit |
+| Deterministic DDIM | No | Euler for the probability-flow ODE in $(y,r)$ coordinates |
+| Probability-flow Euler in $(x,t)$ | No | Direct discretization of the same ODE |
+
+All require a matching schedule, an adequate learned predictor, a suitable terminal approximation, and numerical checks. In higher dimensions, use the same scalar coefficients with vector states, vector predictions, and independent standard Gaussian vector noise.
+
+## Appendix A. Deriving the transformed ODE
+
+Write the forward-clock probability-flow ODE using noise prediction:
+
+$$\dot x=-\frac\beta2x+\frac\beta{2\sigma}\varepsilon_\theta(x,t).$$
+
+Since $\dot\alpha/\alpha=-\beta/2$, differentiation of $y=x/\alpha$ cancels the linear drift:
+
+$$\dot y=\frac{\dot x}{\alpha}-\frac{x\dot\alpha}{\alpha^2}
+=\frac{\beta}{2\alpha\sigma}\varepsilon_\theta(x,t).$$
+
+Also,
+
+$$\begin{aligned}
+\dot r&=\frac{\dot\sigma}{\alpha}-\frac{\sigma\dot\alpha}{\alpha^2}\\
+&=\frac{\beta\alpha}{2\sigma}+\frac{\beta\sigma}{2\alpha}
+=\frac{\beta}{2\alpha\sigma},
+\end{aligned}$$
+
+using $\alpha^2+\sigma^2=1$. Dividing gives $dy/dr=\varepsilon_\theta(\alpha_t y,t)$. Where $\beta>0$ the noise ratio is strictly increasing and can parameterize the ODE. For a positive initial rate, $\dot r$ diverges at zero noise, although the transformed equation need not be singular when its predictor extends regularly to $r=0$. The derivation at the endpoint requires a limiting interpretation; the finite DDIM formula itself avoids dividing by $\sigma_u$ at its destination.
+
+
+## Appendix B. Checking the stochastic DDIM connection
+
+For adjacent times $u=t_{i-1}$ and $t=t_i$, put $b=b_i=1-\alpha_t^2/\alpha_u^2$. At $\eta=1$,
+
+$$\gamma^2=b\frac{\sigma_u^2}{\sigma_t^2}=\widetilde b_i.$$
+
+Also $\sigma_t^2-b=\alpha_t^2\sigma_u^2/\alpha_u^2$, giving
+
+$$\sqrt{\sigma_u^2-\gamma^2}
+=\frac{\alpha_t\sigma_u^2}{\alpha_u\sigma_t}.$$
+
+Substitute $\widehat x_0=(x_t-\sigma_t\varepsilon_\theta)/\alpha_t$ into the generalized mean. The coefficient of $\varepsilon_\theta$ simplifies to
+
+$$-\frac{\alpha_u\sigma_t}{\alpha_t}
++\frac{\alpha_t\sigma_u^2}{\alpha_u\sigma_t}
+=-\frac{\alpha_u}{\alpha_t}\frac b{\sigma_t}.$$
+
+Since $\alpha_u/\alpha_t=1/\sqrt{1-b}$, the resulting mean and variance are exactly the stated DDPM posterior-variance update. This is a finite-step algebraic identity, unlike the limiting SDE correspondence.
