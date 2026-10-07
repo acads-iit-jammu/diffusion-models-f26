@@ -1,4 +1,4 @@
-"""Nest the book's generated probability-flow sidebar group under Lecture Notes.
+"""Nest the book's generated topic groups under Lecture Notes.
 
 Quarto book navigation flattens parts even with explicit sidebar contents.
 Move the complete generated list item; preserve links and collapse targets.
@@ -25,21 +25,25 @@ def group_span(html, label):
 count = 0
 for path in Path('_site').rglob('*.html'):
     html = path.read_text()
-    lecture = group_span(html, 'Lecture Notes')
-    flow = group_span(html, 'Probability-Flow ODE')
-    if lecture is None or flow is None:
-        continue
-    if lecture[0] < flow[0] < flow[1] < lecture[1]:
-        continue  # Idempotent on repeated builds.
-    block = html[flow[0]:flow[1]].replace('sidebar-section depth1', 'sidebar-section depth2')
-    html = html[:flow[0]] + html[flow[1]:]
-    lecture = group_span(html, 'Lecture Notes')
-    insert = html.rfind('</ul>', lecture[0], lecture[1])
-    if insert < 0:
-        raise ValueError(f'Missing lecture list: {path}')
-    html = html[:insert] + block + '\n' + html[insert:]
-    lecture, flow = group_span(html, 'Lecture Notes'), group_span(html, 'Probability-Flow ODE')
-    assert lecture[0] < flow[0] < flow[1] < lecture[1], path
-    path.write_text(html)
-    count += 1
-print(f'Nested probability-flow navigation in {count} pages.')
+    changed = False
+    for label in ('Probability-Flow ODE', 'Score Matching and Stochastic Sampling'):
+        lecture = group_span(html, 'Lecture Notes')
+        topic = group_span(html, label)
+        if lecture is None or topic is None:
+            continue
+        if lecture[0] < topic[0] < topic[1] < lecture[1]:
+            continue  # Idempotent on repeated builds.
+        block = html[topic[0]:topic[1]].replace('sidebar-section depth1', 'sidebar-section depth2')
+        html = html[:topic[0]] + html[topic[1]:]
+        lecture = group_span(html, 'Lecture Notes')
+        insert = html.rfind('</ul>', lecture[0], lecture[1])
+        if insert < 0:
+            raise ValueError(f'Missing lecture list: {path}')
+        html = html[:insert] + block + '\n' + html[insert:]
+        lecture, topic = group_span(html, 'Lecture Notes'), group_span(html, label)
+        assert lecture[0] < topic[0] < topic[1] < lecture[1], path
+        changed = True
+    if changed:
+        path.write_text(html)
+        count += 1
+print(f'Nested topic navigation in {count} pages.')
