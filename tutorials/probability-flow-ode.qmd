@@ -1,0 +1,24 @@
+# Probability-Flow ODE {.unnumbered}
+
+::: {.callout-note}
+## Draft topic
+
+This eight-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–08, and can be read in sequence. The notes and worked examples are in development.
+:::
+
+Start with particle trajectories and density evolution in one dimension. Then extend the construction to vectors, learn the score from clean/noisy pairs, and implement sampling. The later parts provide experiments and an image-model recipe, then connect probability-flow ODEs to Neural ODEs, normalizing flows, and flow matching.
+
+| Part | Focus |
+|---|---|
+| [01 · Transport in one dimension](./07-probability-flow-ode.qmd) | Build a density path and its probability-flow ODE. |
+| [02 · Higher-dimensional transport](./31-probability-flow-ode-part-2.qmd) | Extend the notation and main results to vectors. |
+| [03 · Learning the score](./32-probability-flow-ode-part-3.qmd) | Learn a denoiser, recover the score, and construct the sampling field. |
+| [04 · One-dimensional experiments](./33-probability-flow-ode-part-4.qmd) | Explore four executed notebooks on transport, sampling, training, and denoising. |
+| [05 · Image-model recipe](./34-probability-flow-ode-part-5.qmd) | Connect the equations to an annotated MNIST implementation. |
+| [06 · Train and sample a mixture](./35-probability-flow-ode-part-6.qmd) | Work through neural score estimation and generation in an executed notebook. |
+| [07 · Neural ODEs and normalizing flows](./36-probability-flow-ode-part-7.qmd) | Connect velocity models, invertible transport, and likelihood. |
+| [08 · Flow matching](./37-probability-flow-ode-part-8.qmd) | Learn the velocity directly from conditional-path regression. |
+
+Parts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Parts 07–08 connect the construction to other continuous generative models.
+
+[Download all notebooks and code](../materials/probability-flow/probability-flow-code.zip).

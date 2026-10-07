@@ -1,17 +1,17 @@
-# 14 · Probability-Flow ODE - Part 3 {.unnumbered}
+# 03 · Learning the score {.unnumbered}
 
 ::: {.callout-note}
 ## Draft — Learning the score
 
-These lecture notes are in development and may be revised. [Part 1](./07-probability-flow-ode.qmd) established that a score and the forward schedule determine a sampling vector field; [Part 2](./31-probability-flow-ode-part-2.qmd) extended the construction to vectors. We now construct training targets from clean data and Gaussian noise. We first use scalars to make the conditional expectations explicit, then state the vector formulas.
+These lecture notes are in development and may be revised. [Part 1](./07-probability-flow-ode.qmd) established that a score and the forward schedule determine a sampling vector field; [Part 2](./31-probability-flow-ode-part-2.qmd) extended the construction to vectors. We begin with supervised denoising: predict a clean input from its noisy version. Squared-error regression learns the posterior mean, which supplies the score through Tweedie's formula. We first use scalars to make the conditional expectations explicit, then state the vector formulas.
 :::
 
 ::: {.callout-note}
 ## Primary reference and learning objective
 
-The primary reference is [Song et al., *Score-Based Generative Modeling through Stochastic Differential Equations*, ICLR 2021, arXiv:2011.13456v2](https://arxiv.org/abs/2011.13456v2). Use Section 3.3, Eq. (7), for training; Section 4.3, Eq. (13), for the probability-flow ODE; and Appendix B, Eqs. (32)–(33), for the linear VP schedule and its Gaussian transition law. The paper's reverse SDE is Eq. (6), a different sampling dynamics from Eq. (13).
+The primary reference is [Song et al., *Score-Based Generative Modeling through Stochastic Differential Equations*, ICLR 2021, arXiv:2011.13456v2](https://arxiv.org/abs/2011.13456v2). Use Section 3.3, Eq. (7), for training; Section 4.3, Eq. (13), for the probability-flow ODE; and Appendix B for the linear VP schedule and its Gaussian transition law. The paper's reverse SDE is Eq. (6), a different sampling dynamics from Eq. (13).
 
-**Sampling is the goal.** Choose one forward schedule, generate noisy training examples from it, fit a time-dependent score, and insert that score into the corresponding vector field. Explicit Euler integration with decreasing time then generates approximate data samples. Training and sampling must use the same schedule and time convention.
+**Sampling is the goal.** The sampler needs a score to evaluate its vector field. To learn that score, first consider an ordinary supervised problem: generate clean/noisy pairs and predict the clean value from the noisy input. Squared-error regression learns the posterior mean clean value. Tweedie's formula converts this mean into the marginal score. Conditional-score and noise prediction are alternative parameterizations of this learning problem, with different time weightings unless the losses are adjusted. Explicit Euler integration with decreasing time then generates approximate data samples. Training and sampling must use the same schedule and time convention.
 :::
 
 ## 1. The forward process, SDE, and noise schedule
@@ -21,17 +21,11 @@ Generation requires evaluating a vector field at the current sample and time. Fo
 $$v(x,t)=-\frac{\beta(t)}2[x+s_t(x)],\qquad
 s_t(x)=\frac{d}{dx}\log p_t(x).$$
 
-The schedule is chosen by us; the marginal score is unknown. Our dataset contains observations $X_0\sim p_{\mathrm{data}}$, not values of $p_t$ or its derivative. We therefore need a regression problem that can be constructed from those observations and whose population solution is the score.
+The schedule is chosen by us; the marginal score is unknown. Our dataset contains observations $X_0\sim p_{\mathrm{data}}$, not values of $p_t$ or its derivative. We can construct a denoising regression problem from those observations. We will first identify its posterior-mean solution, then show how it determines the required score.
 
 ### The forward process and its SDE
 
-Choose a nonnegative rate schedule $\beta(t)$ on $0\le t\le1$. It specifies how rapidly each forward step contracts the particle and adds noise. For a small step $h>0$, at time $t_k=kh$ use
-
-$$\boxed{X_{t_{k+1}}=\sqrt{1-\beta(t_k)h}\,X_{t_k}
-+\sqrt{\beta(t_k)h}\,\varepsilon_k,\qquad
-\varepsilon_k\sim\mathcal N(0,1),\quad \beta(t_k)h<1.}$$
-
-The noise draws are independent across steps and independent of the current particle. The one-step noise variance is $\beta(t_k)h$. As the step size tends to zero, this construction gives the VP SDE
+Choose a nonnegative rate schedule $\beta(t)$ on $0\le t\le1$. The forward VP process contracts positions and adds Gaussian noise. Its SDE is
 
 $$\boxed{dX_t=-\frac{\beta(t)}2X_t\,dt+\sqrt{\beta(t)}\,dW_t.}$$
 
@@ -63,7 +57,7 @@ Thus the $\alpha_t$ used to generate training examples determines the $\beta(t)$
 
 ### Constant rate in Part 1; linear rate in the paper
 
-The existing teaching notebooks use $\beta(t)=8$, hence $\alpha_t=e^{-4t}$ and conditional variance $1-e^{-8t}$. Their training code and ODE both use this constant rate. It is a valid VP example, not the paper's experimental linear schedule.
+The earlier Part 4 notebooks (including `03-learn-a-score.ipynb`) use $\beta(t)=8$, hence $\alpha_t=e^{-4t}$ and conditional variance $1-e^{-8t}$. Their training code and ODE both use this constant rate. It is a valid VP example, not the paper's experimental linear schedule.
 
 For the paper's linear VP schedule on $[0,1]$, write its endpoint rates in our notation as
 
@@ -81,26 +75,222 @@ $$X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,$$
 
 and its sampling field uses $\beta(t)=0.1+19.9t$, evaluated at the current solver time. Replacing this coefficient by 8 while keeping the linear-schedule training data would give the wrong field for the learned density path.
 
-For this linear schedule, $\alpha_1=e^{-5.025}\approx0.00657$. The terminal law generally retains a small data contribution; it is not exactly standard normal. Increasing the number of Euler steps does not reduce that terminal-prior approximation. The constant-rate notebooks likewise retain $\alpha_1=e^{-4}$.
+For this linear schedule, $\alpha_1=e^{-5.025}\approx0.00657$. The terminal law generally retains a small data contribution; it is not exactly standard normal. Increasing the number of Euler steps does not reduce that terminal-prior approximation. The constant-rate notebooks likewise retain $\alpha_1=e^{-4}$. Part 6 uses the linear schedule developed here, with $t_{\min}=0.001$.
+
+
+
+## 2. Start with supervised denoising
+
+### Generate joint pairs using the forward process
+
+Fix a positive time $t$ with $0<\alpha_t<1$. Draw independently
+
+$$X_0\sim p_{\mathrm{data}},\qquad \varepsilon\sim\mathcal N(0,1),$$
+
+and construct
+
+$$X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon.$$
+
+We now have a supervised pair: the noisy input $X_t$ and its clean label $X_0$. We know the realized noise because we generated the pair, not because $X_t$ alone determines that noise.
+
+The forward construction samples the joint distribution
+
+$$p(x_0,x_t)=p_{\mathrm{data}}(x_0)\,p_t(x_t\mid x_0).$$
+
+We need not know this joint density analytically: clean samples and a known forward conditional are enough to sample pairs. With finite data, sampling clean observations uniformly uses the empirical data distribution. In that case, the optimal regression function below is the posterior mean under the empirical law, not exactly the population law; Appendix D makes this distinction explicit.
+
+### Learn the clean value from the noisy input
+
+Give the network only $(X_t,t)$ and ask it to predict $X_0$. At this fixed time, the objective is
+
+$$\boxed{\mathcal L_{D,t}(\theta)=
+\mathbb E_{X_0\sim p_{\mathrm{data}},\,\varepsilon\sim\mathcal N(0,1)}
+\left[(D_\theta(X_t,t)-X_0)^2\right].}$$
+
+Assume the clean distribution has a finite second moment. By the law of total expectation, the same loss is
+
+$$\mathcal L_{D,t}(\theta)=\mathbb E_{X_t\sim p_t}
+\left[\mathbb E_{X_0\mid X_t}
+\left[(D_\theta(X_t,t)-X_0)^2\right]\right].$$
+
+At a fixed noisy input $x$, let $m_t(x)=\mathbb E_{X_0\mid X_t=x}[X_0]$. For any proposed output $a$,
+
+$$\mathbb E_{X_0\mid X_t=x}[(a-X_0)^2]
+=(a-m_t(x))^2+\operatorname{Var}(X_0\mid X_t=x).$$
+
+Only the first term depends on $a$. Thus the unrestricted optimal denoiser is
+
+$$\boxed{D_*(x,t)=m_t(x)=\mathbb E_{X_0\mid X_t=x}[X_0].}$$
+
+This is the **posterior mean**, not the full posterior distribution and not necessarily the historical clean input used in a particular pair. Different clean values with different noise draws can produce the same noisy observation.
 
 ::: {.callout-note}
-## Relating a discrete forward step to the continuous rate
+## Forward-generated pairs support reverse-direction estimation
 
-For $0\le u<t\le1$, the exact VP transition is
+Before corruption, $X_0$ and $\varepsilon$ are independent. Given $X_t=x$, they are linked by
 
-$$X_t\mid X_u=x\sim\mathcal N\!\left(
-\frac{\alpha_t}{\alpha_u}x,\ 1-\frac{\alpha_t^2}{\alpha_u^2}\right).$$
+$$\varepsilon=\frac{x-\alpha_tX_0}{\sqrt{1-\alpha_t^2}}.$$
 
-In discrete DDPM notation, a step's noise variance $\beta_i$ is related to the continuous rate by
+Training uses samples from their joint construction. Squared-error regression on the noisy input has a posterior conditional mean as its optimum. We do not evaluate the posterior density, draw posterior samples, or average independently over clean values after fixing $x$. Nor do we need repeated training observations with exactly the same noisy value: a shared regression function is fitted across inputs.
+:::
 
-$$\beta_i=1-\exp\!\left[-\int_{t_{i-1}}^{t_i}\beta(u)\,du\right]
-\approx\beta(t_{i-1})(t_i-t_{i-1}).$$
+To train one network across time, additionally draw $t\sim\operatorname{Uniform}[t_{\min},1]$, independently of $X_0$ and $\varepsilon$, and minimize
 
-Our $\alpha_{t_i}$ is the cumulative **amplitude** $\sqrt{\prod_{j=1}^i(1-\beta_j)}$. It is not the one-step retention $1-\beta_i$. One-step noise variance, accumulated noise variance, and continuous-time rate must not be interchanged.
+$$\mathcal L_D(\theta)=\mathbb E_{t,X_0,\varepsilon}
+[(D_\theta(X_t,t)-X_0)^2].$$
+
+The expectation uses exactly those three independent draws before forming $X_t$. At the unrestricted optimum, the network gives the posterior mean at each trained time. Finite data, restricted networks, and optimization introduce approximation error.
+
+## 3. From the posterior mean to the score required by the ODE
+
+### Tweedie's identity supplies the conversion
+
+The denoiser answers a natural estimation question. We now connect its solution to the quantity needed for sampling. Let $p_{\mathrm{data}}(u)$ denote the clean-data density. At fixed positive time, differentiate the noisy marginal:
+
+$$\begin{aligned}
+p_t(x)&=\int p_t(x\mid u)\,p_{\mathrm{data}}(u)\,du,\\
+\partial_xp_t(x)
+&=\int \frac{\alpha_tu-x}{1-\alpha_t^2}\,p_t(x\mid u)\,p_{\mathrm{data}}(u)\,du.
+\end{aligned}$$
+
+Here $u$ is a possible clean value; the noisy observation $x$ and time $t$ are held fixed. First divide by the noisy marginal density, which is positive at positive Gaussian noise:
+
+$$\begin{aligned}
+s_t(x)
+&=\frac{\partial_xp_t(x)}{p_t(x)}\\
+&=\int\frac{\alpha_tu-x}{1-\alpha_t^2}
+\frac{p_t(x\mid u)}{p_t(x)}\,p_{\mathrm{data}}(u)\,du.
+\end{aligned}$$
+
+Bayes' rule identifies the weighting explicitly:
+
+$$\boxed{p(u\mid X_t=x)
+=\frac{p_t(x\mid u)\,p_{\mathrm{data}}(u)}{p_t(x)},
+\qquad
+p_t(x)=\int p_t(x\mid u)\,p_{\mathrm{data}}(u)\,du.}$$
+
+The numerator weights each possible clean value by its prior density and the likelihood of the observed noisy value. The denominator normalizes those weights. Substituting into the score integral gives
+
+$$\begin{aligned}
+s_t(x)
+&=\int\frac{\alpha_tu-x}{1-\alpha_t^2}
+\underbrace{\frac{p_t(x\mid u)p_{\mathrm{data}}(u)}{p_t(x)}}_{p(u\mid X_t=x)}\,du\\
+&=\frac{1}{1-\alpha_t^2}
+\left[\alpha_t\int u\,p(u\mid X_t=x)\,du
+-x\int p(u\mid X_t=x)\,du\right]\\
+&=\frac{1}{1-\alpha_t^2}
+\left[\alpha_t\,\mathbb E_{X_0\mid X_t=x}[X_0]-x\cdot1\right].
+\end{aligned}$$
+
+The first integral is the definition of the posterior mean; the second equals one because the posterior is a probability density. We can take $x$ outside the integral because it is the fixed observation, not the integration variable.
+
+For discrete or empirical clean data, replace the integrals by sums, as shown in Appendix D. Thus
+
+$$\boxed{s_t(x)=\partial_x\log p_t(x)
+=\frac{\alpha_t\mathbb E_{X_0\mid X_t=x}[X_0]-x}{1-\alpha_t^2}
+=\frac{\alpha_tD_*(x,t)-x}{1-\alpha_t^2}.}$$
+
+This is the VP form of Tweedie's formula. The score is a scaled displacement involving the posterior mean; it is not itself that mean. Appendix A gives the standalone additive-noise derivation, and Appendix D gives an alternative proof using mixture components.
+
+::: {.callout-note}
+## Interpretation: possible clean origins of a noisy observation
+
+Fix the observed noisy position $X_t=x$. Different clean values $x_0$, combined with different noise realizations, could have produced this observation. For each candidate clean value, the required noise is
+
+$$\varepsilon=\frac{x-\alpha_tx_0}{\sqrt{1-\alpha_t^2}}.$$
+
+We weight these possible clean origins by their posterior probabilities: a candidate is more plausible when it is supported by the clean-data distribution and the required noise is plausible. The weights are proportional to $p_{\mathrm{data}}(x_0)p_t(x\mid x_0)$, not equal across candidates.
+
+Their weighted mean is $m_t(x)=\mathbb E[X_0\mid X_t=x]$. The score is the corresponding average conditional-score displacement:
+
+$$\boxed{s_t(x)=\mathbb E_{X_0\mid X_t=x}
+\left[\frac{\alpha_tX_0-x}{1-\alpha_t^2}\right]
+=\frac{\alpha_tm_t(x)-x}{1-\alpha_t^2}.}$$
+
+Thus the posterior mean of the possible clean origins **determines** the marginal score; the score is not the mean itself. The clean origins are scaled by $\alpha_t$ before subtracting the noisy position, and the displacement is divided by the noise variance.
+
+Forward-generated training pairs supply conditional-score labels $(\alpha_tX_0-X_t)/(1-\alpha_t^2)$, denoted $U$ below. Squared-error regression with $(X_t,t)$ as input learns this posterior-weighted average at its unrestricted population optimum, without explicitly evaluating the posterior.
+
+These are possible origins under stochastic corruption, not terminal points of deterministic backward ODE trajectories. The probability-flow ODE uses the resulting score to transport the whole density; it need not recover the historical clean origin of an individual noisy observation. The local score reflects the originating distribution, but the sampler needs only the current position and time, not a stored trajectory. Appendix D.6 develops this distinction.
+
+
 :::
 
 
-## 2. The score-estimation objective: Song et al.'s Eq. (7)
+A fitted denoiser therefore defines the estimates
+
+$$s_\theta(x,t)=\frac{\alpha_tD_\theta(x,t)-x}{1-\alpha_t^2},
+\qquad
+v_\theta(x,t)=-\frac{\beta(t)}2[x+s_\theta(x,t)].$$
+
+The second formula is precisely the probability-flow field from Part 1. Generating samples requires integrating this field backward from the terminal distribution. Applying $D_\theta$ once is not generally a sampling procedure: posterior means need not have the clean-data distribution.
+
+### Additive-noise notation for the examples
+
+For the first example, use $Y=X+\sigma\varepsilon$ with independent $X\sim p_X$, $\varepsilon\sim\mathcal N(0,1)$, and $\sigma>0$. The same posterior-mean identity becomes
+
+$$D_*(y)=\mathbb E_{X\mid Y=y}[X]
+=y+\sigma^2\partial_y\log p_Y(y).$$
+
+Appendix A gives its standalone derivation. The second example uses the VP notation developed above.
+
+### Two solved denoising examples
+
+#### A Gaussian prior
+
+Let $X\sim\mathcal N(\mu,V)$ and $Y=X+\sigma \varepsilon$. Then
+
+$$p_Y=\mathcal N(\mu,V+\sigma^2),\qquad
+\frac{d}{dy}\log p_Y(y)=-\frac{y-\mu}{V+\sigma^2}.$$
+
+Tweedie's formula gives
+
+$$\mathbb E_{X\mid Y=y}[X]
+=\mu+\frac{V}{V+\sigma^2}(y-\mu).$$
+
+At small noise, the posterior mean stays close to $y$. At large noise, it stays close to the prior mean. The posterior variance is $V\sigma^2/(V+\sigma^2)$; the mean alone does not represent this remaining uncertainty.
+
+#### Two equally likely clean values
+
+Let $P(X_0=1)=P(X_0=-1)=1/2$. At a positive diffusion time, Bayes' rule gives posterior log odds
+
+$$\log\frac{P(X_0=1\mid X_t=x)}{P(X_0=-1\mid X_t=x)}
+=\frac{2\alpha_tx}{1-\alpha_t^2}.$$
+
+Consequently,
+
+$$\mathbb E_{X_0\mid X_t=x}[X_0]
+=\tanh\left(\frac{\alpha_tx}{1-\alpha_t^2}\right),$$
+
+$$s_t(x)=\frac{\alpha_t\tanh(\alpha_tx/(1-\alpha_t^2))-x}{1-\alpha_t^2}.$$
+
+At $x=0$, the posterior mean is zero, although clean observations are only $-1$ or $+1$. A posterior sample is one of those two values. This is why a single posterior-mean denoising operation generally does not generate the clean-data distribution.
+
+For each fixed nonzero $x$, the posterior mean tends to $\operatorname{sign}(x)$ as noise vanishes. At $x=0$, it remains zero by symmetry. This discrete clean distribution also illustrates why smooth invertible flow statements are made at positive noise or under appropriate endpoint regularity.
+
+### Conditional-score supervision is a transformed clean-data label
+
+For a forward-generated pair, define
+
+$$U=\frac{\alpha_tX_0-X_t}{1-\alpha_t^2}
+=\partial_{X_t}\log p_t(X_t\mid X_0).$$
+
+At fixed input $X_t=x$, this label is an affine transformation of $X_0$. Its squared-error-optimal prediction is therefore the same transformation of the posterior mean:
+
+$$\boxed{\mathbb E_{U\mid X_t=x}[U]
+=\frac{\alpha_tD_*(x,t)-x}{1-\alpha_t^2}=s_t(x).}$$
+
+This explains why we can supervise with a **conditional score** while predicting the **marginal score**. The known forward conditional provides the training label; regression on the noisy input performs the reverse-direction averaging.
+
+For predictions related by the denoiser-to-score conversion, the samplewise errors obey
+
+$$(s_\theta(X_t,t)-U)^2
+=\frac{\alpha_t^2}{(1-\alpha_t^2)^2}
+(D_\theta(X_t,t)-X_0)^2.$$
+
+At a fixed positive time this is a positive rescaling of the denoising loss. Across time it changes the weighting, so unweighted clean-data and score losses need not train a finite network identically. We can now interpret the paper's objective as regression with these transformed labels.
+
+### Song et al.'s Eq. (7): training with conditional-score labels
 
 With the paper's terminal time normalized to 1, its population objective is
 
@@ -120,7 +310,7 @@ The notation $p_{0t}(\cdot\mid x_0)$ is the paper's forward transition law from 
 2. Draw a clean observation $X_0$ from $p_{\mathrm{data}}$.
 3. Holding that time and clean observation fixed, draw $X_t$ from $p_{0t}(\cdot\mid X_0)$.
 
-In particular, the innermost expectation is over the **conditional forward distribution**, not an independent draw from the marginal $p_t$, and not the posterior $p(X_0\mid X_t)$. The posterior appears in the regression identity in Section 3; the training pairs are drawn in the forward direction. With a finite dataset, the clean-data expectation is approximated by sampling observations from its empirical distribution.
+In particular, the innermost expectation is over the **conditional forward distribution**, not an independent draw from the marginal $p_t$, and not the posterior $p(X_0\mid X_t)$. The posterior characterizes the denoising solution in Section 2; the training pairs are drawn in the forward direction. With a finite dataset, the clean-data expectation is approximated by sampling observations from its empirical distribution.
 
 For VP diffusion,
 
@@ -128,25 +318,7 @@ $$p_{0t}(\cdot\mid x_0)=\mathcal N(\alpha_t x_0,1-\alpha_t^2).$$
 
 Consequently, sampling independent $\varepsilon\sim\mathcal N(0,1)$ and forming $X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\varepsilon$ is exactly a reparameterization of that innermost conditional expectation. It is not a different training distribution.
 
-### Constructing the conditional-score target
-
-We can sample the exact conditional law at a selected time without simulating all intervening forward steps. For each minibatch, select a clean observation $x_0$, a time $t$, and independent standard-normal noise $\varepsilon$. Construct
-
-$$x_t=\alpha_tx_0+\sqrt{1-\alpha_t^2}\,\varepsilon.$$
-
-The conditional Gaussian density is known, so its score is known:
-
-$$\frac{\partial}{\partial x}\log p_t(x\mid x_0)
-=-\frac{x-\alpha_tx_0}{1-\alpha_t^2}.$$
-
-At the generated observation, this becomes
-
-$$U=-\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}.$$
-
-The network sees $(x_t,t)$ as input and $U$ as a target. It does not see $x_0$ as an input. Individual training targets are noisy: several $(x_0,\varepsilon)$ pairs can produce similar $x_t$.
-
-**Target and prediction represent different quantities.** In direct score regression, the available label is the conditional score $\partial_x\log p_t(x_t\mid x_0)$ for a particular clean/noisy pair. The fitted function $s_\theta(x_t,t)$ estimates the marginal score $\partial_x\log p_t(x_t)$. It can do so because squared-error regression averages labels conditional on the features $(x_t,t)$; it does not have to reproduce every individual label. Section 3 proves this statement.
-
+For the generated pair, the label defined above is $U=-\varepsilon/\sqrt{1-\alpha_t^2}$. The network sees $(X_t,t)$, not the clean label $X_0$ as an input.
 
 ### The practical, positive-time version
 
@@ -165,38 +337,17 @@ The resulting **denoising score-matching** loss is
 $$\boxed{\mathcal J_s(\theta)=\mathbb E_{t,X_0,\varepsilon}\left[
 \lambda(t)\left(s_\theta(X_t,t)+\frac{\varepsilon}{\sqrt{1-\alpha_t^2}}\right)^2\right]}$$
 
-and we train by minimizing it over $\theta$. Section 3 explains why it has the desired population solution $s_\theta(x,t)=s_t(x)$, for positive weights on the times being trained and sufficient model capacity. Finite datasets, restricted networks, and optimization error make practical estimates approximate. This is the Gaussian reparameterization of [Song et al., Eq. (7)](https://arxiv.org/html/2011.13456v2#S3.E7), with the positive-time cutoff stated above.
+and we train by minimizing it over $\theta$. The regression argument below explains why it has the desired population solution $s_\theta(x,t)=s_t(x)$, for positive weights on the times being trained and sufficient model capacity. Finite datasets, restricted networks, and optimization error make practical estimates approximate. This is the Gaussian reparameterization of [Song et al., Eq. (7)](https://arxiv.org/html/2011.13456v2#S3.E7), with the positive-time cutoff stated above.
 
 
-## 3. Why conditional targets recover the marginal score
+### The regression decomposition
 
-In the conditional expectations below, the time $t$ is fixed. The subscript states which conditional distribution is being averaged over: for example, $\mathbb E_{X_0\mid X_t=x}[X_0]$ averages possible clean values under the posterior distribution given the noisy observation. It does not average over $x$ or over time.
+The posterior identity above can also be written in terms of noise:
 
-The key identity is
+$$s_t(x)=\mathbb E_{X_0\mid X_t=x}[\partial_x\log p_t(x\mid X_0)]
+=-\frac{\mathbb E_{\varepsilon\mid X_t=x}[\varepsilon]}{\sqrt{1-\alpha_t^2}}.$$
 
-$$\boxed{s_t(x)=\mathbb E_{X_0\mid X_t=x}\left[
-\frac{\partial}{\partial x}\log p_t(x\mid X_0)\right]
-=-\frac{\mathbb E_{\varepsilon\mid X_t=x}[\varepsilon]}{\sqrt{1-\alpha_t^2}}.}$$
-
-To see why, differentiate the marginal mixture and divide by its density:
-
-$$\begin{aligned}
-\frac{p_t'(x)}{p_t(x)}
-&=\int \frac{\partial_xp_t(x\mid x_0)}{p_t(x)}p_{\mathrm{data}}(x_0)\,dx_0\\
-&=\int \partial_x\log p_t(x\mid x_0)\,p(x_0\mid X_t=x)\,dx_0.
-\end{aligned}$$
-
-The second line uses Bayes' rule. The integral notation assumes a data density; an expectation with respect to the data distribution gives the same identity for discrete data after positive Gaussian corruption. Differentiation under the integral requires the usual integrability conditions.
-
-::: {.callout-note}
-## The unknown posterior is used in the proof, not in training
-
-The posterior $p(x_0\mid X_t=x)$ is generally unknown. Its appearance above does **not** give a directly computable formula for the marginal score. It identifies the function that we want regression to learn.
-
-Training uses forward samples: draw $X_0$ from the dataset, draw independent Gaussian noise, and construct $X_t$ and the known target $U=-\varepsilon/\sqrt{1-\alpha_t^2}$. These pairs have the required joint distribution without evaluating its density or the posterior. A network minimizing squared prediction error learns the conditional average of $U$ given $(X_t,t)$; the identity above shows that this average is the marginal score.
-
-We therefore do not compute posterior probabilities or numerically integrate over $p(x_0\mid X_t=x)$. Conditional expectation describes the population regression solution. A finite neural network fitted to finite data approximates it. In continuous space, training also does not require repeated observations with exactly the same noisy value: the shared regression function is fitted across noisy inputs.
-:::
+Time is fixed in these conditional expectations. The input $x$ is held fixed while compatible clean/noise pairs are averaged under their posterior law.
 
 Squared-error regression estimates the conditional mean of its target given the input. Here the input is $(X_t,t)$, the target is $U$, and the identity above identifies that conditional mean with $s_t(X_t)$. More explicitly, the loss decomposes as (see Appendix B for the conditional squared-error expansion)
 
@@ -240,7 +391,7 @@ For the Gaussian kernel, the first equality follows directly from $\mathbb E[X_t
 Take $X_0\sim\mathcal N(0,1)$ and fix a positive time with $\alpha_t=1/2$. Then
 
 $$X_t=\tfrac12X_0+\tfrac{\sqrt3}{2}\varepsilon,
-\qquad P_t=\mathcal N(0,1),\qquad s_t(x)=-x.$$
+\qquad p_t(x)=\mathcal N(x;0,1),\qquad s_t(x)=-x.$$
 
 Consider the clean value $x_0=2$ and noisy value $x_t=1$, corresponding to the noise value $\varepsilon=0$. The conditional-score label for this pair is
 
@@ -265,6 +416,12 @@ Thus zero is the label of one particular pair; $-1$ is the squared-error-optimal
 This does not say that an average of identically zero labels can be nonzero. Other clean values compatible with the same noisy observation have different labels. Also, because this example starts from standard normal, its VP probability-flow velocity is $-\beta(t)[x+s_t(x)]/2=0$, even though its marginal score is nonzero away from the origin.
 
 
+### Alternative explanation: each observed data point is a mixture component
+
+A finite dataset can be viewed as a mixture of point masses. Gaussian corruption turns it into a Gaussian mixture, with one component centered at each scaled observation. At a noisy input $x$, the marginal score is the average of these component scores weighted by their posterior probabilities given $x$. These input-dependent weights explain why one conditional-score label can be zero while the marginal-score prediction is not.
+
+[Appendix D](#sec-mixture-score-proof) develops this argument step by step: two clean points, a finite dataset, and an arbitrary population distribution. The same calculation gives Tweedie's formula. It is an alternative explanation of the identity above, not an assumption that the clean population must be a finite Gaussian mixture.
+
 ## 4. Noise prediction as a parameterization of the marginal score
 
 A numerically convenient network output is $\varepsilon_\theta(x,t)$, trained with
@@ -280,6 +437,7 @@ The phrase **noise predictor** names the regression target and output units. It 
 
 | Parameterization | Label available for each training pair | Population prediction from $(x,t)$ |
 |---|---|---|
+| Clean data | Realized $X_0$ | $D_*(x,t)=\mathbb E[X_0\mid X_t=x,t]$ |
 | Direct score | $U=-\varepsilon/\sqrt{1-\alpha_t^2}$, the conditional score | $\mathbb E[U\mid X_t=x,t]=s_t(x)$ |
 | Noise | Realized $\varepsilon$ | $\mathbb E[\varepsilon\mid X_t=x,t]=-\sqrt{1-\alpha_t^2}\,s_t(x)$ |
 
@@ -331,9 +489,11 @@ Use a time-conditioned network $\varepsilon_\theta(x,t)$ with one scalar output 
 6. Backpropagate this loss and update the parameters. Repeat with fresh times and noise.
 7. Evaluate on held-out observations; save the fitted parameters, schedule, and time range. At generation time, freeze the model and use $s_\theta=-\varepsilon_\theta/\sqrt{1-\alpha_t^2}$.
 
-The network receives the noisy position and time, not the clean observation or the sampled noise. A minibatch average estimates the nested population expectation in Section 2; it is not an additional density-estimation step. No ODE solver is needed during this training procedure.
+The network receives the noisy position and time, not the clean observation or the sampled noise. A minibatch average estimates the noise-regression expectation in Section 4; it is not an additional density-estimation step. No ODE solver is needed during this training procedure.
 
 ### PyTorch implementation
+
+This minimal network uses position and time directly. Part 6 adds fixed sinusoidal time features to the same inputs; these change the network representation, not the schedule or objective.
 
 The code below uses the paper's linear VP schedule. Setting both endpoint rates to 8 recovers the teaching notebooks' constant schedule. The data tensor has shape `[number_of_observations, 1]`; flattening images or vectors gives `[number_of_observations, data_dimension]`.
 
@@ -392,66 +552,9 @@ def train_score_model(data, updates=2500, batch_size=512, t_min=1e-3):
 
 For vectors, the Gaussian noise is $\mathcal N(\mathbf0,I_d)$ and the network predicts one noise component per data coordinate. The code averages over coordinates as well as observations; this differs from the squared Euclidean norm by the fixed factor $1/d$ and has the same minimizer. The vector score conversion is $\mathbf s_\theta=-\boldsymbol\varepsilon_\theta/\sqrt{1-\alpha_t^2}$.
 
-The displayed cutoff $10^{-3}$ is a teaching choice; the existing notebook uses $0.01$. Train and sample on compatible time ranges. In this code, `beta_min` and `beta_max` are globals read by both training and sampling; do not change them between those operations. Keep the schedule parameters with the saved model: changing the schedule after fitting changes the density associated with each time. An average noise loss need not approach zero because the noise is uncertain given $(X_t,t)$.
+This code and Part 6 use cutoff $10^{-3}$; the earlier Part 4 notebook `03-learn-a-score.ipynb` uses $0.01$. Train and sample on compatible time ranges. In this code, `beta_min` and `beta_max` are globals read by both training and sampling; do not change them between those operations. Keep the schedule parameters with the saved model: changing the schedule after fitting changes the density associated with each time. An average noise loss need not approach zero because the noise is uncertain given $(X_t,t)$.
 
-## 6. Tweedie's formula: the posterior mean denoiser
-
-First consider the standalone additive-noise model
-
-$$Y=X+\sigma \varepsilon,\qquad \varepsilon\sim\mathcal N(0,1),\quad \sigma>0.$$
-
-The denoising risk is $\mathbb E_{X,\varepsilon}[(X-D(X+\sigma\varepsilon))^2]$, with independent $X\sim p_X$ and $\varepsilon\sim\mathcal N(0,1)$. Among all functions $D(y)$, its minimizer is
-
-$$D_*(y)=\mathbb E_{X\mid Y=y}[X].$$
-
-This conditional expectation averages $X$ under $p(x\mid y)$ with the observed $y$ held fixed. Tweedie's formula expresses this optimal estimator through the noisy density:
-
-$$\boxed{D_*(y)=y+\sigma^2\frac{d}{dy}\log p_Y(y).}$$
-
-Equivalently, the score is the displacement from the observed value toward its posterior mean, divided by the noise variance. It describes the noisy **marginal** density, not the conditional likelihood for one particular clean observation. The complete Bayes-optimality argument and differentiation are in Appendix A.
-
-Apply this formula to $Z=\alpha_tX_0$, with noise variance $1-\alpha_t^2$:
-
-$$\boxed{\mathbb E_{X_0\mid X_t=x}[X_0]
-=\frac{x+(1-\alpha_t^2)s_t(x)}{\alpha_t}.}$$
-
-This also follows directly by taking conditional expectations in the forward corruption equation and using the noise–score identity. It connects the same three quantities: posterior mean clean data, conditional mean noise, and marginal score.
-
-## 7. Two solved denoising examples
-
-### A Gaussian prior
-
-Let $X\sim\mathcal N(\mu,V)$ and $Y=X+\sigma \varepsilon$. Then
-
-$$p_Y=\mathcal N(\mu,V+\sigma^2),\qquad
-\frac{d}{dy}\log p_Y(y)=-\frac{y-\mu}{V+\sigma^2}.$$
-
-Tweedie's formula gives
-
-$$\mathbb E_{X\mid Y=y}[X]
-=\mu+\frac{V}{V+\sigma^2}(y-\mu).$$
-
-At small noise, the posterior mean stays close to $y$. At large noise, it stays close to the prior mean. The posterior variance is $V\sigma^2/(V+\sigma^2)$; the mean alone does not represent this remaining uncertainty.
-
-### Two equally likely clean values
-
-Let $P(X_0=1)=P(X_0=-1)=1/2$. At a positive diffusion time, Bayes' rule gives posterior log odds
-
-$$\log\frac{P(X_0=1\mid X_t=x)}{P(X_0=-1\mid X_t=x)}
-=\frac{2\alpha_tx}{1-\alpha_t^2}.$$
-
-Consequently,
-
-$$\mathbb E_{X_0\mid X_t=x}[X_0]
-=\tanh\left(\frac{\alpha_tx}{1-\alpha_t^2}\right),$$
-
-$$s_t(x)=\frac{\alpha_t\tanh(\alpha_tx/(1-\alpha_t^2))-x}{1-\alpha_t^2}.$$
-
-At $x=0$, the posterior mean is zero, although clean observations are only $-1$ or $+1$. A posterior sample is one of those two values. This is why a single posterior-mean denoising operation generally does not generate the clean-data distribution.
-
-For each fixed nonzero $x$, the posterior mean tends to $\operatorname{sign}(x)$ as noise vanishes. At $x=0$, it remains zero by symmetry. This discrete clean distribution also illustrates why smooth invertible flow statements are made at positive noise or under appropriate endpoint regularity.
-
-## 8. Using the trained model for generation
+## 6. Using the trained model for generation
 
 Freeze the network. At every solver evaluation, convert its output to a score and evaluate
 
@@ -522,15 +625,17 @@ plt.tight_layout()
 plt.show()
 ```
 
-This comparison checks the complete procedure, not convergence to an exact solution. The intended output is $p_{0.001}$; learned-score error, Gaussian terminal initialization, and finite Euler steps remain approximations. The more detailed fidelity checks are in Part 4.
+This comparison checks the complete procedure, not convergence to an exact solution. The intended output is $p_{0.001}$; learned-score error, Gaussian terminal initialization, and finite Euler steps remain approximations. Part 6 provides the executed end-to-end experiment and detailed fidelity checks.
 
 ### Analytic check of the schedule and solver
+
+This Gaussian check tests the schedule and sign with a velocity independent of position; its Euler error is a quadrature error. Part 6 also checks state-dependent mixture dynamics against exact quantile transport.
 
 The probability-flow construction does not require a standard-normal terminal law. It requires that initialization match the terminal density of the forward process used to derive the score and velocity. Changing the terminal distribution alone generally breaks that match.
 
 For a fully matched Gaussian example, take $P_0=\mathcal N(\mu,1)$ and retain the VP schedule above. The forward corruption gives
 
-$$P_t=\mathcal N(\alpha_t\mu,1),\qquad
+$$p_t(x)=\mathcal N(x;\alpha_t\mu,1),\qquad
 P_1=\mathcal N(\alpha_1\mu,1).$$
 
 The score and velocity of this same density path are
@@ -547,7 +652,7 @@ Integrating the ODE backward gives
 $$X_t=X_1+(\alpha_t-\alpha_1)\mu
 =\alpha_t\mu+\varepsilon.$$
 
-Consequently, $X_t\sim P_t$ at every time and $X_0=\mu+\varepsilon\sim\mathcal N(\mu,1)$ exactly for the exact flow. This example has no terminal-prior approximation. Comparing Euler endpoints with this trajectory isolates numerical error. For $\mu=0$, the score is $-x$ and the probability-flow velocity is zero.
+Consequently, $X_t$ has density $p_t$ at every time and $X_0=\mu+\varepsilon\sim\mathcal N(\mu,1)$ exactly for the exact flow. This example has no terminal-prior approximation. Comparing Euler endpoints with this trajectory isolates numerical error. For $\mu=0$, the score is $-x$ and the probability-flow velocity is zero.
 
 **A separate approximation experiment:** if we replace this matched initialization by $X_1\sim\mathcal N(0,1)$ while leaving the field unchanged, the output at time zero is $\mathcal N((1-\alpha_1)\mu,1)$, not $P_0$. Its mean error is $-\alpha_1\mu$. This quantifies the cost of substituting a convenient prior; it is not part of the exact derivation above.
 
@@ -559,7 +664,7 @@ If sampling stops at $t_{\min}$, its intended output law is $p_{t_{\min}}$, not 
 - estimation error: the learned field versus the exact field;
 - endpoint choice: $p_{t_{\min}}$ versus clean data.
 
-[Part 4](./33-probability-flow-ode-part-4.qmd) implements these comparisons on a Gaussian mixture where the reference score is known.
+[Part 6](./35-probability-flow-ode-part-6.qmd) implements these comparisons on a Gaussian mixture where the reference score is known.
 
 ## Appendix A. Bayes optimality and a standalone derivation of Tweedie's formula
 
@@ -674,6 +779,23 @@ $$\boxed{\alpha_t'=-\tfrac12\beta(t)\alpha_t,
 The training-data schedule and the ODE rate are not independent choices. The same $\beta(t)$ produces the noisy densities and appears in $v(x,t)=-\beta(t)[x+s_t(x)]/2$. Data are at time zero; the standard Gaussian used at time one approximates the actual terminal law for a finite-rate schedule.
 
 
+::: {.callout-note}
+## Relating a discrete forward step to the continuous rate
+
+For $0\le u<t\le1$, the exact VP transition is
+
+$$X_t\mid X_u=x\sim\mathcal N\!\left(
+\frac{\alpha_t}{\alpha_u}x,\ 1-\frac{\alpha_t^2}{\alpha_u^2}\right).$$
+
+In discrete DDPM notation, a step's noise variance $\beta_i$ is related to the continuous rate by
+
+$$\beta_i=1-\exp\!\left[-\int_{t_{i-1}}^{t_i}\beta(u)\,du\right]
+\approx\beta(t_{i-1})(t_i-t_{i-1}).$$
+
+Our $\alpha_{t_i}$ is the cumulative **amplitude** $\sqrt{\prod_{j=1}^i(1-\beta_j)}$. It is not the one-step retention $1-\beta_i$. One-step noise variance, accumulated noise variance, and continuous-time rate must not be interchanged.
+:::
+
+
 ### Checking the conditional law directly from the SDE
 
 Fix the clean value $X_0=x_0$. For the forward SDE, let $m_t$ and $V_t$ be the conditional mean and variance. The linear drift and Gaussian Brownian increments give a Gaussian conditional law, with
@@ -698,3 +820,132 @@ $$\partial_t p_t=\frac{\beta(t)}2\partial_x(xp_t)
 Thus the same schedule that supplies the training pairs determines the probability-flow velocity. This is the VP specialization of the paper's Eq. (13); the conditional kernel agrees with its Appendix B.
 
 [Part 6](./35-probability-flow-ode-part-6.qmd) provides a complete executed notebook that trains a small network and samples the two-component example.
+
+
+## Appendix D. An alternative proof using mixture components {#sec-mixture-score-proof}
+
+### D.1. A finite dataset becomes a Gaussian mixture after corruption
+
+Let the observed clean values be $x_1,\ldots,x_n$. Their empirical distribution is
+
+$$\widehat P_0=\sum_{i=1}^n w_i\delta_{x_i},\qquad
+w_i\geq0,\quad\sum_iw_i=1,$$
+
+where $\delta_{x_i}$ denotes a point mass at $x_i$ and usually $w_i=1/n$. Select an index $I$ with probability $w_i$, then set $X_0=x_I$. This is an exact representation of the empirical distribution, not a fitted Gaussian-mixture assumption about the population.
+
+Fix a positive time. For this appendix, abbreviate the existing noise standard deviation by $\sigma_t=\sqrt{1-\alpha_t^2}$. The forward corruption is
+
+$$X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
+\varepsilon\sim\mathcal N(0,1),$$
+
+with noise independent of the selected clean observation. Thus
+
+$$X_t\mid I=i\sim\mathcal N(\alpha_tx_i,\sigma_t^2),\qquad
+\boxed{\widehat p_t(x)=\sum_iw_i\mathcal N(x;\alpha_tx_i,\sigma_t^2).}$$
+
+Each **clean point** produces one noisy Gaussian component. If the clean distribution is instead a mixture of Gaussians with nonzero component variances, those variances also contribute to the noisy component variances, as in Part 6.
+
+### D.2. Differentiate the mixture and identify the weights
+
+Write $\phi_i(x)=\mathcal N(x;\alpha_tx_i,\sigma_t^2)$. The component derivative is
+
+$$\phi_i'(x)=\phi_i(x)\frac{\alpha_tx_i-x}{\sigma_t^2}.$$
+
+Divide the derivative of the mixture by its density:
+
+$$\begin{aligned}
+\widehat s_t(x)
+&=\frac{\widehat p_t'(x)}{\widehat p_t(x)}\\
+&=\frac{\sum_iw_i\phi_i(x)(\alpha_tx_i-x)/\sigma_t^2}
+{\sum_jw_j\phi_j(x)}\\
+&=\sum_i r_i(x,t)\frac{\alpha_tx_i-x}{\sigma_t^2},
+\end{aligned}$$
+
+where Bayes' rule gives
+
+$$\boxed{r_i(x,t)=\frac{w_i\phi_i(x)}{\sum_jw_j\phi_j(x)}
+=P(I=i\mid X_t=x).}$$
+
+These probabilities sum to one. They depend on the observed noisy position, unlike the original weights $w_i$. Consequently,
+
+$$\boxed{\widehat s_t(x)=\mathbb E_{I\mid X_t=x}
+\left[\partial_x\log p_t(x\mid X_0=x_I)\right].}$$
+
+The expectation is over the possible clean-data indices conditional on the fixed noisy input. The network receives $(x,t)$ because these features determine which clean origins are plausible. It does not receive the actual index used to construct a training pair.
+
+### D.3. The posterior mean and Tweedie's formula
+
+Collect the terms in the score expression:
+
+$$\widehat s_t(x)=\frac{\alpha_t\sum_i r_i(x,t)x_i-x}{\sigma_t^2}.$$
+
+Under the empirical data distribution,
+
+$$m_t(x):=\mathbb E_{\widehat P_0}[X_0\mid X_t=x]
+=\sum_i r_i(x,t)x_i.$$
+
+Therefore, for $\alpha_t>0$,
+
+$$\boxed{m_t(x)=\frac{x+\sigma_t^2\widehat s_t(x)}{\alpha_t}.}$$
+
+This is the VP form of Tweedie's formula. To see its Bayes-optimal meaning, let $a$ be a proposed clean reconstruction. At the fixed noisy input,
+
+$$\mathbb E_{\widehat P_0}[(X_0-a)^2\mid X_t=x]
+=\operatorname{Var}_{\widehat P_0}(X_0\mid X_t=x)+(m_t(x)-a)^2.$$
+
+Only the second term depends on $a$, so the posterior mean is the squared-error-optimal denoiser. This does not make a posterior mean a posterior sample.
+
+### D.4. A zero conditional score and a nonzero marginal score
+
+Take equally weighted clean points $x_1=0$ and $x_2=2$, and evaluate at noisy position $x=0$. Assume $\alpha_t>0$ and $\sigma_t>0$. Their conditional scores are
+
+$$\left.\partial_x\log p_t(x\mid X_0=0)\right|_{x=0}=0,
+\qquad
+\left.\partial_x\log p_t(x\mid X_0=2)\right|_{x=0}
+=\frac{2\alpha_t}{\sigma_t^2}.$$
+
+The posterior probability of the second clean point is
+
+$$r_2(0,t)=\frac{\exp(-2\alpha_t^2/\sigma_t^2)}
+{1+\exp(-2\alpha_t^2/\sigma_t^2)}>0.$$
+
+Hence
+
+$$\boxed{\widehat s_t(0)=r_2(0,t)\frac{2\alpha_t}{\sigma_t^2}>0.}$$
+
+The first clean point with zero corruption noise has a zero target, but the optimal prediction at that noisy input is positive. The second clean point remains a possible origin and contributes a positive conditional score. The calculation evaluates continuous score functions at a point; the distinction persists in nearby intervals, which have positive probability. It never asserts that an average of identically zero targets is nonzero.
+
+### D.5. From a finite mixture to an arbitrary population
+
+For an arbitrary clean probability distribution $P_0$, replace the sum by an integral with respect to that distribution:
+
+$$p_t(x)=\int\mathcal N(x;\alpha_tu,\sigma_t^2)\,dP_0(u).$$
+
+This is a continuous location mixture after corruption. The clean law may be discrete, continuous, or mixed; it need not have a density. No informal limit of an infinitely large dataset is required.
+
+Differentiating the Gaussian kernel under the integral and dividing by $p_t(x)$ gives
+
+$$\begin{aligned}
+s_t(x)
+&=\int\frac{\alpha_tu-x}{\sigma_t^2}
+\frac{\mathcal N(x;\alpha_tu,\sigma_t^2)}{p_t(x)}\,dP_0(u)\\
+&=\mathbb E_{X_0\mid X_t=x}
+\left[\frac{\alpha_tX_0-x}{\sigma_t^2}\right].
+\end{aligned}$$
+
+The measure multiplying the component score is precisely the posterior distribution of $X_0$ given $X_t=x$. At positive noise and $\alpha_t>0$, the Gaussian kernel and its spatial derivative are bounded as functions of the clean location, locally uniformly in $x$, which justifies this differentiation. For a global squared-error denoising risk, assume $\mathbb E_{X_0\sim P_0}[X_0^2]<\infty$.
+
+Rearranging yields the population Tweedie identity. The exact empirical-score transport approaches the discrete training distribution as the noise tends to zero. Model restrictions and regularization may help generalization, but do not guarantee it. A finite-data regression learns the score of the corrupted empirical distribution in its unrestricted optimum; approximating the population score additionally involves finite-data, model, and optimization errors.
+
+For the finite mixture, the posterior weights can actually be evaluated by summing over the dataset. This offers an exact empirical-score reference at positive time, but costs a sum over all $n$ observations per query. Neural regression approximates that function without enumerating the dataset during each sampling step. Training itself continues to use forward-generated pairs; it does not require calculating these posterior weights.
+
+
+### D.6. Local density information and trajectory history
+
+**A local derivative that reflects the originating distribution.** The score $s_t(x)=\partial_x\log p_t(x)$ describes the local spatial slope of the current log density. Yet that density combines contributions from the clean-data distribution:
+
+$$p_t(x)=\int p_t(x\mid x_0)\,p_{\mathrm{data}}(x_0)\,dx_0.$$
+
+Its local slope therefore reflects the possible clean origins and the forward corruption law. This is dependence on the originating **distribution**, not memory of an individual particle's trajectory. Different histories that produce the same current density $p_t$ give the same score at that time.
+
+Once the time-dependent score field is specified, the sampler evaluates it using only the current position and time. The probability-flow ODE needs no stored trajectory history. The reverse SDE discussed in Part 2 is likewise a time-inhomogeneous Markov process. Posterior averaging over possible clean origins does not change this property.

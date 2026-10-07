@@ -35,13 +35,13 @@ runs. This command starts fresh; it does not resume training automatically.
 
 Raw tensors are saved alongside display images. Full MNIST training and
 image-quality evaluation have not been run for the draft. A successful smoke
-check does not establish image quality. See Lecture 16 for the full recipe.
+check does not establish image quality. See Part 05 for the full recipe.
 
 ## Browser reading copies
 
 A full `quarto render` runs the notebook renderer through
 `scripts/render-notebooks.ts`. The nested Quarto configuration renders saved
-notebook outputs without executing the training cells. Lecture 15 links to
+notebook outputs without executing the training cells. Part 04 links to
 both the rendered HTML and the downloadable notebook sources.
 
 `quarto preview` reuses those HTML pages rather than rebuilding the nested

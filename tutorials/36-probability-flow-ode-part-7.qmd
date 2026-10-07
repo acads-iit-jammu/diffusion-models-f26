@@ -1,0 +1,130 @@
+# 07 · Neural ODEs and normalizing flows {.unnumbered}
+
+::: {.callout-note}
+## Draft — Connecting the model classes
+
+Parts 01–06 constructed a sampling velocity from a learned score. Here we place that construction within Neural ODEs and continuous normalizing flows. We keep **data at $t=0$ and the prior at $t=1$**; generation integrates backward. Start in one dimension, then replace derivatives by Jacobians and divergences for vectors.
+:::
+
+## 1. A network can parameterize the velocity directly
+
+A Neural ODE uses a neural network to specify an ordinary differential equation:
+
+$$\frac{dx}{dt}=v_\theta(x,t).$$
+
+An initial state and an ODE solver determine its trajectory. For a forward Euler step,
+
+$$x_{k+1}=x_k+h\,v_\theta(x_k,t_k).$$
+
+This resembles a residual-network layer. With a suitable family of increasingly small steps, the discrete updates approximate continuous dynamics. An arbitrary residual layer need not be invertible; the exact ODE flow has stronger properties when its solutions exist and are unique.
+
+A Neural ODE is a way to represent a transformation, not a particular training objective. It can model supervised predictions, physical trajectories, or generative transport. The original paper also introduced its use for continuous normalizing flows. [Chen et al., Neural Ordinary Differential Equations](https://arxiv.org/abs/1806.07366)
+
+## 2. From trajectories to an invertible map
+
+Write the flow as $\Phi_{t\leftarrow s}(x_s)=x_t$. The two time indices matter because the field can depend on time. Under existence and uniqueness in both directions over the interval,
+
+$$\Phi_{s\leftarrow t}=\Phi_{t\leftarrow s}^{-1},\qquad
+\Phi_{t\leftarrow r}\circ\Phi_{r\leftarrow s}=\Phi_{t\leftarrow s}.$$
+
+For a continuously differentiable field with suitable bounds ensuring solutions remain defined, these maps are diffeomorphisms. Particles cannot meet at the same position at the same time and subsequently have distinct histories under this unique flow. Paths may visit the same location at different times.
+
+Consider $v(x,t)=-x$. Then
+
+$$\Phi_{t\leftarrow s}(x)=e^{-(t-s)}x.$$
+
+It contracts distances forward and expands them backward. It is invertible for every finite elapsed time; collapse to a point occurs only in the infinite-time limit. More generally, exact mapping from a full-dimensional smooth prior onto discrete data or a lower-dimensional support can require a singular limiting endpoint. The positive-noise cutoff used earlier avoids asserting regular invertibility at such an endpoint.
+
+## 3. Normalizing flows track density as well as position
+
+A discrete normalizing flow applies an invertible map $x=F(z)$ to a tractable random variable. In one dimension,
+
+$$\log p_X(F(z))=\log p_Z(z)-\log|F'(z)|.$$
+
+The derivative measures local stretching: an interval that grows spreads its probability over a greater length. In $d$ dimensions, the corresponding factor is the absolute Jacobian determinant:
+
+$$\log p_X(F(z))=\log p_Z(z)-\log|\det J_F(z)|.$$
+
+A **continuous normalizing flow (CNF)** uses an ODE flow for this map. Along its trajectory,
+
+$$\boxed{\frac{d}{dt}\log p_t(x_t)=-\partial_xv_\theta(x_t,t).}$$
+
+In vector notation,
+
+$$\boxed{\frac{d}{dt}\log p_t(\mathbf x_t)
+=-\nabla\cdot\mathbf v_\theta(\mathbf x_t,t)
+=-\operatorname{tr}J_{\mathbf v_\theta}(\mathbf x_t,t).}$$
+
+This is the instantaneous change-of-variables formula. Its short derivation from the continuity equation is in Appendix A. Divergence is a scalar measuring local volume expansion, not the magnitude of the velocity. [Chen et al., Theorem 1](https://papers.nips.cc/paper_files/paper/2018/file/69386f6bb1dfed68692a24c8686939b9-Paper.pdf)
+
+### Check with a contraction
+
+For $v(x)=-x$, $\partial_xv=-1$, so along each trajectory,
+
+$$\log p_t(x_t)=\log p_0(x_0)+t.$$
+
+Indeed, $x_t=e^{-t}x_0$ gives $p_t(x)=e^tp_0(e^tx)$. Density grows while occupied lengths shrink; total probability remains one.
+
+## 4. Generation and likelihood use the same flow
+
+Let the chosen terminal prior be $p_1=\mathcal N(0,1)$. To generate, draw $X_1\sim p_1$ and integrate $v_\theta$ from 1 to 0. This defines a model distribution at time zero.
+
+To evaluate that model's density at an observed $x_0$, integrate forward to $x_1$ and accumulate divergence:
+
+$$\boxed{\log p_0^{\mathrm{model}}(x_0)
+=\log p_1(x_1)+\int_0^1\partial_xv_\theta(x_t,t)\,dt.}$$
+
+In higher dimensions, use $\nabla\cdot\mathbf v_\theta$. The sign follows by integrating the preceding log-density ODE. This formula is exact for the exact regular flow; numerical integration and approximate trace estimation introduce computational error.
+
+One way to train a CNF is maximum likelihood using this formula. It generally involves solving the ODE during training and differentiating the loss through its solution. Adjoint methods are one option; differentiating through solver steps is another. A Neural ODE does not require one specific gradient method. Flow matching, introduced in Part 08, trains the velocity by regression instead.
+
+## 5. Our probability-flow ODE is a particular CNF
+
+For the forward SDE
+
+$$dX_t=f(X_t,t)\,dt+g(t)\,dW_t,$$
+
+the exact marginal score defines the probability-flow velocity
+
+$$v(x,t)=f(x,t)-\tfrac12g(t)^2s_t(x).$$
+
+For VP diffusion this becomes
+
+$$v_\theta(x,t)=-\tfrac12\beta(t)[x+s_\theta(x,t)].$$
+
+Once a neural network estimates the score, this is a neural parameterization of an ODE field. Under the same regularity conditions it defines a CNF. The velocity is learned indirectly through the score and the known forward schedule. Song et al. use this connection for deterministic sampling and likelihood computation. [Song et al., Section 4.3](https://arxiv.org/abs/2011.13456v2)
+
+With the exact score and matching initial law, the SDE and ODE have the same marginal densities. Their particle trajectories and joint couplings differ. With an approximate score, the learned ODE still defines its own transport model, but its marginals need not equal the prescribed forward densities. Its CNF likelihood refers to that induced model law.
+
+| Construction | What is parameterized? | How can it be trained? |
+|---|---|---|
+| Neural ODE | A velocity determining continuous state evolution | Depends on the task |
+| Likelihood-trained CNF | A velocity and its induced density transformation | Change-of-variables likelihood |
+| Score-based probability-flow ODE | Score; velocity follows from the forward process | Denoising/score regression |
+| Flow-matching CNF | Velocity directly | Conditional-velocity regression |
+
+These are overlapping constructions, not mutually exclusive model families. A probability-flow ODE and a flow-matching model can both be Neural ODEs and CNFs.
+
+## 6. What the next part changes
+
+Part 03 learned a conditional mean from forward-generated pairs, then converted it into a score and velocity. Part 08 asks whether we can construct pairs with a known **velocity label** and regress that label directly. The ODE solver used for generation remains the same kind of solver; the training construction changes.
+
+## Appendix A. Density change along a trajectory
+
+The continuity equation is
+
+$$\partial_tp_t=-\partial_x(p_tv)
+=-v\partial_xp_t-p_t\partial_xv.$$
+
+Along $\dot x_t=v(x_t,t)$, the chain rule gives
+
+$$\begin{aligned}
+\frac{d}{dt}\log p_t(x_t)
+&=\frac{\partial_tp_t(x_t)}{p_t(x_t)}
++v(x_t,t)\frac{\partial_xp_t(x_t)}{p_t(x_t)}\\
+&=-\partial_xv(x_t,t).
+\end{aligned}$$
+
+In $d$ dimensions, expand $\nabla\cdot(p_t\mathbf v)=\mathbf v\cdot\nabla p_t+p_t\nabla\cdot\mathbf v$. The same cancellation yields the divergence formula.
+
+[Continue to 08 · Flow matching](./37-probability-flow-ode-part-8.qmd).

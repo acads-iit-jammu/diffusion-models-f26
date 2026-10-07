@@ -3,5 +3,5 @@
   "executed_cells": 9,
   "errors": [],
   "figures": 6,
-  "validation": "All cells executed; schedule identities, exact-score finite difference, finite sampling outputs, and Euler convergence passed. Review revisions include final-update validation, noise-scale errors, independent diagnostic RNGs, and repeated KS baselines."
+  "validation": "Executed all cells after critical review: schedule identities, score derivative, finite Euler outputs, Euler convergence, practical learned-field Gaussian-prior sampling, validation oracle, known-CDF cutoff gap and initial KS diagnostics."
 }

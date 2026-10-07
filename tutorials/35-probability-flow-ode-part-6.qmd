@@ -1,4 +1,4 @@
-# 17 · Probability-Flow ODE - Part 6 {.unnumbered}
+# 06 · Train and sample a mixture {.unnumbered}
 
 ::: {.callout-note}
 ## Draft — A worked training and inference notebook
@@ -14,7 +14,7 @@ $$p_0(x)=\tfrac12\mathcal N(x;-2,0.25)+\tfrac12\mathcal N(x;2,0.25).$$
 
 The notebook fixes a linear VP schedule, derives the noisy mixture's reference score, trains a small noise-prediction network, converts its output into a score, and generates samples using explicit Euler integration with decreasing time. It follows [Song et al.](https://arxiv.org/abs/2011.13456v2), particularly Eqs. (7) and (13).
 
-The main experiment starts from the actual terminal mixture, so its initial law matches the derived vector field. A separate experiment measures substitution of a standard Gaussian. Both stop at a stated positive time and compare with the corresponding density. The notebook includes score errors, density and CDF plots, mode mass, moments, Wasserstein distance, and an exact-score Euler convergence check.
+The main experiment starts from the actual terminal mixture, so its initial law matches the derived vector field. A second learned-field run starts from standard Gaussian noise, as in practical generation. Both sample runs are compared with the positive-time target density. A separate paired quantile experiment with the exact field isolates terminal-prior substitution. The notebook includes score errors, density and CDF plots, mode mass, moments, Wasserstein distance, and an exact-score Euler convergence check.
 
 ## Run locally
 
@@ -34,4 +34,4 @@ Download the [complete teaching bundle](../materials/probability-flow/probabilit
 | Student t with five degrees of freedom | Tail quantiles and finite-rate terminal approximation |
 | Uniform on a bounded interval | Smoothed boundaries and positive-time endpoint effects |
 
-Start with unequal weights in the existing mixture, then unequal component variances. Both changes preserve analytic noisy densities and scores. The notebook explains the additional reference calculations needed for Laplace, Student t, and bounded-support examples.
+Start with unequal weights in the existing mixture, then unequal component variances. Both changes preserve analytic noisy densities and scores. The notebook indicates the additional reference calculations needed for Laplace, Student t, and bounded-support examples.
