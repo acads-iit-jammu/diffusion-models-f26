@@ -26,7 +26,7 @@ count = 0
 for path in Path('_site').rglob('*.html'):
     html = path.read_text()
     changed = False
-    for label in ('Probability-Flow ODE', 'Score Matching and Stochastic Sampling'):
+    for label in ('12 · Probability-Flow ODE', '13 · Score Matching and Stochastic Sampling'):
         lecture = group_span(html, 'Lecture Notes')
         topic = group_span(html, label)
         if lecture is None or topic is None:
