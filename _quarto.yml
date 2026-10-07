@@ -46,7 +46,91 @@ book:
   author: "Uma Satyaranjan · Soma S Dhavala · IIT Jammu"
   reader-mode: true
   sidebar:
-    collapse-level: 1
+    collapse-level: 2
+    contents:
+      - index.qmd
+      - course.qmd
+      - syllabus.qmd
+      - curriculum.qmd
+      - assignments.qmd
+      - section: "Lecture Notes"
+        contents:
+          - tutorials/04-genai-simplest-form.qmd
+          - tutorials/01-probability-101.qmd
+          - tutorials/16-joints-conditionals.qmd
+          - tutorials/02-distributions-mle.qmd
+          - tutorials/12-multivariate-gaussian.qmd
+          - tutorials/17-density-estimation-many-dimensions.qmd
+          - tutorials/15-comparing-distributions.qmd
+          - tutorials/18-metropolis-hastings.qmd
+          - tutorials/19-generative-adversarial-networks.qmd
+          - tutorials/29-variational-autoencoders.qmd
+          - tutorials/30-ddpm.qmd
+          - section: tutorials/probability-flow-ode.qmd
+            contents:
+              - tutorials/07-probability-flow-ode.qmd
+              - tutorials/31-probability-flow-ode-part-2.qmd
+              - tutorials/32-probability-flow-ode-part-3.qmd
+              - tutorials/33-probability-flow-ode-part-4.qmd
+              - tutorials/34-probability-flow-ode-part-5.qmd
+              - tutorials/35-probability-flow-ode-part-6.qmd
+              - tutorials/36-probability-flow-ode-part-7.qmd
+              - tutorials/37-probability-flow-ode-part-8.qmd
+              - tutorials/38-probability-flow-ode-part-9.qmd
+      - section: "Score Matching and Stochastic Sampling"
+        contents:
+          - tutorials/39-denoising-score-matching.qmd
+          - tutorials/40-reverse-sde-sampling.qmd
+      - section: "Decks"
+        contents:
+          - href: materials/w01-deck-01-mechanics.html
+            text: "01 · Course Mechanics"
+          - href: materials/w01-deck-02-motivation.html
+            text: "02 · Why Diffusion Models?"
+          - href: materials/w01-deck-03-toy-example.html
+            text: "03 · The World's Smallest Diffusion Model"
+          - href: materials/w02-deck-00-probability-joints.html
+            text: "04 · Probability, Joints, Conditionals and Bayes"
+          - href: materials/w02-deck-01-distributions-mle.html
+            text: "05 · Distributions and Maximum Likelihood"
+          - href: materials/w02-deck-02-genai-maps.html
+            text: "06 · Generative AI, in Its Simplest Form"
+          - href: materials/w03-deck-01-multivariate-gaussian.html
+            text: "07 · The Multivariate Gaussian"
+          - href: materials/w04-deck-01-metropolis-hastings.html
+            text: "08 · Sampling What You Cannot Normalise"
+          - href: materials/w04-deck-02-gans.html
+            text: "09 · Generative Adversarial Networks"
+      - section: "Tutorials"
+        contents:
+          - tutorials/13-inequalities.qmd
+          - tutorials/20-random-walk.qmd
+      - section: "Perspectives"
+        contents:
+          - tutorials/03-transport-story.qmd
+          - tutorials/06-map-proved.qmd
+          - tutorials/08-transport-rigorous.qmd
+          - tutorials/09-discrete-transport.qmd
+          - tutorials/10-measuring-things.qmd
+          - tutorials/11-joint-conditional-bayes.qmd
+          - tutorials/14-why-gaussian.qmd
+          - href: materials/w02-deck-03-map-limit.html
+            text: "Deck · The Map, Proved"
+      - section: "Draft"
+        contents:
+          - tutorials/21-one-estimator-many-parameterizations.qmd
+          - tutorials/05-two-point-diffusion.qmd
+          - tutorials/22-vector-fields-to-score-diffusion.qmd
+          - tutorials/24-sampling-with-scores.qmd
+          - tutorials/23-tweedie-bayes-denoising.qmd
+      - resources.qmd
+      - section: "Retired"
+        contents:
+          - tutorials/score-based-diffusion-guide.qmd
+          - tutorials/25-learning-the-score.qmd
+          - tutorials/26-probability-flow-sampling.qmd
+          - tutorials/27-diffusion-neural-odes-normalizing-flows.qmd
+          - tutorials/28-langevin-dynamics.qmd
 
   page-footer:
     left: |
@@ -77,10 +161,6 @@ book:
         - tutorials/19-generative-adversarial-networks.qmd
         - tutorials/29-variational-autoencoders.qmd
         - tutorials/30-ddpm.qmd
-    - part: "Score Matching and Stochastic Sampling"
-      chapters:
-        - tutorials/39-denoising-score-matching.qmd
-        - tutorials/40-reverse-sde-sampling.qmd
     - part: tutorials/probability-flow-ode.qmd
       chapters:
         - tutorials/07-probability-flow-ode.qmd
@@ -92,6 +172,10 @@ book:
         - tutorials/36-probability-flow-ode-part-7.qmd
         - tutorials/37-probability-flow-ode-part-8.qmd
         - tutorials/38-probability-flow-ode-part-9.qmd
+    - part: "Score Matching and Stochastic Sampling"
+      chapters:
+        - tutorials/39-denoising-score-matching.qmd
+        - tutorials/40-reverse-sde-sampling.qmd
     - part: "Decks"
       chapters:
         - href: materials/w01-deck-01-mechanics.html
