@@ -27,7 +27,7 @@ Write the flow as $\Phi_{t\leftarrow s}(x_s)=x_t$. The two time indices matter b
 $$\Phi_{s\leftarrow t}=\Phi_{t\leftarrow s}^{-1},\qquad
 \Phi_{t\leftarrow r}\circ\Phi_{r\leftarrow s}=\Phi_{t\leftarrow s}.$$
 
-For a continuously differentiable field with suitable bounds ensuring solutions remain defined, these maps are diffeomorphisms. Particles cannot meet at the same position at the same time and subsequently have distinct histories under this unique flow. Paths may visit the same location at different times.
+For a continuously differentiable field with suitable bounds ensuring solutions remain defined, these maps are diffeomorphisms. Two trajectories at the same position at the same time coincide throughout their common interval of existence. Distinct trajectories cannot meet at a common time. Paths may visit the same location at different times.
 
 Consider $v(x,t)=-x$. Then
 
@@ -55,7 +55,7 @@ $$\boxed{\frac{d}{dt}\log p_t(\mathbf x_t)
 =-\nabla\cdot\mathbf v_\theta(\mathbf x_t,t)
 =-\operatorname{tr}J_{\mathbf v_\theta}(\mathbf x_t,t).}$$
 
-This is the instantaneous change-of-variables formula. Its short derivation from the continuity equation is in Appendix A. Divergence is a scalar measuring local volume expansion, not the magnitude of the velocity. [Chen et al., Theorem 1](https://papers.nips.cc/paper_files/paper/2018/file/69386f6bb1dfed68692a24c8686939b9-Paper.pdf)
+This is the instantaneous change-of-variables formula. Its short derivation from the continuity equation is in Appendix A. Divergence is a scalar measuring the rate of local volume expansion, not the magnitude of the velocity. [Chen et al., Theorem 1](https://papers.nips.cc/paper_files/paper/2018/file/69386f6bb1dfed68692a24c8686939b9-Paper.pdf)
 
 ### Check with a contraction
 
@@ -75,6 +75,8 @@ $$\boxed{\log p_0^{\mathrm{model}}(x_0)
 =\log p_1(x_1)+\int_0^1\partial_xv_\theta(x_t,t)\,dt.}$$
 
 In higher dimensions, use $\nabla\cdot\mathbf v_\theta$. The sign follows by integrating the preceding log-density ODE. This formula is exact for the exact regular flow; numerical integration and approximate trace estimation introduce computational error.
+
+If the sampler stops at $t_{\min}>0$, replace the lower integration limit by $t_{\min}$: the resulting likelihood is for the positive-time model density, not the clean endpoint.
 
 One way to train a CNF is maximum likelihood using this formula. It generally involves solving the ODE during training and differentiating the loss through its solution. Adjoint methods are one option; differentiating through solver steps is another. A Neural ODE does not require one specific gradient method. Flow matching, introduced in Part 08, trains the velocity by regression instead.
 

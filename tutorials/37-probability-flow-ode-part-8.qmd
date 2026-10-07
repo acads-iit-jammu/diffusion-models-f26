@@ -3,9 +3,9 @@
 ::: {.callout-note}
 ## Draft — Learning the sampling velocity directly
 
-Part 07 established that a learned velocity can define a continuous normalizing flow. Flow matching gives a regression objective for learning that velocity. We retain **$t=0$ for data and $t=1$ for the prior**; generation runs from 1 to 0. Many flow-matching papers use the opposite convention. Replacing $t$ by $1-t$ reverses the velocity sign.
+Part 07 established that a learned velocity can define a continuous normalizing flow. Flow matching gives a regression objective for learning that velocity. We retain **$t=0$ for data and $t=1$ for the prior**; generation runs from 1 to 0. Many flow-matching papers use the opposite convention. With $\tau=1-t$, the reversed field is $\widetilde v(x,\tau)=-v(x,1-\tau)$: both the sign and time argument change.
 
-Primary reference: [Lipman et al., Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747). The straight interpolation below is a simple conditional-path construction; its endpoints can be singular when conditioning on an individual clean observation.
+Primary reference: [Lipman et al., Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747). The straight interpolation below is the zero-terminal-smoothing limit of the Gaussian conditional path, written in our reversed time convention. Independent endpoint interpolation is also studied in [rectified flow](https://arxiv.org/abs/2209.03003), [stochastic interpolants](https://arxiv.org/abs/2209.15571), and [independent conditional flow matching](https://arxiv.org/abs/2302.00482). A positive smoothing variance avoids the point-mass conditional data endpoint; here that endpoint is understood as a limit.
 :::
 
 ## 1. The learning objective is still sampling
@@ -43,13 +43,15 @@ At a constructed training observation, $u_t(X_t\mid X_0)=X_1-X_0$. The quotient 
 
 Train with
 
-$$\boxed{\mathcal L_{\mathrm{FM}}(\theta)
+$$\boxed{\mathcal L_{\mathrm{CFM}}(\theta)
 =\mathbb E_{t,X_0,X_1}
 [(v_\theta((1-t)X_0+tX_1,t)-(X_1-X_0))^2],}$$
 
 where $t\sim\operatorname{Uniform}(0,1)$ and the three draws are independent before constructing $X_t$. Assume finite second moments for this loss. Squared-error regression gives
 
 $$\boxed{v_*(x,t)=\mathbb E[X_1-X_0\mid X_t=x,t].}$$
+
+This is the **conditional flow-matching** (CFM) loss. Direct regression onto the unavailable marginal velocity would use $\mathcal L_{\mathrm{FM}}=\mathbb E_{t,X_t}[(v_\theta(X_t,t)-v_*(X_t,t))^2]$. The two losses differ by a parameter-independent conditional-variance term, so their population gradients and minimizers agree when differentiation is justified.
 
 The expectation is over endpoint pairs compatible with the fixed noisy/intermediate input. As in Part 03, individual labels differ from their conditional-mean prediction. The loss decomposes into a velocity-estimation error plus a conditional variance independent of the network.
 
@@ -95,7 +97,7 @@ Conditional regression yields
 
 $$v_*(x,t)=\alpha_t' m_t(x)+\sigma_t'\mathbb E[\varepsilon\mid X_t=x].$$
 
-Using the identities from Part 03 gives, on positive-noise times with $\alpha_t>0$,
+For a general Gaussian corruption, $m_t(x)=(x+\sigma_t^2s_t(x))/\alpha_t$ and $\mathbb E[\varepsilon\mid X_t=x]=-\sigma_ts_t(x)$, by the same differentiation as in Part 03. Substitution gives, on positive-noise times with $\alpha_t>0$,
 
 $$v_*(x,t)=\frac{\alpha_t'}{\alpha_t}x+
 \left(\frac{\alpha_t'}{\alpha_t}\sigma_t^2-\sigma_t\sigma_t'\right)s_t(x).$$
@@ -133,8 +135,9 @@ for update in range(updates):
     indices = torch.randint(len(training_data), (batch_size,))
     x0 = training_data[indices]
     x1 = torch.randn_like(x0)
-    t = torch.rand_like(x0)
-    xt = (1 - t) * x0 + t * x1
+    t = torch.rand(len(x0), device=x0.device)  # One time per example.
+    t_broadcast = t.view(-1, *([1] * (x0.ndim - 1)))
+    xt = (1 - t_broadcast) * x0 + t_broadcast * x1
     target = x1 - x0
     loss = (velocity(xt, t) - target).square().mean()
     optimizer.zero_grad(set_to_none=True)
@@ -147,16 +150,18 @@ Generation uses decreasing time and the same velocity convention:
 ```python
 @torch.no_grad()
 def sample_flow(velocity, count=1000, steps=1000):
+    was_training = velocity.training
     velocity.eval()
     x = torch.randn(count)
     times = torch.linspace(1.0, 0.0, steps + 1)
     for t, next_t in zip(times[:-1], times[1:]):
         h = t - next_t
         x = x - h * velocity(x, torch.full_like(x, float(t)))
+    velocity.train(was_training)
     return x
 ```
 
-These are CPU scalar snippets, not a complete trained experiment. Near-endpoint network extrapolation and integration error still require checking; a finite dataset has an atomic empirical endpoint, while the desired population may be continuous. Compare held-out moments, mode mass, CDFs, and exact-field references where available, as in Part 06. A network trained with flow matching is not automatically accurate enough for one Euler step.
+The scalar network takes position and time tensors of shape `(batch,)`, as does Part 06; a vector network must accept vector positions and one scalar time per example. These are CPU scalar sampling snippets, not a complete trained experiment. Near-endpoint network extrapolation and integration error still require checking; a finite dataset has an atomic empirical endpoint, while the desired population may be continuous. Compare held-out moments, mode mass, CDFs, and exact-field references where available, as in Part 06. A network trained with flow matching is not automatically accurate enough for one Euler step.
 
 ## Appendix A. Why the averaged velocity follows the marginal path
 
@@ -170,4 +175,4 @@ $$\begin{aligned}
 &=-\int\varphi(x)\partial_x[p_t(x)v_*(x,t)]\,dx.
 \end{aligned}$$
 
-The left side is $\int\varphi(x)\partial_tp_t(x)\,dx$. Equality for all such test functions gives the continuity equation in its weak form. Replace $\varphi'$ by $\nabla\varphi$ and the product by an inner product to obtain the vector result. This is the mechanism behind conditional flow matching: known conditional velocities determine a learnable marginal velocity. [Lipman et al., conditional flow matching](https://arxiv.org/abs/2210.02747)
+The left side is $\int\varphi(x)\partial_tp_t(x)\,dx$. The equality before integration by parts is the weak continuity equation. The final derivative can be interpreted distributionally; when $p_tv_*$ and $p_t$ have the needed smoothness, it gives the usual differential form. Replace $\varphi'$ by $\nabla\varphi$ and the product by an inner product to obtain the vector result. This is the mechanism behind conditional flow matching: known conditional velocities determine a learnable marginal velocity. [Lipman et al., conditional flow matching](https://arxiv.org/abs/2210.02747)
