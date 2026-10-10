@@ -922,6 +922,34 @@ s_t(x)
 \qquad
 v_\theta(x,t)=-\frac{\beta(t)}2[x+s_\theta(x,t)].\]</span></p>
 <p>The second formula is precisely the probability-flow field from Part 1. Generating samples requires integrating this field backward from the terminal distribution. Applying <span class="math inline">\(D_\theta\)</span> once is not generally a sampling procedure: posterior means need not have the clean-data distribution.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Connection to inference: the denoised estimate determines the Euler step
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Although this part focuses on training, substituting Tweedie’s formula directly into the sampler makes clear how the learned posterior mean is used. Write <span class="math inline">\(m_t(x)=\mathbb E[X_0\mid X_t=x]=D_*(x,t)\)</span>. For <span class="math inline">\(0&lt;\alpha_t&lt;1\)</span>,</p>
+<p><span class="math display">\[\begin{aligned}
+v(x,t)
+&amp;=-\frac{\beta(t)}2\left[x+\frac{\alpha_tm_t(x)-x}{1-\alpha_t^2}\right]\\
+&amp;=\frac{\beta(t)\alpha_t}{2(1-\alpha_t^2)}
+\left[\alpha_tx-m_t(x)\right].
+\end{aligned}\]</span></p>
+<p>An explicit Euler step with decreasing time, from <span class="math inline">\(t\)</span> to <span class="math inline">\(t-h\)</span> with <span class="math inline">\(h&gt;0\)</span>, is therefore</p>
+<p><span class="math display">\[\boxed{
+x_{t-h}=x_t-hv(x_t,t)
+=x_t+\frac{h\beta(t)\alpha_t}{2(1-\alpha_t^2)}
+\left[\underbrace{\mathbb E[X_0\mid X_t=x_t]}_{\text{denoised estimate}}
+-\alpha_tx_t\right].
+}\]</span></p>
+<p>The score no longer appears explicitly. <strong>At each step, the model estimates the clean observation from the current noisy position, and the known schedule converts that estimate into a transport step.</strong> In practice, replace the posterior mean by <span class="math inline">\(D_\theta(x_t,t)\)</span>; a score or noise predictor supplies the equivalent denoised estimate through the identities in this part.</p>
+<p>The velocity is determined by the denoised estimate, the current position, and the schedule; it is not itself the denoised estimate. The displacement involves <span class="math inline">\(m_t(x_t)-\alpha_tx_t\)</span>, so the VP scaling matters. Repeating the small transport steps generates an approximate sample. It does not replace the particle by its posterior mean in one step or recover its particular historical clean origin. Here Euler with decreasing time is the explicit method, not the implicit numerical method called backward Euler.</p>
+</div>
+</div>
 </section>
 <section id="additive-noise-notation-for-the-examples" class="level3">
 <h3 class="anchored" data-anchor-id="additive-noise-notation-for-the-examples">Additive-noise notation for the examples</h3>

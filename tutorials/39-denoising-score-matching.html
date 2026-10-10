@@ -597,7 +597,15 @@ window.Quarto = {
   <li><a href="#once-a-fixed-score-is-known-langevin-sampling" id="toc-once-a-fixed-score-is-known-langevin-sampling" class="nav-link" data-scroll-target="#once-a-fixed-score-is-known-langevin-sampling">3. Once a fixed score is known: Langevin sampling</a></li>
   <li><a href="#first-solved-check-a-standard-gaussian" id="toc-first-solved-check-a-standard-gaussian" class="nav-link" data-scroll-target="#first-solved-check-a-standard-gaussian">4. First solved check: a standard Gaussian</a></li>
   <li><a href="#several-noise-levels-and-annealed-langevin-dynamics" id="toc-several-noise-levels-and-annealed-langevin-dynamics" class="nav-link" data-scroll-target="#several-noise-levels-and-annealed-langevin-dynamics">5. Several noise levels and annealed Langevin dynamics</a></li>
-  <li><a href="#appendix-outline-stationarity-from-density-evolution" id="toc-appendix-outline-stationarity-from-density-evolution" class="nav-link" data-scroll-target="#appendix-outline-stationarity-from-density-evolution">Appendix outline: stationarity from density evolution</a></li>
+  <li><a href="#sec-langevin-stationarity" id="toc-sec-langevin-stationarity" class="nav-link" data-scroll-target="#sec-langevin-stationarity">Appendix A: why score-driven Langevin dynamics preserves the target density</a>
+  <ul class="collapse">
+  <li><a href="#a.1.-target-density-and-current-particle-density" id="toc-a.1.-target-density-and-current-particle-density" class="nav-link" data-scroll-target="#a.1.-target-density-and-current-particle-density">A.1. Target density and current particle density</a></li>
+  <li><a href="#a.2.-probability-flux-and-the-fokkerplanck-equation" id="toc-a.2.-probability-flux-and-the-fokkerplanck-equation" class="nav-link" data-scroll-target="#a.2.-probability-flux-and-the-fokkerplanck-equation">A.2. Probability flux and the Fokker–Planck equation</a></li>
+  <li><a href="#a.3.-at-the-target-density-the-two-fluxes-cancel" id="toc-a.3.-at-the-target-density-the-two-fluxes-cancel" class="nav-link" data-scroll-target="#a.3.-at-the-target-density-the-two-fluxes-cancel">A.3. At the target density, the two fluxes cancel</a></li>
+  <li><a href="#a.4.-recovering-the-target-from-the-stationary-equation" id="toc-a.4.-recovering-the-target-from-the-stationary-equation" class="nav-link" data-scroll-target="#a.4.-recovering-the-target-from-the-stationary-equation">A.4. Recovering the target from the stationary equation</a></li>
+  <li><a href="#a.5.-solved-example-convergence-to-a-gaussian" id="toc-a.5.-solved-example-convergence-to-a-gaussian" class="nav-link" data-scroll-target="#a.5.-solved-example-convergence-to-a-gaussian">A.5. Solved example: convergence to a Gaussian</a></li>
+  <li><a href="#a.6.-what-this-guarantees-for-a-numerical-sampler" id="toc-a.6.-what-this-guarantees-for-a-numerical-sampler" class="nav-link" data-scroll-target="#a.6.-what-this-guarantees-for-a-numerical-sampler">A.6. What this guarantees for a numerical sampler</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -665,7 +673,7 @@ p_\sigma(y)=\int\mathcal N(y;x_0,\sigma^2)p_{\mathrm{data}}(x_0)\,dx_0.\]</span>
 <p>Brownian increments over an interval of length <span class="math inline">\(\eta\)</span> are independent Gaussians with variance <span class="math inline">\(\eta\)</span>. Euler–Maruyama therefore gives</p>
 <p><span class="math display">\[\boxed{x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k,
 \qquad z_k\overset{\mathrm{iid}}{\sim}\mathcal N(0,1).}\]</span></p>
-<p>Score-directed drift and random spreading balance at the target distribution. For the continuous SDE, <span class="math inline">\(p\)</span> is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error.</p>
+<p>Score-directed drift and random spreading balance at the target distribution. For the continuous SDE, <span class="math inline">\(p\)</span> is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error. <a href="#sec-langevin-stationarity">Appendix A</a> derives the stationary density and illustrates convergence with a Gaussian target.</p>
 <p>If the learned score is <span class="math inline">\(s_\sigma\)</span>, the intended stationary target is <span class="math inline">\(p_\sigma\)</span>. Langevin does not remove the smoothing merely by running longer. Its sampling clock is not a schedule that automatically reduces <span class="math inline">\(\sigma\)</span>.</p>
 </section>
 <section id="first-solved-check-a-standard-gaussian" class="level2">
@@ -682,15 +690,88 @@ p_\sigma(y)=\int\mathcal N(y;x_0,\sigma^2)p_{\mathrm{data}}(x_0)\,dx_0.\]</span>
 <p>Train <span class="math inline">\(s_\theta(x,\sigma)\)</span> at a decreasing sequence <span class="math inline">\(\sigma_1&gt;\cdots&gt;\sigma_L&gt;0\)</span>, averaging the DSM loss over a stated distribution of noise levels with positive weights. At each level, perform several Langevin steps targeting <span class="math inline">\(p_{\sigma_i}\)</span>, then lower the noise scale. Large smoothing can make movement between modes easier; short runs at each level do not guarantee equilibrium.</p>
 <p>This is the approach of <a href="https://arxiv.org/abs/1907.05600">Song and Ermon (2019)</a>. It differs from a reverse diffusion SDE designed to follow prescribed changing marginals without equilibrating at every level. The final positive noise level retains smoothing error.</p>
 </section>
-<section id="appendix-outline-stationarity-from-density-evolution" class="level2">
-<h2 class="anchored" data-anchor-id="appendix-outline-stationarity-from-density-evolution">Appendix outline: stationarity from density evolution</h2>
-<p>If <span class="math inline">\(r_\tau\)</span> is the current sampler density, its Fokker–Planck equation is</p>
-<p><span class="math display">\[\partial_\tau r_\tau=-\partial_x(r_\tau s)+\partial_{xx}r_\tau.\]</span></p>
-<p>At <span class="math inline">\(r_\tau=p\)</span>, <span class="math inline">\(ps=\partial_xp\)</span>, so the two terms cancel. This proves invariance subject to the relevant boundary and regularity conditions; it does not establish a mixing rate. The full appendix will develop the fixed-interval probability balance and distinguish invariance, convergence, and discretization bias.</p>
+<section id="sec-langevin-stationarity" class="level2">
+<h2 class="anchored" data-anchor-id="sec-langevin-stationarity">Appendix A: why score-driven Langevin dynamics preserves the target density</h2>
+<section id="a.1.-target-density-and-current-particle-density" class="level3">
+<h3 class="anchored" data-anchor-id="a.1.-target-density-and-current-particle-density">A.1. Target density and current particle density</h3>
+<p>Fix a smooth, strictly positive, normalized density <span class="math inline">\(p(x)\)</span> on <span class="math inline">\(\mathbb R\)</span>. Its score is</p>
+<p><span class="math display">\[s(x)=\partial_x\log p(x)=\frac{p'(x)}{p(x)}.\]</span></p>
+<p>Consider the continuous-time Langevin SDE</p>
+<p><span class="math display">\[\boxed{dX_\tau=s(X_\tau)\,d\tau+\sqrt2\,dW_\tau.}\]</span></p>
+<p>Here <span class="math inline">\(\tau\)</span> is sampling time. The target <span class="math inline">\(p\)</span> remains fixed, while the density <span class="math inline">\(r_\tau\)</span> of the moving particles can change. We assume the SDE is well posed and nonexplosive, and that the densities and boundary behavior justify the derivatives and probability balances below. On the real line, use vanishing probability flux at infinity; on a bounded interval, reflecting boundaries impose zero flux.</p>
+<p>The question is: <strong>why should the equilibrium particle density be <span class="math inline">\(p\)</span> when the drift is its score?</strong></p>
+</section>
+<section id="a.2.-probability-flux-and-the-fokkerplanck-equation" class="level3">
+<h3 class="anchored" data-anchor-id="a.2.-probability-flux-and-the-fokkerplanck-equation">A.2. Probability flux and the Fokker–Planck equation</h3>
+<p>For a one-dimensional SDE <span class="math inline">\(dX_\tau=b(X_\tau)\,d\tau+g\,dW_\tau\)</span> with constant <span class="math inline">\(g\)</span>, the density satisfies</p>
+<p><span class="math display">\[\partial_\tau r_\tau=-\partial_x(br_\tau)+\frac{g^2}{2}\partial_{xx}r_\tau.\]</span></p>
+<p>Substitute <span class="math inline">\(b=s\)</span> and <span class="math inline">\(g=\sqrt2\)</span>:</p>
+<p><span class="math display">\[\partial_\tau r_\tau=-\partial_x(r_\tau s)+\partial_{xx}r_\tau
+=-\partial_x J_\tau,\]</span></p>
+<p>where</p>
+<p><span class="math display">\[\boxed{J_\tau(x)=\underbrace{r_\tau(x)s(x)}_{\text{drift flux}}
+\;\underbrace{-\partial_x r_\tau(x)}_{\text{diffusive flux}}.}\]</span></p>
+<p>The first flux transports particles according to the score vector field. The second describes the net spreading caused by Brownian motion: probability flows down the gradient of the current particle density.</p>
+<p>For any fixed interval <span class="math inline">\([a,b]\)</span>, integrate the continuity equation:</p>
+<p><span class="math display">\[\frac{d}{d\tau}\Pr(a\leq X_\tau\leq b)
+=\int_a^b\partial_\tau r_\tau(x)\,dx
+=J_\tau(a)-J_\tau(b).\]</span></p>
+<p>The interval gains probability through its left boundary and loses probability through its right boundary, with signed flux accounting for either direction of movement.</p>
+</section>
+<section id="a.3.-at-the-target-density-the-two-fluxes-cancel" class="level3">
+<h3 class="anchored" data-anchor-id="a.3.-at-the-target-density-the-two-fluxes-cancel">A.3. At the target density, the two fluxes cancel</h3>
+<p>Set <span class="math inline">\(r_\tau=p\)</span>. By the definition of the score,</p>
+<p><span class="math display">\[p(x)s(x)=p(x)\frac{p'(x)}{p(x)}=p'(x).\]</span></p>
+<p>Hence</p>
+<p><span class="math display">\[\boxed{J(x)=p(x)s(x)-p'(x)=p'(x)-p'(x)=0.}\]</span></p>
+<p>It follows that</p>
+<p><span class="math display">\[\left.\partial_\tau r_\tau(x)\right|_{r_\tau=p}=-\partial_x J(x)=0.\]</span></p>
+<p>Thus, under the stated conditions, <span class="math inline">\(p\)</span> is an <strong>invariant density</strong>: if <span class="math inline">\(X_0\sim p\)</span>, then <span class="math inline">\(X_\tau\sim p\)</span> at every later sampling time. Individual particles continue moving. Their distribution stays unchanged because drift and diffusion balance at every location.</p>
+<p>The relative coefficients matter. More generally, <span class="math inline">\(dX_\tau=c\,s(X_\tau)\,d\tau+\sqrt{2c}\,dW_\tau\)</span>, for constant <span class="math inline">\(c&gt;0\)</span>, preserves the same target: both fluxes are multiplied by <span class="math inline">\(c\)</span>. Changing the drift coefficient without the corresponding change in noise generally changes the stationary density.</p>
+</section>
+<section id="a.4.-recovering-the-target-from-the-stationary-equation" class="level3">
+<h3 class="anchored" data-anchor-id="a.4.-recovering-the-target-from-the-stationary-equation">A.4. Recovering the target from the stationary equation</h3>
+<p>Conversely, suppose a smooth positive density <span class="math inline">\(r_*\)</span> is stationary on a connected domain with zero-flux boundary conditions. Then</p>
+<p><span class="math display">\[\partial_x J_*=0.\]</span></p>
+<p>The flux is spatially constant, and the boundary condition makes that constant zero. Therefore</p>
+<p><span class="math display">\[r_*(x)s(x)-r_*'(x)=0.\]</span></p>
+<p>Divide by <span class="math inline">\(r_*(x)&gt;0\)</span> and substitute the score:</p>
+<p><span class="math display">\[\frac{r_*'(x)}{r_*(x)}=s(x)=\frac{p'(x)}{p(x)},\]</span></p>
+<p><span class="math display">\[\partial_x\log r_*(x)=\partial_x\log p(x).\]</span></p>
+<p>Integrating over the connected domain gives <span class="math inline">\(r_*(x)=C p(x)\)</span>. Since both densities integrate to one, <span class="math inline">\(C=1\)</span>:</p>
+<p><span class="math display">\[\boxed{r_*(x)=p(x).}\]</span></p>
+<p>This identifies the stationary density within the stated class. It does not by itself prove convergence from every initial distribution. That requires ergodicity conditions; separated modes can also make convergence very slow.</p>
+</section>
+<section id="a.5.-solved-example-convergence-to-a-gaussian" class="level3">
+<h3 class="anchored" data-anchor-id="a.5.-solved-example-convergence-to-a-gaussian">A.5. Solved example: convergence to a Gaussian</h3>
+<p>Take <span class="math inline">\(p=\mathcal N(\mu,1)\)</span>. Its score is <span class="math inline">\(s(x)=-(x-\mu)\)</span>, so</p>
+<p><span class="math display">\[dX_\tau=-(X_\tau-\mu)\,d\tau+\sqrt2\,dW_\tau.\]</span></p>
+<p>Multiplying the centered process by <span class="math inline">\(e^\tau\)</span> and integrating gives</p>
+<p><span class="math display">\[X_\tau=\mu+e^{-\tau}(X_0-\mu)
++\sqrt2\int_0^\tau e^{-(\tau-u)}\,dW_u.\]</span></p>
+<p>The stochastic integral has mean zero and variance</p>
+<p><span class="math display">\[2\int_0^\tau e^{-2(\tau-u)}\,du=1-e^{-2\tau}.\]</span></p>
+<p>Assuming <span class="math inline">\(X_0\)</span> is independent of the driving Brownian motion, at each fixed time this yields the distributional representation</p>
+<p><span class="math display">\[\boxed{X_\tau\overset{d}{=}\mu+e^{-\tau}(X_0-\mu)
++\sqrt{1-e^{-2\tau}}\,Z,\qquad Z\sim\mathcal N(0,1),}\]</span></p>
+<p>where <span class="math inline">\(Z\)</span> is independent of <span class="math inline">\(X_0\)</span>. As <span class="math inline">\(\tau\to\infty\)</span>, the initial-condition term disappears and <span class="math inline">\(X_\tau\)</span> converges in distribution to <span class="math inline">\(\mathcal N(\mu,1)\)</span>. If <span class="math inline">\(X_0\)</span> already has that distribution, the variance at every time is <span class="math inline">\(e^{-2\tau}+(1-e^{-2\tau})=1\)</span>, and the mean remains <span class="math inline">\(\mu\)</span>.</p>
+<p>Without Brownian noise, the contraction would collapse all particles toward <span class="math inline">\(\mu\)</span>. With noise, the spreading exactly balances the contraction at unit variance.</p>
+</section>
+<section id="a.6.-what-this-guarantees-for-a-numerical-sampler" class="level3">
+<h3 class="anchored" data-anchor-id="a.6.-what-this-guarantees-for-a-numerical-sampler">A.6. What this guarantees for a numerical sampler</h3>
+<p>The proof concerns the exact score and the continuous SDE. Euler–Maruyama instead generates</p>
+<p><span class="math display">\[x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k.\]</span></p>
+<p>For the Gaussian example, the centered update is an autoregression with coefficient <span class="math inline">\(1-\eta\)</span>. At stationarity its variance must satisfy</p>
+<p><span class="math display">\[V=(1-\eta)^2V+2\eta
+\quad\Longrightarrow\quad
+V=\frac{1}{1-\eta/2},\qquad 0&lt;\eta&lt;2.\]</span></p>
+<p>Thus even the exact score gives a biased stationary density at a fixed Euler step size. An estimated score introduces another source of error. Small steps and sufficient sampling time are essential qualifications in <a href="https://yang-song.net/blog/2021/score/">Song’s discussion of Langevin sampling</a>.</p>
+<p>Finally, stationarity describes each sample’s marginal law. Successive observations along one stationary trajectory are generally correlated; they are not independent draws merely because the chain is at equilibrium.</p>
 <p>For a different use of a time-dependent score—deterministic transport through a prescribed density path—see the separate <a href="../tutorials/probability-flow-ode.html">Probability-Flow ODE topic</a>.</p>
 <p><a href="../tutorials/40-reverse-sde-sampling.html">Continue to Reverse-SDE sampling</a> to follow a changing density path rather than equilibrate at one noise level.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
