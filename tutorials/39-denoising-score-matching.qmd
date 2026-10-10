@@ -48,7 +48,7 @@ Brownian increments over an interval of length $\eta$ are independent Gaussians 
 $$\boxed{x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k,
 \qquad z_k\overset{\mathrm{iid}}{\sim}\mathcal N(0,1).}$$
 
-Score-directed drift and random spreading balance at the target distribution. For the continuous SDE, $p$ is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error.
+Score-directed drift and random spreading balance at the target distribution. For the continuous SDE, $p$ is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error. [Appendix A](#sec-langevin-stationarity) derives the stationary density and illustrates convergence with a Gaussian target.
 
 If the learned score is $s_\sigma$, the intended stationary target is $p_\sigma$. Langevin does not remove the smoothing merely by running longer. Its sampling clock is not a schedule that automatically reduces $\sigma$.
 
@@ -71,13 +71,127 @@ Train $s_\theta(x,\sigma)$ at a decreasing sequence $\sigma_1>\cdots>\sigma_L>0$
 
 This is the approach of [Song and Ermon (2019)](https://arxiv.org/abs/1907.05600). It differs from a reverse diffusion SDE designed to follow prescribed changing marginals without equilibrating at every level. The final positive noise level retains smoothing error.
 
-## Appendix outline: stationarity from density evolution
+## Appendix A: why score-driven Langevin dynamics preserves the target density {#sec-langevin-stationarity}
 
-If $r_\tau$ is the current sampler density, its Fokker–Planck equation is
+### A.1. Target density and current particle density
 
-$$\partial_\tau r_\tau=-\partial_x(r_\tau s)+\partial_{xx}r_\tau.$$
+Fix a smooth, strictly positive, normalized density $p(x)$ on $\mathbb R$. Its score is
 
-At $r_\tau=p$, $ps=\partial_xp$, so the two terms cancel. This proves invariance subject to the relevant boundary and regularity conditions; it does not establish a mixing rate. The full appendix will develop the fixed-interval probability balance and distinguish invariance, convergence, and discretization bias.
+$$s(x)=\partial_x\log p(x)=\frac{p'(x)}{p(x)}.$$
+
+Consider the continuous-time Langevin SDE
+
+$$\boxed{dX_\tau=s(X_\tau)\,d\tau+\sqrt2\,dW_\tau.}$$
+
+Here $\tau$ is sampling time. The target $p$ remains fixed, while the density $r_\tau$ of the moving particles can change. We assume the SDE is well posed and nonexplosive, and that the densities and boundary behavior justify the derivatives and probability balances below. On the real line, use vanishing probability flux at infinity; on a bounded interval, reflecting boundaries impose zero flux.
+
+The question is: **why should the equilibrium particle density be $p$ when the drift is its score?**
+
+### A.2. Probability flux and the Fokker–Planck equation
+
+For a one-dimensional SDE $dX_\tau=b(X_\tau)\,d\tau+g\,dW_\tau$ with constant $g$, the density satisfies
+
+$$\partial_\tau r_\tau=-\partial_x(br_\tau)+\frac{g^2}{2}\partial_{xx}r_\tau.$$
+
+Substitute $b=s$ and $g=\sqrt2$:
+
+$$\partial_\tau r_\tau=-\partial_x(r_\tau s)+\partial_{xx}r_\tau
+=-\partial_x J_\tau,$$
+
+where
+
+$$\boxed{J_\tau(x)=\underbrace{r_\tau(x)s(x)}_{\text{drift flux}}
+\;\underbrace{-\partial_x r_\tau(x)}_{\text{diffusive flux}}.}$$
+
+The first flux transports particles according to the score vector field. The second describes the net spreading caused by Brownian motion: probability flows down the gradient of the current particle density.
+
+For any fixed interval $[a,b]$, integrate the continuity equation:
+
+$$\frac{d}{d\tau}\Pr(a\leq X_\tau\leq b)
+=\int_a^b\partial_\tau r_\tau(x)\,dx
+=J_\tau(a)-J_\tau(b).$$
+
+The interval gains probability through its left boundary and loses probability through its right boundary, with signed flux accounting for either direction of movement.
+
+### A.3. At the target density, the two fluxes cancel
+
+Set $r_\tau=p$. By the definition of the score,
+
+$$p(x)s(x)=p(x)\frac{p'(x)}{p(x)}=p'(x).$$
+
+Hence
+
+$$\boxed{J(x)=p(x)s(x)-p'(x)=p'(x)-p'(x)=0.}$$
+
+It follows that
+
+$$\left.\partial_\tau r_\tau(x)\right|_{r_\tau=p}=-\partial_x J(x)=0.$$
+
+Thus, under the stated conditions, $p$ is an **invariant density**: if $X_0\sim p$, then $X_\tau\sim p$ at every later sampling time. Individual particles continue moving. Their distribution stays unchanged because drift and diffusion balance at every location.
+
+The relative coefficients matter. More generally, $dX_\tau=c\,s(X_\tau)\,d\tau+\sqrt{2c}\,dW_\tau$, for constant $c>0$, preserves the same target: both fluxes are multiplied by $c$. Changing the drift coefficient without the corresponding change in noise generally changes the stationary density.
+
+### A.4. Recovering the target from the stationary equation
+
+Conversely, suppose a smooth positive density $r_*$ is stationary on a connected domain with zero-flux boundary conditions. Then
+
+$$\partial_x J_*=0.$$
+
+The flux is spatially constant, and the boundary condition makes that constant zero. Therefore
+
+$$r_*(x)s(x)-r_*'(x)=0.$$
+
+Divide by $r_*(x)>0$ and substitute the score:
+
+$$\frac{r_*'(x)}{r_*(x)}=s(x)=\frac{p'(x)}{p(x)},$$
+
+$$\partial_x\log r_*(x)=\partial_x\log p(x).$$
+
+Integrating over the connected domain gives $r_*(x)=C p(x)$. Since both densities integrate to one, $C=1$:
+
+$$\boxed{r_*(x)=p(x).}$$
+
+This identifies the stationary density within the stated class. It does not by itself prove convergence from every initial distribution. That requires ergodicity conditions; separated modes can also make convergence very slow.
+
+### A.5. Solved example: convergence to a Gaussian
+
+Take $p=\mathcal N(\mu,1)$. Its score is $s(x)=-(x-\mu)$, so
+
+$$dX_\tau=-(X_\tau-\mu)\,d\tau+\sqrt2\,dW_\tau.$$
+
+Multiplying the centered process by $e^\tau$ and integrating gives
+
+$$X_\tau=\mu+e^{-\tau}(X_0-\mu)
++\sqrt2\int_0^\tau e^{-(\tau-u)}\,dW_u.$$
+
+The stochastic integral has mean zero and variance
+
+$$2\int_0^\tau e^{-2(\tau-u)}\,du=1-e^{-2\tau}.$$
+
+Assuming $X_0$ is independent of the driving Brownian motion, at each fixed time this yields the distributional representation
+
+$$\boxed{X_\tau\overset{d}{=}\mu+e^{-\tau}(X_0-\mu)
++\sqrt{1-e^{-2\tau}}\,Z,\qquad Z\sim\mathcal N(0,1),}$$
+
+where $Z$ is independent of $X_0$. As $\tau\to\infty$, the initial-condition term disappears and $X_\tau$ converges in distribution to $\mathcal N(\mu,1)$. If $X_0$ already has that distribution, the variance at every time is $e^{-2\tau}+(1-e^{-2\tau})=1$, and the mean remains $\mu$.
+
+Without Brownian noise, the contraction would collapse all particles toward $\mu$. With noise, the spreading exactly balances the contraction at unit variance.
+
+### A.6. What this guarantees for a numerical sampler
+
+The proof concerns the exact score and the continuous SDE. Euler–Maruyama instead generates
+
+$$x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k.$$
+
+For the Gaussian example, the centered update is an autoregression with coefficient $1-\eta$. At stationarity its variance must satisfy
+
+$$V=(1-\eta)^2V+2\eta
+\quad\Longrightarrow\quad
+V=\frac{1}{1-\eta/2},\qquad 0<\eta<2.$$
+
+Thus even the exact score gives a biased stationary density at a fixed Euler step size. An estimated score introduces another source of error. Small steps and sufficient sampling time are essential qualifications in [Song's discussion of Langevin sampling](https://yang-song.net/blog/2021/score/).
+
+Finally, stationarity describes each sample's marginal law. Successive observations along one stationary trajectory are generally correlated; they are not independent draws merely because the chain is at equilibrium.
 
 For a different use of a time-dependent score—deterministic transport through a prescribed density path—see the separate [Probability-Flow ODE topic](./probability-flow-ode.qmd).
 

@@ -225,6 +225,32 @@ v_\theta(x,t)=-\frac{\beta(t)}2[x+s_\theta(x,t)].$$
 
 The second formula is precisely the probability-flow field from Part 1. Generating samples requires integrating this field backward from the terminal distribution. Applying $D_\theta$ once is not generally a sampling procedure: posterior means need not have the clean-data distribution.
 
+::: {.callout-note}
+## Connection to inference: the denoised estimate determines the Euler step
+
+Although this part focuses on training, substituting Tweedie's formula directly into the sampler makes clear how the learned posterior mean is used. Write $m_t(x)=\mathbb E[X_0\mid X_t=x]=D_*(x,t)$. For $0<\alpha_t<1$,
+
+$$\begin{aligned}
+v(x,t)
+&=-\frac{\beta(t)}2\left[x+\frac{\alpha_tm_t(x)-x}{1-\alpha_t^2}\right]\\
+&=\frac{\beta(t)\alpha_t}{2(1-\alpha_t^2)}
+\left[\alpha_tx-m_t(x)\right].
+\end{aligned}$$
+
+An explicit Euler step with decreasing time, from $t$ to $t-h$ with $h>0$, is therefore
+
+$$\boxed{
+x_{t-h}=x_t-hv(x_t,t)
+=x_t+\frac{h\beta(t)\alpha_t}{2(1-\alpha_t^2)}
+\left[\underbrace{\mathbb E[X_0\mid X_t=x_t]}_{\text{denoised estimate}}
+-\alpha_tx_t\right].
+}$$
+
+The score no longer appears explicitly. **At each step, the model estimates the clean observation from the current noisy position, and the known schedule converts that estimate into a transport step.** In practice, replace the posterior mean by $D_\theta(x_t,t)$; a score or noise predictor supplies the equivalent denoised estimate through the identities in this part.
+
+The velocity is determined by the denoised estimate, the current position, and the schedule; it is not itself the denoised estimate. The displacement involves $m_t(x_t)-\alpha_tx_t$, so the VP scaling matters. Repeating the small transport steps generates an approximate sample. It does not replace the particle by its posterior mean in one step or recover its particular historical clean origin. Here Euler with decreasing time is the explicit method, not the implicit numerical method called backward Euler.
+:::
+
 ### Additive-noise notation for the examples
 
 For the first example, use $Y=X+\sigma\varepsilon$ with independent $X\sim p_X$, $\varepsilon\sim\mathcal N(0,1)$, and $\sigma>0$. The same posterior-mean identity becomes
