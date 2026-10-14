@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>07 · Neural ODEs and normalizing flows – ID-5-02 (TO)</title>
+<title>08 · Neural ODEs and normalizing flows – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -37,7 +37,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../tutorials/37-probability-flow-ode-part-8.html" rel="next">
-<link href="../tutorials/35-probability-flow-ode-part-6.html" rel="prev">
+<link href="../tutorials/41-empirical-score-interpolation.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/36-probability-flow-ode-part-7.html">07 · Neural ODEs and normalizing flows</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/36-probability-flow-ode-part-7.html">08 · Neural ODEs and normalizing flows</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -302,20 +302,26 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/41-empirical-score-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Empirical-score sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/36-probability-flow-ode-part-7.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">07 · Neural ODEs and normalizing flows</span></a>
+ <span class="menu-text">08 · Neural ODEs and normalizing flows</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/37-probability-flow-ode-part-8.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">08 · Flow matching</span></a>
+ <span class="menu-text">09 · Flow matching</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">09 · DDPM, DDIM, and probability flow</span></a>
+ <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
   </div>
 </li>
       </ul>
@@ -608,9 +614,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/36-probability-flow-ode-part-7.html">07 · Neural ODEs and normalizing flows</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/36-probability-flow-ode-part-7.html">08 · Neural ODEs and normalizing flows</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">07 · Neural ODEs and normalizing flows</h1>
+<h1 class="title">08 · Neural ODEs and normalizing flows</h1>
 </div>
 
 
@@ -637,7 +643,7 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Parts 01–06 constructed a sampling velocity from a learned score. Here we place that construction within Neural ODEs and continuous normalizing flows. We keep <strong>data at <span class="math inline">\(t=0\)</span> and the prior at <span class="math inline">\(t=1\)</span></strong>; generation integrates backward. Start in one dimension, then replace derivatives by Jacobians and divergences for vectors.</p>
+<p>Parts 01–06 constructed a sampling velocity from a learned score; Part 07 evaluated the empirical score exactly and inspected its supporting observations. Here we place that construction within Neural ODEs and continuous normalizing flows. We keep <strong>data at <span class="math inline">\(t=0\)</span> and the prior at <span class="math inline">\(t=1\)</span></strong>; generation integrates backward. Start in one dimension, then replace derivatives by Jacobians and divergences for vectors.</p>
 </div>
 </div>
 <section id="a-network-can-parameterize-the-velocity-directly" class="level2">
@@ -696,7 +702,7 @@ window.Quarto = {
 <p><span class="math display">\[\operatorname{tr}J_{\mathbf v}=\mathbb E_\xi[\xi^\top J_{\mathbf v}\xi].\]</span></p>
 <p>A Jacobian-vector or vector-Jacobian product computes a probe value without forming the full Jacobian. A finite number of probes introduces estimation variability; in one dimension the derivative can usually be computed directly. This density calculation is not needed merely to draw ODE samples.</p>
 <p>If the sampler stops at <span class="math inline">\(t_{\min}&gt;0\)</span>, replace the lower integration limit by <span class="math inline">\(t_{\min}\)</span>: the resulting likelihood is for the positive-time model density, not the clean endpoint.</p>
-<p>One way to train a CNF is maximum likelihood using this formula. It generally involves solving the ODE during training and differentiating the loss through its solution. Adjoint methods are one option; differentiating through solver steps is another. A Neural ODE does not require one specific gradient method. Flow matching, introduced in Part 08, trains the velocity by regression instead.</p>
+<p>One way to train a CNF is maximum likelihood using this formula. It generally involves solving the ODE during training and differentiating the loss through its solution. Adjoint methods are one option; differentiating through solver steps is another. A Neural ODE does not require one specific gradient method. Flow matching, introduced in Part 09, trains the velocity by regression instead.</p>
 </section>
 <section id="our-probability-flow-ode-is-a-particular-cnf" class="level2">
 <h2 class="anchored" data-anchor-id="our-probability-flow-ode-is-a-particular-cnf">5. Our probability-flow ODE is a particular CNF</h2>
@@ -748,7 +754,7 @@ window.Quarto = {
 </section>
 <section id="what-the-next-part-changes" class="level2">
 <h2 class="anchored" data-anchor-id="what-the-next-part-changes">6. What the next part changes</h2>
-<p>Part 03 learned a conditional mean from forward-generated pairs, then converted it into a score and velocity. Part 08 asks whether we can construct pairs with a known <strong>velocity label</strong> and regress that label directly. The ODE solver used for generation remains the same kind of solver; the training construction changes.</p>
+<p>Part 03 learned a conditional mean from forward-generated pairs, then converted it into a score and velocity. Part 09 asks whether we can construct pairs with a known <strong>velocity label</strong> and regress that label directly. The ODE solver used for generation remains the same kind of solver; the training construction changes.</p>
 </section>
 <section id="appendix-a.-density-change-along-a-trajectory" class="level2">
 <h2 class="anchored" data-anchor-id="appendix-a.-density-change-along-a-trajectory">Appendix A. Density change along a trajectory</h2>
@@ -764,7 +770,7 @@ window.Quarto = {
 &amp;=-\partial_xv(x_t,t).
 \end{aligned}\]</span></p>
 <p>In <span class="math inline">\(d\)</span> dimensions, expand <span class="math inline">\(\nabla\cdot(p_t\mathbf v)=\mathbf v\cdot\nabla p_t+p_t\nabla\cdot\mathbf v\)</span>. The same cancellation yields the divergence formula.</p>
-<p><a href="../tutorials/37-probability-flow-ode-part-8.html">Continue to 08 · Flow matching</a>.</p>
+<p><a href="../tutorials/37-probability-flow-ode-part-8.html">Continue to 09 · Flow matching</a>.</p>
 
 
 </section>
@@ -1177,13 +1183,13 @@ window.Quarto = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/35-probability-flow-ode-part-6.html" class="pagination-link" aria-label="06 · Train and sample a mixture">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">06 · Train and sample a mixture</span>
+      <a href="../tutorials/41-empirical-score-interpolation.html" class="pagination-link" aria-label="07 · Empirical-score sampling">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">07 · Empirical-score sampling</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/37-probability-flow-ode-part-8.html" class="pagination-link" aria-label="08 · Flow matching">
-        <span class="nav-page-text">08 · Flow matching</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/37-probability-flow-ode-part-8.html" class="pagination-link" aria-label="09 · Flow matching">
+        <span class="nav-page-text">09 · Flow matching</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

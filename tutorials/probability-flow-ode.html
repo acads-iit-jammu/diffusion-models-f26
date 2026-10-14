@@ -273,20 +273,26 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/41-empirical-score-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Empirical-score sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/36-probability-flow-ode-part-7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">07 · Neural ODEs and normalizing flows</span></a>
+ <span class="menu-text">08 · Neural ODEs and normalizing flows</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/37-probability-flow-ode-part-8.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">08 · Flow matching</span></a>
+ <span class="menu-text">09 · Flow matching</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">09 · DDPM, DDIM, and probability flow</span></a>
+ <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
   </div>
 </li>
       </ul>
@@ -593,7 +599,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This nine-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–09, and can be read in sequence. The notes and worked examples are in development.</p>
+<p>This ten-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–10, and can be read in sequence. The notes and worked examples are in development.</p>
 </div>
 </div>
 <p>Start with particle trajectories and density evolution in one dimension. Then extend the construction to vectors, learn the score from clean/noisy pairs, and implement sampling. The later parts provide experiments and an image-model recipe, then connect probability-flow ODEs to Neural ODEs, normalizing flows, and flow matching.</p>
@@ -630,20 +636,24 @@ ul.task-list li input[type="checkbox"] {
 <td>Work through neural score estimation and generation in an executed notebook.</td>
 </tr>
 <tr class="odd">
-<td><a href="../tutorials/36-probability-flow-ode-part-7.html">07 · Neural ODEs and normalizing flows</a></td>
-<td>Connect velocity models, invertible transport, and likelihood.</td>
+<td><a href="../tutorials/41-empirical-score-interpolation.html">07 · Empirical-score sampling</a></td>
+<td>Compute an exact bank-based score, inspect interpolation and retrieval, and sample scalars and MNIST without training.</td>
 </tr>
 <tr class="even">
-<td><a href="../tutorials/37-probability-flow-ode-part-8.html">08 · Flow matching</a></td>
-<td>Learn the velocity directly from conditional-path regression.</td>
+<td><a href="../tutorials/36-probability-flow-ode-part-7.html">08 · Neural ODEs and normalizing flows</a></td>
+<td>Connect velocity models, invertible transport, and likelihood.</td>
 </tr>
 <tr class="odd">
-<td><a href="../tutorials/38-probability-flow-ode-part-9.html">09 · DDPM, DDIM, and probability flow</a></td>
+<td><a href="../tutorials/37-probability-flow-ode-part-8.html">09 · Flow matching</a></td>
+<td>Learn the velocity directly from conditional-path regression.</td>
+</tr>
+<tr class="even">
+<td><a href="../tutorials/38-probability-flow-ode-part-9.html">10 · DDPM, DDIM, and probability flow</a></td>
 <td>Relate discrete samplers to the reverse SDE and probability-flow ODE.</td>
 </tr>
 </tbody>
 </table>
-<p>Parts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Parts 07–08 connect the construction to other continuous generative models.</p>
+<p>Parts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Part 07 provides an exact empirical alternative and makes the supporting observations visible. Parts 08–09 connect the construction to other continuous generative models; Part 10 relates it to discrete diffusion samplers.</p>
 <p><a href="../materials/probability-flow/probability-flow-code.zip">Download all notebooks and code</a>.</p>
 
 

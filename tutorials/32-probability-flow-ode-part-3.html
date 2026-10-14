@@ -337,20 +337,26 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/41-empirical-score-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Empirical-score sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/36-probability-flow-ode-part-7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">07 · Neural ODEs and normalizing flows</span></a>
+ <span class="menu-text">08 · Neural ODEs and normalizing flows</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/37-probability-flow-ode-part-8.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">08 · Flow matching</span></a>
+ <span class="menu-text">09 · Flow matching</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">09 · DDPM, DDIM, and probability flow</span></a>
+ <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
   </div>
 </li>
       </ul>
@@ -730,6 +736,12 @@ window.Quarto = {
 </div>
 <div class="callout-body-container callout-body">
 <p>The primary reference is <a href="https://arxiv.org/abs/2011.13456v2">Song et al., <em>Score-Based Generative Modeling through Stochastic Differential Equations</em>, ICLR 2021, arXiv:2011.13456v2</a>. Use Section 3.3, Eq. (7), for training; Section 4.3, Eq. (13), for the probability-flow ODE; and Appendix B for the linear VP schedule and its Gaussian transition law. The paper’s reverse SDE is Eq. (6), a different sampling dynamics from Eq. (13).</p>
+<p>Complementary references:</p>
+<ul>
+<li>Chicago Y. Park, Michael T. McCann, Cristina Garcia-Cardona, Brendt Wohlberg, and Ulugbek S. Kamilov, <a href="https://arxiv.org/abs/2411.18702"><em>Random Walks with Tweedie: A Unified View of Score-Based Diffusion Models</em></a>, IEEE Signal Processing Magazine (2025). A complementary derivation of score-based diffusion with algorithmic templates for training and sampling.</li>
+<li>Preetum Nakkiran, Arwen Bradley, Hattie Zhou, and Madhu Advani, <a href="https://arxiv.org/abs/2406.08929"><em>Step-by-Step Diffusion: An Elementary Tutorial</em> (2024), arXiv:2406.08929</a>. An introductory treatment of diffusion models and flow matching for readers without prior diffusion experience.</li>
+<li>Yang Song, <a href="https://yang-song.net/blog/2021/score/"><em>Generative Modeling by Estimating Gradients of the Data Distribution</em> (2021)</a>. An illustrated introduction to scores, Langevin sampling, score estimation, reverse SDEs, and probability-flow ODEs.</li>
+</ul>
 <p><strong>Sampling is the goal.</strong> The sampler needs a score to evaluate its vector field. To learn that score, first consider an ordinary supervised problem: generate clean/noisy pairs and predict the clean value from the noisy input. Squared-error regression learns the posterior mean clean value. Tweedie’s formula converts this mean into the marginal score. Conditional-score and noise prediction are alternative parameterizations of this learning problem, with different time weightings unless the losses are adjusted. Explicit Euler integration with decreasing time then generates approximate data samples. Training and sampling must use the same schedule and time convention.</p>
 </div>
 </div>
@@ -1506,6 +1518,7 @@ s_t(x)
 <p><span class="math display">\[p_t(x)=\int p_t(x\mid x_0)\,p_{\mathrm{data}}(x_0)\,dx_0.\]</span></p>
 <p>Its local slope therefore reflects the possible clean origins and the forward corruption law. This is dependence on the originating <strong>distribution</strong>, not memory of an individual particle’s trajectory. Different histories that produce the same current density <span class="math inline">\(p_t\)</span> give the same score at that time.</p>
 <p>Once the time-dependent score field is specified, the sampler evaluates it using only the current position and time. The probability-flow ODE needs no stored trajectory history. The reverse SDE discussed in Part 2 is likewise a time-inhomogeneous Markov process. Posterior averaging over possible clean origins does not change this property.</p>
+<p>For exact empirical-score sampling without a neural network, including scalar and MNIST experiments, see <a href="../tutorials/41-empirical-score-interpolation.html">Part 07 · Empirical-score sampling</a>.</p>
 
 
 </section>

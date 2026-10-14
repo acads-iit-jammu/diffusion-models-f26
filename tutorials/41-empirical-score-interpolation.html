@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>07 · Empirical-score sampling – ID-5-02 (TO)</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/36-probability-flow-ode-part-7.html" rel="next">
+<link href="../tutorials/35-probability-flow-ode-part-6.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-970586c648819a176f05aa782ae30df3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-4e42ae105fa35cf935172ecd058ec8f7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/41-empirical-score-interpolation.html">07 · Empirical-score sampling</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">ID-5-02 (TO)</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Syllabus</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../curriculum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Curriculum</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assignments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lecture Notes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">00 · Introduction and Motivation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/17-density-estimation-many-dimensions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Estimating a Density in Many Dimensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/19-generative-adversarial-networks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/29-variational-autoencoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · Variational Autoencoders (VAEs)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+  </div>
+</li>
+      <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 · Probability-Flow ODE</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Transport in one dimension</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/31-probability-flow-ode-part-2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Higher-dimensional transport</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/32-probability-flow-ode-part-3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Learning the score</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/33-probability-flow-ode-part-4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · One-dimensional experiments</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/34-probability-flow-ode-part-5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Image-model recipe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/35-probability-flow-ode-part-6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Train and sample a mixture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/41-empirical-score-interpolation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">07 · Empirical-score sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/36-probability-flow-ode-part-7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Neural ODEs and normalizing flows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/37-probability-flow-ode-part-8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Flow matching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+<li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">13 · Score Matching and Stochastic Sampling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Denoising Score Matching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/40-reverse-sde-sampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Reverse-SDE sampling</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+</ul>
+  </li>
+        
+        
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Decks</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Course Mechanics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-02-motivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Why Diffusion Models?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-03-toy-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-00-probability-joints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-01-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-02-genai-maps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w03-deck-01-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · The Multivariate Gaussian</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-01-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-02-gans.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inequalities Worth Knowing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/20-random-walk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Random Walk: Forward, and Backward</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Perspectives</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Deterministic Map, Proved</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/09-discrete-transport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-03-map-limit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deck · The Map, Proved</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Draft</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/21-one-estimator-many-parameterizations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">One Estimator, Many Parameterizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/22-vector-fields-to-score-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From Local Arrows to Score-Based Diffusion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/24-sampling-with-scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling with Scores: Worked Examples of the Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resources</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Retired</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Score-Based Diffusion: A One-Dimensional Learning Sequence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/25-learning-the-score.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODEs in One Dimension: Particles, Flows, and Densities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/26-probability-flow-sampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SDEs in One Dimension: Brownian Motion, Itô Calculus, and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Score-Based Diffusion in One Dimension: Corruption, Sampling, and Denoising</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/28-langevin-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From One-Dimensional Transport to Neural ODEs and Higher Dimensions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-empirical-distribution-gives-an-exact-score-model" id="toc-the-empirical-distribution-gives-an-exact-score-model" class="nav-link active" data-scroll-target="#the-empirical-distribution-gives-an-exact-score-model">1. The empirical distribution gives an exact score model</a>
+  <ul class="collapse">
+  <li><a href="#one-dimension-from-the-gaussian-mixture-to-softmax" id="toc-one-dimension-from-the-gaussian-mixture-to-softmax" class="nav-link" data-scroll-target="#one-dimension-from-the-gaussian-mixture-to-softmax">1.1. One dimension: from the Gaussian mixture to softmax</a></li>
+  <li><a href="#general-dimension-one-softmax-over-vector-observations" id="toc-general-dimension-one-softmax-over-vector-observations" class="nav-link" data-scroll-target="#general-dimension-one-softmax-over-vector-observations">1.2. General dimension: one softmax over vector observations</a></li>
+  <li><a href="#inner-product-logits-used-in-the-notebooks" id="toc-inner-product-logits-used-in-the-notebooks" class="nav-link" data-scroll-target="#inner-product-logits-used-in-the-notebooks">1.3. Inner-product logits used in the notebooks</a></li>
+  </ul></li>
+  <li><a href="#substitute-the-interpolating-denoiser-into-the-transport-field" id="toc-substitute-the-interpolating-denoiser-into-the-transport-field" class="nav-link" data-scroll-target="#substitute-the-interpolating-denoiser-into-the-transport-field">2. Substitute the interpolating denoiser into the transport field</a>
+  <ul class="collapse">
+  <li><a href="#a-complete-sampling-procedure" id="toc-a-complete-sampling-procedure" class="nav-link" data-scroll-target="#a-complete-sampling-procedure">2.1. A complete sampling procedure</a></li>
+  </ul></li>
+  <li><a href="#an-output-need-not-equal-a-training-point" id="toc-an-output-need-not-equal-a-training-point" class="nav-link" data-scroll-target="#an-output-need-not-equal-a-training-point">3. An output need not equal a training point</a></li>
+  <li><a href="#fresh-terminal-noise-does-not-need-a-recorded-origin" id="toc-fresh-terminal-noise-does-not-need-a-recorded-origin" class="nav-link" data-scroll-target="#fresh-terminal-noise-does-not-need-a-recorded-origin">4. Fresh terminal noise does not need a recorded origin</a></li>
+  <li><a href="#computation-and-truncated-softmax" id="toc-computation-and-truncated-softmax" class="nav-link" data-scroll-target="#computation-and-truncated-softmax">5. Computation and truncated softmax</a></li>
+  <li><a href="#what-the-notebooks-measure" id="toc-what-the-notebooks-measure" class="nav-link" data-scroll-target="#what-the-notebooks-measure">6. What the notebooks measure</a>
+  <ul class="collapse">
+  <li><a href="#observations-from-the-saved-run" id="toc-observations-from-the-saved-run" class="nav-link" data-scroll-target="#observations-from-the-saved-run">Observations from the saved run</a></li>
+  </ul></li>
+  <li><a href="#explainability-through-the-observation-bank" id="toc-explainability-through-the-observation-bank" class="nav-link" data-scroll-target="#explainability-through-the-observation-bank">7. Explainability through the observation bank</a>
+  <ul class="collapse">
+  <li><a href="#track-concentration-over-reverse-time" id="toc-track-concentration-over-reverse-time" class="nav-link" data-scroll-target="#track-concentration-over-reverse-time">7.1. Track concentration over reverse time</a></li>
+  <li><a href="#posterior-contribution-and-causal-influence" id="toc-posterior-contribution-and-causal-influence" class="nav-link" data-scroll-target="#posterior-contribution-and-causal-influence">7.2. Posterior contribution and causal influence</a></li>
+  </ul></li>
+  <li><a href="#connection-to-generation-as-approximate-retrieval" id="toc-connection-to-generation-as-approximate-retrieval" class="nav-link" data-scroll-target="#connection-to-generation-as-approximate-retrieval">8. Connection to generation as approximate retrieval</a></li>
+  <li><a href="#questions-and-extensions" id="toc-questions-and-extensions" class="nav-link" data-scroll-target="#questions-and-extensions">9. Questions and extensions</a></li>
+  <li><a href="#what-this-construction-establishes" id="toc-what-this-construction-establishes" class="nav-link" data-scroll-target="#what-this-construction-establishes">10. What this construction establishes</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/41-empirical-score-interpolation.html">07 · Empirical-score sampling</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">07 · Empirical-score sampling</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Draft — Exact denoising, interpolation, and retrieval
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="../tutorials/35-probability-flow-ode-part-6.html">Part 06</a> trained a neural network to estimate a mixture score. Here we keep the sampling problem and evaluate the corrupted empirical score exactly from stored observations. The posterior mean is a softmax-weighted interpolation in the original sample space. We derive the scalar and vector formulas, integrate the probability-flow ODE, inspect which observations support a trajectory, and compare interpolation with retrieval as noise decreases.</p>
+<p>The learning objectives are to derive an empirical score without training, use it in backward-time Euler sampling, and explain a denoised estimate through its posterior weights. The one-dimensional and MNIST notebooks provide executed examples. Keep data at <span class="math inline">\(t=0\)</span> and the terminal prior at <span class="math inline">\(t=1\)</span>, as in the earlier parts.</p>
+</div>
+</div>
+<p><a href="../materials/probability-flow/notebooks/06-empirical-score-1d.html"><strong>One-dimensional notebook</strong></a> · <a href="../materials/probability-flow/notebooks/06-empirical-score-1d.ipynb">Download <code>.ipynb</code></a></p>
+<p><a href="../materials/probability-flow/notebooks/07-empirical-score-mnist.html"><strong>MNIST notebook</strong></a> · <a href="../materials/probability-flow/notebooks/07-empirical-score-mnist.ipynb">Download <code>.ipynb</code></a></p>
+<section id="the-empirical-distribution-gives-an-exact-score-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-empirical-distribution-gives-an-exact-score-model">1. The empirical distribution gives an exact score model</h2>
+<p>Use <span class="math inline">\(n\)</span> for the number of observations and <span class="math inline">\(d\)</span> for their dimension. We first derive the scalar formula, then repeat the steps for vectors. Both derivations apply at positive noise, <span class="math inline">\(\sigma_t&gt;0\)</span>, with the same VP amplitudes <span class="math inline">\(\sigma_t^2=1-\alpha_t^2\)</span>.</p>
+<section id="one-dimension-from-the-gaussian-mixture-to-softmax" class="level3">
+<h3 class="anchored" data-anchor-id="one-dimension-from-the-gaussian-mixture-to-softmax">1.1. One dimension: from the Gaussian mixture to softmax</h3>
+<p>Suppose we observe scalars <span class="math inline">\(x_1,\ldots,x_n\)</span>. Introduce a uniformly sampled observation index <span class="math inline">\(I\)</span> and set <span class="math inline">\(X_0=x_I\)</span>:</p>
+<p><span class="math display">\[\Pr(I=i)=\frac1n,\qquad
+\widehat P_0=\frac1n\sum_{i=1}^n\delta_{x_i}.\]</span></p>
+<p>Each observed index has mass <span class="math inline">\(1/n\)</span>; repeated values combine their masses. This empirical distribution is a model we can sample exactly, not a claim that the unknown population distribution is discrete.</p>
+<p>Under VP corruption,</p>
+<p><span class="math display">\[X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
+\varepsilon\sim\mathcal N(0,1),\]</span></p>
+<p>with <span class="math inline">\(\varepsilon\)</span> independent of <span class="math inline">\(I\)</span>. Conditional on the index, the Gaussian density is</p>
+<p><span class="math display">\[\phi_i(x,t)=p_t(x\mid I=i)
+=\frac1{\sqrt{2\pi\sigma_t^2}}
+\exp\left[-\frac{(x-\alpha_tx_i)^2}{2\sigma_t^2}\right].\]</span></p>
+<p>Average over the indices to obtain the marginal density:</p>
+<p><span class="math display">\[\boxed{\widehat p_t(x)=\sum_{i=1}^n\Pr(I=i)\phi_i(x,t)
+=\frac1n\sum_{i=1}^n\phi_i(x,t).}\]</span></p>
+<p>Differentiating one component gives</p>
+<p><span class="math display">\[\partial_x\phi_i(x,t)
+=\phi_i(x,t)\,\partial_x
+\left[-\frac{(x-\alpha_tx_i)^2}{2\sigma_t^2}\right]
+=\phi_i(x,t)\frac{\alpha_tx_i-x}{\sigma_t^2}.\]</span></p>
+<p>Now differentiate the finite sum and divide by its density:</p>
+<p><span class="math display">\[\begin{aligned}
+\widehat s_t(x)
+&amp;=\partial_x\log\widehat p_t(x)
+=\frac{\partial_x\widehat p_t(x)}{\widehat p_t(x)}\\
+&amp;=\frac{\frac1n\sum_i\phi_i(x,t)(\alpha_tx_i-x)/\sigma_t^2}
+{\frac1n\sum_j\phi_j(x,t)}\\
+&amp;=\sum_i\frac{\phi_i(x,t)}{\sum_j\phi_j(x,t)}
+\frac{\alpha_tx_i-x}{\sigma_t^2}.
+\end{aligned}\]</span></p>
+<p>Define the normalized component weights</p>
+<p><span class="math display">\[w_i(x,t)=\frac{\phi_i(x,t)}{\sum_j\phi_j(x,t)}.\]</span></p>
+<p>All components have the same Gaussian normalizing factor, so it cancels. With logits</p>
+<p><span class="math display">\[\ell_i(x,t)=-\frac{(x-\alpha_tx_i)^2}{2\sigma_t^2},\]</span></p>
+<p>the weights become exactly a softmax over the <span class="math inline">\(n\)</span> observation indices:</p>
+<p><span class="math display">\[\boxed{w_i(x,t)=\frac{e^{\ell_i(x,t)}}{\sum_{j=1}^n e^{\ell_j(x,t)}}
+=\operatorname{softmax}_i(\ell_1(x,t),\ldots,\ell_n(x,t)).}\]</span></p>
+<p>Bayes’ rule identifies what these weights mean:</p>
+<p><span class="math display">\[\Pr(I=i\mid X_t=x)
+=\frac{p_t(x\mid I=i)\Pr(I=i)}{\widehat p_t(x)}
+=\frac{\phi_i(x,t)/n}{\sum_j\phi_j(x,t)/n}
+=w_i(x,t).\]</span></p>
+<p>They are the posterior probabilities of the stored observation indices. Since <span class="math inline">\(\sum_iw_i=1\)</span>, the score simplifies to</p>
+<p><span class="math display">\[\begin{aligned}
+\widehat s_t(x)
+&amp;=\frac1{\sigma_t^2}
+\left[\alpha_t\sum_iw_i(x,t)x_i-x\sum_iw_i(x,t)\right]\\
+&amp;=\boxed{\frac{\alpha_tm_t(x)-x}{\sigma_t^2}},
+\qquad
+\boxed{m_t(x)=\mathbb E_{\widehat P_0}[X_0\mid X_t=x]
+=\sum_iw_i(x,t)x_i.}
+\end{aligned}\]</span></p>
+<p>Thus the <strong>posterior weights</strong> are a softmax, the <strong>denoised estimate</strong> is their weighted average of observations, and the <strong>score</strong> is the resulting scaled displacement. These are three related quantities, not the same quantity.</p>
+</section>
+<section id="general-dimension-one-softmax-over-vector-observations" class="level3">
+<h3 class="anchored" data-anchor-id="general-dimension-one-softmax-over-vector-observations">1.2. General dimension: one softmax over vector observations</h3>
+<p>Now let <span class="math inline">\(x_1,\ldots,x_n\in\mathbb R^d\)</span> and</p>
+<p><span class="math display">\[X_t=\alpha_tX_0+\sigma_t\varepsilon,\qquad
+\varepsilon\sim\mathcal N(0,I_d),\qquad X_0=x_I.\]</span></p>
+<p>The same scalar noise scale is used in every coordinate. Each corrupted observation has density</p>
+<p><span class="math display">\[\phi_i(x,t)=\frac1{(2\pi\sigma_t^2)^{d/2}}
+\exp\left[-\frac{\|x-\alpha_tx_i\|^2}{2\sigma_t^2}\right],
+\qquad
+\widehat p_t(x)=\frac1n\sum_{i=1}^n\phi_i(x,t).\]</span></p>
+<p>To see the vector derivative explicitly, expand the squared norm:</p>
+<p><span class="math display">\[\|x-\alpha_tx_i\|^2=\sum_{k=1}^d(x_k-\alpha_tx_{i,k})^2,
+\qquad
+\nabla_x\|x-\alpha_tx_i\|^2=2(x-\alpha_tx_i).\]</span></p>
+<p>Consequently,</p>
+<p><span class="math display">\[\nabla_x\phi_i(x,t)
+=\phi_i(x,t)\frac{\alpha_tx_i-x}{\sigma_t^2}.\]</span></p>
+<p>Differentiate the marginal and divide, just as in one dimension:</p>
+<p><span class="math display">\[\begin{aligned}
+\widehat s_t(x)
+&amp;=\nabla_x\log\widehat p_t(x)
+=\frac{\nabla_x\widehat p_t(x)}{\widehat p_t(x)}\\
+&amp;=\frac{\frac1n\sum_i\phi_i(x,t)(\alpha_tx_i-x)/\sigma_t^2}
+{\frac1n\sum_j\phi_j(x,t)}\\
+&amp;=\sum_iw_i(x,t)\frac{\alpha_tx_i-x}{\sigma_t^2}\\
+&amp;=\boxed{\frac{\alpha_t\sum_iw_i(x,t)x_i-x}{\sigma_t^2}}.
+\end{aligned}\]</span></p>
+<p>The equal prior masses and common Gaussian normalizer again cancel:</p>
+<p><span class="math display">\[\boxed{
+w_i(x,t)
+=\frac{\exp[-\|x-\alpha_tx_i\|^2/(2\sigma_t^2)]}
+{\sum_{j=1}^n\exp[-\|x-\alpha_tx_j\|^2/(2\sigma_t^2)]}
+=\Pr(I=i\mid X_t=x).
+}\]</span></p>
+<p>There is <strong>one softmax over observations</strong>, based on the full vector distance. We do not compute separate posterior weights for individual coordinates. Every coordinate of the denoised vector uses the same <span class="math inline">\(w_i(x,t)\)</span>:</p>
+<p><span class="math display">\[\boxed{m_t(x)=\sum_{i=1}^n w_i(x,t)x_i\in\mathbb R^d,
+\qquad\widehat s_t(x)=\frac{\alpha_tm_t(x)-x}{\sigma_t^2}\in\mathbb R^d.}\]</span></p>
+</section>
+<section id="inner-product-logits-used-in-the-notebooks" class="level3">
+<h3 class="anchored" data-anchor-id="inner-product-logits-used-in-the-notebooks">1.3. Inner-product logits used in the notebooks</h3>
+<p>Expand the vector logit:</p>
+<p><span class="math display">\[-\frac{\|x-\alpha_tx_i\|^2}{2\sigma_t^2}
+=-\frac{\|x\|^2}{2\sigma_t^2}
++\frac{\alpha_tx^Tx_i-\alpha_t^2\|x_i\|^2/2}{\sigma_t^2}.\]</span></p>
+<p>The first term is identical for all indices. Adding or subtracting a common constant leaves a softmax unchanged, because the common exponential factor cancels between numerator and denominator. We can therefore use</p>
+<p><span class="math display">\[\boxed{w_i(x,t)=\operatorname{softmax}_i
+\left(\frac{\alpha_tx^Tx_i-\alpha_t^2\|x_i\|^2/2}{\sigma_t^2}\right).}\]</span></p>
+<p>For <span class="math inline">\(d=1\)</span>, this reduces to logits <span class="math inline">\((\alpha_txx_i-\alpha_t^2x_i^2/2)/\sigma_t^2\)</span>. For MNIST, <span class="math inline">\(d=784\)</span>: inner products with the stored image vectors and their precomputed squared norms give the same exact posterior weights.</p>
+<p>The denoiser is an exact empirical Bayes estimator and a convex combination of stored observations. No neural network is needed to evaluate these formulas. Unequal prior masses <span class="math inline">\(\pi_i\)</span> would add <span class="math inline">\(\log\pi_i\)</span> to each logit; the equal-weight empirical model uses <span class="math inline">\(\pi_i=1/n\)</span>, whose common term cancels.</p>
+</section>
+</section>
+<section id="substitute-the-interpolating-denoiser-into-the-transport-field" class="level2">
+<h2 class="anchored" data-anchor-id="substitute-the-interpolating-denoiser-into-the-transport-field">2. Substitute the interpolating denoiser into the transport field</h2>
+<p>With data at <span class="math inline">\(t=0\)</span> and the terminal prior at <span class="math inline">\(t=1\)</span>, choose</p>
+<p><span class="math display">\[\beta(t)=0.1+19.9t,\qquad
+\alpha_t=e^{-0.05t-4.975t^2},\qquad
+\sigma_t^2=1-e^{-0.1t-9.95t^2}.\]</span></p>
+<p>The score-based probability-flow ODE of <a href="https://arxiv.org/abs/2011.13456">Song et al.</a> becomes</p>
+<p><span class="math display">\[\boxed{
+v(x,t)=-\frac{\beta(t)}2[x+\widehat s_t(x)]
+=\frac{\beta(t)\alpha_t}{2\sigma_t^2}
+\left[\alpha_tx-\sum_iw_i(x,t)x_i\right].
+}\]</span></p>
+<p>Explicit Euler from <span class="math inline">\(t\)</span> to <span class="math inline">\(t-h\)</span> therefore gives</p>
+<p><span class="math display">\[\boxed{x_{t-h}=x_t+
+\frac{h\beta(t)\alpha_t}{2\sigma_t^2}
+\left[\sum_iw_i(x_t,t)x_i-\alpha_tx_t\right].}\]</span></p>
+<p>At each step the method computes an interpolated clean estimate and converts it into a velocity using the known schedule. No network is required. This gives a precise sense in which <strong>empirical-score probability flow is driven by interpolation</strong>.</p>
+<p>The denoised estimate is an interpolation in sample space. Its use in the velocity gives the transport an explicit dependence on the observation bank. The Euler state also includes the current noisy position and VP rescaling, so it need not lie in the bank’s convex hull. A population score need not have this finite-bank representation; the interpretation here is exact for the empirical model.</p>
+<section id="a-complete-sampling-procedure" class="level3">
+<h3 class="anchored" data-anchor-id="a-complete-sampling-procedure">2.1. A complete sampling procedure</h3>
+<p>Given the stored bank, a positive cutoff <span class="math inline">\(\epsilon\)</span>, and a decreasing grid <span class="math inline">\(1=t_K&gt;t_{K-1}&gt;\cdots&gt;t_0=\epsilon\)</span>:</p>
+<ol type="1">
+<li>Compute <span class="math inline">\(\alpha_{t_k}\)</span>, <span class="math inline">\(\sigma_{t_k}^2\)</span> and <span class="math inline">\(\beta(t_k)\)</span> from the same VP schedule.</li>
+<li>Draw the initial state. For a matched-law experiment, choose <span class="math inline">\(I\)</span> uniformly from the bank and set <span class="math inline">\(x_1=\alpha_1x_I+\sigma_1z\)</span>, where <span class="math inline">\(z\sim\mathcal N(0,I_d)\)</span> is independent. For a practical-prior comparison, draw <span class="math inline">\(x_1\sim\mathcal N(0,I_d)\)</span> instead and record that the terminal law is approximate.</li>
+<li>At each current state <span class="math inline">\(x_{t_k}\)</span>, evaluate the logits, normalized weights and denoised estimate <span class="math inline">\(m_{t_k}(x_{t_k})\)</span>.</li>
+<li>Let <span class="math inline">\(h_k=t_k-t_{k-1}&gt;0\)</span> and take the explicit Euler step</li>
+</ol>
+<p><span class="math display">\[x_{t_{k-1}}=x_{t_k}+\frac{h_k\beta(t_k)\alpha_{t_k}}{2\sigma_{t_k}^2}
+\left[m_{t_k}(x_{t_k})-\alpha_{t_k}x_{t_k}\right].\]</span></p>
+<ol start="5" type="1">
+<li>Save both the raw final state <span class="math inline">\(x_\epsilon\)</span> and the optionally denoised output <span class="math inline">\(m_\epsilon(x_\epsilon)\)</span>, together with their posterior weights. They define different output laws.</li>
+</ol>
+<p>The procedure is identical for scalars and vectors. The notebooks refine the time grid near zero, avoid evaluating the singular empirical score at <span class="math inline">\(t=0\)</span>, and compare step resolutions. No posterior sampling or neural training is needed. Directly sampling the known mixture remains a useful reference for checking whether the numerical transport reproduces its positive-time density.</p>
+</section>
+</section>
+<section id="an-output-need-not-equal-a-training-point" class="level2">
+<h2 class="anchored" data-anchor-id="an-output-need-not-equal-a-training-point">3. An output need not equal a training point</h2>
+<p>There are several distinct meanings of this statement.</p>
+<p><strong>A positive-time ODE state.</strong> Stop at <span class="math inline">\(\epsilon&gt;0\)</span>. Under the correct initialization and exact integration, the output has continuous density <span class="math inline">\(\widehat p_\epsilon\)</span>. It equals one of finitely many stored points with probability zero. It also retains Gaussian corruption, so a nonmatching value alone is not evidence of useful interpolation.</p>
+<p><strong>A positive-time posterior mean.</strong> Output <span class="math inline">\(m_\epsilon(X_\epsilon)\)</span> instead. This is explicitly a convex combination, generally different from every stored observation. Its law is the pushforward <span class="math inline">\((m_\epsilon)_\#\widehat P_\epsilon\)</span>, not <span class="math inline">\(\widehat P_0\)</span>. Choosing this rule intentionally produces interpolated clean estimates. At small noise the weights may nevertheless concentrate almost completely on one observation.</p>
+<p><strong>An exceptional zero-noise trajectory.</strong> For <span class="math inline">\(\widehat P_0=(\delta_{-1}+\delta_{+1})/2\)</span>,</p>
+<p><span class="math display">\[m_t(x)=\tanh\left(\frac{\alpha_tx}{\sigma_t^2}\right).\]</span></p>
+<p>At <span class="math inline">\(x=0\)</span>, both <span class="math inline">\(m_t(0)\)</span> and <span class="math inline">\(v(0,t)\)</span> are zero. The trajectory initialized exactly at zero stays there and its limit is not a training point. This confirms that an individual path need not terminate at a stored point. A continuous terminal initialization, however, gives that exact initial value probability zero; the example does not establish a positive probability of interpolated endpoints.</p>
+<p><strong>The matched-law zero-noise limit.</strong> The exact marginals satisfy <span class="math inline">\(\widehat P_t\Rightarrow\widehat P_0\)</span> as <span class="math inline">\(t\downarrow0\)</span>. This is a distributional statement about empirical atoms; a regular invertible flow is not asserted at the singular endpoint. Finite cutoffs and exceptional trajectories are consistent with this limit.</p>
+</section>
+<section id="fresh-terminal-noise-does-not-need-a-recorded-origin" class="level2">
+<h2 class="anchored" data-anchor-id="fresh-terminal-noise-does-not-need-a-recorded-origin">4. Fresh terminal noise does not need a recorded origin</h2>
+<p>A fresh draw from <span class="math inline">\(\widehat p_1\)</span> need not be obtained by recording a deterministic forward trajectory. Its distribution is sufficient. The empirical mixture is positive everywhere at positive noise.</p>
+<p>Starting instead from standard Gaussian noise replaces <span class="math inline">\(\widehat P_1\)</span> by an approximate prior <span class="math inline">\(R_1\)</span>. At positive time,</p>
+<p><span class="math display">\[R_\epsilon=(\Phi_{\epsilon\leftarrow1})_\#R_1.\]</span></p>
+<p>This generally differs from <span class="math inline">\(\widehat P_\epsilon\)</span>. Prior mismatch alone does not guarantee interpolation: it may alter the frequencies of approach to training points. The notebooks compare fresh matched-mixture initialization with fresh standard Gaussian initialization. At the finite rate used here, <span class="math inline">\(\alpha_1=e^{-5.025}&gt;0\)</span>, so these terminal laws are not exactly equal.</p>
+</section>
+<section id="computation-and-truncated-softmax" class="level2">
+<h2 class="anchored" data-anchor-id="computation-and-truncated-softmax">5. Computation and truncated softmax</h2>
+<p>For vector data, cancel the common query norm in the logits:</p>
+<p><span class="math display">\[\ell_i(x,t)=\frac{\alpha_tx^Tx_i-\alpha_t^2\|x_i\|^2/2}{\sigma_t^2}.\]</span></p>
+<p>A batch of inner products and precomputed data norms suffices. Subtracting the largest logit before exponentiation avoids overflow. The complete calculation costs <span class="math inline">\(O(nd)\)</span> per query and does not require an <span class="math inline">\(n\times d\)</span> difference tensor for every query.</p>
+<p>One can retain a subset <span class="math inline">\(S\)</span> and renormalize its weights. Let <span class="math inline">\(\delta=\sum_{i\notin S}w_i\)</span> be the discarded mass and <span class="math inline">\(m_S\)</span> the retained weighted mean. Then</p>
+<p><span class="math display">\[m=(1-\delta)m_S+\delta m_{S^c},\qquad
+\|m-m_S\|\leq\delta\,\operatorname{diam}\{x_i\}.\]</span></p>
+<p>This directly controls denoiser error for the finite bank. The corresponding score error is multiplied by <span class="math inline">\(\alpha_t/\sigma_t^2\)</span>, and velocity error by <span class="math inline">\(\beta(t)\alpha_t/(2\sigma_t^2)\)</span>. Small omitted mass does not by itself provide an integrated trajectory-error bound.</p>
+<p>The notebooks test top-<span class="math inline">\(k\)</span> approximation but still evaluate all logits. They do not claim a search speedup. Efficient nearest-neighbor search is a separate implementation choice; diffuse high-noise responsibilities can require many observations.</p>
+</section>
+<section id="what-the-notebooks-measure" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-notebooks-measure">6. What the notebooks measure</h2>
+<p>The scalar notebook draws 128 observations from a two-component Gaussian population. It compares empirical and population scores, checks the analytic score against a finite difference, runs backward Euler sampling, checks positive-time distributions against directly sampled mixtures, and measures refinement error. The symmetry-fixed two-point trajectory is included explicitly.</p>
+<p>The MNIST notebook uses 1,000 original training images in 784-dimensional pixel space and generates 32 trajectories per initialization law on a CPU. It trains no model. Labels are used only for reporting, never in the score. At each cutoff it reports nearest-bank pixel RMSE for raw states and posterior means, effective posterior count <span class="math inline">\(1/\sum_iw_i^2\)</span>, and maximum posterior weight. It displays the first eight trajectories and nearest bank images without selecting attractive outputs.</p>
+<p>The notebooks also plot posterior weights for a fixed trajectory across reverse times. The scalar plot shows all 128 weights against the stored observation values; the MNIST plot displays the six highest-weight bank images at each selected time. Both plot the effective support count as weights concentrate.</p>
+<p>These diagnostics distinguish interpolation, residual noise and near-retrieval. Pixel differences alone do not establish new digit structure, and this small experiment does not measure held-out generative quality. The notebooks include step refinement and discarded-mass checks so numerical error and truncation are visible.</p>
+<section id="observations-from-the-saved-run" class="level3">
+<h3 class="anchored" data-anchor-id="observations-from-the-saved-run">Observations from the saved run</h3>
+<p>For the scalar bank, the average effective posterior count decreases from 118.14 at <span class="math inline">\(t=0.6\)</span> to 2.12 at <span class="math inline">\(t=0.001\)</span>. At the latter cutoff, the mean distance from the denoised output to a stored scalar is 0.00302. The outputs still interpolate at finite noise, with increasingly concentrated weights.</p>
+<p>For the MNIST run initialized from standard Gaussian noise:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 26%">
+<col style="width: 26%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Cutoff <span class="math inline">\(t\)</span></th>
+<th style="text-align: right;">Mean effective count</th>
+<th style="text-align: right;">Denoised nearest-bank pixel RMSE</th>
+<th style="text-align: right;">Raw-state nearest-bank pixel RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.8</td>
+<td style="text-align: right;">912.26</td>
+<td style="text-align: right;">0.19801</td>
+<td style="text-align: right;">0.99550</td>
+</tr>
+<tr class="even">
+<td>0.4</td>
+<td style="text-align: right;">7.88</td>
+<td style="text-align: right;">0.09780</td>
+<td style="text-align: right;">0.89926</td>
+</tr>
+<tr class="odd">
+<td>0.2</td>
+<td style="text-align: right;">1.03</td>
+<td style="text-align: right;">0.00084</td>
+<td style="text-align: right;">0.58494</td>
+</tr>
+<tr class="even">
+<td>0.01</td>
+<td style="text-align: right;">approximately 1</td>
+<td style="text-align: right;">below <span class="math inline">\(10^{-4}\)</span> for all 32 outputs</td>
+<td style="text-align: right;">0.04448</td>
+</tr>
+</tbody>
+</table>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/empirical-score-mnist-posterior-means.png" class="img-fluid figure-img"></p>
+<figcaption>Posterior means along the first eight MNIST trajectories, followed by their nearest stored images. Intermediate estimates blend images; the final estimates closely match stored observations.</figcaption>
+</figure>
+</div>
+<p>Both terminal initialization laws produced 32 near-bank denoised outputs at <span class="math inline">\(t=0.01\)</span>. Doubling the Euler resolution changed the raw states by 0.000120 RMS at that cutoff on the first eight Gaussian-initialized trajectories; their final denoised outputs were unchanged at displayed precision. Thus the absence of a network is demonstrated, but useful novel-image interpolation at low noise is not.</p>
+<p>Top-32 truncation retains only 6.03% of the posterior mass at <span class="math inline">\(t=0.8\)</span>, compared with 92.84% at <span class="math inline">\(t=0.4\)</span> and essentially all mass at <span class="math inline">\(t=0.1\)</span>. Aggressive truncation is therefore not uniformly accurate across the schedule. These are results for one fixed bank and seed, not a general image-quality benchmark.</p>
+</section>
+</section>
+<section id="explainability-through-the-observation-bank" class="level2">
+<h2 class="anchored" data-anchor-id="explainability-through-the-observation-bank">7. Explainability through the observation bank</h2>
+<p>For a fixed noisy input and time, the decomposition is exact:</p>
+<p><span class="math display">\[m_t(x)=\sum_i\underbrace{w_i(x,t)x_i}_{\text{contribution to the denoised estimate}},
+\qquad
+\widehat s_t(x)=\sum_i\underbrace{w_i(x,t)\frac{\alpha_tx_i-x}{\sigma_t^2}}_{\text{contribution to the score}}.\]</span></p>
+<p>We can display the highest-weight observations and the omitted mass. This answers a concrete question: <strong>which stored observations contribute to the current estimate, and by how much?</strong> The weights are probabilities of candidate clean origins under the specified empirical corruption model. Their interpretation does not require a surrogate explanation method.</p>
+<section id="track-concentration-over-reverse-time" class="level3">
+<h3 class="anchored" data-anchor-id="track-concentration-over-reverse-time">7.1. Track concentration over reverse time</h3>
+<p>If <span class="math inline">\(\alpha_t\)</span> tends to zero while <span class="math inline">\(x\)</span> remains bounded, the likelihoods of all stored observations become identical and <span class="math inline">\(w_i(x,t)\to1/n\)</span>. At the finite terminal schedule used here, they are only approximately uniform. As noise decreases, relative distances increasingly distinguish the candidates. Along the sampled trajectories the notebooks show concentration from broad averaging toward a small supporting set.</p>
+<p>Useful summaries are</p>
+<p><span class="math display">\[N_{\mathrm{eff}}(x,t)=\frac1{\sum_iw_i(x,t)^2},\qquad
+H(x,t)=-\sum_iw_i(x,t)\log w_i(x,t),\qquad
+w_{\max}(x,t)=\max_i w_i(x,t).\]</span></p>
+<p>Uniform weights give <span class="math inline">\(N_{\mathrm{eff}}=n\)</span> and <span class="math inline">\(H=\log n\)</span>; a single supporting observation gives <span class="math inline">\(N_{\mathrm{eff}}=1\)</span> and <span class="math inline">\(H=0\)</span>. The bank indices and the observations themselves provide the detailed explanation behind these summaries. Weight concentration need not be monotone for every trajectory: both the query position and the scale change during integration.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/empirical-score-1d-support.png" class="img-fluid figure-img"></p>
+<figcaption>Posterior weights for one scalar trajectory. Columns are stored scalar values; decreasing time concentrates support on fewer observations. The red dots mark the posterior mean.</figcaption>
+</figure>
+</div>
+<p>In the MNIST notebook, the first particle has approximately uniform weights initially. Around <span class="math inline">\(t=0.4\)</span>, bank image 224 has posterior weight about 0.693, with several other images contributing. At lower noise, its weight becomes numerically indistinguishable from one. The displayed supporting images make the transition from blending to retrieval directly inspectable. Bank indices refer to this particular selected bank, not the original MNIST file order.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/empirical-score-mnist-support.png" class="img-fluid figure-img"></p>
+<figcaption>The six highest-weight MNIST bank images for one trajectory at each time. Near the terminal prior, weights are almost uniform; at low noise, one stored image dominates. Very small displayed weights may underflow to zero.</figcaption>
+</figure>
+</div>
+</section>
+<section id="posterior-contribution-and-causal-influence" class="level3">
+<h3 class="anchored" data-anchor-id="posterior-contribution-and-causal-influence">7.2. Posterior contribution and causal influence</h3>
+<p>The weights explain the current empirical Bayes estimate. They do not assign unique causes to the complete generated sample. Removing an observation changes the normalization of every remaining weight and can change all subsequent positions.</p>
+<p>A stronger influence experiment removes the top-weight observation, recomputes the field, and reruns generation from the same terminal point. Compare the denoised output, final nearest bank index and weight trajectory. Repeat with a random low-weight observation as a control. If using matched-law initialization, hold the terminal point fixed for this intervention; changing the initial law at the same time would introduce another effect.</p>
+<p>A neural predictor trained in Part 06 can also be compared with this exact empirical reference. Agreement supports approximation of the bank-based denoiser at the tested positions. The neural representation does not automatically expose the same explicit weights, and generalization to a population distribution remains a separate question.</p>
+</section>
+</section>
+<section id="connection-to-generation-as-approximate-retrieval" class="level2">
+<h2 class="anchored" data-anchor-id="connection-to-generation-as-approximate-retrieval">8. Connection to generation as approximate retrieval</h2>
+<p>Soma S Dhavala’s <a href="https://dhavala.github.io/saddlepoint/2026-06-30-towards-testable-theory-of-emergence/"><em>Towards a Testable Theory of Emergence</em></a> explores retrieval and recombination over learned representations, with new compositions understood through the support available in the underlying geometry. The empirical-score model gives a concrete setting in which the retrieval operation is explicit and measurable.</p>
+<p>The stored observations act as values. The current noisy sample supplies the query. Gaussian distance determines the similarity weights, and the weighted average returns a denoised estimate. For <span class="math inline">\(\alpha_t&gt;0\)</span>, the same operation can be written as Gaussian kernel regression in clean-data coordinates:</p>
+<p><span class="math display">\[m_t(x)=\frac{\sum_i K_t(x/\alpha_t,x_i)x_i}
+{\sum_j K_t(x/\alpha_t,x_j)},\qquad
+K_t(y,x_i)=\exp\left[-\frac{\|y-x_i\|^2}{2(\sigma_t/\alpha_t)^2}\right].\]</span></p>
+<p>The effective kernel bandwidth <span class="math inline">\(\sigma_t/\alpha_t\)</span> decreases during reverse generation. Each step retrieves a new weighted estimate using the updated query. This realizes iterative soft retrieval in the original sample space, and at low noise it can approach selection of one stored item.</p>
+<p>This example supplies a testable instance of the retrieval interpretation. A convex combination is not sufficient evidence of a coherent new composition: averaged pixels can blur digits, and the MNIST experiment approaches stored images at low noise. The blog’s broader discussion of learned geometry and held-out composition suggests additional experiments, rather than being proved by this empirical pixel-space construction.</p>
+</section>
+<section id="questions-and-extensions" class="level2">
+<h2 class="anchored" data-anchor-id="questions-and-extensions">9. Questions and extensions</h2>
+<ol type="1">
+<li>For a two-point bank, derive <span class="math inline">\(w_+(x,t)=1/(1+e^{-2\alpha_tx/\sigma_t^2})\)</span> and show that <span class="math inline">\(m_t(x)=2w_+(x,t)-1\)</span>. Explain why the symmetric zero trajectory is exceptional under a continuous initialization law.</li>
+<li>In the scalar notebook, compare posterior weights, nearest-observation distance and effective support for two different terminal particles. Does the same cutoff produce the same degree of interpolation?</li>
+<li>In MNIST, choose a positive cutoff before the weights become concentrated. Inspect both the denoised image and its contributing bank images. How does pixel averaging affect visual quality?</li>
+<li>Remove a dominant bank observation and repeat a paired trajectory. Compare this intervention with removing a low-weight observation.</li>
+<li>Repeat with larger banks and several random seeds. Report discarded posterior mass if using top-<span class="math inline">\(k\)</span> truncation, and distinguish approximation error from any genuine search speedup.</li>
+</ol>
+</section>
+<section id="what-this-construction-establishes" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-construction-establishes">10. What this construction establishes</h2>
+<p>A neural network is unnecessary for the empirical-score construction. The exact denoiser is already available as a data-dependent softmax average. For sampling the empirical endpoint itself, uniformly selecting a stored observation is simpler; for sampling its positive-time Gaussian mixture, select an observation and add the specified corruption directly.</p>
+<p>The ODE is useful here as an explicit transport experiment. Positive-time denoising provides a deliberate interpolation rule. Whether that rule produces useful new observations, particularly images, must be evaluated separately. Neural networks are one way to approximate the score and impose a model restriction, not a mathematical prerequisite for this transport.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2011.13456">Song et al., <em>Score-Based Generative Modeling through Stochastic Differential Equations</em></a>: VP corruption and probability-flow ODE.</li>
+<li><a href="https://arxiv.org/abs/2411.18702">Park et al., <em>Random Walks with Tweedie: A Unified View of Score-Based Diffusion Models</em></a>: denoising and score-based sampling.</li>
+<li><a href="https://dhavala.github.io/saddlepoint/2026-06-30-towards-testable-theory-of-emergence/">Soma S Dhavala, <em>Towards a Testable Theory of Emergence</em></a>: retrieval, representation geometry and testable composition.</li>
+<li><a href="https://github.com/cvdfoundation/mnist">MNIST data mirror maintained by CVDF</a>: original IDX files used in the image experiment.</li>
+</ul>
+<p>The derivation also connects directly to <a href="../tutorials/32-probability-flow-ode-part-3.html">Part 3, Appendix D</a>, which develops the empirical-mixture identity.</p>
+<p><a href="../tutorials/35-probability-flow-ode-part-6.html">Previous: 06 · Train and sample a mixture</a> · <a href="../tutorials/36-probability-flow-ode-part-7.html">Continue to 08 · Neural ODEs and normalizing flows</a>.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/acads-iit-jammu\.github\.io\/diffusion-models-f26");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../tutorials/35-probability-flow-ode-part-6.html" class="pagination-link" aria-label="06 · Train and sample a mixture">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">06 · Train and sample a mixture</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../tutorials/36-probability-flow-ode-part-7.html" class="pagination-link" aria-label="08 · Neural ODEs and normalizing flows">
+        <span class="nav-page-text">08 · Neural ODEs and normalizing flows</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
