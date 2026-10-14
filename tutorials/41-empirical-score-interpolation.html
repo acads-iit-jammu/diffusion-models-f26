@@ -607,6 +607,7 @@ window.Quarto = {
   <li><a href="#substitute-the-interpolating-denoiser-into-the-transport-field" id="toc-substitute-the-interpolating-denoiser-into-the-transport-field" class="nav-link" data-scroll-target="#substitute-the-interpolating-denoiser-into-the-transport-field">2. Substitute the interpolating denoiser into the transport field</a>
   <ul class="collapse">
   <li><a href="#a-complete-sampling-procedure" id="toc-a-complete-sampling-procedure" class="nav-link" data-scroll-target="#a-complete-sampling-procedure">2.1. A complete sampling procedure</a></li>
+  <li><a href="#sec-empirical-quantile-flow" id="toc-sec-empirical-quantile-flow" class="nav-link" data-scroll-target="#sec-empirical-quantile-flow">2.2. Exact scalar transport through quantiles</a></li>
   </ul></li>
   <li><a href="#an-output-need-not-equal-a-training-point" id="toc-an-output-need-not-equal-a-training-point" class="nav-link" data-scroll-target="#an-output-need-not-equal-a-training-point">3. An output need not equal a training point</a></li>
   <li><a href="#fresh-terminal-noise-does-not-need-a-recorded-origin" id="toc-fresh-terminal-noise-does-not-need-a-recorded-origin" class="nav-link" data-scroll-target="#fresh-terminal-noise-does-not-need-a-recorded-origin">4. Fresh terminal noise does not need a recorded origin</a></li>
@@ -780,6 +781,10 @@ w_i(x,t)
 <p><span class="math display">\[\beta(t)=0.1+19.9t,\qquad
 \alpha_t=e^{-0.05t-4.975t^2},\qquad
 \sigma_t^2=1-e^{-0.1t-9.95t^2}.\]</span></p>
+<p>For any VP schedule, the amplitude and rate satisfy</p>
+<p><span class="math display">\[\alpha_t=\exp\left[-\frac12\int_0^t\beta(u)\,du\right],\qquad
+\alpha_t'=-\frac{\beta(t)}2\alpha_t,\qquad
+\sigma_t\sigma_t'=\frac{\beta(t)}2\alpha_t^2.\]</span></p>
 <p>The score-based probability-flow ODE of <a href="https://arxiv.org/abs/2011.13456">Song et al.</a> becomes</p>
 <p><span class="math display">\[\boxed{
 v(x,t)=-\frac{\beta(t)}2[x+\widehat s_t(x)]
@@ -797,7 +802,7 @@ v(x,t)=-\frac{\beta(t)}2[x+\widehat s_t(x)]
 <p>Given the stored bank, a positive cutoff <span class="math inline">\(\epsilon\)</span>, and a decreasing grid <span class="math inline">\(1=t_K&gt;t_{K-1}&gt;\cdots&gt;t_0=\epsilon\)</span>:</p>
 <ol type="1">
 <li>Compute <span class="math inline">\(\alpha_{t_k}\)</span>, <span class="math inline">\(\sigma_{t_k}^2\)</span> and <span class="math inline">\(\beta(t_k)\)</span> from the same VP schedule.</li>
-<li>Draw the initial state. For a matched-law experiment, choose <span class="math inline">\(I\)</span> uniformly from the bank and set <span class="math inline">\(x_1=\alpha_1x_I+\sigma_1z\)</span>, where <span class="math inline">\(z\sim\mathcal N(0,I_d)\)</span> is independent. For a practical-prior comparison, draw <span class="math inline">\(x_1\sim\mathcal N(0,I_d)\)</span> instead and record that the terminal law is approximate.</li>
+<li>Draw the initial state. For a matched-law experiment, choose <span class="math inline">\(I\)</span> uniformly from the bank and set <span class="math inline">\(x(1)=\alpha_1x_I+\sigma_1z\)</span>, where <span class="math inline">\(z\sim\mathcal N(0,I_d)\)</span> is independent. For a practical-prior comparison, draw <span class="math inline">\(x(1)\sim\mathcal N(0,I_d)\)</span> instead and record that the terminal law is approximate.</li>
 <li>At each current state <span class="math inline">\(x_{t_k}\)</span>, evaluate the logits, normalized weights and denoised estimate <span class="math inline">\(m_{t_k}(x_{t_k})\)</span>.</li>
 <li>Let <span class="math inline">\(h_k=t_k-t_{k-1}&gt;0\)</span> and take the explicit Euler step</li>
 </ol>
@@ -807,6 +812,67 @@ v(x,t)=-\frac{\beta(t)}2[x+\widehat s_t(x)]
 <li>Save both the raw final state <span class="math inline">\(x_\epsilon\)</span> and the optionally denoised output <span class="math inline">\(m_\epsilon(x_\epsilon)\)</span>, together with their posterior weights. They define different output laws.</li>
 </ol>
 <p>The procedure is identical for scalars and vectors. The notebooks refine the time grid near zero, avoid evaluating the singular empirical score at <span class="math inline">\(t=0\)</span>, and compare step resolutions. No posterior sampling or neural training is needed. Directly sampling the known mixture remains a useful reference for checking whether the numerical transport reproduces its positive-time density.</p>
+</section>
+<section id="sec-empirical-quantile-flow" class="level3">
+<h3 class="anchored" data-anchor-id="sec-empirical-quantile-flow">2.2. Exact scalar transport through quantiles</h3>
+<p>In one dimension, the empirical-mixture ODE also has an exact representation through quantiles. We can derive it independently of the softmax formula by using the continuity equation, just as in <a href="../tutorials/07-probability-flow-ode.html#sec-cdf-velocity">Part 01’s CDF construction</a>.</p>
+<p>Let <span class="math inline">\(\Phi\)</span> denote the standard-normal CDF. Integrating the empirical Gaussian-mixture density gives</p>
+<p><span class="math display">\[\boxed{F_t(x)=\int_{-\infty}^x\widehat p_t(y)\,dy
+=\frac1n\sum_{i=1}^n
+\Phi\left(\frac{x-\alpha_tx_i}{\sigma_t}\right).}\]</span></p>
+<p>At every positive noise level, <span class="math inline">\(\partial_xF_t(x)=\widehat p_t(x)&gt;0\)</span> and <span class="math inline">\(F_t(-\infty)=0\)</span>, <span class="math inline">\(F_t(+\infty)=1\)</span>. Hence <span class="math inline">\(F_t\)</span> is a bijection from <span class="math inline">\(\mathbb R\)</span> to <span class="math inline">\((0,1)\)</span>, with a unique inverse for every probability rank <span class="math inline">\(u\in(0,1)\)</span>.</p>
+<p>To find a velocity that realizes this density path, impose the continuity equation on an initially unknown field <span class="math inline">\(v_F\)</span>. Integrating from <span class="math inline">\(-\infty\)</span> to <span class="math inline">\(x\)</span> with zero left-boundary flux requires</p>
+<p><span class="math display">\[\begin{aligned}
+\partial_tF_t(x)
+&amp;=-\int_{-\infty}^x\partial_y[\widehat p_t(y)v_F(y,t)]\,dy\\
+&amp;=-\widehat p_t(x)v_F(x,t),
+\qquad
+\boxed{v_F(x,t)=-\frac{\partial_tF_t(x)}{\widehat p_t(x)}.}
+\end{aligned}\]</span></p>
+<p>Conversely, this definition satisfies the continuity equation because <span class="math inline">\(-\partial_x(\widehat p_tv_F)=\partial_x\partial_tF_t=\partial_t\widehat p_t\)</span>. We can now derive <span class="math inline">\(v_F\)</span> directly from the boxed mixture CDF and check that it agrees with the score-based field, without assuming that agreement.</p>
+<p>Let <span class="math inline">\(\varphi\)</span> be the standard-normal density, so <span class="math inline">\(\Phi'=\varphi\)</span>. Differentiating the mixture CDF at a fixed position <span class="math inline">\(x\)</span> gives</p>
+<p><span class="math display">\[\partial_tF_t(x)=\frac1n\sum_i
+\varphi\left(\frac{x-\alpha_tx_i}{\sigma_t}\right)
+\left[-\frac{\alpha_t'x_i}{\sigma_t}
+-\frac{\sigma_t'}{\sigma_t^2}(x-\alpha_tx_i)\right].\]</span></p>
+<p>Since <span class="math inline">\(\phi_i(x,t)=\varphi((x-\alpha_tx_i)/\sigma_t)/\sigma_t\)</span>, division by <span class="math inline">\(\widehat p_t=(1/n)\sum_i\phi_i\)</span> yields</p>
+<p><span class="math display">\[\begin{aligned}
+v_F(x,t)
+&amp;=\sum_i w_i(x,t)\left[\alpha_t'x_i+
+\frac{\sigma_t'}{\sigma_t}(x-\alpha_tx_i)\right]\\
+&amp;=\alpha_t'm_t(x)+\frac{\sigma_t'}{\sigma_t}[x-\alpha_tm_t(x)]\\
+&amp;=-\frac{\beta(t)\alpha_t}{2}m_t(x)
++\frac{\beta(t)\alpha_t^2}{2\sigma_t^2}[x-\alpha_tm_t(x)]\\
+&amp;=\frac{\beta(t)\alpha_t}{2\sigma_t^2}
+[\alpha_tx-(\sigma_t^2+\alpha_t^2)m_t(x)]\\
+&amp;=\boxed{\frac{\beta(t)\alpha_t}{2\sigma_t^2}[\alpha_tx-m_t(x)]
+=v(x,t).}
+\end{aligned}\]</span></p>
+<p>The CDF construction and the score construction therefore produce the same scalar field. Their probability flux vanishes at the left boundary: the finite bank bounds <span class="math inline">\(m_t\)</span>, the field grows at most linearly in <span class="math inline">\(x\)</span> at a fixed positive time, and <span class="math inline">\(\widehat p_t\)</span> has Gaussian tails.</p>
+<p>Along a trajectory satisfying <span class="math inline">\(\dot x_t=v(x_t,t)\)</span>, the chain rule gives</p>
+<p><span class="math display">\[\begin{aligned}
+\frac{d}{dt}F_t(x_t)
+&amp;=\partial_tF_t(x_t)+\partial_xF_t(x_t)\dot x_t\\
+&amp;=-\widehat p_t(x_t)v(x_t,t)+\widehat p_t(x_t)v(x_t,t)=0.
+\end{aligned}\]</span></p>
+<p><strong>The particle’s probability rank is conserved.</strong> Starting from a terminal value <span class="math inline">\(\xi=x(1)\)</span>, compute <span class="math inline">\(u=F_1(\xi)\)</span> once. This avoids confusing the terminal position with the first stored observation <span class="math inline">\(x_1\)</span>. The exact backward trajectory at every positive time is</p>
+<p><span class="math display">\[\boxed{x_t=F_t^{-1}(u)=F_t^{-1}\bigl(F_1(\xi)\bigr),\qquad t&gt;0.}\]</span></p>
+<p>Conversely, differentiate <span class="math inline">\(F_t(x_t)=u\)</span> implicitly. This gives <span class="math inline">\(\dot x_t=-\partial_tF_t(x_t)/\widehat p_t(x_t)=v(x_t,t)\)</span>, confirming that the quantile curve solves the same ODE. It is an exact representation; evaluating an arbitrary mixture quantile generally requires a scalar root solve rather than an elementary formula. We can solve <span class="math inline">\(F_t(x_t)=u\)</span> by bisection without integrating all intervening time steps, or use it as a reference for the Euler trajectory.</p>
+<p>The representation holds for the linear <span class="math inline">\(\beta(t)\)</span> schedule above and for other regular VP schedules. For example, constant <span class="math inline">\(\beta(t)=b&gt;0\)</span> gives <span class="math inline">\(\alpha_t=e^{-bt/2}\)</span> and <span class="math inline">\(\sigma_t^2=1-e^{-bt}\)</span>, so the exact position solves</p>
+<p><span class="math display">\[\boxed{\frac1n\sum_i
+\Phi\left(\frac{x_t-e^{-bt/2}x_i}{\sqrt{1-e^{-bt}}}\right)=u.}\]</span></p>
+<p>Constant <span class="math inline">\(\beta\)</span> gives an exponential signal amplitude. A linear amplitude <span class="math inline">\(\alpha_t=1-t\)</span> instead requires <span class="math inline">\(\beta(t)=2/(1-t)\)</span>, which diverges at time one. Nevertheless <span class="math inline">\(\beta(t)\alpha_t=2\)</span>, so the probability-flow velocity is</p>
+<p><span class="math display">\[v(x,t)=\frac{(1-t)x-m_t(x)}{1-(1-t)^2}.\]</span></p>
+<p>For a finite bank and a finite query position, this field has a finite terminal limit, <span class="math inline">\(v(x,1)=-n^{-1}\sum_i x_i\)</span>. Also <span class="math inline">\(\alpha_1=0\)</span>, <span class="math inline">\(\sigma_1=1\)</span> and <span class="math inline">\(F_1=\Phi\)</span>, so standard Gaussian initialization is exactly matched for this density path. The singular SDE rate requires endpoint treatment; it does not make the density-path ODE velocity singular there. The notebooks use the finite linear-<span class="math inline">\(\beta\)</span> schedule above, not this linear-<span class="math inline">\(\alpha\)</span> construction.</p>
+<p>Changing the schedule changes <span class="math inline">\(F_t\)</span> and the speed of transport, while the rank-conservation argument remains the same on the regular positive-noise interval.</p>
+<p>For a bank containing a single observation <span class="math inline">\(a\)</span>, the Gaussian inverse is explicit:</p>
+<p><span class="math display">\[\boxed{x_t=\alpha_ta+\frac{\sigma_t}{\sigma_1}
+(\xi-\alpha_1a).}\]</span></p>
+<p>If <span class="math inline">\(X_1\sim\widehat p_1\)</span>, then <span class="math inline">\(U=F_1(X_1)\)</span> is uniform on <span class="math inline">\((0,1)\)</span>, and <span class="math inline">\(F_t^{-1}(U)\)</span> has density <span class="math inline">\(\widehat p_t\)</span>. Using an approximate Gaussian terminal law changes the distribution of <span class="math inline">\(U\)</span>; it does not change the trajectory formula for a given terminal point.</p>
+<p>For distinct sorted observations <span class="math inline">\(x_{(1)}&lt;\cdots&lt;x_{(n)}\)</span>, away from the boundary ranks <span class="math inline">\(u=k/n\)</span>,</p>
+<p><span class="math display">\[\boxed{\lim_{t\downarrow0}x_t=x_{(\lceil nu\rceil)}.}\]</span></p>
+<p>The boundary ranks have probability zero under any terminal law with a density, including the matched mixture and standard Gaussian noise, and must be treated separately: the symmetric two-point example below has the rank-<span class="math inline">\(1/2\)</span> trajectory fixed at zero. The positive-time quantile formula does not assert a smooth inverse at the atomic endpoint. Repeated observations can be grouped into distinct atoms and the intervals determined by their cumulative empirical masses.</p>
+<p>The scalar result provides a second route to the same probability-flow trajectories and can serve as a numerical reference. At very low noise, the CDF becomes nearly flat between stored atoms; inversion near boundary ranks can require stable Gaussian-tail evaluation and greater numerical precision. In multiple dimensions, a scalar CDF inverse does not determine this flow; the empirical vector score is still explicit, but the ODE generally needs numerical integration.</p>
 </section>
 </section>
 <section id="an-output-need-not-equal-a-training-point" class="level2">
@@ -823,8 +889,8 @@ v(x,t)=-\frac{\beta(t)}2[x+\widehat s_t(x)]
 <h2 class="anchored" data-anchor-id="fresh-terminal-noise-does-not-need-a-recorded-origin">4. Fresh terminal noise does not need a recorded origin</h2>
 <p>A fresh draw from <span class="math inline">\(\widehat p_1\)</span> need not be obtained by recording a deterministic forward trajectory. Its distribution is sufficient. The empirical mixture is positive everywhere at positive noise.</p>
 <p>Starting instead from standard Gaussian noise replaces <span class="math inline">\(\widehat P_1\)</span> by an approximate prior <span class="math inline">\(R_1\)</span>. At positive time,</p>
-<p><span class="math display">\[R_\epsilon=(\Phi_{\epsilon\leftarrow1})_\#R_1.\]</span></p>
-<p>This generally differs from <span class="math inline">\(\widehat P_\epsilon\)</span>. Prior mismatch alone does not guarantee interpolation: it may alter the frequencies of approach to training points. The notebooks compare fresh matched-mixture initialization with fresh standard Gaussian initialization. At the finite rate used here, <span class="math inline">\(\alpha_1=e^{-5.025}&gt;0\)</span>, so these terminal laws are not exactly equal.</p>
+<p><span class="math display">\[R_\epsilon=(\Psi_{\epsilon\leftarrow1})_\#R_1.\]</span></p>
+<p>Here <span class="math inline">\(\Psi_{\epsilon\leftarrow1}\)</span> is the ODE flow map. This generally differs from <span class="math inline">\(\widehat P_\epsilon\)</span>. Prior mismatch alone does not guarantee interpolation: it may alter the frequencies of approach to training points. The notebooks compare fresh matched-mixture initialization with fresh standard Gaussian initialization. At the finite rate used here, <span class="math inline">\(\alpha_1=e^{-5.025}&gt;0\)</span>, so these terminal laws are not exactly equal.</p>
 </section>
 <section id="computation-and-truncated-softmax" class="level2">
 <h2 class="anchored" data-anchor-id="computation-and-truncated-softmax">5. Computation and truncated softmax</h2>
