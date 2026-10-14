@@ -170,6 +170,12 @@ $$\beta(t)=0.1+19.9t,\qquad
 \alpha_t=e^{-0.05t-4.975t^2},\qquad
 \sigma_t^2=1-e^{-0.1t-9.95t^2}.$$
 
+For any VP schedule, the amplitude and rate satisfy
+
+$$\alpha_t=\exp\left[-\frac12\int_0^t\beta(u)\,du\right],\qquad
+\alpha_t'=-\frac{\beta(t)}2\alpha_t,\qquad
+\sigma_t\sigma_t'=\frac{\beta(t)}2\alpha_t^2.$$
+
 The score-based probability-flow ODE of [Song et al.](https://arxiv.org/abs/2011.13456) becomes
 
 $$\boxed{
@@ -193,7 +199,7 @@ The denoised estimate is an interpolation in sample space. Its use in the veloci
 Given the stored bank, a positive cutoff $\epsilon$, and a decreasing grid $1=t_K>t_{K-1}>\cdots>t_0=\epsilon$:
 
 1. Compute $\alpha_{t_k}$, $\sigma_{t_k}^2$ and $\beta(t_k)$ from the same VP schedule.
-2. Draw the initial state. For a matched-law experiment, choose $I$ uniformly from the bank and set $x_1=\alpha_1x_I+\sigma_1z$, where $z\sim\mathcal N(0,I_d)$ is independent. For a practical-prior comparison, draw $x_1\sim\mathcal N(0,I_d)$ instead and record that the terminal law is approximate.
+2. Draw the initial state. For a matched-law experiment, choose $I$ uniformly from the bank and set $x(1)=\alpha_1x_I+\sigma_1z$, where $z\sim\mathcal N(0,I_d)$ is independent. For a practical-prior comparison, draw $x(1)\sim\mathcal N(0,I_d)$ instead and record that the terminal law is approximate.
 3. At each current state $x_{t_k}$, evaluate the logits, normalized weights and denoised estimate $m_{t_k}(x_{t_k})$.
 4. Let $h_k=t_k-t_{k-1}>0$ and take the explicit Euler step
 
@@ -214,14 +220,43 @@ $$\boxed{F_t(x)=\int_{-\infty}^x\widehat p_t(y)\,dy
 =\frac1n\sum_{i=1}^n
 \Phi\left(\frac{x-\alpha_tx_i}{\sigma_t}\right).}$$
 
-At every positive noise level, $\partial_xF_t(x)=\widehat p_t(x)>0$, so $F_t$ has a unique inverse on probability ranks $u\in(0,1)$. Integrate the continuity equation from $-\infty$ to $x$, assuming the Gaussian-mixture probability flux vanishes at the left boundary:
+At every positive noise level, $\partial_xF_t(x)=\widehat p_t(x)>0$ and $F_t(-\infty)=0$, $F_t(+\infty)=1$. Hence $F_t$ is a bijection from $\mathbb R$ to $(0,1)$, with a unique inverse for every probability rank $u\in(0,1)$.
+
+To find a velocity that realizes this density path, impose the continuity equation on an initially unknown field $v_F$. Integrating from $-\infty$ to $x$ with zero left-boundary flux requires
 
 $$\begin{aligned}
 \partial_tF_t(x)
-&=\int_{-\infty}^x\partial_t\widehat p_t(y)\,dy\\
-&=-\int_{-\infty}^x\partial_y[\widehat p_t(y)v(y,t)]\,dy\\
-&=-\widehat p_t(x)v(x,t).
+&=-\int_{-\infty}^x\partial_y[\widehat p_t(y)v_F(y,t)]\,dy\\
+&=-\widehat p_t(x)v_F(x,t),
+\qquad
+\boxed{v_F(x,t)=-\frac{\partial_tF_t(x)}{\widehat p_t(x)}.}
 \end{aligned}$$
+
+Conversely, this definition satisfies the continuity equation because $-\partial_x(\widehat p_tv_F)=\partial_x\partial_tF_t=\partial_t\widehat p_t$. We can now derive $v_F$ directly from the boxed mixture CDF and check that it agrees with the score-based field, without assuming that agreement.
+
+Let $\varphi$ be the standard-normal density, so $\Phi'=\varphi$. Differentiating the mixture CDF at a fixed position $x$ gives
+
+$$\partial_tF_t(x)=\frac1n\sum_i
+\varphi\left(\frac{x-\alpha_tx_i}{\sigma_t}\right)
+\left[-\frac{\alpha_t'x_i}{\sigma_t}
+-\frac{\sigma_t'}{\sigma_t^2}(x-\alpha_tx_i)\right].$$
+
+Since $\phi_i(x,t)=\varphi((x-\alpha_tx_i)/\sigma_t)/\sigma_t$, division by $\widehat p_t=(1/n)\sum_i\phi_i$ yields
+
+$$\begin{aligned}
+v_F(x,t)
+&=\sum_i w_i(x,t)\left[\alpha_t'x_i+
+\frac{\sigma_t'}{\sigma_t}(x-\alpha_tx_i)\right]\\
+&=\alpha_t'm_t(x)+\frac{\sigma_t'}{\sigma_t}[x-\alpha_tm_t(x)]\\
+&=-\frac{\beta(t)\alpha_t}{2}m_t(x)
++\frac{\beta(t)\alpha_t^2}{2\sigma_t^2}[x-\alpha_tm_t(x)]\\
+&=\frac{\beta(t)\alpha_t}{2\sigma_t^2}
+[\alpha_tx-(\sigma_t^2+\alpha_t^2)m_t(x)]\\
+&=\boxed{\frac{\beta(t)\alpha_t}{2\sigma_t^2}[\alpha_tx-m_t(x)]
+=v(x,t).}
+\end{aligned}$$
+
+The CDF construction and the score construction therefore produce the same scalar field. Their probability flux vanishes at the left boundary: the finite bank bounds $m_t$, the field grows at most linearly in $x$ at a fixed positive time, and $\widehat p_t$ has Gaussian tails.
 
 Along a trajectory satisfying $\dot x_t=v(x_t,t)$, the chain rule gives
 
@@ -231,9 +266,9 @@ $$\begin{aligned}
 &=-\widehat p_t(x_t)v(x_t,t)+\widehat p_t(x_t)v(x_t,t)=0.
 \end{aligned}$$
 
-**The particle's probability rank is conserved.** Starting from a terminal value $x_1$, compute $u=F_1(x_1)$ once. The exact backward trajectory at every positive time is
+**The particle's probability rank is conserved.** Starting from a terminal value $\xi=x(1)$, compute $u=F_1(\xi)$ once. This avoids confusing the terminal position with the first stored observation $x_1$. The exact backward trajectory at every positive time is
 
-$$\boxed{x_t=F_t^{-1}(u)=F_t^{-1}\bigl(F_1(x_1)\bigr),\qquad t>0.}$$
+$$\boxed{x_t=F_t^{-1}(u)=F_t^{-1}\bigl(F_1(\xi)\bigr),\qquad t>0.}$$
 
 Conversely, differentiate $F_t(x_t)=u$ implicitly. This gives $\dot x_t=-\partial_tF_t(x_t)/\widehat p_t(x_t)=v(x_t,t)$, confirming that the quantile curve solves the same ODE. It is an exact representation; evaluating an arbitrary mixture quantile generally requires a scalar root solve rather than an elementary formula. We can solve $F_t(x_t)=u$ by bisection without integrating all intervening time steps, or use it as a reference for the Euler trajectory.
 
@@ -242,12 +277,18 @@ The representation holds for the linear $\beta(t)$ schedule above and for other 
 $$\boxed{\frac1n\sum_i
 \Phi\left(\frac{x_t-e^{-bt/2}x_i}{\sqrt{1-e^{-bt}}}\right)=u.}$$
 
-Constant $\beta$ gives an exponential signal amplitude. A linear amplitude $\alpha_t=1-t$ instead requires $\beta(t)=2/(1-t)$, which is singular at time one. Changing the schedule changes $F_t$ and the speed of transport, while the rank-conservation argument remains the same on the regular positive-noise interval.
+Constant $\beta$ gives an exponential signal amplitude. A linear amplitude $\alpha_t=1-t$ instead requires $\beta(t)=2/(1-t)$, which diverges at time one. Nevertheless $\beta(t)\alpha_t=2$, so the probability-flow velocity is
+
+$$v(x,t)=\frac{(1-t)x-m_t(x)}{1-(1-t)^2}.$$
+
+For a finite bank and a finite query position, this field has a finite terminal limit, $v(x,1)=-n^{-1}\sum_i x_i$. Also $\alpha_1=0$, $\sigma_1=1$ and $F_1=\Phi$, so standard Gaussian initialization is exactly matched for this density path. The singular SDE rate requires endpoint treatment; it does not make the density-path ODE velocity singular there. The notebooks use the finite linear-$\beta$ schedule above, not this linear-$\alpha$ construction.
+
+Changing the schedule changes $F_t$ and the speed of transport, while the rank-conservation argument remains the same on the regular positive-noise interval.
 
 For a bank containing a single observation $a$, the Gaussian inverse is explicit:
 
 $$\boxed{x_t=\alpha_ta+\frac{\sigma_t}{\sigma_1}
-(x_1-\alpha_1a).}$$
+(\xi-\alpha_1a).}$$
 
 If $X_1\sim\widehat p_1$, then $U=F_1(X_1)$ is uniform on $(0,1)$, and $F_t^{-1}(U)$ has density $\widehat p_t$. Using an approximate Gaussian terminal law changes the distribution of $U$; it does not change the trajectory formula for a given terminal point.
 
@@ -255,9 +296,9 @@ For distinct sorted observations $x_{(1)}<\cdots<x_{(n)}$, away from the boundar
 
 $$\boxed{\lim_{t\downarrow0}x_t=x_{(\lceil nu\rceil)}.}$$
 
-The boundary ranks have probability zero under matched continuous initialization and must be treated separately: the symmetric two-point example below has the rank-$1/2$ trajectory fixed at zero. The positive-time quantile formula does not assert a smooth inverse at the atomic endpoint. Repeated observations can be grouped into distinct atoms and the intervals determined by their cumulative empirical masses.
+The boundary ranks have probability zero under any terminal law with a density, including the matched mixture and standard Gaussian noise, and must be treated separately: the symmetric two-point example below has the rank-$1/2$ trajectory fixed at zero. The positive-time quantile formula does not assert a smooth inverse at the atomic endpoint. Repeated observations can be grouped into distinct atoms and the intervals determined by their cumulative empirical masses.
 
-The scalar result provides a second route to the same probability-flow trajectories and a useful numerical reference. In multiple dimensions, a scalar CDF inverse does not determine this flow; the empirical vector score is still explicit, but the ODE generally needs numerical integration.
+The scalar result provides a second route to the same probability-flow trajectories and can serve as a numerical reference. At very low noise, the CDF becomes nearly flat between stored atoms; inversion near boundary ranks can require stable Gaussian-tail evaluation and greater numerical precision. In multiple dimensions, a scalar CDF inverse does not determine this flow; the empirical vector score is still explicit, but the ODE generally needs numerical integration.
 
 ## 3. An output need not equal a training point
 
@@ -281,9 +322,9 @@ A fresh draw from $\widehat p_1$ need not be obtained by recording a determinist
 
 Starting instead from standard Gaussian noise replaces $\widehat P_1$ by an approximate prior $R_1$. At positive time,
 
-$$R_\epsilon=(\Phi_{\epsilon\leftarrow1})_\#R_1.$$
+$$R_\epsilon=(\Psi_{\epsilon\leftarrow1})_\#R_1.$$
 
-This generally differs from $\widehat P_\epsilon$. Prior mismatch alone does not guarantee interpolation: it may alter the frequencies of approach to training points. The notebooks compare fresh matched-mixture initialization with fresh standard Gaussian initialization. At the finite rate used here, $\alpha_1=e^{-5.025}>0$, so these terminal laws are not exactly equal.
+Here $\Psi_{\epsilon\leftarrow1}$ is the ODE flow map. This generally differs from $\widehat P_\epsilon$. Prior mismatch alone does not guarantee interpolation: it may alter the frequencies of approach to training points. The notebooks compare fresh matched-mixture initialization with fresh standard Gaussian initialization. At the finite rate used here, $\alpha_1=e^{-5.025}>0$, so these terminal laws are not exactly equal.
 
 ## 5. Computation and truncated softmax
 
