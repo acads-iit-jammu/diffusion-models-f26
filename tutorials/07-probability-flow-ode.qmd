@@ -554,7 +554,7 @@ between components. The ODE will move particles deterministically. It is one pos
 from the data density to the Gaussian. We now ask which particle velocities
 would realize that path.
 
-#### Derivation: recover velocity from the density path
+#### Derivation: recover velocity from the density path {#sec-cdf-velocity}
 
 Suppose $p_t(x)$ is smooth and positive, integrates to one at each time, and
 has sufficient regularity for the following differentiation and integration.
