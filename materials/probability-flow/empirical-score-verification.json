@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-14",
+  "seed": 20261014,
+  "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+  "packages": {
+    "numpy": "2.3.5",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2",
+    "nbclient": "0.11.0",
+    "nbformat": "5.11.1",
+    "threadpoolctl": "3.7.0"
+  },
+  "notebooks": {
+    "06-empirical-score-1d": {
+      "sha256": "678fa099d56da57fe39fa316589dcf46264292188cdb7283bfef3064f10859ce",
+      "executed_code_cells": 5,
+      "figures": 3,
+      "stdout": "Score finite-difference maximum error: 1.0680822892794595e-10\n\ntime   raw nearest | denoised nearest | effective count | max weight (means)\n0.600 [  0.26278   0.37295 118.14376   0.01102]\n0.300 [ 0.1378   0.04775 67.28394  0.02308]\n0.100 [ 0.02333  0.01183 36.32926  0.05682]\n0.030 [ 0.01319  0.01174 14.88902  0.1385 ]\n0.010 [0.01115 0.00852 6.65709 0.27902]\n0.003 [0.00814 0.00528 3.31562 0.47466]\n0.001 [0.00591 0.00302 2.11809 0.64522]\nW1 to direct positive-time mixture, t= 0.3 matched: 0.02971133277429106 normal: 0.029797943323024934\nW1 to direct positive-time mixture, t= 0.01 matched: 0.042489482013624125 normal: 0.042453903029163034\n\nt | effective count | largest weight | top-three bank indices and their clean values\n1.000 |  127.999 |  0.0078 | [(103, 3.189), (71, 2.878), (23, 2.708)]\n0.600 |  127.040 |  0.0084 | [(26, 1.534), (74, 1.534), (9, 1.547)]\n0.300 |   76.575 |  0.0176 | [(80, 0.93), (76, 1.077), (37, 1.082)]\n0.100 |   44.096 |  0.0316 | [(119, 1.473), (1, 1.444), (74, 1.534)]\n0.030 |   17.901 |  0.0749 | [(9, 1.547), (121, 1.584), (26, 1.534)]\n0.010 |    9.581 |  0.1490 | [(121, 1.584), (39, 1.597), (9, 1.547)]\n0.003 |    3.942 |  0.3627 | [(121, 1.584), (39, 1.597), (6, 1.617)]\n0.001 |    2.103 |  0.5231 | [(121, 1.584), (39, 1.597), (6, 1.617)]\n\nPaired Euler mean absolute differences (800 vs 1600):\n0.3 0.0032925279532184503\n0.01 0.0017557540526381447\n0.001 0.0018033608122506057\nt, retained mass, denoiser MAE: 0.6 0.08500197746657598 1.949856985898958\nt, retained mass, denoiser MAE: 0.1 0.3416691767355 0.09967571689625171\nt, retained mass, denoiser MAE: 0.01 0.9233654984365028 0.001719752004038822\nSymmetry-fixed path at t=.001: [0.]\n"
+    },
+    "07-empirical-score-mnist": {
+      "sha256": "d42abf7b38edd42bd872d67bb5af9d87234cc4902887e6740e18ac2a7b69f398",
+      "executed_code_cells": 6,
+      "figures": 5,
+      "stdout": "Bank shape: (1000, 784) label counts: [ 95 100 110  93  83  98 106 115 107  93]\n\nTwo 32-particle runs, elapsed seconds: 0.72\ntime | raw nearest pixel RMSE | denoised nearest RMSE | effective count | max weight\n0.8 [  0.9955    0.19801 912.26275   0.00256]\n0.6 [  0.98309   0.19321 268.37663   0.02786]\n0.4 [0.89926 0.0978  7.88491 0.48851]\n0.2 [0.58494 0.00084 1.03119 0.98694]\n0.1 [0.32117 0.      1.00003 0.99999]\n0.03 [0.10861 0.      1.      1.     ]\n0.01 [0.04448 0.      1.      1.     ]\nGaussian near-bank fraction (RMSE < 1e-4): 1.0 unique nearest bank images: 32 nearest labels: [2 4 4 3 3 1 3 2 8 2]\nmatched near-bank fraction (RMSE < 1e-4): 1.0 unique nearest bank images: 32 nearest labels: [2 4 4 3 3 1 3 2 8 2]\n\nt | effective count for first particle | top bank index | top weight\n1.000 |    998.36 |   224 | 0.001138\n0.800 |    942.10 |   224 | 0.002144\n0.600 |    375.01 |   224 | 0.017468\n0.400 |      2.05 |   224 | 0.692553\n0.200 |      1.00 |   224 | 1.000000\n0.100 |      1.00 |   224 | 1.000000\n0.030 |      1.00 |   224 | 1.000000\n0.010 |      1.00 |   224 | 1.000000\n\ntime, paired raw RMSE, paired mean RMSE: 0.4 0.001060256970694746 0.0009592450418914292\ntime, paired raw RMSE, paired mean RMSE: 0.1 0.0008083090811016998 9.663077650950204e-41\ntime, paired raw RMSE, paired mean RMSE: 0.01 0.00011993901732164364 0.0\ntime, retained mass, top-32 mean RMSE: 0.8 0.06032076114862689 0.11264824024228412\ntime, retained mass, top-32 mean RMSE: 0.4 0.928350109639376 0.009891991398877597\ntime, retained mass, top-32 mean RMSE: 0.1 1.0 1.3427362802718403e-48\n"
+    }
+  }
+}

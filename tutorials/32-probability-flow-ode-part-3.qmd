@@ -11,6 +11,12 @@ These lecture notes are in development and may be revised. [Part 1](./07-probabi
 
 The primary reference is [Song et al., *Score-Based Generative Modeling through Stochastic Differential Equations*, ICLR 2021, arXiv:2011.13456v2](https://arxiv.org/abs/2011.13456v2). Use Section 3.3, Eq. (7), for training; Section 4.3, Eq. (13), for the probability-flow ODE; and Appendix B for the linear VP schedule and its Gaussian transition law. The paper's reverse SDE is Eq. (6), a different sampling dynamics from Eq. (13).
 
+Complementary references:
+
+- Chicago Y. Park, Michael T. McCann, Cristina Garcia-Cardona, Brendt Wohlberg, and Ulugbek S. Kamilov, [*Random Walks with Tweedie: A Unified View of Score-Based Diffusion Models*](https://arxiv.org/abs/2411.18702), IEEE Signal Processing Magazine (2025). A complementary derivation of score-based diffusion with algorithmic templates for training and sampling.
+- Preetum Nakkiran, Arwen Bradley, Hattie Zhou, and Madhu Advani, [*Step-by-Step Diffusion: An Elementary Tutorial* (2024), arXiv:2406.08929](https://arxiv.org/abs/2406.08929). An introductory treatment of diffusion models and flow matching for readers without prior diffusion experience.
+- Yang Song, [*Generative Modeling by Estimating Gradients of the Data Distribution* (2021)](https://yang-song.net/blog/2021/score/). An illustrated introduction to scores, Langevin sampling, score estimation, reverse SDEs, and probability-flow ODEs.
+
 **Sampling is the goal.** The sampler needs a score to evaluate its vector field. To learn that score, first consider an ordinary supervised problem: generate clean/noisy pairs and predict the clean value from the noisy input. Squared-error regression learns the posterior mean clean value. Tweedie's formula converts this mean into the marginal score. Conditional-score and noise prediction are alternative parameterizations of this learning problem, with different time weightings unless the losses are adjusted. Explicit Euler integration with decreasing time then generates approximate data samples. Training and sampling must use the same schedule and time convention.
 :::
 
@@ -975,3 +981,6 @@ $$p_t(x)=\int p_t(x\mid x_0)\,p_{\mathrm{data}}(x_0)\,dx_0.$$
 Its local slope therefore reflects the possible clean origins and the forward corruption law. This is dependence on the originating **distribution**, not memory of an individual particle's trajectory. Different histories that produce the same current density $p_t$ give the same score at that time.
 
 Once the time-dependent score field is specified, the sampler evaluates it using only the current position and time. The probability-flow ODE needs no stored trajectory history. The reverse SDE discussed in Part 2 is likewise a time-inhomogeneous Markov process. Posterior averaging over possible clean origins does not change this property.
+
+
+For exact empirical-score sampling without a neural network, including scalar and MNIST experiments, see [Part 07 · Empirical-score sampling](./41-empirical-score-interpolation.qmd).

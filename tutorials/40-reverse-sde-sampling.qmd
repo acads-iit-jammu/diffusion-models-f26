@@ -106,4 +106,4 @@ $$\begin{aligned}
 
 because $r_\tau s_t=\partial_xr_\tau$. This verifies the marginal equation. Identifying the full reversed path law requires the time-reversal result cited above; the marginal calculation alone does not establish that joint law.
 
-For comparison, the ODE flux with $-f+g^2s_t/2$ gives the same marginal equation without a diffusion term. See [Probability-Flow ODE, Part 09](./38-probability-flow-ode-part-9.qmd) for the connection to DDPM and DDIM.
+For comparison, the ODE flux with $-f+g^2s_t/2$ gives the same marginal equation without a diffusion term. See [Probability-Flow ODE, Part 10](./38-probability-flow-ode-part-9.qmd) for the connection to DDPM and DDIM.

@@ -1,9 +1,9 @@
-# 08 · Flow matching {.unnumbered}
+# 09 · Flow matching {.unnumbered}
 
 ::: {.callout-note}
 ## Draft — Learning the sampling velocity directly
 
-Part 07 established that a learned velocity can define a continuous normalizing flow. Flow matching gives a regression objective for learning that velocity. We retain **$t=0$ for data and $t=1$ for the prior**; generation runs from 1 to 0. Many flow-matching papers use the opposite convention. With $\tau=1-t$, the reversed field is $\widetilde v(x,\tau)=-v(x,1-\tau)$: both the sign and time argument change.
+Part 08 established that a learned velocity can define a continuous normalizing flow. Flow matching gives a regression objective for learning that velocity. We retain **$t=0$ for data and $t=1$ for the prior**; generation runs from 1 to 0. Many flow-matching papers use the opposite convention. With $\tau=1-t$, the reversed field is $\widetilde v(x,\tau)=-v(x,1-\tau)$: both the sign and time argument change.
 
 Primary reference: [Lipman et al., Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747). The straight interpolation below is the zero-terminal-smoothing limit of the Gaussian conditional path, written in our reversed time convention. Independent endpoint interpolation is also studied in [rectified flow](https://arxiv.org/abs/2209.03003), [stochastic interpolants](https://arxiv.org/abs/2209.15571), and [independent conditional flow matching](https://arxiv.org/abs/2302.00482). A positive smoothing variance avoids the point-mass conditional data endpoint; here that endpoint is understood as a limit.
 :::

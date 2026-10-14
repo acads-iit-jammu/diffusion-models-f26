@@ -35,3 +35,6 @@ Download the [complete teaching bundle](../materials/probability-flow/probabilit
 | Uniform on a bounded interval | Smoothed boundaries and positive-time endpoint effects |
 
 Start with unequal weights in the existing mixture, then unequal component variances. Both changes preserve analytic noisy densities and scores. The notebook indicates the additional reference calculations needed for Laplace, Student t, and bounded-support examples.
+
+
+[Continue to 07 · Empirical-score sampling](./41-empirical-score-interpolation.qmd) to replace neural estimation with exact softmax weights on a stored observation bank. The scalar and MNIST notebooks make the supporting observations visible.

@@ -1,9 +1,9 @@
-# 07 · Neural ODEs and normalizing flows {.unnumbered}
+# 08 · Neural ODEs and normalizing flows {.unnumbered}
 
 ::: {.callout-note}
 ## Draft — Connecting the model classes
 
-Parts 01–06 constructed a sampling velocity from a learned score. Here we place that construction within Neural ODEs and continuous normalizing flows. We keep **data at $t=0$ and the prior at $t=1$**; generation integrates backward. Start in one dimension, then replace derivatives by Jacobians and divergences for vectors.
+Parts 01–06 constructed a sampling velocity from a learned score; Part 07 evaluated the empirical score exactly and inspected its supporting observations. Here we place that construction within Neural ODEs and continuous normalizing flows. We keep **data at $t=0$ and the prior at $t=1$**; generation integrates backward. Start in one dimension, then replace derivatives by Jacobians and divergences for vectors.
 :::
 
 ## 1. A network can parameterize the velocity directly
@@ -94,7 +94,7 @@ A Jacobian-vector or vector-Jacobian product computes a probe value without form
 
 If the sampler stops at $t_{\min}>0$, replace the lower integration limit by $t_{\min}$: the resulting likelihood is for the positive-time model density, not the clean endpoint.
 
-One way to train a CNF is maximum likelihood using this formula. It generally involves solving the ODE during training and differentiating the loss through its solution. Adjoint methods are one option; differentiating through solver steps is another. A Neural ODE does not require one specific gradient method. Flow matching, introduced in Part 08, trains the velocity by regression instead.
+One way to train a CNF is maximum likelihood using this formula. It generally involves solving the ODE during training and differentiating the loss through its solution. Adjoint methods are one option; differentiating through solver steps is another. A Neural ODE does not require one specific gradient method. Flow matching, introduced in Part 09, trains the velocity by regression instead.
 
 ## 5. Our probability-flow ODE is a particular CNF
 
@@ -125,7 +125,7 @@ These are overlapping constructions, not mutually exclusive model families. A pr
 
 ## 6. What the next part changes
 
-Part 03 learned a conditional mean from forward-generated pairs, then converted it into a score and velocity. Part 08 asks whether we can construct pairs with a known **velocity label** and regress that label directly. The ODE solver used for generation remains the same kind of solver; the training construction changes.
+Part 03 learned a conditional mean from forward-generated pairs, then converted it into a score and velocity. Part 09 asks whether we can construct pairs with a known **velocity label** and regress that label directly. The ODE solver used for generation remains the same kind of solver; the training construction changes.
 
 ## Appendix A. Density change along a trajectory
 
@@ -146,4 +146,4 @@ $$\begin{aligned}
 
 In $d$ dimensions, expand $\nabla\cdot(p_t\mathbf v)=\mathbf v\cdot\nabla p_t+p_t\nabla\cdot\mathbf v$. The same cancellation yields the divergence formula.
 
-[Continue to 08 · Flow matching](./37-probability-flow-ode-part-8.qmd).
+[Continue to 09 · Flow matching](./37-probability-flow-ode-part-8.qmd).

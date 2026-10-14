@@ -1,6 +1,6 @@
 # Probability-flow teaching code (Draft)
 
-Companion to Lecture Notes 15–17. Data time is 0; terminal time is 1.
+Companion to Probability-Flow ODE Parts 04–07. Data time is 0; terminal time is 1.
 
 ## Setup
 
@@ -51,3 +51,8 @@ creates it once. This prevents generated files from causing a rebuild loop.
 After editing notebook code, rerun and save the notebook to update its outputs.
 Then run `quarto render` to refresh its reading page and the course site.
 Ordinary lecture edits still update through live preview.
+
+## Part 07: empirical scores without a network
+
+Notebook `06-empirical-score-1d.ipynb` studies a finite scalar data bank.
+Notebook `07-empirical-score-mnist.ipynb` uses 1,000 MNIST images and downloads the original IDX data on its first run. Both evaluate exact empirical scores, compare cutoffs, plot posterior weights along reverse trajectories, and test interpolation against nearest-observation diagnostics. Install `threadpoolctl` in addition to the numerical notebook dependencies. Neither notebook trains a network.
