@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/31-probability-flow-ode-part-2.html">02 · Higher-dimensional transport</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">13 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/31-probability-flow-ode-part-2.html">02 · Higher-dimensional transport</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -251,14 +251,20 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Denoising Score Matching and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+ <span class="menu-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
   </div>
 </li>
       <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12 · Probability-Flow ODE</span></a>
+ <span class="menu-text">13 · Probability-Flow ODE</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -320,8 +326,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/42-ddpm-reverse-vp-sde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · DDPM through the reverse VP SDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
+ <span class="menu-text">11 · DDIM and the probability-flow ODE</span></a>
   </div>
 </li>
       </ul>
@@ -329,7 +341,7 @@ window.Quarto = {
 <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">13 · Score Matching and Stochastic Sampling</span></a>
+ <span class="menu-text">14 · Reverse-SDE Sampling</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -337,14 +349,8 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">01 · Denoising Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../tutorials/40-reverse-sde-sampling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">02 · Reverse-SDE sampling</span></a>
+ <span class="menu-text">01 · Reverse-SDE sampling</span></a>
   </div>
 </li>
       </ul>
@@ -617,7 +623,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/31-probability-flow-ode-part-2.html">02 · Higher-dimensional transport</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">13 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/31-probability-flow-ode-part-2.html">02 · Higher-dimensional transport</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">02 · Higher-dimensional transport</h1>
 </div>
@@ -657,7 +663,8 @@ window.Quarto = {
 <p><span class="math display">\[\boxed{p_0=p_{\mathrm{data}},\qquad
 p_1=p_{\mathrm{prior}}=\mathcal N(\mathbf0,I_d).}\]</span></p>
 <p>These specify population distributions, not an endpoint for each individual particle. The finite-rate diffusion construction below generally achieves an approximate Gaussian terminal law. Exact distributional recovery assumes the actual terminal law, exact dynamics, and exact integration.</p>
-<p>Multivariate CDFs exist, but a single cumulative probability does not uniquely identify a position in <span class="math inline">\(\mathbb R^d\)</span>. Applying a separate CDF transform to each coordinate does not generally remove dependence between coordinates. The scalar percentile construction in Part 1 therefore has no direct coordinatewise extension. The continuity equation and score-based probability-flow construction do extend to <span class="math inline">\(d\)</span> dimensions.</p>
+<p>Multivariate CDFs exist, but a single cumulative probability does not uniquely identify a position in <span class="math inline">\(\mathbb R^d\)</span>. Applying a separate CDF transform to each coordinate does not generally remove dependence between coordinates. The scalar percentile construction in Part 1 therefore has no direct coordinatewise extension. This does not prevent us from specifying a density path: a mixture of the data density and a Gaussian still defines one. What is missing is the scalar CDF rule that directly recovers its transport field. In higher dimensions, continuity generally admits several velocity fields for the same path, and evaluating explicit constructions may require difficult joint-density or conditional-distribution estimates.</p>
+<p>Our alternative is to specify forward Gaussian corruption, whose associated SDE determines a density path through the Fokker–Planck equation. Writing that equation in continuity form supplies a particular compatible velocity in terms of the score. This construction extends to all coordinates jointly without estimating multivariate CDFs. Other transport constructions are possible; the SDE provides the one used here.</p>
 </section>
 <section id="notation-and-differential-operators" class="level2">
 <h2 class="anchored" data-anchor-id="notation-and-differential-operators">2. Notation and differential operators</h2>

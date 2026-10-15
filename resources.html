@@ -222,14 +222,20 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Denoising Score Matching and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+ <span class="menu-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
   </div>
 </li>
       <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12 · Probability-Flow ODE</span></a>
+ <span class="menu-text">13 · Probability-Flow ODE</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -291,8 +297,14 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./tutorials/42-ddpm-reverse-vp-sde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · DDPM through the reverse VP SDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
+ <span class="menu-text">11 · DDIM and the probability-flow ODE</span></a>
   </div>
 </li>
       </ul>
@@ -300,7 +312,7 @@ ul.task-list li input[type="checkbox"] {
 <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">13 · Score Matching and Stochastic Sampling</span></a>
+ <span class="menu-text">14 · Reverse-SDE Sampling</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -308,14 +320,8 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">01 · Denoising Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./tutorials/40-reverse-sde-sampling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">02 · Reverse-SDE sampling</span></a>
+ <span class="menu-text">01 · Reverse-SDE sampling</span></a>
   </div>
 </li>
       </ul>
@@ -606,8 +612,9 @@ ul.task-list li input[type="checkbox"] {
 <section id="reference" class="level2">
 <h2 class="anchored" data-anchor-id="reference">Reference</h2>
 <ul>
-<li>Peter Holderrieth, Ezra Erives. <strong>An Introduction to Flow Matching and Diffusion Models.</strong> <a href="https://arxiv.org/abs/2506.02070">arXiv:2506.02070</a>. The MIT 6.S184 lecture notes, and the closest thing to a parallel text for this course: self-contained, built from first principles, and it develops the ODE/SDE background before deriving flow matching and denoising diffusion. Read it alongside the primary text when you want a second derivation of the same result — it reaches the reverse-time and probability-flow material of Modules 5–6 by a flow-matching route rather than a score-matching one.</li>
-<li>G. A. Pavliotis. <em>Stochastic Processes and Applications: Diffusion Processes, the Fokker-Planck and Langevin Equations.</em> Springer, 2014 — for the stochastic-processes machinery of Modules 5–6.</li>
+<li><p>Peter Holderrieth, Ezra Erives. <strong>An Introduction to Flow Matching and Diffusion Models.</strong> <a href="https://arxiv.org/abs/2506.02070">arXiv:2506.02070</a>. The MIT 6.S184 lecture notes, and the closest thing to a parallel text for this course: self-contained, built from first principles, and it develops the ODE/SDE background before deriving flow matching and denoising diffusion. Read it alongside the primary text when you want a second derivation of the same result — it reaches the reverse-time and probability-flow material of Modules 5–6 by a flow-matching route rather than a score-matching one.</p></li>
+<li><p>G. A. Pavliotis. <em>Stochastic Processes and Applications: Diffusion Processes, the Fokker-Planck and Langevin Equations.</em> Springer, 2014 — for the stochastic-processes machinery of Modules 5–6.</p></li>
+<li><p>Preetum Nakkiran, Arwen Bradley, Hattie Zhou, Madhu Advani. <strong>Step-by-Step Diffusion: An Elementary Tutorial.</strong> <a href="https://arxiv.org/abs/2406.08929">arXiv:2406.08929</a>. An accessible development of DDPM, DDIM, and flow matching. Section 2.1 gives the Bayes-and-Taylor explanation of the small-step Gaussian reverse approximation; Lemma 1 and Appendix B.1 quantify its KL error.</p></li>
 </ul>
 </section>
 <section id="supplementary-reading" class="level2">

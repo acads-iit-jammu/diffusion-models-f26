@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/07-probability-flow-ode.html">01 · Transport in one dimension</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">13 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/07-probability-flow-ode.html">01 · Transport in one dimension</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -251,14 +251,20 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Denoising Score Matching and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+ <span class="menu-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
   </div>
 </li>
       <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12 · Probability-Flow ODE</span></a>
+ <span class="menu-text">13 · Probability-Flow ODE</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -320,8 +326,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/42-ddpm-reverse-vp-sde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · DDPM through the reverse VP SDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
+ <span class="menu-text">11 · DDIM and the probability-flow ODE</span></a>
   </div>
 </li>
       </ul>
@@ -329,7 +341,7 @@ window.Quarto = {
 <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">13 · Score Matching and Stochastic Sampling</span></a>
+ <span class="menu-text">14 · Reverse-SDE Sampling</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -337,14 +349,8 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">01 · Denoising Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../tutorials/40-reverse-sde-sampling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">02 · Reverse-SDE sampling</span></a>
+ <span class="menu-text">01 · Reverse-SDE sampling</span></a>
   </div>
 </li>
       </ul>
@@ -609,7 +615,7 @@ window.Quarto = {
   <li><a href="#from-trajectories-to-a-flow-the-transport-question" id="toc-from-trajectories-to-a-flow-the-transport-question" class="nav-link" data-scroll-target="#from-trajectories-to-a-flow-the-transport-question">From trajectories to a flow: the transport question</a></li>
   <li><a href="#an-invertible-flow-gives-a-sampling-procedure" id="toc-an-invertible-flow-gives-a-sampling-procedure" class="nav-link" data-scroll-target="#an-invertible-flow-gives-a-sampling-procedure">An invertible flow gives a sampling procedure</a></li>
   <li><a href="#designing-a-vector-field-through-a-desired-density-evolution" id="toc-designing-a-vector-field-through-a-desired-density-evolution" class="nav-link" data-scroll-target="#designing-a-vector-field-through-a-desired-density-evolution">Designing a vector field through a desired density evolution</a></li>
-  <li><a href="#the-score-an-alternative-quantity-to-estimate" id="toc-the-score-an-alternative-quantity-to-estimate" class="nav-link" data-scroll-target="#the-score-an-alternative-quantity-to-estimate">The score: an alternative quantity to estimate</a></li>
+  <li><a href="#the-score-a-quantity-that-will-appear-in-the-diffusion-derived-field" id="toc-the-score-a-quantity-that-will-appear-in-the-diffusion-derived-field" class="nav-link" data-scroll-target="#the-score-a-quantity-that-will-appear-in-the-diffusion-derived-field">The score: a quantity that will appear in the diffusion-derived field</a></li>
   <li><a href="#constructing-the-vector-field-through-a-forward-stochastic-process" id="toc-constructing-the-vector-field-through-a-forward-stochastic-process" class="nav-link" data-scroll-target="#constructing-the-vector-field-through-a-forward-stochastic-process">Constructing the vector field through a forward stochastic process</a></li>
   </ul></li>
   <li><a href="#forward-diffusion-and-its-probability-flow-ode" id="toc-forward-diffusion-and-its-probability-flow-ode" class="nav-link" data-scroll-target="#forward-diffusion-and-its-probability-flow-ode">2. Forward diffusion and its probability-flow ODE</a>
@@ -650,7 +656,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/07-probability-flow-ode.html">01 · Transport in one dimension</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">13 · Probability-Flow ODE</a></li><li class="breadcrumb-item"><a href="../tutorials/07-probability-flow-ode.html">01 · Transport in one dimension</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">01 · Transport in one dimension</h1>
 </div>
@@ -1038,14 +1044,19 @@ X=F_0^{-1}(\Phi(X_1)).}\]</span></p>
 <li>Estimate the unknown functions in that field from data, then use the field in a numerical solver to generate samples.</li>
 </ol>
 </section>
-<section id="why-seek-an-alternative-to-the-cdf-construction" class="level4">
-<h4 class="anchored" data-anchor-id="why-seek-an-alternative-to-the-cdf-construction">Why seek an alternative to the CDF construction?</h4>
-<p>The special advantage of one dimension is that particles can be ordered from left to right and labeled by a single percentile. Multivariate CDFs exist, but a single cumulative probability no longer specifies a unique position. The scalar inverse-CDF construction therefore does not extend directly. Applying separate CDF transformations to individual coordinates also does not generally remove their statistical dependence.</p>
-<p>Higher-dimensional constructions require additional information about that joint dependence. Estimating and using these distributions becomes difficult as the dimension increases. This motivates an alternative that can be learned from samples without explicitly constructing CDFs. We continue to develop it in one dimension.</p>
+<section id="why-the-cdf-construction-does-not-extend-directly-to-higher-dimensions" class="level4">
+<h4 class="anchored" data-anchor-id="why-the-cdf-construction-does-not-extend-directly-to-higher-dimensions">Why the CDF construction does not extend directly to higher dimensions</h4>
+<p>The preceding construction did not require an SDE. We chose a density path, used continuity to recover its vector field, and obtained a sampling procedure by reversing the resulting ODE. In one dimension, integrating from the left boundary gives the probability flux directly:</p>
+<p><span class="math display">\[p_t(x)v(x,t)=-\partial_tF_t(x).\]</span></p>
+<p>This works because a point divides the line into a left side and a right side. The change in probability on the left determines the net flux through that point. A single percentile also identifies a unique position when the CDF is strictly increasing.</p>
+<p>In higher dimensions, we can still specify an explicit density path. For example, a mixture of the data density and a standard multivariate Gaussian is a valid path between the desired endpoints. The difficulty is recovering and evaluating a vector field that realizes it. A point no longer divides space into two sides, and a single cumulative probability does not identify a unique position. Multivariate CDFs exist, but the scalar inverse-CDF construction does not extend directly. Applying separate CDF transforms to individual coordinates also fails to account for their joint dependence.</p>
+<p>There is an additional ambiguity: knowing how much probability enters or leaves each region does not specify all directions in which particles move inside it. In higher dimensions, several vector fields can produce the same density evolution. The continuity equation therefore needs an additional choice of transport field; Part 2 states this nonuniqueness precisely. Estimating the joint data density and the conditional distributions needed for more general cumulative transforms can also be difficult from samples.</p>
+<p>Thus an explicit density path remains possible, but it no longer supplies the simple CDF-based construction available on the line. We seek a different way to specify a path together with a computable field that realizes it. For score-based diffusion, we choose forward Gaussian corruption. Its continuous-time SDE supplies a density-evolution equation, the Fokker–Planck equation. Rewriting that equation in continuity form will identify one compatible deterministic vector field without constructing multivariate CDFs. An SDE is a useful choice for this purpose, not a requirement for every higher-dimensional transport method.</p>
+<p>We will carry out this alternative construction in one dimension first. The resulting velocity involves a spatial derivative of the log density, called the score. We define that quantity next, then derive why it appears; we do not assume in advance that the score itself is the required velocity.</p>
 </section>
 </section>
-<section id="the-score-an-alternative-quantity-to-estimate" class="level3">
-<h3 class="anchored" data-anchor-id="the-score-an-alternative-quantity-to-estimate">The score: an alternative quantity to estimate</h3>
+<section id="the-score-a-quantity-that-will-appear-in-the-diffusion-derived-field" class="level3">
+<h3 class="anchored" data-anchor-id="the-score-a-quantity-that-will-appear-in-the-diffusion-derived-field">The score: a quantity that will appear in the diffusion-derived field</h3>
 <p>For a smooth positive density <span class="math inline">\(p_t\)</span>, define its <strong>score</strong> by</p>
 <p><span class="math display">\[\boxed{s_t(x)=\partial_x\log p_t(x)
 =\frac{\partial_xp_t(x)}{p_t(x)}.}\]</span></p>
@@ -1067,7 +1078,7 @@ X=F_0^{-1}(\Phi(X_1)).}\]</span></p>
 <p><span class="math display">\[\frac{dx(t)}{dt}=v(x(t),t),\qquad
 p_0=p_{\mathrm{data}},\qquad p_1\approx\mathcal N(0,1).\]</span></p>
 <p>The initial distribution <span class="math inline">\(p_0\)</span> is supplied to the dynamics. The vector field then determines its evolution through the continuity equation. Specifying the initial and terminal distributions does not uniquely determine either the intermediate densities or the vector field.</p>
-<p>In the CDF construction, we selected intermediate densities explicitly. We now consider another construction: specify a <strong>forward stochastic process</strong> whose distributions evolve from the data distribution toward a standard Gaussian. We can then use its density equation to derive a deterministic vector field with the same density evolution.</p>
+<p>In the CDF construction, we selected intermediate densities explicitly and used one-dimensional cumulative probabilities to recover their flux. To obtain a construction that extends directly to higher dimensions, we now specify a <strong>forward stochastic process</strong> whose distributions evolve from the data distribution toward a standard Gaussian. We can then use its density equation to derive a deterministic vector field with the same density evolution.</p>
 <p>The construction has four stages:</p>
 <ol type="1">
 <li>Specify a forward stochastic process initialized with data samples, with a terminal distribution close to standard normal.</li>
@@ -2025,8 +2036,8 @@ m_t=\alpha_t m_0,\qquad V_t=1+\alpha_t^2(V_0-1).\]</span></p>
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/probability-flow-ode.html" class="pagination-link" aria-label="12 · Probability-Flow ODE">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">12 · Probability-Flow ODE</span>
+      <a href="../tutorials/probability-flow-ode.html" class="pagination-link" aria-label="13 · Probability-Flow ODE">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">13 · Probability-Flow ODE</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

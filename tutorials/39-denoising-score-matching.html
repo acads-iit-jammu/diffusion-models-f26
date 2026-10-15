@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>01 · Denoising Score Matching – ID-5-02 (TO)</title>
+<title>11 · Denoising Score Matching and Langevin Sampling – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/40-reverse-sde-sampling.html" rel="next">
-<link href="../tutorials/38-probability-flow-ode-part-9.html" rel="prev">
+<link href="../tutorials/30-ddpm.html" rel="next">
+<link href="../tutorials/29-variational-autoencoders.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">13 · Score Matching and Stochastic Sampling</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">01 · Denoising Score Matching</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">11 · Denoising Score Matching and Langevin Sampling</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -251,14 +251,20 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">11 · Denoising Score Matching and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+ <span class="menu-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
   </div>
 </li>
       <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12 · Probability-Flow ODE</span></a>
+ <span class="menu-text">13 · Probability-Flow ODE</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -320,8 +326,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/42-ddpm-reverse-vp-sde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · DDPM through the reverse VP SDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
+ <span class="menu-text">11 · DDIM and the probability-flow ODE</span></a>
   </div>
 </li>
       </ul>
@@ -329,7 +341,7 @@ window.Quarto = {
 <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">13 · Score Matching and Stochastic Sampling</span></a>
+ <span class="menu-text">14 · Reverse-SDE Sampling</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -337,14 +349,8 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">01 · Denoising Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../tutorials/40-reverse-sde-sampling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">02 · Reverse-SDE sampling</span></a>
+ <span class="menu-text">01 · Reverse-SDE sampling</span></a>
   </div>
 </li>
       </ul>
@@ -603,6 +609,7 @@ window.Quarto = {
   <li><a href="#once-a-fixed-score-is-known-langevin-sampling" id="toc-once-a-fixed-score-is-known-langevin-sampling" class="nav-link" data-scroll-target="#once-a-fixed-score-is-known-langevin-sampling">3. Once a fixed score is known: Langevin sampling</a></li>
   <li><a href="#first-solved-check-a-standard-gaussian" id="toc-first-solved-check-a-standard-gaussian" class="nav-link" data-scroll-target="#first-solved-check-a-standard-gaussian">4. First solved check: a standard Gaussian</a></li>
   <li><a href="#several-noise-levels-and-annealed-langevin-dynamics" id="toc-several-noise-levels-and-annealed-langevin-dynamics" class="nav-link" data-scroll-target="#several-noise-levels-and-annealed-langevin-dynamics">5. Several noise levels and annealed Langevin dynamics</a></li>
+  <li><a href="#next-a-learned-reverse-markov-chain" id="toc-next-a-learned-reverse-markov-chain" class="nav-link" data-scroll-target="#next-a-learned-reverse-markov-chain">6. Next: a learned reverse Markov chain</a></li>
   <li><a href="#sec-langevin-stationarity" id="toc-sec-langevin-stationarity" class="nav-link" data-scroll-target="#sec-langevin-stationarity">Appendix A: why score-driven Langevin dynamics preserves the target density</a>
   <ul class="collapse">
   <li><a href="#a.1.-target-density-and-current-particle-density" id="toc-a.1.-target-density-and-current-particle-density" class="nav-link" data-scroll-target="#a.1.-target-density-and-current-particle-density">A.1. Target density and current particle density</a></li>
@@ -618,9 +625,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">13 · Score Matching and Stochastic Sampling</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">01 · Denoising Score Matching</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">11 · Denoising Score Matching and Langevin Sampling</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">01 · Denoising Score Matching</h1>
+<h1 class="title">11 · Denoising Score Matching and Langevin Sampling</h1>
 </div>
 
 
@@ -643,13 +650,14 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Draft — Standalone topic outline
+<span class="screen-reader-only">Note</span>Draft — Learn a score, then sample with it
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This topic develops score estimation and Langevin sampling independently of probability-flow ODEs. The aim is to learn a score from samples, then use it to sample a fixed density. Start with one dimension; vector formulas replace derivatives by gradients. The sections below establish the main results and the planned teaching sequence.</p>
+<p>This topic develops score estimation and Langevin sampling independently of probability-flow ODEs. The aim is to learn a score from samples, then use it to sample a fixed density. Start with one dimension; vector formulas replace derivatives by gradients. This lecture comes before DDPM: it separates the regression problem used to learn a score from the sampling algorithm that uses it.</p>
 </div>
 </div>
+<p>For a smooth positive density <span class="math inline">\(p\)</span>, its scalar score is <span class="math inline">\(s(x)=\partial_x\log p(x)\)</span>. It measures the local rate of change of log density. We first learn this quantity for a Gaussian-smoothed data distribution, then use it as the drift in a sampling procedure. No probability-flow ODE is needed here.</p>
 <section id="learn-from-cleannoisy-pairs" class="level2">
 <h2 class="anchored" data-anchor-id="learn-from-cleannoisy-pairs">1. Learn from clean/noisy pairs</h2>
 <p>Draw <span class="math inline">\(X_0\sim p_{\mathrm{data}}\)</span> and independent <span class="math inline">\(\varepsilon\sim\mathcal N(0,1)\)</span>. At a fixed noise scale <span class="math inline">\(\sigma&gt;0\)</span>, form</p>
@@ -670,7 +678,24 @@ p_\sigma(y)=\int\mathcal N(y;x_0,\sigma^2)p_{\mathrm{data}}(x_0)\,dx_0.\]</span>
 =\mathbb E_{X_0\sim p_{\mathrm{data}},\,\varepsilon\sim\mathcal N(0,1)}
 [(s_\theta(X_0+\sigma\varepsilon,\sigma)+\varepsilon/\sigma)^2].\]</span></p>
 <p>At the unrestricted optimum, <span class="math inline">\(s_*(y,\sigma)=\mathbb E[U\mid Y=y]=s_\sigma(y)\)</span>. The conditional target is known even though the marginal score is not. The loss differs from marginal-score regression by a conditional-variance term independent of the predictor. This is the denoising/score-matching connection developed by <a href="https://gwern.net/doc/ai/nn/diffusion/2011-vincent.pdf">Vincent (2011)</a>.</p>
-<p>Planned derivation: expand the conditional squared error, differentiate the Gaussian convolution, and show explicitly why the posterior mean appears. Finite-data training targets the corrupted empirical law at its unrestricted optimum.</p>
+<p>To verify the identity, differentiate the marginal density:</p>
+<p><span class="math display">\[\begin{aligned}
+\partial_y p_\sigma(y)
+&amp;=\int \frac{x_0-y}{\sigma^2}p(y\mid x_0)p_{\mathrm{data}}(x_0)\,dx_0,\\
+\partial_y\log p_\sigma(y)
+&amp;=\int \frac{x_0-y}{\sigma^2}
+\frac{p(y\mid x_0)p_{\mathrm{data}}(x_0)}{p_\sigma(y)}\,dx_0\\
+&amp;=\int \frac{x_0-y}{\sigma^2}p(x_0\mid y)\,dx_0
+=\mathbb E[U\mid Y=y].
+\end{aligned}\]</span></p>
+<p>Although the posterior is not explicitly available during training, sampling clean/noisy pairs supplies draws from their joint law. Squared-error regression performs the conditional averaging:</p>
+<p><span class="math display">\[\mathbb E[(s_\theta(Y,\sigma)-U)^2\mid Y]
+=(s_\theta(Y,\sigma)-\mathbb E[U\mid Y])^2
++\operatorname{Var}(U\mid Y).\]</span></p>
+<p>The second term is independent of the predictor. For an empirical training distribution, the unrestricted population objective over corrupted training pairs targets its smoothed empirical score.</p>
+<p>Equivalently, train a noise predictor with squared error and set <span class="math inline">\(s_\theta=-\varepsilon_\theta/\sigma\)</span>. Then</p>
+<p><span class="math display">\[\mathbb E[(\varepsilon-\varepsilon_\theta)^2]=\sigma^2\mathcal L_{\mathrm{DSM}}.\]</span></p>
+<p>This exact reparameterization will reappear in DDPM, with a different cumulative noise scale at every discrete step.</p>
 </section>
 <section id="once-a-fixed-score-is-known-langevin-sampling" class="level2">
 <h2 class="anchored" data-anchor-id="once-a-fixed-score-is-known-langevin-sampling">3. Once a fixed score is known: Langevin sampling</h2>
@@ -689,12 +714,16 @@ p_\sigma(y)=\int\mathcal N(y;x_0,\sigma^2)p_{\mathrm{data}}(x_0)\,dx_0.\]</span>
 <p>For <span class="math inline">\(0&lt;\eta&lt;2\)</span>, the discrete chain’s stationary variance solves</p>
 <p><span class="math display">\[V=(1-\eta)^2V+2\eta,
 \qquad V=\frac1{1-\eta/2}.\]</span></p>
-<p>It approaches the target variance 1 as <span class="math inline">\(\eta\to0\)</span>, but is not exactly 1 at a finite step. This will anchor simulations of step-size bias, convergence, and multimodal mixing.</p>
+<p>It approaches the target variance 1 as <span class="math inline">\(\eta\to0\)</span>, but is not exactly 1 at a finite step. This separates finite-step sampling bias from score-estimation error.</p>
 </section>
 <section id="several-noise-levels-and-annealed-langevin-dynamics" class="level2">
 <h2 class="anchored" data-anchor-id="several-noise-levels-and-annealed-langevin-dynamics">5. Several noise levels and annealed Langevin dynamics</h2>
 <p>Train <span class="math inline">\(s_\theta(x,\sigma)\)</span> at a decreasing sequence <span class="math inline">\(\sigma_1&gt;\cdots&gt;\sigma_L&gt;0\)</span>, averaging the DSM loss over a stated distribution of noise levels with positive weights. At each level, perform several Langevin steps targeting <span class="math inline">\(p_{\sigma_i}\)</span>, then lower the noise scale. Large smoothing can make movement between modes easier; short runs at each level do not guarantee equilibrium.</p>
 <p>This is the approach of <a href="https://arxiv.org/abs/1907.05600">Song and Ermon (2019)</a>. It differs from a reverse diffusion SDE designed to follow prescribed changing marginals without equilibrating at every level. The final positive noise level retains smoothing error.</p>
+</section>
+<section id="next-a-learned-reverse-markov-chain" class="level2">
+<h2 class="anchored" data-anchor-id="next-a-learned-reverse-markov-chain">6. Next: a learned reverse Markov chain</h2>
+<p>The training problem is now familiar: use known conditional Gaussian targets to estimate an unknown marginal score. Langevin supplies one sampling method, with a fixed target at each noise level. <a href="../tutorials/30-ddpm.html">DDPM</a> next builds a reverse Markov chain and motivates its training through the ELBO. Its simplified noise-prediction loss is another weighted denoising score objective, but its ancestral sampler follows different dynamics. After DDPM, <a href="../tutorials/probability-flow-ode.html">Probability-Flow ODE</a> develops deterministic transport and later reinterprets DDPM through a reverse SDE.</p>
 </section>
 <section id="sec-langevin-stationarity" class="level2">
 <h2 class="anchored" data-anchor-id="sec-langevin-stationarity">Appendix A: why score-driven Langevin dynamics preserves the target density</h2>
@@ -1188,13 +1217,13 @@ V=\frac{1}{1-\eta/2},\qquad 0&lt;\eta&lt;2.\]</span></p>
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/38-probability-flow-ode-part-9.html" class="pagination-link" aria-label="10 · DDPM, DDIM, and probability flow">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">10 · DDPM, DDIM, and probability flow</span>
+      <a href="../tutorials/29-variational-autoencoders.html" class="pagination-link" aria-label="10 · Variational Autoencoders (VAEs)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">10 · Variational Autoencoders (VAEs)</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/40-reverse-sde-sampling.html" class="pagination-link" aria-label="02 · Reverse-SDE sampling">
-        <span class="nav-page-text">02 · Reverse-SDE sampling</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/30-ddpm.html" class="pagination-link" aria-label="12 · Denoising Diffusion Probabilistic Models (DDPM)">
+        <span class="nav-page-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>12 · Probability-Flow ODE – ID-5-02 (TO)</title>
+<title>13 · Probability-Flow ODE – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -88,7 +88,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">12 · Probability-Flow ODE</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/probability-flow-ode.html">13 · Probability-Flow ODE</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -222,14 +222,20 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Denoising Score Matching and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+ <span class="menu-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
   </div>
 </li>
       <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">12 · Probability-Flow ODE</span></a>
+ <span class="menu-text">13 · Probability-Flow ODE</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -291,8 +297,14 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/42-ddpm-reverse-vp-sde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · DDPM through the reverse VP SDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
+ <span class="menu-text">11 · DDIM and the probability-flow ODE</span></a>
   </div>
 </li>
       </ul>
@@ -300,7 +312,7 @@ ul.task-list li input[type="checkbox"] {
 <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">13 · Score Matching and Stochastic Sampling</span></a>
+ <span class="menu-text">14 · Reverse-SDE Sampling</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -308,14 +320,8 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">01 · Denoising Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../tutorials/40-reverse-sde-sampling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">02 · Reverse-SDE sampling</span></a>
+ <span class="menu-text">01 · Reverse-SDE sampling</span></a>
   </div>
 </li>
       </ul>
@@ -572,7 +578,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">12 · Probability-Flow ODE</h1>
+<h1 class="title">13 · Probability-Flow ODE</h1>
 </div>
 
 
@@ -599,9 +605,10 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This ten-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–10, and can be read in sequence. The notes and worked examples are in development.</p>
+<p>This eleven-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–11, and can be read in sequence. The notes and worked examples are in development.</p>
 </div>
 </div>
+<p>This topic follows <a href="../tutorials/39-denoising-score-matching.html">denoising score matching and Langevin sampling</a> and the <a href="../tutorials/30-ddpm.html">original DDPM lecture</a>.</p>
 <p>Start with particle trajectories and density evolution in one dimension. Then extend the construction to vectors, learn the score from clean/noisy pairs, and implement sampling. The later parts provide experiments and an image-model recipe, then connect probability-flow ODEs to Neural ODEs, normalizing flows, and flow matching.</p>
 <table class="caption-top table">
 <thead>
@@ -648,12 +655,16 @@ ul.task-list li input[type="checkbox"] {
 <td>Learn the velocity directly from conditional-path regression.</td>
 </tr>
 <tr class="even">
-<td><a href="../tutorials/38-probability-flow-ode-part-9.html">10 · DDPM, DDIM, and probability flow</a></td>
-<td>Relate discrete samplers to the reverse SDE and probability-flow ODE.</td>
+<td><a href="../tutorials/42-ddpm-reverse-vp-sde.html">10 · DDPM through the reverse VP SDE</a></td>
+<td>Reinterpret ancestral DDPM as a numerical discretization of the reverse VP SDE.</td>
+</tr>
+<tr class="odd">
+<td><a href="../tutorials/38-probability-flow-ode-part-9.html">11 · DDIM and the probability-flow ODE</a></td>
+<td>Derive DDIM as Euler integration in transformed probability-flow coordinates.</td>
 </tr>
 </tbody>
 </table>
-<p>Parts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Part 07 provides an exact empirical alternative and makes the supporting observations visible. Parts 08–09 connect the construction to other continuous generative models; Part 10 relates it to discrete diffusion samplers.</p>
+<p>Parts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Part 07 provides an exact empirical alternative and makes the supporting observations visible. Parts 08–09 connect the construction to other continuous generative models; Parts 10–11 reinterpret DDPM and DDIM through reverse-SDE and probability-flow dynamics, respectively.</p>
 <p><a href="../materials/probability-flow/probability-flow-code.zip">Download all notebooks and code</a>.</p>
 
 
@@ -1066,8 +1077,8 @@ ul.task-list li input[type="checkbox"] {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/30-ddpm.html" class="pagination-link" aria-label="11 · Denoising Diffusion Probabilistic Models (DDPM)">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span>
+      <a href="../tutorials/30-ddpm.html" class="pagination-link" aria-label="12 · Denoising Diffusion Probabilistic Models (DDPM)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

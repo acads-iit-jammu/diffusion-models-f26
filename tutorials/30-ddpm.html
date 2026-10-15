@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>11 · Denoising Diffusion Probabilistic Models (DDPM) – ID-5-02 (TO)</title>
+<title>12 · Denoising Diffusion Probabilistic Models (DDPM) – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -37,7 +37,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../tutorials/probability-flow-ode.html" rel="next">
-<link href="../tutorials/29-variational-autoencoders.html" rel="prev">
+<link href="../tutorials/39-denoising-score-matching.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/30-ddpm.html">11 · Denoising Diffusion Probabilistic Models (DDPM)</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/30-ddpm.html">12 · Denoising Diffusion Probabilistic Models (DDPM)</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -251,14 +251,20 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Denoising Score Matching and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">11 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+ <span class="menu-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
   </div>
 </li>
       <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12 · Probability-Flow ODE</span></a>
+ <span class="menu-text">13 · Probability-Flow ODE</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -320,8 +326,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/42-ddpm-reverse-vp-sde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · DDPM through the reverse VP SDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">10 · DDPM, DDIM, and probability flow</span></a>
+ <span class="menu-text">11 · DDIM and the probability-flow ODE</span></a>
   </div>
 </li>
       </ul>
@@ -329,7 +341,7 @@ window.Quarto = {
 <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">13 · Score Matching and Stochastic Sampling</span></a>
+ <span class="menu-text">14 · Reverse-SDE Sampling</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -337,14 +349,8 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">01 · Denoising Score Matching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../tutorials/40-reverse-sde-sampling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">02 · Reverse-SDE sampling</span></a>
+ <span class="menu-text">01 · Reverse-SDE sampling</span></a>
   </div>
 </li>
       </ul>
@@ -598,25 +604,45 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#generation-by-reversing-a-corruption-sequence" id="toc-generation-by-reversing-a-corruption-sequence" class="nav-link active" data-scroll-target="#generation-by-reversing-a-corruption-sequence">1. Generation by reversing a corruption sequence</a></li>
-  <li><a href="#one-step-and-its-cumulative-form" id="toc-one-step-and-its-cumulative-form" class="nav-link" data-scroll-target="#one-step-and-its-cumulative-form">2. One step and its cumulative form</a></li>
-  <li><a href="#what-is-known-about-a-reverse-step" id="toc-what-is-known-about-a-reverse-step" class="nav-link" data-scroll-target="#what-is-known-about-a-reverse-step">3. What is known about a reverse step?</a></li>
-  <li><a href="#learn-a-noise-predictor" id="toc-learn-a-noise-predictor" class="nav-link" data-scroll-target="#learn-a-noise-predictor">4. Learn a noise predictor</a></li>
-  <li><a href="#the-ancestral-sampler" id="toc-the-ancestral-sampler" class="nav-link" data-scroll-target="#the-ancestral-sampler">5. The ancestral sampler</a></li>
-  <li><a href="#a-normal-data-check" id="toc-a-normal-data-check" class="nav-link" data-scroll-target="#a-normal-data-check">6. A normal-data check</a></li>
-  <li><a href="#from-discrete-denoising-to-a-vector-field" id="toc-from-discrete-denoising-to-a-vector-field" class="nav-link" data-scroll-target="#from-discrete-denoising-to-a-vector-field">7. From discrete denoising to a vector field</a></li>
-  <li><a href="#appendix-a.-the-cumulative-corruption-law" id="toc-appendix-a.-the-cumulative-corruption-law" class="nav-link" data-scroll-target="#appendix-a.-the-cumulative-corruption-law">Appendix A. The cumulative corruption law</a></li>
-  <li><a href="#appendix-b.-the-conditional-reverse-gaussian" id="toc-appendix-b.-the-conditional-reverse-gaussian" class="nav-link" data-scroll-target="#appendix-b.-the-conditional-reverse-gaussian">Appendix B. The conditional reverse Gaussian</a></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding">Check your understanding</a></li>
+  <li><a href="#hos-ddpm-algorithms-training-a-noise-predictor-and-generating-samples" id="toc-hos-ddpm-algorithms-training-a-noise-predictor-and-generating-samples" class="nav-link active" data-scroll-target="#hos-ddpm-algorithms-training-a-noise-predictor-and-generating-samples">1. Ho’s DDPM algorithms: training a noise predictor and generating samples</a></li>
+  <li><a href="#forward-gaussian-corruption-constructing-noisy-training-examples" id="toc-forward-gaussian-corruption-constructing-noisy-training-examples" class="nav-link" data-scroll-target="#forward-gaussian-corruption-constructing-noisy-training-examples">2. Forward Gaussian corruption: constructing noisy training examples</a></li>
+  <li><a href="#deriving-ddpms-training-objective-from-the-reverse-model-to-the-simplified-loss" id="toc-deriving-ddpms-training-objective-from-the-reverse-model-to-the-simplified-loss" class="nav-link" data-scroll-target="#deriving-ddpms-training-objective-from-the-reverse-model-to-the-simplified-loss">3. Deriving DDPM’s training objective: from the reverse model to the simplified loss</a>
+  <ul class="collapse">
+  <li><a href="#express-the-data-likelihood-as-an-expectation-over-forward-trajectories" id="toc-express-the-data-likelihood-as-an-expectation-over-forward-trajectories" class="nav-link" data-scroll-target="#express-the-data-likelihood-as-an-expectation-over-forward-trajectories">3.1. Express the data likelihood as an expectation over forward trajectories</a></li>
+  <li><a href="#derive-the-likelihood-lower-bound-and-its-exact-kl-gap" id="toc-derive-the-likelihood-lower-bound-and-its-exact-kl-gap" class="nav-link" data-scroll-target="#derive-the-likelihood-lower-bound-and-its-exact-kl-gap">3.2. Derive the likelihood lower bound and its exact KL gap</a></li>
+  <li><a href="#factor-the-forward-trajectory-law-backward-and-telescope-the-log-terms" id="toc-factor-the-forward-trajectory-law-backward-and-telescope-the-log-terms" class="nav-link" data-scroll-target="#factor-the-forward-trajectory-law-backward-and-telescope-the-log-terms">3.3. Factor the forward trajectory law backward and telescope the log terms</a></li>
+  <li><a href="#decompose-the-negative-elbo-into-prior-reverse-transition-and-reconstruction-losses" id="toc-decompose-the-negative-elbo-into-prior-reverse-transition-and-reconstruction-losses" class="nav-link" data-scroll-target="#decompose-the-negative-elbo-into-prior-reverse-transition-and-reconstruction-losses">3.4. Decompose the negative ELBO into prior, reverse-transition, and reconstruction losses</a></li>
+  <li><a href="#evaluate-the-terminal-prior-loss-and-specify-the-observation-likelihood" id="toc-evaluate-the-terminal-prior-loss-and-specify-the-observation-likelihood" class="nav-link" data-scroll-target="#evaluate-the-terminal-prior-loss-and-specify-the-observation-likelihood">3.5. Evaluate the terminal-prior loss and specify the observation likelihood</a></li>
+  <li><a href="#evaluate-the-gaussian-reverse-transition-kl-as-a-mean-regression-loss" id="toc-evaluate-the-gaussian-reverse-transition-kl-as-a-mean-regression-loss" class="nav-link" data-scroll-target="#evaluate-the-gaussian-reverse-transition-kl-as-a-mean-regression-loss">3.6. Evaluate the Gaussian reverse-transition KL as a mean-regression loss</a></li>
+  <li><a href="#express-the-reverse-mean-through-noise-prediction-and-derive-the-loss-weight" id="toc-express-the-reverse-mean-through-noise-prediction-and-derive-the-loss-weight" class="nav-link" data-scroll-target="#express-the-reverse-mean-through-noise-prediction-and-derive-the-loss-weight">3.7. Express the reverse mean through noise prediction and derive the loss weight</a></li>
+  <li><a href="#obtain-hos-simplified-loss-by-reweighting-the-noise-regression-objective" id="toc-obtain-hos-simplified-loss-by-reweighting-the-noise-regression-objective" class="nav-link" data-scroll-target="#obtain-hos-simplified-loss-by-reweighting-the-noise-regression-objective">3.8. Obtain Ho’s simplified loss by reweighting the noise-regression objective</a></li>
+  <li><a href="#interpret-the-simplified-loss-as-denoising-score-matching" id="toc-interpret-the-simplified-loss-as-denoising-score-matching" class="nav-link" data-scroll-target="#interpret-the-simplified-loss-as-denoising-score-matching">3.9. Interpret the simplified loss as denoising score matching</a></li>
+  <li><a href="#collecting-the-loss-terms-which-depend-on-the-network" id="toc-collecting-the-loss-terms-which-depend-on-the-network" class="nav-link" data-scroll-target="#collecting-the-loss-terms-which-depend-on-the-network">3.10. Collecting the loss terms: which depend on the network?</a></li>
+  </ul></li>
+  <li><a href="#the-ddpm-sampling-update-why-the-predicted-mean-needs-a-noise-term" id="toc-the-ddpm-sampling-update-why-the-predicted-mean-needs-a-noise-term" class="nav-link" data-scroll-target="#the-ddpm-sampling-update-why-the-predicted-mean-needs-a-noise-term">4. The DDPM sampling update: why the predicted mean needs a noise term</a>
+  <ul class="collapse">
+  <li><a href="#mean-only-recursion-removes-conditional-variance" id="toc-mean-only-recursion-removes-conditional-variance" class="nav-link" data-scroll-target="#mean-only-recursion-removes-conditional-variance">4.1. Mean-only recursion removes conditional variance</a></li>
+  <li><a href="#justifying-fresh-noise-requires-a-reverse-conditional-distribution" id="toc-justifying-fresh-noise-requires-a-reverse-conditional-distribution" class="nav-link" data-scroll-target="#justifying-fresh-noise-requires-a-reverse-conditional-distribution">4.2. Justifying fresh noise requires a reverse conditional distribution</a></li>
+  </ul></li>
+  <li><a href="#deriving-ancestral-sampling-from-an-approximately-gaussian-reverse-kernel" id="toc-deriving-ancestral-sampling-from-an-approximately-gaussian-reverse-kernel" class="nav-link" data-scroll-target="#deriving-ancestral-sampling-from-an-approximately-gaussian-reverse-kernel">5. Deriving ancestral sampling from an approximately Gaussian reverse kernel</a></li>
+  <li><a href="#justifying-hos-fixed-reverse-step-variance-choices" id="toc-justifying-hos-fixed-reverse-step-variance-choices" class="nav-link" data-scroll-target="#justifying-hos-fixed-reverse-step-variance-choices">6. Justifying Ho’s fixed reverse-step variance choices</a>
+  <ul class="collapse">
+  <li><a href="#a-standard-normal-marginal-gives-reverse-variance-equal-to-the-forward-step-variance" id="toc-a-standard-normal-marginal-gives-reverse-variance-equal-to-the-forward-step-variance" class="nav-link" data-scroll-target="#a-standard-normal-marginal-gives-reverse-variance-equal-to-the-forward-step-variance">6.1. A standard-normal marginal gives reverse variance equal to the forward-step variance</a></li>
+  <li><a href="#conditioning-on-the-clean-origin-gives-the-posterior-variance-choice" id="toc-conditioning-on-the-clean-origin-gives-the-posterior-variance-choice" class="nav-link" data-scroll-target="#conditioning-on-the-clean-origin-gives-the-posterior-variance-choice">6.2. Conditioning on the clean origin gives the posterior variance choice</a></li>
+  </ul></li>
+  <li><a href="#connecting-ddpm-to-reverse-sdes-and-probability-flow-odes" id="toc-connecting-ddpm-to-reverse-sdes-and-probability-flow-odes" class="nav-link" data-scroll-target="#connecting-ddpm-to-reverse-sdes-and-probability-flow-odes">7. Connecting DDPM to reverse SDEs and probability-flow ODEs</a></li>
+  <li><a href="#appendix-a.-deriving-the-reverse-gaussian-conditioned-on-clean-data" id="toc-appendix-a.-deriving-the-reverse-gaussian-conditioned-on-clean-data" class="nav-link" data-scroll-target="#appendix-a.-deriving-the-reverse-gaussian-conditioned-on-clean-data">Appendix A. Deriving the reverse Gaussian conditioned on clean data</a></li>
+  <li><a href="#appendix-b.-deriving-the-exact-scalar-reverse-variance-from-tweedies-identity" id="toc-appendix-b.-deriving-the-exact-scalar-reverse-variance-from-tweedies-identity" class="nav-link" data-scroll-target="#appendix-b.-deriving-the-exact-scalar-reverse-variance-from-tweedies-identity">Appendix B. Deriving the exact scalar reverse variance from Tweedie’s identity</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/30-ddpm.html">11 · Denoising Diffusion Probabilistic Models (DDPM)</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/30-ddpm.html">12 · Denoising Diffusion Probabilistic Models (DDPM)</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">11 · Denoising Diffusion Probabilistic Models (DDPM)</h1>
+<h1 class="title">12 · Denoising Diffusion Probabilistic Models (DDPM)</h1>
 </div>
 
 
@@ -639,163 +665,501 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Draft
+<span class="screen-reader-only">Note</span>Draft — Ho’s training and sampling algorithms
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>These lecture notes are in development and may be revised. This lecture uses finite Gaussian transitions; no knowledge of Brownian motion or SDEs is required. The aim is to understand what is trained and how the trained model generates samples.</p>
+<p>A denoising diffusion probabilistic model learns to generate data by reversing a prescribed sequence of noisy transformations. The forward transformations are known and can be applied to training observations. The reverse transformations must be learned because a noisy observation can have several possible clean origins.</p>
+<p>We first state Ho et al.’s training and sampling algorithms so that the computational task is visible. We then derive the training criterion from the likelihood of a reverse Markov model, explain its reduction to noise regression, and then derive the sampling rule. The sampling discussion begins with why repeatedly applying the predicted mean is insufficient. We then justify the approximately Gaussian reverse kernel and explain the two fixed variance choices. The discussion uses <strong>Ho’s notation throughout</strong>. It builds on <a href="../tutorials/39-denoising-score-matching.html">denoising score matching and Langevin sampling</a>; the later <a href="../tutorials/42-ddpm-reverse-vp-sde.html">Probability Flow discussion</a> provides the continuous-time reinterpretation.</p>
 </div>
 </div>
-<section id="generation-by-reversing-a-corruption-sequence" class="level2">
-<h2 class="anchored" data-anchor-id="generation-by-reversing-a-corruption-sequence">1. Generation by reversing a corruption sequence</h2>
-<p>Start with a data observation <span class="math inline">\(X_0\)</span>. Repeatedly contract its current value and add independent Gaussian noise. With enough corruption, its distribution is close to a standard normal. We then train a model to generate observations by traversing a learned reverse sequence, starting from a normal sample.</p>
-<p>Use <span class="math inline">\(N\)</span> steps and normalized times <span class="math inline">\(t_n=n/N\)</span>. Data are at <span class="math inline">\(t_0=0\)</span>; the terminal prior is at <span class="math inline">\(t_N=1\)</span>. For now every observation is scalar. The same formulas later apply coordinatewise to vectors and images with independent Gaussian corruption noise.</p>
-</section>
-<section id="one-step-and-its-cumulative-form" class="level2">
-<h2 class="anchored" data-anchor-id="one-step-and-its-cumulative-form">2. One step and its cumulative form</h2>
-<p>Choose a discrete noise variance <span class="math inline">\(0&lt;\beta_n&lt;1\)</span> and set <span class="math inline">\(a_n=1-\beta_n\)</span>. One step is</p>
-<p><span class="math display">\[X_n=\sqrt{a_n}X_{n-1}+\sqrt{\beta_n}\varepsilon_n,
-\qquad \varepsilon_n\overset{\mathrm{iid}}\sim\mathcal N(0,1).\]</span></p>
-<p>Here <span class="math inline">\(X_n\)</span> means <span class="math inline">\(X_{t_n}\)</span>. With <span class="math inline">\(\bar a_n=\prod_{j=1}^n a_j\)</span>, the conditional law after <span class="math inline">\(n\)</span> steps is</p>
-<p><span class="math display">\[\boxed{X_n\mid X_0=x_0\sim
-\mathcal N\left(\sqrt{\bar a_n}x_0,1-\bar a_n\right).}\]</span></p>
-<p>Consequently, a training example at step <span class="math inline">\(n\)</span> can be drawn directly:</p>
-<p><span class="math display">\[X_n=\sqrt{\bar a_n}X_0+\sqrt{1-\bar a_n}\,\varepsilon.\]</span></p>
-<p>This equality constructs the conditional distribution at one chosen time. Using a single shared <span class="math inline">\(\varepsilon\)</span> at every time does not simulate the forward Markov chain’s joint trajectories.</p>
+<section id="hos-ddpm-algorithms-training-a-noise-predictor-and-generating-samples" class="level2">
+<h2 class="anchored" data-anchor-id="hos-ddpm-algorithms-training-a-noise-predictor-and-generating-samples">1. Ho’s DDPM algorithms: training a noise predictor and generating samples</h2>
+<p>DDPM has two computational stages. During training, a neural network learns from pairs of clean observations and artificially corrupted observations. During generation, the trained network determines the means of successive reverse transitions, starting from a Gaussian prior. We state both algorithms first, then derive the training objective and the sampling rule in the sections that follow.</p>
+<p>Let <span class="math inline">\(x_0\sim q(x_0)\)</span> be clean data and let <span class="math inline">\(t=1,\ldots,T\)</span> be a <strong>discrete step index</strong>. Choose forward noise variances <span class="math inline">\(0&lt;\beta_t&lt;1\)</span> and define</p>
+<p><span class="math display">\[\alpha_t=1-\beta_t,\qquad \bar\alpha_t=\prod_{s=1}^t\alpha_s,\qquad\bar\alpha_0=1.\]</span></p>
+<p>Here <span class="math inline">\(\alpha_t\)</span> is one-step variance retention; <span class="math inline">\(\sqrt{\bar\alpha_t}\)</span> is the cumulative signal amplitude. The symbol <span class="math inline">\(\sigma_t^2\)</span> below denotes a chosen <strong>reverse-step variance</strong>, not cumulative forward noise variance. The network <span class="math inline">\(\varepsilon_\theta(x_t,t)\)</span> takes a noisy observation and its step index as inputs. The same parameters are used at every noise level, with the index identifying how much corruption has been applied. We write vector observations below; the scalar case follows by replacing the identity covariance by one and squared norms by squares.</p>
 <div class="callout callout-style-simple callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Notation across the lectures
+<span class="screen-reader-only">Note</span>Algorithm 1 — Train the noise-prediction network
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Quantity</th>
-<th>Discrete DDPM notation here</th>
-<th>Continuous lectures</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>One-step noise variance</td>
-<td><span class="math inline">\(\beta_n\)</span></td>
-<td>Approximately <span class="math inline">\(\beta(t_n)\Delta t\)</span></td>
-</tr>
-<tr class="even">
-<td>One-step variance retention</td>
-<td><span class="math inline">\(a_n=1-\beta_n\)</span></td>
-<td>One-step amplitude squared</td>
-</tr>
-<tr class="odd">
-<td>Cumulative amplitude</td>
-<td><span class="math inline">\(\sqrt{\bar a_n}\)</span></td>
-<td><span class="math inline">\(\alpha_{t_n}\)</span></td>
-</tr>
-<tr class="even">
-<td>Cumulative noise variance</td>
-<td><span class="math inline">\(1-\bar a_n\)</span></td>
-<td><span class="math inline">\(1-\alpha_{t_n}^2\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>Many DDPM sources call our <span class="math inline">\(a_n\)</span> “<span class="math inline">\(\alpha_n\)</span>.” We use <span class="math inline">\(a_n\)</span> here to reserve <span class="math inline">\(\alpha_t\)</span> for the cumulative <strong>amplitude</strong> used throughout Parts 1–5. A discrete <span class="math inline">\(\beta_n\)</span> is a variance, whereas a continuous <span class="math inline">\(\beta(t)\)</span> is a rate.</p>
-</div>
-</div>
-<p>If <span class="math inline">\(\bar a_N\)</span> is small, the terminal distribution is approximately normal. It is not exactly normal for arbitrary data at finite nonzero <span class="math inline">\(\bar a_N\)</span>. For example, its mean is <span class="math inline">\(\sqrt{\bar a_N}\mathbb E[X_0]\)</span> and its variance is <span class="math inline">\(\bar a_N\operatorname{Var}(X_0)+1-\bar a_N\)</span>.</p>
-</section>
-<section id="what-is-known-about-a-reverse-step" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-known-about-a-reverse-step">3. What is known about a reverse step?</h2>
-<p>If the clean observation is also known, the forward process gives an exactly computable conditional distribution:</p>
-<p><span class="math display">\[p(x_{n-1}\mid x_n,x_0)=\mathcal N(\widetilde m_n,\widetilde\beta_n),\qquad n\ge2,\]</span></p>
-<p>where</p>
-<p><span class="math display">\[\widetilde\beta_n=\beta_n\frac{1-\bar a_{n-1}}{1-\bar a_n},\]</span></p>
-<p><span class="math display">\[\widetilde m_n=
-\frac{\sqrt{\bar a_{n-1}}\beta_n}{1-\bar a_n}x_0
-+\frac{\sqrt{a_n}(1-\bar a_{n-1})}{1-\bar a_n}x_n.\]</span></p>
-<p>At <span class="math inline">\(n=1\)</span>, conditioning on <span class="math inline">\(x_0\)</span> gives a point mass at <span class="math inline">\(x_0\)</span>, and the variance formula is zero.</p>
-<p>During generation we do <strong>not</strong> know <span class="math inline">\(x_0\)</span>. The actual conditional <span class="math inline">\(p(x_{n-1}\mid x_n)\)</span> averages over the posterior possibilities for <span class="math inline">\(x_0\)</span> and generally is not Gaussian. A DDPM models it with a learned Gaussian transition. Inserting an estimate of <span class="math inline">\(x_0\)</span> into the displayed Gaussian is a model choice, not an exact finite-step inversion of arbitrary data corruption.</p>
-</section>
-<section id="learn-a-noise-predictor" class="level2">
-<h2 class="anchored" data-anchor-id="learn-a-noise-predictor">4. Learn a noise predictor</h2>
-<p>Train a network <span class="math inline">\(\varepsilon_\theta(x_n,t_n)\)</span> using pairs constructed from data and newly sampled noise:</p>
-<p><span class="math display">\[\boxed{\mathcal J(\theta)=
-\mathbb E_{X_0,n,\varepsilon}\left[
-\left(\varepsilon-\varepsilon_\theta(\sqrt{\bar a_n}X_0+
-\sqrt{1-\bar a_n}\varepsilon,t_n)\right)^2\right].}\]</span></p>
-<p>Here <span class="math inline">\(n\)</span> is commonly sampled uniformly from <span class="math inline">\(1,\ldots,N\)</span>. For vectors, use squared Euclidean error, with an explicitly chosen sum or coordinate average.</p>
-<p>Squared-error regression estimates</p>
-<p><span class="math display">\[\varepsilon_\theta(x,t_n)\approx\mathbb E[\varepsilon\mid X_n=x].\]</span></p>
-<p>An observed <span class="math inline">\(x_n\)</span> can arise from several clean observations and noise draws. The optimal network predicts their conditional mean noise, not the particular realized noise with certainty.</p>
-<p>Convert the output into a clean-data estimate:</p>
-<p><span class="math display">\[\widehat x_0(x_n,n)=
-\frac{x_n-\sqrt{1-\bar a_n}\,\varepsilon_\theta(x_n,t_n)}{\sqrt{\bar a_n}}.\]</span></p>
-<p>The simple noise loss is a standard DDPM training choice. It is related to, but is not the full weighted variational likelihood objective. See <a href="https://arxiv.org/abs/2006.11239">Ho et al., <em>Denoising Diffusion Probabilistic Models</em></a>.</p>
-</section>
-<section id="the-ancestral-sampler" class="level2">
-<h2 class="anchored" data-anchor-id="the-ancestral-sampler">5. The ancestral sampler</h2>
-<p>Substituting the estimate into the posterior-mean expression yields the learned reverse mean</p>
-<p><span class="math display">\[m_\theta(x_n,n)=\frac{1}{\sqrt{a_n}}
-\left(x_n-\frac{\beta_n}{\sqrt{1-\bar a_n}}
-\varepsilon_\theta(x_n,t_n)\right).\]</span></p>
-<p>One common sampler uses the fixed posterior variance <span class="math inline">\(\widetilde\beta_n\)</span>:</p>
-<p><span class="math display">\[\boxed{x_{n-1}=m_\theta(x_n,n)+\sqrt{\widetilde\beta_n}\,\varepsilon_n,
-\qquad \varepsilon_n\sim\mathcal N(0,1).}\]</span></p>
-<p>The <span class="math inline">\(\varepsilon_n\)</span> in this reverse update are fresh draws, unrelated to the forward-step noises. Start with <span class="math inline">\(x_N\sim\mathcal N(0,1)\)</span> and repeat for <span class="math inline">\(n=N,\ldots,1\)</span>. At the final step, <span class="math inline">\(\widetilde\beta_1=0\)</span>, so no fresh noise is added. Other DDPM variants use different variance choices; training and sampling must specify which one is used.</p>
-<p>This finite Gaussian chain is an <strong>ancestral DDPM sampler</strong>. It is not automatically the same algorithm as Euler–Maruyama for a continuous reverse SDE. Their connection requires an appropriate small-step limit.</p>
-</section>
-<section id="a-normal-data-check" class="level2">
-<h2 class="anchored" data-anchor-id="a-normal-data-check">6. A normal-data check</h2>
-<p>Suppose <span class="math inline">\(X_0\sim\mathcal N(0,1)\)</span>. Every forward marginal is then <span class="math inline">\(\mathcal N(0,1)\)</span> and</p>
-<p><span class="math display">\[\mathbb E[\varepsilon\mid X_n=x]=\sqrt{1-\bar a_n}\,x.\]</span></p>
-<p>The learned reverse mean at the population optimum becomes <span class="math inline">\(\sqrt{a_n}x_n\)</span>. The <strong>exact</strong> reverse conditional for this stationary normal chain has variance <span class="math inline">\(\beta_n\)</span>. The fixed posterior variance <span class="math inline">\(\widetilde\beta_n\)</span> above is smaller: it conditions additionally on <span class="math inline">\(x_0\)</span>.</p>
-<p>This provides a useful diagnostic. Even a perfect noise predictor does not make a finite-step Gaussian sampler with an arbitrary variance choice exact. Increasing resolution, changing the variance convention, and improving score estimation are different changes.</p>
-</section>
-<section id="from-discrete-denoising-to-a-vector-field" class="level2">
-<h2 class="anchored" data-anchor-id="from-discrete-denoising-to-a-vector-field">7. From discrete denoising to a vector field</h2>
-<p>At a positive noise level, the marginal score satisfies</p>
-<p><span class="math display">\[s_{t_n}(x)=\frac{d}{dx}\log p_{t_n}(x)
-=-\frac{\mathbb E[\varepsilon\mid X_n=x]}{\sqrt{1-\bar a_n}}.\]</span></p>
-<p>The network therefore provides a score estimate. <a href="../tutorials/32-probability-flow-ode-part-3.html">Part 3</a> derives this identity and its relationship to the posterior mean denoiser.</p>
-<p>With a continuous corruption schedule, that score determines a probability-flow velocity. For a VP process,</p>
-<p><span class="math display">\[v(x,t)=-\frac{\beta(t)}2\bigl[x+s_t(x)\bigr].\]</span></p>
-<p><a href="../tutorials/07-probability-flow-ode.html">Part 1</a> develops why this velocity transports the required densities. Generation follows its ODE from <span class="math inline">\(t=1\)</span> toward <span class="math inline">\(t=0\)</span>. This deterministic sampler and the stochastic reverse sampler share marginal densities under exact continuous-time conditions; their individual trajectories differ.</p>
-</section>
-<section id="appendix-a.-the-cumulative-corruption-law" class="level2">
-<h2 class="anchored" data-anchor-id="appendix-a.-the-cumulative-corruption-law">Appendix A. The cumulative corruption law</h2>
-<p>Suppose the accumulated signal coefficient after <span class="math inline">\(n-1\)</span> steps is <span class="math inline">\(\sqrt{\bar a_{n-1}}\)</span> and the conditional noise variance is <span class="math inline">\(1-\bar a_{n-1}\)</span>. The next step multiplies that variance by <span class="math inline">\(a_n\)</span> and adds independent variance <span class="math inline">\(\beta_n\)</span>:</p>
-<p><span class="math display">\[a_n(1-\bar a_{n-1})+\beta_n=1-\bar a_n.\]</span></p>
-<p>The mean becomes <span class="math inline">\(\sqrt{a_n\bar a_{n-1}}x_0\)</span>. Induction establishes the formula without simulating intermediate states.</p>
-</section>
-<section id="appendix-b.-the-conditional-reverse-gaussian" class="level2">
-<h2 class="anchored" data-anchor-id="appendix-b.-the-conditional-reverse-gaussian">Appendix B. The conditional reverse Gaussian</h2>
-<p>For <span class="math inline">\(n\ge2\)</span>, Bayes’ rule gives</p>
-<p><span class="math display">\[p(x_{n-1}\mid x_n,x_0)\propto
-p(x_n\mid x_{n-1})p(x_{n-1}\mid x_0).\]</span></p>
-<p>As a function of <span class="math inline">\(u=x_{n-1}\)</span>, the negative log density, up to constants, is</p>
-<p><span class="math display">\[\frac{(x_n-\sqrt{a_n}u)^2}{2\beta_n}
-+\frac{(u-\sqrt{\bar a_{n-1}}x_0)^2}{2(1-\bar a_{n-1})}.\]</span></p>
-<p>The coefficient of <span class="math inline">\(u^2/2\)</span> is</p>
-<p><span class="math display">\[\frac{a_n}{\beta_n}+\frac{1}{1-\bar a_{n-1}}
-=\frac{1-\bar a_n}{\beta_n(1-\bar a_{n-1})}.\]</span></p>
-<p>Its reciprocal is <span class="math inline">\(\widetilde\beta_n\)</span>. Multiplying that reciprocal by the linear coefficient <span class="math inline">\(\sqrt{a_n}x_n/\beta_n+\sqrt{\bar a_{n-1}}x_0/(1-\bar a_{n-1})\)</span> gives <span class="math inline">\(\widetilde m_n\)</span>.</p>
-</section>
-<section id="check-your-understanding" class="level2">
-<h2 class="anchored" data-anchor-id="check-your-understanding">Check your understanding</h2>
+<p>Initialize the network parameters <span class="math inline">\(\theta\)</span>. Repeat:</p>
 <ol type="1">
-<li>Why can training draw <span class="math inline">\(X_n\)</span> in one operation, even though generation uses many steps?</li>
-<li>Which conditional distribution is exactly Gaussian: <span class="math inline">\(p(x_{n-1}\mid x_n,x_0)\)</span> or <span class="math inline">\(p(x_{n-1}\mid x_n)\)</span>?</li>
-<li>Explain the difference between prediction error, discretization error, and a terminal prior that only approximates <span class="math inline">\(p_1\)</span>.</li>
+<li><p>Draw independently</p>
+<p><span class="math display">\[x_0\sim q(x_0),\qquad t\sim\operatorname{Uniform}\{1,\ldots,T\},\qquad\varepsilon\sim\mathcal N(0,I).\]</span></p></li>
+<li><p>Construct the noisy observation:</p>
+<p><span class="math display">\[x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\varepsilon.\]</span></p></li>
+<li><p>Take an optimizer step on the squared prediction error. For gradient descent with learning rate <span class="math inline">\(\rho\)</span>,</p>
+<p><span class="math display">\[\boxed{\theta\leftarrow\theta-\rho\nabla_\theta
+\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2.}\]</span></p></li>
 </ol>
+<p>Return the trained predictor. Minibatches average this loss over independently constructed examples.</p>
+</div>
+</div>
+<p>Training uses clean observations to construct supervised pairs, but generation begins without a clean observation. Algorithm 2 uses the fitted predictor at its current generated state to determine a reverse-step mean. It then draws the next state around that mean using a prescribed variance. The coefficients in this update will follow from the Gaussian conditioning calculation in Section 3.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm 2 — Generate data by ancestral sampling
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Draw <span class="math inline">\(x_T\sim\mathcal N(0,I)\)</span>. For <span class="math inline">\(t=T,T-1,\ldots,1\)</span>:</p>
+<ol type="1">
+<li><p>Draw a fresh <span class="math inline">\(z\sim\mathcal N(0,I)\)</span> if <span class="math inline">\(t&gt;1\)</span>; set <span class="math inline">\(z=0\)</span> if <span class="math inline">\(t=1\)</span>.</p></li>
+<li><p>Update</p>
+<p><span class="math display">\[\boxed{x_{t-1}=\frac1{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\varepsilon_\theta(x_t,t)\right)+\sigma_tz.}\]</span></p></li>
+</ol>
+<p>Return <span class="math inline">\(x_0\)</span>. The fixed choices considered here are</p>
+<p><span class="math display">\[\sigma_t^2=\beta_t
+\quad\text{or}\quad
+\sigma_t^2=\widetilde\beta_t
+:=\beta_t\frac{1-\bar\alpha_{t-1}}{1-\bar\alpha_t}.\]</span></p>
+<p>Fresh noise is suppressed in the final step for either choice.</p>
+</div>
+</div>
+<p>These are Ho et al.’s Algorithms 1 and 2, with the learning-rate update made explicit. Although both contain Gaussian random variables, those variables have different roles. In training, the sampled noise creates a known target for regression. In generation, a fresh noise draw samples uncertainty in a reverse transition. The derivation must therefore explain both why noise regression learns an appropriate mean and why the sampler needs a distribution around that mean. We begin with the forward process, which determines the joint laws used in these arguments. <a href="https://arxiv.org/abs/2006.11239">Ho et al.&nbsp;(2020)</a></p>
+</section>
+<section id="forward-gaussian-corruption-constructing-noisy-training-examples" class="level2">
+<h2 class="anchored" data-anchor-id="forward-gaussian-corruption-constructing-noisy-training-examples">2. Forward Gaussian corruption: constructing noisy training examples</h2>
+<p>The forward process is fixed before fitting the neural network. At each step it reduces the signal amplitude and adds independent Gaussian noise. In distributional form, one transition is</p>
+<p><span class="math display">\[q(x_t\mid x_{t-1})=\mathcal N(x_t;\sqrt{\alpha_t}\,x_{t-1},\beta_tI).\]</span></p>
+<p>Conditioned on a particular clean observation, every subsequent state is a linear combination of that observation and independent Gaussian variables. Its conditional distribution is therefore Gaussian. Multiplying the successive signal factors and accumulating their noise variances gives</p>
+<p><span class="math display">\[\boxed{q(x_t\mid x_0)=\mathcal N(x_t;\sqrt{\bar\alpha_t}\,x_0,(1-\bar\alpha_t)I).}\]</span></p>
+<p>To verify the noise variance, suppose the conditional variance at step <span class="math inline">\(t-1\)</span> is <span class="math inline">\(1-\bar\alpha_{t-1}\)</span>. The next contraction multiplies it by <span class="math inline">\(\alpha_t\)</span>, while the independent new noise contributes variance <span class="math inline">\(\beta_t\)</span>. Thus</p>
+<p><span class="math display">\[\alpha_t(1-\bar\alpha_{t-1})+\beta_t=1-\bar\alpha_t.\]</span></p>
+<p>The conditional mean similarly becomes <span class="math inline">\(\sqrt{\alpha_t\bar\alpha_{t-1}}x_0\)</span>. This establishes the cumulative law by induction and justifies drawing a training input at any selected time in one operation.</p>
+<p>The conditional law is available even though the marginal data density is unknown. Given a stored observation <span class="math inline">\(x_0\)</span>, we can evaluate the corruption kernel and draw from it; averaging over training observations produces noisy data examples. When <span class="math inline">\(\bar\alpha_T\)</span> is small, the contribution of clean data is small and the terminal law is approximately standard normal. It is generally not exactly normal at a finite schedule. Algorithm 1 needs only a sample at one selected time. If we instead wished to simulate a complete forward trajectory, we would use independent noise increments in the successive transitions. Reusing a single Gaussian vector in the cumulative formula at all times would give the same one-time conditional laws but a different joint trajectory law.</p>
+<p>This construction supplies a terminal distribution that is easy to approximate by a normal prior. To turn it into a generative model, we now specify transitions that start at that prior and move toward the data.</p>
+</section>
+<section id="deriving-ddpms-training-objective-from-the-reverse-model-to-the-simplified-loss" class="level2">
+<h2 class="anchored" data-anchor-id="deriving-ddpms-training-objective-from-the-reverse-model-to-the-simplified-loss">3. Deriving DDPM’s training objective: from the reverse model to the simplified loss</h2>
+<p>We seek network parameters that assign high likelihood to the training data. This section starts with the reverse generative model, derives a lower bound on its log likelihood, and reduces the learnable interior terms to weighted noise regression. Ho’s simplified loss then follows by changing those weights; it is not an exact equality to the original likelihood bound.</p>
+<p>The latent variables <span class="math inline">\(x_1,\ldots,x_T\)</span> represent the intermediate states of the generative model. We specify their joint density together with the generated observation by</p>
+<p><span class="math display">\[p_\theta(x_{0:T})=p(x_T)\prod_{t=1}^T p_\theta(x_{t-1}\mid x_t),
+\qquad p(x_T)=\mathcal N(0,I),\]</span></p>
+<p><span class="math display">\[p_\theta(x_{t-1}\mid x_t)=\mathcal N(x_{t-1};\mu_\theta(x_t,t),\sigma_t^2I).\]</span></p>
+<p>The Gaussian transition is a modeling choice, whose approximation quality we discuss in Section 5. For the present derivation, it gives a tractable conditional density once its mean and variance have been specified. The mean will be learned; the basic algorithm holds the variance schedule fixed.</p>
+<p>The notation <span class="math inline">\(q\)</span> denotes the data distribution together with the prescribed forward corruption, whereas <span class="math inline">\(p_\theta\)</span> denotes the generative model. We can sample from <span class="math inline">\(q\)</span> using data and known corruption kernels without being able to evaluate the unknown data density <span class="math inline">\(q(x_0)\)</span>. The training problem is to make the generated marginal <span class="math inline">\(p_\theta(x_0)\)</span> fit the data. Direct likelihood evaluation requires integrating out all intermediate states, so we use a variational bound.</p>
+<section id="express-the-data-likelihood-as-an-expectation-over-forward-trajectories" class="level3">
+<h3 class="anchored" data-anchor-id="express-the-data-likelihood-as-an-expectation-over-forward-trajectories">3.1. Express the data likelihood as an expectation over forward trajectories</h3>
+<p>Fix one observed datum <span class="math inline">\(x_0\)</span>. The likelihood integrates out all latent states:</p>
+<p><span class="math display">\[p_\theta(x_0)=\int p_\theta(x_{0:T})\,dx_1\cdots dx_T.\]</span></p>
+<p>The prescribed forward conditional is</p>
+<p><span class="math display">\[q(x_{1:T}\mid x_0)=\prod_{t=1}^Tq(x_t\mid x_{t-1}).\]</span></p>
+<p>Insert this density into the integral by multiplying and dividing by it:</p>
+<p><span class="math display">\[\begin{aligned}
+p_\theta(x_0)
+&amp;=\int q(x_{1:T}\mid x_0)
+\frac{p_\theta(x_{0:T})}{q(x_{1:T}\mid x_0)}\,dx_1\cdots dx_T\\
+&amp;=\mathbb E_{x_{1:T}\sim q(\cdot\mid x_0)}
+\left[\frac{p_\theta(x_{0:T})}{q(x_{1:T}\mid x_0)}\right].
+\end{aligned}\]</span></p>
+<p>Here <span class="math inline">\(x_0\)</span> is fixed; the expectation is over the entire forward trajectory conditional on it. For continuous data, these expressions use densities and integrals. For discrete observations, <span class="math inline">\(p_\theta(x_0\mid x_1)\)</span> is an observation probability, while the intermediate states remain continuous. We assume the needed support and integrability conditions throughout.</p>
+</section>
+<section id="derive-the-likelihood-lower-bound-and-its-exact-kl-gap" class="level3">
+<h3 class="anchored" data-anchor-id="derive-the-likelihood-lower-bound-and-its-exact-kl-gap">3.2. Derive the likelihood lower bound and its exact KL gap</h3>
+<p>Because the logarithm is concave, <span class="math inline">\(\log\mathbb E[R]\ge\mathbb E[\log R]\)</span> for a positive random variable <span class="math inline">\(R\)</span>. Consequently,</p>
+<p><span class="math display">\[\begin{aligned}
+\log p_\theta(x_0)
+&amp;=\log\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\frac{p_\theta(x_{0:T})}{q(x_{1:T}\mid x_0)}\right]\\
+&amp;\ge\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\log p_\theta(x_{0:T})-\log q(x_{1:T}\mid x_0)\right]\\
+&amp;=: \mathcal E_\theta(x_0).
+\end{aligned}\]</span></p>
+<p>The quantity <span class="math inline">\(\mathcal E_\theta(x_0)\)</span> is the <strong>evidence lower bound</strong>, or ELBO. The exact gap follows from the model’s posterior identity</p>
+<p><span class="math display">\[p_\theta(x_{1:T}\mid x_0)=\frac{p_\theta(x_{0:T})}{p_\theta(x_0)}.\]</span></p>
+<p>Indeed,</p>
+<p><span class="math display">\[\begin{aligned}
+D_{\mathrm{KL}}\!\left(q(x_{1:T}\mid x_0)\,\|\,p_\theta(x_{1:T}\mid x_0)\right)
+&amp;=\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\log q(x_{1:T}\mid x_0)-\log p_\theta(x_{1:T}\mid x_0)\right]\\
+&amp;=\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\log q(x_{1:T}\mid x_0)-\log p_\theta(x_{0:T})+\log p_\theta(x_0)\right]\\
+&amp;=\log p_\theta(x_0)-\mathcal E_\theta(x_0).
+\end{aligned}\]</span></p>
+<p>The last log likelihood is constant inside the trajectory expectation. Thus maximizing the ELBO maximizes a lower bound on the likelihood; equality holds when the forward conditional over trajectories equals the model posterior for that observation. DDPM fixes the forward conditional rather than learning a separate inference network for it.</p>
+<p>Define the negative ELBO for this datum by <span class="math inline">\(\mathcal L_\theta(x_0)=-\mathcal E_\theta(x_0)\)</span>. Averaging over training observations gives</p>
+<p><span class="math display">\[\boxed{
+L_{\mathrm{VLB}}:=\mathbb E_{x_0\sim q(x_0)}[\mathcal L_\theta(x_0)]
+\ge \mathbb E_{x_0\sim q(x_0)}[-\log p_\theta(x_0)].}\]</span></p>
+<p>Only samples from <span class="math inline">\(q(x_0)\)</span> are needed to estimate this expectation. The unknown data density itself is never evaluated.</p>
+</section>
+<section id="factor-the-forward-trajectory-law-backward-and-telescope-the-log-terms" class="level3">
+<h3 class="anchored" data-anchor-id="factor-the-forward-trajectory-law-backward-and-telescope-the-log-terms">3.3. Factor the forward trajectory law backward and telescope the log terms</h3>
+<p>Substitute the generative and forward factorizations into <span class="math inline">\(\mathcal L_\theta(x_0)\)</span>:</p>
+<p><span class="math display">\[\begin{aligned}
+\mathcal L_\theta(x_0)
+&amp;=\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\log q(x_{1:T}\mid x_0)-\log p_\theta(x_{0:T})\right]\\
+&amp;=\mathbb E_{q(x_{1:T}\mid x_0)}\left[
+-\log p(x_T)+\sum_{t=1}^T\log q(x_t\mid x_{t-1})
+-\sum_{t=1}^T\log p_\theta(x_{t-1}\mid x_t)\right].
+\end{aligned}\]</span></p>
+<p>This expression is already a valid bound, but the forward and reverse transition terms condition on different variables. To obtain tractable Gaussian KL terms, we rewrite the forward factors in the reverse direction <strong>while retaining the observed <span class="math inline">\(x_0\)</span> in the conditioning</strong>.</p>
+<p>For <span class="math inline">\(t\ge2\)</span>, Bayes’ rule and the forward Markov property give</p>
+<p><span class="math display">\[q(x_{t-1}\mid x_t,x_0)
+=\frac{q(x_t\mid x_{t-1})q(x_{t-1}\mid x_0)}{q(x_t\mid x_0)}.\]</span></p>
+<p>Rearranging and taking logarithms,</p>
+<p><span class="math display">\[\log q(x_t\mid x_{t-1})
+=\log q(x_{t-1}\mid x_t,x_0)
++\log q(x_t\mid x_0)-\log q(x_{t-1}\mid x_0).\]</span></p>
+<p>Sum this identity from <span class="math inline">\(t=2\)</span> to <span class="math inline">\(T\)</span>. The last two terms telescope:</p>
+<p><span class="math display">\[\begin{aligned}
+\sum_{t=2}^T\big[\log q(x_t\mid x_0)-\log q(x_{t-1}\mid x_0)\big]
+&amp;=\log q(x_T\mid x_0)-\log q(x_1\mid x_0).
+\end{aligned}\]</span></p>
+<p>Adding the <span class="math inline">\(t=1\)</span> forward term cancels the remaining <span class="math inline">\(-\log q(x_1\mid x_0)\)</span>. Therefore</p>
+<p><span class="math display">\[\sum_{t=1}^T\log q(x_t\mid x_{t-1})
+=\log q(x_T\mid x_0)+\sum_{t=2}^T\log q(x_{t-1}\mid x_t,x_0).\]</span></p>
+<p>Equivalently, the forward trajectory law has the reverse factorization</p>
+<p><span class="math display">\[q(x_{1:T}\mid x_0)=q(x_T\mid x_0)\prod_{t=2}^Tq(x_{t-1}\mid x_t,x_0).\]</span></p>
+<p>This is a factorization of the same joint law, not a new generative model. Substitution into the negative ELBO gives</p>
+<p><span class="math display">\[\begin{aligned}
+\mathcal L_\theta(x_0)
+=\mathbb E_{q(x_{1:T}\mid x_0)}\Bigg[
+&amp;\log\frac{q(x_T\mid x_0)}{p(x_T)}\\
+&amp;+\sum_{t=2}^T\log\frac{q(x_{t-1}\mid x_t,x_0)}{p_\theta(x_{t-1}\mid x_t)}
+-\log p_\theta(x_0\mid x_1)\Bigg].
+\end{aligned}\]</span></p>
+</section>
+<section id="decompose-the-negative-elbo-into-prior-reverse-transition-and-reconstruction-losses" class="level3">
+<h3 class="anchored" data-anchor-id="decompose-the-negative-elbo-into-prior-reverse-transition-and-reconstruction-losses">3.4. Decompose the negative ELBO into prior, reverse-transition, and reconstruction losses</h3>
+<p>The first log ratio depends only on <span class="math inline">\(x_T\)</span>, so integrating out the other states yields</p>
+<p><span class="math display">\[\mathbb E_{x_T\sim q(\cdot\mid x_0)}
+\left[\log\frac{q(x_T\mid x_0)}{p(x_T)}\right]
+=D_{\mathrm{KL}}(q(x_T\mid x_0)\|p(x_T)).\]</span></p>
+<p>For an interior term, integrate out every state except <span class="math inline">\((x_{t-1},x_t)\)</span>, then factor their conditional joint law:</p>
+<p><span class="math display">\[q(x_{t-1},x_t\mid x_0)=q(x_t\mid x_0)q(x_{t-1}\mid x_t,x_0).\]</span></p>
+<p>Hence the expectation of that log ratio is</p>
+<p><span class="math display">\[\begin{aligned}
+&amp;\int q(x_t\mid x_0)\int q(x_{t-1}\mid x_t,x_0)
+\log\frac{q(x_{t-1}\mid x_t,x_0)}{p_\theta(x_{t-1}\mid x_t)}\,dx_{t-1}\,dx_t\\
+&amp;\qquad=\mathbb E_{x_t\sim q(\cdot\mid x_0)}
+D_{\mathrm{KL}}\!\left(q(x_{t-1}\mid x_t,x_0)\|p_\theta(x_{t-1}\mid x_t)\right).
+\end{aligned}\]</span></p>
+<p>The reconstruction term depends only on <span class="math inline">\(x_1\)</span> and the fixed <span class="math inline">\(x_0\)</span>. Combining all three kinds of terms, and now averaging over <span class="math inline">\(x_0\)</span>, gives Ho’s variational decomposition:</p>
+<p><span class="math display">\[\boxed{L_{\mathrm{VLB}}=L_T+\sum_{t=2}^T L_{t-1}+L_0,}\]</span></p>
+<p>where</p>
+<p><span class="math display">\[L_T=\mathbb E_{x_0\sim q(x_0)}
+D_{\mathrm{KL}}(q(x_T\mid x_0)\|p(x_T)),\]</span></p>
+<p><span class="math display">\[L_{t-1}=\mathbb E_{\substack{x_0\sim q(x_0)\\x_t\sim q(\cdot\mid x_0)}}
+D_{\mathrm{KL}}\!\left(q(x_{t-1}\mid x_t,x_0)\|p_\theta(x_{t-1}\mid x_t)\right),
+\qquad 2\le t\le T,\]</span></p>
+<p><span class="math display">\[L_0=-\mathbb E_{\substack{x_0\sim q(x_0)\\x_1\sim q(\cdot\mid x_0)}}
+\log p_\theta(x_0\mid x_1).\]</span></p>
+<p>The draws in each nested expectation are dependent: first draw the clean observation, then corrupt that observation. In particular, the interior KL is computable because training provides <span class="math inline">\(x_0\)</span>; it does not require evaluating the generally unknown <span class="math inline">\(q(x_{t-1}\mid x_t)\)</span>.</p>
+</section>
+<section id="evaluate-the-terminal-prior-loss-and-specify-the-observation-likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="evaluate-the-terminal-prior-loss-and-specify-the-observation-likelihood">3.5. Evaluate the terminal-prior loss and specify the observation likelihood</h3>
+<p>Let <span class="math inline">\(d\)</span> be the number of coordinates. The known terminal conditional is <span class="math inline">\(\mathcal N(\sqrt{\bar\alpha_T}x_0,(1-\bar\alpha_T)I)\)</span>, and the chosen prior is <span class="math inline">\(\mathcal N(0,I)\)</span>. The Gaussian KL formula gives</p>
+<p><span class="math display">\[\begin{aligned}
+D_{\mathrm{KL}}(q(x_T\mid x_0)\|p(x_T))
+&amp;=\frac12\left[
+\bar\alpha_T\|x_0\|^2+d(1-\bar\alpha_T)-d-d\log(1-\bar\alpha_T)\right]\\
+&amp;=\frac12\left[\bar\alpha_T\|x_0\|^2-d\bar\alpha_T-d\log(1-\bar\alpha_T)\right].
+\end{aligned}\]</span></p>
+<p>This term has no network parameters when the schedule and prior are fixed. With finite data second moment it tends to zero as <span class="math inline">\(\bar\alpha_T\to0\)</span>, explaining the use of a sufficiently noisy terminal state.</p>
+<p>The observation term <span class="math inline">\(L_0\)</span> must be treated separately because <span class="math inline">\(x_0\)</span> is observed, rather than another noisy latent state. For continuous data, choosing a Gaussian decoder with positive variance <span class="math inline">\(\sigma_1^2\)</span> gives</p>
+<p><span class="math display">\[L_0=\mathbb E_{x_0\sim q,\,x_1\sim q(\cdot\mid x_0)}
+\left[\frac{\|x_0-\mu_\theta(x_1,1)\|^2}{2\sigma_1^2}
++\frac d2\log(2\pi\sigma_1^2)\right].\]</span></p>
+<p>For quantized images, Ho instead integrates a Gaussian over the bin corresponding to each pixel value. For a coordinate with bin boundaries <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, the assigned probability is</p>
+<p><span class="math display">\[\Phi\!\left(\frac{b-\mu}{\sigma_1}\right)
+-\Phi\!\left(\frac{a-\mu}{\sigma_1}\right),\]</span></p>
+<p>with the outermost bins extended to infinity and <span class="math inline">\(\Phi\)</span> the standard-normal CDF. The decoder log probability sums the coordinate log probabilities. A continuous density evaluated at a pixel value is not its discrete probability. Also, <span class="math inline">\(\widetilde\beta_1=0\)</span> cannot be inserted as the variance of a nonsingular Gaussian likelihood: the endpoint observation model must be specified separately. Algorithm 2’s final mean-only output is a sampling convention, not a justification for dropping <span class="math inline">\(L_0\)</span> from the likelihood bound.</p>
+<p>The remaining terms <span class="math inline">\(L_{t-1}\)</span>, for <span class="math inline">\(t\ge2\)</span>, compare Gaussian distributions and yield the weighted denoising objective. We evaluate them next.</p>
+<p>The ELBO has reduced likelihood training to a sum of reverse-transition losses. We now evaluate those losses explicitly. First, the Gaussian KL becomes a weighted squared error between means. Expressing the model mean through a noise predictor then gives Ho’s weighted noise-regression objective. Finally, we distinguish that objective from the simplified loss used in Algorithm 1.</p>
+</section>
+<section id="evaluate-the-gaussian-reverse-transition-kl-as-a-mean-regression-loss" class="level3">
+<h3 class="anchored" data-anchor-id="evaluate-the-gaussian-reverse-transition-kl-as-a-mean-regression-loss">3.6. Evaluate the Gaussian reverse-transition KL as a mean-regression loss</h3>
+<p>Conditioning on <span class="math inline">\(x_0\)</span> makes <span class="math inline">\(x_{t-1}\)</span> Gaussian, and <span class="math inline">\(x_t\)</span> is a noisy linear observation of it. Therefore, for <span class="math inline">\(t\ge2\)</span>, ordinary Gaussian conditioning gives</p>
+<p><span class="math display">\[q(x_{t-1}\mid x_t,x_0)=\mathcal N(x_{t-1};\widetilde\mu_t(x_t,x_0),\widetilde\beta_tI),\]</span></p>
+<p><span class="math display">\[\widetilde\mu_t(x_t,x_0)=
+\frac{\sqrt{\bar\alpha_{t-1}}\beta_t}{1-\bar\alpha_t}x_0
++\frac{\sqrt{\alpha_t}(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}x_t.\]</span></p>
+<p>Appendix A obtains these coefficients by completing the square. The dependence on <span class="math inline">\(x_0\)</span> is essential: this is a training-time conditional distribution, not the conditional available to a sampler that knows only <span class="math inline">\(x_t\)</span>. Marginalizing over possible clean origins generally produces a non-Gaussian mixture for <span class="math inline">\(q(x_{t-1}\mid x_t)\)</span>.</p>
+<p>Although the target posterior uses <span class="math inline">\(x_0\)</span>, the learned mean receives only <span class="math inline">\(x_t\)</span> and <span class="math inline">\(t\)</span>. Fitting it across many clean/noisy pairs makes it average over the clean origins compatible with the input. This is exactly the conditional averaging performed by squared-error regression.</p>
+<p>To evaluate one interior KL, fix <span class="math inline">\((x_0,x_t)\)</span> and write <span class="math inline">\(u=x_{t-1}\)</span>. The log ratio of the two Gaussian densities is</p>
+<p><span class="math display">\[\log\frac{q(u\mid x_t,x_0)}{p_\theta(u\mid x_t)}
+=\frac d2\log\frac{\sigma_t^2}{\widetilde\beta_t}
+-\frac{\|u-\widetilde\mu_t\|^2}{2\widetilde\beta_t}
++\frac{\|u-\mu_\theta\|^2}{2\sigma_t^2}.\]</span></p>
+<p>Take expectations over <span class="math inline">\(u\sim\mathcal N(\widetilde\mu_t,\widetilde\beta_tI)\)</span>. The first squared distance has expectation <span class="math inline">\(d\widetilde\beta_t\)</span>. For the second, expand around the target mean:</p>
+<p><span class="math display">\[\begin{aligned}
+\mathbb E_u\|u-\mu_\theta\|^2
+&amp;=\mathbb E_u\|(u-\widetilde\mu_t)+(\widetilde\mu_t-\mu_\theta)\|^2\\
+&amp;=\mathbb E_u\|u-\widetilde\mu_t\|^2
++2\mathbb E_u[u-\widetilde\mu_t]^\mathsf T(\widetilde\mu_t-\mu_\theta)
++\|\widetilde\mu_t-\mu_\theta\|^2\\
+&amp;=d\widetilde\beta_t+\|\widetilde\mu_t-\mu_\theta\|^2.
+\end{aligned}\]</span></p>
+<p>The cross term vanishes because <span class="math inline">\(\mathbb E_u[u]=\widetilde\mu_t\)</span>. Consequently,</p>
+<p><span class="math display">\[\begin{aligned}
+D_{\mathrm{KL}}(q(u\mid x_t,x_0)\|p_\theta(u\mid x_t))
+&amp;=\frac{\|\widetilde\mu_t-\mu_\theta\|^2}{2\sigma_t^2}
++\frac d2\left[
+\frac{\widetilde\beta_t}{\sigma_t^2}-1+
+\log\frac{\sigma_t^2}{\widetilde\beta_t}\right].
+\end{aligned}\]</span></p>
+<p>Define the second term as <span class="math inline">\(C_t\)</span>. It depends on the schedules and dimension but not on <span class="math inline">\(\theta\)</span> when the reverse variance is fixed. Averaging over the training pair gives</p>
+<p><span class="math display">\[L_{t-1}=\mathbb E_{x_0\sim q,\,x_t\sim q(\cdot\mid x_0)}
+\left[\frac{\|\widetilde\mu_t(x_t,x_0)-\mu_\theta(x_t,t)\|^2}{2\sigma_t^2}\right]+C_t.\]</span></p>
+<p>Thus optimizing the interior variational loss reduces to predicting a known posterior mean. If the variance were learned, <span class="math inline">\(C_t\)</span> would also depend on model parameters and could not be discarded. Ho’s fixed-variance construction next reparameterizes the mean using the noise that generated the training pair.</p>
+</section>
+<section id="express-the-reverse-mean-through-noise-prediction-and-derive-the-loss-weight" class="level3">
+<h3 class="anchored" data-anchor-id="express-the-reverse-mean-through-noise-prediction-and-derive-the-loss-weight">3.7. Express the reverse mean through noise prediction and derive the loss weight</h3>
+<p>From <span class="math inline">\(x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\varepsilon\)</span>, substitute</p>
+<p><span class="math display">\[x_0=\frac{x_t-\sqrt{1-\bar\alpha_t}\varepsilon}{\sqrt{\bar\alpha_t}}\]</span></p>
+<p>into <span class="math inline">\(\widetilde\mu_t\)</span>. Keeping the coefficients explicit,</p>
+<p><span class="math display">\[\begin{aligned}
+\widetilde\mu_t
+&amp;=\frac{\beta_t}{\sqrt{\alpha_t}(1-\bar\alpha_t)}
+\left(x_t-\sqrt{1-\bar\alpha_t}\varepsilon\right)
++\frac{\sqrt{\alpha_t}(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}x_t\\
+&amp;=\frac{\beta_t+\alpha_t(1-\bar\alpha_{t-1})}
+{\sqrt{\alpha_t}(1-\bar\alpha_t)}x_t
+-\frac{\beta_t}{\sqrt{\alpha_t}\sqrt{1-\bar\alpha_t}}\varepsilon.
+\end{aligned}\]</span></p>
+<p>The numerator of the first coefficient simplifies because</p>
+<p><span class="math display">\[\beta_t+\alpha_t(1-\bar\alpha_{t-1})
+=\beta_t+\alpha_t-\bar\alpha_t=1-\bar\alpha_t.\]</span></p>
+<p>Therefore</p>
+<p><span class="math display">\[\widetilde\mu_t=\frac1{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\varepsilon\right).\]</span></p>
+<p>The noise <span class="math inline">\(\varepsilon\)</span> is known for a constructed training pair, but it is unavailable at generation time. The expression above shows that learning its conditional estimate is sufficient to parameterize the reverse mean. We therefore define</p>
+<p><span class="math display">\[\boxed{\mu_\theta(x_t,t)=\frac1{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\varepsilon_\theta(x_t,t)\right).}\]</span></p>
+<p>The part involving <span class="math inline">\(x_t\)</span> cancels when we subtract the two means:</p>
+<p><span class="math display">\[\widetilde\mu_t-\mu_\theta
+=-\frac{\beta_t}{\sqrt{\alpha_t}\sqrt{1-\bar\alpha_t}}
+(\varepsilon-\varepsilon_\theta).\]</span></p>
+<p>Squaring this expression and inserting it into the Gaussian KL gives Ho’s Eq. (12):</p>
+<p><span class="math display">\[L_{t-1}=\mathbb E_{x_0\sim q,\,\varepsilon\sim\mathcal N(0,I)}
+\left[\frac{\beta_t^2}{2\sigma_t^2\alpha_t(1-\bar\alpha_t)}
+\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2\right]+C_t.\]</span></p>
+<p>The weight is determined by the forward schedule and the chosen reverse variance. Up to this point, the noise-regression expression is an algebraic rewriting of the interior variational loss. The simplified objective used in Algorithm 1 makes an additional change to the relative weights of the time steps.</p>
+<p>For completeness, collecting the interior terms gives the full objective in this parameterization:</p>
+<p><span class="math display">\[L_{\mathrm{VLB}}=L_T+L_0+
+\sum_{t=2}^T\left[
+\mathbb E_{x_0\sim q,\,\varepsilon\sim\mathcal N(0,I)}
+w_t\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2+C_t\right],\]</span></p>
+<p><span class="math display">\[w_t:=\frac{\beta_t^2}{2\sigma_t^2\alpha_t(1-\bar\alpha_t)}.\]</span></p>
+<p>The interior sum can be estimated without constructing a complete trajectory. Draw <span class="math inline">\(t\)</span> uniformly from <span class="math inline">\(\{2,\ldots,T\}\)</span>, independently of <span class="math inline">\(x_0\)</span> and <span class="math inline">\(\varepsilon\)</span>, and use</p>
+<p><span class="math display">\[(T-1)\,w_t\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2.\]</span></p>
+<p>Its expectation equals the sum of the parameter-dependent interior losses. The factor <span class="math inline">\(T-1\)</span> comes from converting a uniform average to a sum. The separate observation loss <span class="math inline">\(L_0\)</span> is still part of the full likelihood bound. This distinguishes an unbiased estimator of the variational objective from Ho’s simplified training rule below, which changes the weighting and includes <span class="math inline">\(t=1\)</span> in the noise-regression objective.</p>
+</section>
+<section id="obtain-hos-simplified-loss-by-reweighting-the-noise-regression-objective" class="level3">
+<h3 class="anchored" data-anchor-id="obtain-hos-simplified-loss-by-reweighting-the-noise-regression-objective">3.8. Obtain Ho’s simplified loss by reweighting the noise-regression objective</h3>
+<p>Algorithm 1 drops the time-dependent coefficient and samples the step uniformly:</p>
+<p><span class="math display">\[\boxed{L_{\mathrm{simple}}=
+\mathbb E_{t\sim\mathrm{Unif}\{1,\ldots,T\},\,x_0\sim q,\,\varepsilon\sim\mathcal N(0,I)}
+\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2.}\]</span></p>
+<p>The three draws are independent. This is Ho’s Eq. (14), a reweighted training objective rather than the full ELBO. Positive weights that depend only on the time step leave the unrestricted optimum at each time unchanged. They can nevertheless change the fitted result when a single finite-capacity network shares parameters across times.</p>
+<p>At a fixed step, the unrestricted optimal predictor is <span class="math inline">\(\mathbb E[\varepsilon\mid x_t,t]\)</span>. Several combinations of clean data and corruption noise can produce the same noisy input, so the fitted function cannot generally identify the realized noise of an individual pair. It estimates their posterior average. This explains why the regression target can be a sampled noise vector while the trained function is a deterministic function of the noisy observation.</p>
+</section>
+<section id="interpret-the-simplified-loss-as-denoising-score-matching" class="level3">
+<h3 class="anchored" data-anchor-id="interpret-the-simplified-loss-as-denoising-score-matching">3.9. Interpret the simplified loss as denoising score matching</h3>
+<p>The preceding <a href="../tutorials/39-denoising-score-matching.html">score-matching lecture</a> explains why conditional Gaussian targets can estimate marginal scores. Here,</p>
+<p><span class="math display">\[\nabla_{x_t}\log q(x_t\mid x_0)=-\frac{\varepsilon}{\sqrt{1-\bar\alpha_t}}.\]</span></p>
+<p>Consequently, parameterizing the score estimate as <span class="math inline">\(-\varepsilon_\theta/\sqrt{1-\bar\alpha_t}\)</span> gives the exact loss identity</p>
+<p><span class="math display">\[\|\varepsilon-\varepsilon_\theta\|^2
+=(1-\bar\alpha_t)
+\left\|\frac{-\varepsilon_\theta}{\sqrt{1-\bar\alpha_t}}
+-\nabla_{x_t}\log q(x_t\mid x_0)\right\|^2.\]</span></p>
+<p>The simplified DDPM loss is therefore denoising score matching weighted by cumulative forward noise variance. At the unrestricted optimum, the rescaled predictor estimates the noisy marginal score, as established in the preceding score-matching lecture. Song et al.’s Section 2.2, Eq. (3), writes the DDPM objective in precisely this form.</p>
+</section>
+<section id="collecting-the-loss-terms-which-depend-on-the-network" class="level3">
+<h3 class="anchored" data-anchor-id="collecting-the-loss-terms-which-depend-on-the-network">3.10. Collecting the loss terms: which depend on the network?</h3>
+<p>With Ho’s indexing, <span class="math inline">\(L_t\)</span> for <span class="math inline">\(1\le t\le T-1\)</span> trains the transition from <span class="math inline">\(x_{t+1}\)</span> to <span class="math inline">\(x_t\)</span>. Thus the term previously written as <span class="math inline">\(L_{t-1}\)</span> can equivalently be indexed as <span class="math inline">\(L_t\)</span>, and the complete negative ELBO is</p>
+<p><span class="math display">\[\boxed{L_{\mathrm{VLB}}=L_0+\sum_{t=1}^{T-1}L_t+L_T.}\]</span></p>
+<p>For a fixed forward schedule, fixed reverse variances, and a fixed standard-normal prior, the three kinds of terms are as follows.</p>
+<p><strong>Terminal-prior term.</strong> Using the terminal Gaussian KL derived above,</p>
+<p><span class="math display">\[\boxed{L_T=\frac12\left[
+\bar\alpha_T\mathbb E_{x_0\sim q(x_0)}\|x_0\|^2
+-d\bar\alpha_T-d\log(1-\bar\alpha_T)\right].}\]</span></p>
+<p>This is <strong>constant with respect to <span class="math inline">\(\theta\)</span></strong>. It need not be zero, but it contributes no gradient when training only the denoising network. It would not be constant with respect to parameters of a learned schedule or learned prior.</p>
+<p><strong>Interior reverse-transition terms.</strong> For <span class="math inline">\(1\le t\le T-1\)</span>,</p>
+<p><span class="math display">\[\boxed{L_t=
+\mathbb E_{\substack{x_0\sim q(x_0)\\\varepsilon\sim\mathcal N(0,I)}}
+\left[\frac{\beta_{t+1}^2}
+{2\sigma_{t+1}^2\alpha_{t+1}(1-\bar\alpha_{t+1})}
+\|\varepsilon-\varepsilon_\theta(x_{t+1},t+1)\|^2\right]+C_{t+1},}\]</span></p>
+<p>where the clean observation and noise are independent,</p>
+<p><span class="math display">\[x_{t+1}=\sqrt{\bar\alpha_{t+1}}x_0+\sqrt{1-\bar\alpha_{t+1}}\varepsilon,\]</span></p>
+<p>and</p>
+<p><span class="math display">\[C_{t+1}=\frac d2\left[
+\frac{\widetilde\beta_{t+1}}{\sigma_{t+1}^2}-1+
+\log\frac{\sigma_{t+1}^2}{\widetilde\beta_{t+1}}\right].\]</span></p>
+<p>Each <span class="math inline">\(L_t\)</span> <strong>depends on <span class="math inline">\(\theta\)</span></strong> through the network prediction. Only <span class="math inline">\(C_{t+1}\)</span> is constant under the fixed-variance assumption; it is zero when <span class="math inline">\(\sigma_{t+1}^2=\widetilde\beta_{t+1}\)</span>.</p>
+<p><strong>Reconstruction term.</strong> The endpoint contribution is</p>
+<p><span class="math display">\[\boxed{L_0=-\mathbb E_{\substack{x_0\sim q(x_0)\\x_1\sim q(\cdot\mid x_0)}}
+\log p_\theta(x_0\mid x_1).}\]</span></p>
+<p>This is <strong>not constant with respect to <span class="math inline">\(\theta\)</span></strong>. For a continuous Gaussian decoder with a fixed positive variance <span class="math inline">\(\sigma_1^2\)</span>, its explicit expression is</p>
+<p><span class="math display">\[L_0=\mathbb E_{x_0\sim q,\,x_1\sim q(\cdot\mid x_0)}
+\frac{\|x_0-\mu_\theta(x_1,1)\|^2}{2\sigma_1^2}
++\frac d2\log(2\pi\sigma_1^2).\]</span></p>
+<p>In this continuous-decoder case, <span class="math inline">\(\bar\alpha_1=\alpha_1\)</span> and <span class="math inline">\(1-\bar\alpha_1=\beta_1\)</span>. Substituting the noise parameterization gives</p>
+<p><span class="math display">\[L_0=\mathbb E_{x_0\sim q,\,\varepsilon\sim\mathcal N(0,I)}
+\left[\frac{\beta_1}{2\sigma_1^2\alpha_1}
+\|\varepsilon-\varepsilon_\theta(x_1,1)\|^2\right]
++\frac d2\log(2\pi\sigma_1^2).\]</span></p>
+<p>Only the final additive term is constant. For Ho’s discretized image decoder, use the bin probabilities in Section 3.5 in the negative log likelihood instead; the squared-error expression above is not its exact reconstruction loss.</p>
+<p>Consequently, likelihood training may omit <span class="math inline">\(L_T\)</span> and the fixed additive constants from its gradient calculation, but it cannot omit <span class="math inline">\(L_0\)</span> on the grounds that it is constant. Ho’s simplified objective changes the time weighting and uses noise regression at every step, including <span class="math inline">\(t=1\)</span>; it does not arise by declaring the reconstruction term constant.</p>
+<p>This establishes what Algorithm 1 learns and how its predictor determines the reverse mean <span class="math inline">\(\mu_\theta\)</span>. We now return to Algorithm 2 and derive the sampling rule, including the fresh noise added at each intermediate step.</p>
+</section>
+</section>
+<section id="the-ddpm-sampling-update-why-the-predicted-mean-needs-a-noise-term" class="level2">
+<h2 class="anchored" data-anchor-id="the-ddpm-sampling-update-why-the-predicted-mean-needs-a-noise-term">4. The DDPM sampling update: why the predicted mean needs a noise term</h2>
+<p>Recall that generation starts with <span class="math inline">\(x_T\sim\mathcal N(0,I)\)</span> and runs backward through <span class="math inline">\(t=T,T-1,\ldots,1\)</span>. Algorithm 2 updates the current state according to</p>
+<p><span class="math display">\[\boxed{x_{t-1}=\underbrace{\frac1{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\varepsilon_\theta(x_t,t)\right)}_{\mu_\theta(x_t,t)}
++\underbrace{\sigma_t z}_{\text{fresh noise}},}\]</span></p>
+<p>where <span class="math inline">\(z\sim\mathcal N(0,I)\)</span> is drawn independently at each step with <span class="math inline">\(t&gt;1\)</span>. Ho sets <span class="math inline">\(z=0\)</span> for the final step <span class="math inline">\(t=1\)</span>. The training derivation has explained the first term: at the ideal regression optimum, <span class="math inline">\(\mu_\theta(x_t,t)\)</span> is the conditional mean of the preceding state given the current noisy state. It has not yet explained why we should add fresh noise around that mean during generation.</p>
+<p>Since the initial state <span class="math inline">\(x_T\)</span> is already random, a natural alternative is to omit the second term and repeatedly apply</p>
+<p><span class="math display">\[x_{t-1}=\mu_\theta(x_t,t).\]</span></p>
+<p>This recursion still generates random outputs through its random initial state. The question is whether those outputs have the desired distribution. In general, they do not: a conditional mean summarizes the possible preceding states by their average, and replacing each conditional distribution by that average removes its remaining uncertainty.</p>
+<section id="mean-only-recursion-removes-conditional-variance" class="level3">
+<h3 class="anchored" data-anchor-id="mean-only-recursion-removes-conditional-variance">4.1. Mean-only recursion removes conditional variance</h3>
+<p>To examine one step, let <span class="math inline">\(U=x_{t-1}\)</span> and <span class="math inline">\(V=x_t\)</span> be scalar states under the forward joint law, with finite second moments. Then</p>
+<p><span class="math display">\[\operatorname{Var}(U)=\operatorname{Var}(\mathbb E[U\mid V])+
+\mathbb E[\operatorname{Var}(U\mid V)].\]</span></p>
+<p>Replacing <span class="math inline">\(U\)</span> by <span class="math inline">\(\mathbb E[U\mid V]\)</span> preserves only the first term. Whenever the conditional variance is positive, the distribution of the conditional mean has less variance than the desired distribution of <span class="math inline">\(U\)</span>. This failure can occur even when the predictor and the current marginal are exact.</p>
+<p>For a complete recursion that can be solved explicitly, let clean data be <span class="math inline">\(\mathcal N(0,1)\)</span>, so every forward marginal is standard normal. The exact reverse mean is <span class="math inline">\(\sqrt{\alpha_t}x_t\)</span>. Without fresh noise,</p>
+<p><span class="math display">\[x_{t-1}=\sqrt{\alpha_t}x_t
+\quad\Longrightarrow\quad
+x_0=\sqrt{\bar\alpha_T}x_T.\]</span></p>
+<p>Starting from <span class="math inline">\(x_T\sim\mathcal N(0,1)\)</span> therefore gives <span class="math inline">\(x_0\sim\mathcal N(0,\bar\alpha_T)\)</span>, nearly a point mass when <span class="math inline">\(\bar\alpha_T\)</span> is small. The desired data variance is one. With reverse variance <span class="math inline">\(\beta_t\)</span>, each non-final Gaussian step restores variance <span class="math inline">\(\alpha_t+\beta_t=1\)</span>; Ho’s final mean-only reconstruction remains a separate convention.</p>
+<p>This does not rule out deterministic generation. It shows that simply deleting noise from this particular reverse-mean recursion changes the output law. Deterministic transport and DDIM are developed later.</p>
+</section>
+<section id="justifying-fresh-noise-requires-a-reverse-conditional-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="justifying-fresh-noise-requires-a-reverse-conditional-distribution">4.2. Justifying fresh noise requires a reverse conditional distribution</h3>
+<p>The variance calculation shows why the conditional mean alone is insufficient, but it does not establish that adding arbitrary Gaussian noise will produce the correct law. We need a distribution for the preceding state, conditional on the current state. The appropriate reference is the reverse conditional <span class="math inline">\(q(x_{t-1}\mid x_t)\)</span> induced by the forward process.</p>
+<p>If this conditional were Gaussian with mean <span class="math inline">\(\mu_\theta(x_t,t)\)</span> and covariance <span class="math inline">\(\sigma_t^2I\)</span>, drawing from it would give exactly <span class="math inline">\(\mu_\theta(x_t,t)+\sigma_tz\)</span>. The fresh noise would then represent the conditional uncertainty left after the current state is known. To justify Algorithm 2, we must therefore establish why sampling the reverse conditional recovers the preceding marginal, why a Gaussian is a reasonable approximation to that conditional, and how to choose its variance. Section 5 develops the reverse-kernel argument, and Section 6 examines the variance choices.</p>
+</section>
+</section>
+<section id="deriving-ancestral-sampling-from-an-approximately-gaussian-reverse-kernel" class="level2">
+<h2 class="anchored" data-anchor-id="deriving-ancestral-sampling-from-an-approximately-gaussian-reverse-kernel">5. Deriving ancestral sampling from an approximately Gaussian reverse kernel</h2>
+<p>Suppose first that we could use the true reverse conditional induced by the forward process. If <span class="math inline">\(x_t\)</span> has the correct forward marginal, sampling the true conditional <span class="math inline">\(q(x_{t-1}\mid x_t)\)</span> recovers the preceding marginal:</p>
+<p><span class="math display">\[q(x_{t-1})=\int q(x_{t-1}\mid x_t)q(x_t)\,dx_t.\]</span></p>
+<p>DDPM approximates this conditional with its learned Gaussian model. Sampling a Gaussian with mean <span class="math inline">\(\mu_\theta\)</span> and covariance <span class="math inline">\(\sigma_t^2I\)</span> means computing <span class="math inline">\(\mu_\theta+\sigma_tz\)</span>, exactly Algorithm 2’s update. This is <strong>ancestral sampling</strong>: sample the root <span class="math inline">\(x_T\)</span>, then each successive variable from its conditional given its parent in the reverse generative chain. Song et al.&nbsp;use this name in Section 2.2, Eq. (4).</p>
+<p>The remaining modeling question is whether a Gaussian is an adequate representation of the reverse conditional. For a small forward step, Bayes’ rule multiplies a narrow Gaussian likelihood by the preceding density. Where that density is positive and sufficiently smooth on the scale of the step, a local expansion of its log changes the Gaussian’s center to leading order. The resulting reverse conditional is approximately Gaussian. This argument is local and asymptotic; finite-step reverse conditionals can be multimodal. <a href="https://arxiv.org/abs/2406.08929">Nakkiran et al., Section 2.1 and Appendix B.1</a> provide the intuition and a small-noise KL calculation.</p>
+<p>To see this approximation explicitly in one dimension, write <span class="math inline">\(u=x_{t-1}\)</span>, <span class="math inline">\(x=x_t\)</span>, and let <span class="math inline">\(q_{t-1}\)</span> denote the preceding marginal. Bayes’ rule gives</p>
+<p><span class="math display">\[q(u\mid x)\propto
+\exp\!\left[-\frac{(x-\sqrt{\alpha_t}u)^2}{2\beta_t}
++\log q_{t-1}(u)\right].\]</span></p>
+<p>The Gaussian likelihood is centered at <span class="math inline">\(u_*=x/\sqrt{\alpha_t}\)</span> as a function of <span class="math inline">\(u\)</span>, with variance <span class="math inline">\(\beta_t/\alpha_t\)</span>. Expand the remaining log density locally:</p>
+<p><span class="math display">\[\log q_{t-1}(u)
+\approx\log q_{t-1}(u_*)+\ell'(u_*)(u-u_*),
+\qquad \ell(u)=\log q_{t-1}(u).\]</span></p>
+<p>Completing the square then gives the leading local approximation</p>
+<p><span class="math display">\[q(u\mid x)\approx\mathcal N\!\left(
+u_*+\frac{\beta_t}{\alpha_t}\ell'(u_*),
+\frac{\beta_t}{\alpha_t}\right).\]</span></p>
+<p>This calculation explains the Gaussian shape when the preceding log density varies smoothly across the narrow likelihood. It is not an exact finite-step formula: curvature changes the variance, and higher-order terms change the shape. Since <span class="math inline">\(\alpha_t=1-\beta_t\)</span>, the displayed variance equals <span class="math inline">\(\beta_t+O(\beta_t^2)\)</span>. Rather than use this local approximation to compute the mean, DDPM obtains it from the learned denoising predictor, as follows.</p>
+<p>The regression calculation also identifies the mean that the model should use. At each fixed step, the tower property gives</p>
+<p><span class="math display">\[\mathbb E[\widetilde\mu_t(x_t,x_0)\mid x_t]
+=\mathbb E[\mathbb E[x_{t-1}\mid x_t,x_0]\mid x_t]
+=\mathbb E[x_{t-1}\mid x_t].\]</span></p>
+<p>Thus the exact regression optimum supplies the true reverse conditional mean even when the conditional itself is non-Gaussian. The approximation concerns the shape and variance of the Gaussian model, as well as any error in the learned mean. We now examine the variance choices separately so that these sources of error remain distinguishable.</p>
+</section>
+<section id="justifying-hos-fixed-reverse-step-variance-choices" class="level2">
+<h2 class="anchored" data-anchor-id="justifying-hos-fixed-reverse-step-variance-choices">6. Justifying Ho’s fixed reverse-step variance choices</h2>
+<p>The ELBO calculation allowed us to specify a reverse variance independently of the learned mean. In the basic DDPM model, this variance is a function of the step index and is not predicted from the current state. Ho considers <span class="math inline">\(\sigma_t^2=\beta_t\)</span> and <span class="math inline">\(\sigma_t^2=\widetilde\beta_t\)</span>. Two limiting cases explain these choices: a Gaussian marginal gives the first variance exactly, while a known clean origin gives the second.</p>
+<section id="a-standard-normal-marginal-gives-reverse-variance-equal-to-the-forward-step-variance" class="level3">
+<h3 class="anchored" data-anchor-id="a-standard-normal-marginal-gives-reverse-variance-equal-to-the-forward-step-variance">6.1. A standard-normal marginal gives reverse variance equal to the forward-step variance</h3>
+<p>If the preceding state is standard normal, the forward step preserves that law. Gaussian conditioning then gives</p>
+<p><span class="math display">\[q(x_{t-1}\mid x_t)=\mathcal N(\sqrt{\alpha_t}\,x_t,\beta_t I).\]</span></p>
+<p>Thus <span class="math inline">\(\beta_t\)</span> is exactly the reverse variance in this case. Near a sufficiently Gaussian terminal regime, it is a natural approximation. The other choice is close when the preceding cumulative signal is small:</p>
+<p><span class="math display">\[\boxed{\beta_t-\widetilde\beta_t
+=\frac{\beta_t^2\bar\alpha_{t-1}}{1-\bar\alpha_t}.}\]</span></p>
+<p>This terminal-regime argument explains why the two choices can be close near the beginning of generation. It does not explain their difference at later steps, when the preceding marginal may have substantial structure. For that, we return to the posterior conditioned on the clean origin.</p>
+</section>
+<section id="conditioning-on-the-clean-origin-gives-the-posterior-variance-choice" class="level3">
+<h3 class="anchored" data-anchor-id="conditioning-on-the-clean-origin-gives-the-posterior-variance-choice">6.2. Conditioning on the clean origin gives the posterior variance choice</h3>
+<p>For a scalar observation, first condition on both <span class="math inline">\(x_t\)</span> and <span class="math inline">\(x_0\)</span>, then average over the unknown <span class="math inline">\(x_0\)</span>. The conditional variance in the first stage is <span class="math inline">\(\widetilde\beta_t\)</span>, while the conditional mean varies with <span class="math inline">\(x_0\)</span>. The law of total variance therefore gives</p>
+<p><span class="math display">\[\operatorname{Var}(x_{t-1}\mid x_t)=\widetilde\beta_t+
+\left(\frac{\sqrt{\bar\alpha_{t-1}}\beta_t}{1-\bar\alpha_t}\right)^2
+\operatorname{Var}(x_0\mid x_t).\]</span></p>
+<p>The first term is the variance when the clean origin is also known. The second accounts for uncertainty over that origin. The choice <span class="math inline">\(\widetilde\beta_t\)</span> is accurate when the entire second term is negligible; it is exact for data concentrated at a single point. Small posterior uncertainty alone is insufficient if its coefficient is large.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Exact reverse variance from the second-order Tweedie identity
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For scalar data, a second-order Tweedie identity gives</p>
+<p><span class="math display">\[\operatorname{Var}(x_{t-1}\mid x_t=x)
+=\frac{\beta_t}{\alpha_t}
+\left[1+\beta_t\,\partial_x^2\log q_t(x)\right],\]</span></p>
+<p>where <span class="math inline">\(q_t\)</span> is the noisy marginal density. Appendix B derives it. For <span class="math inline">\(q_t=\mathcal N(0,1)\)</span>, its log-density curvature is <span class="math inline">\(-1\)</span>, recovering variance <span class="math inline">\(\beta_t\)</span>. For small <span class="math inline">\(\beta_t\)</span> with bounded curvature, the variance is <span class="math inline">\(\beta_t+O(\beta_t^2)\)</span>; this need not hold uniformly near the data endpoint.</p>
+<p>The fixed-variance algorithm avoids estimating this curvature. Using the identity might improve some finite-step approximations, but that possibility is <strong>untested in these notes</strong>. Estimated curvature can be inaccurate, and even exact first two moments do not capture a non-Gaussian conditional’s full shape.</p>
+</div>
+</div>
+<p>An additional justification of the sampler, including its noise variance, appears later in <a href="../tutorials/42-ddpm-reverse-vp-sde.html">DDPM through the reverse VP SDE</a>. There we first obtain the forward VP SDE as the small-step limit of DDPM’s forward chain, then reverse that SDE and apply Euler–Maruyama. Its drift and Brownian noise recover the leading-order ancestral update, with reverse-step variance <span class="math inline">\(\beta_t\)</span>. This explains the mean and variance together through the continuous-time dynamics. The later note also compares Song’s discrete reverse-diffusion construction with ancestral sampling, making explicit their finite-step differences and common SDE limit.</p>
+</section>
+</section>
+<section id="connecting-ddpm-to-reverse-sdes-and-probability-flow-odes" class="level2">
+<h2 class="anchored" data-anchor-id="connecting-ddpm-to-reverse-sdes-and-probability-flow-odes">7. Connecting DDPM to reverse SDEs and probability-flow ODEs</h2>
+<p>The construction above specifies both a training problem and a generative model. Its training criterion is motivated by the likelihood of the reverse Markov chain, and its implementation uses noise regression to parameterize the reverse means. Generation then draws from the chosen reverse transitions. The score interpretation explains the quantity learned by the predictor, but it does not require us to change Ho’s sampling algorithm.</p>
+<p>This separation will be useful when we introduce other sampling dynamics. A trained denoising predictor may be reused, while the rule for updating the generated state changes. Such a change must be derived from the intended density evolution; removing one term from an existing sampler is not sufficient. The next topic develops this reasoning through continuous transport, before returning to DDPM as a discretization of a reverse stochastic process.</p>
+<p>Continue to <a href="../tutorials/probability-flow-ode.html">Probability-Flow ODE</a> for a different route to transport. Within that series, <a href="../tutorials/42-ddpm-reverse-vp-sde.html">DDPM through the reverse VP SDE</a> returns to this same ancestral sampler and shows how it discretizes stochastic reverse dynamics.</p>
+</section>
+<section id="appendix-a.-deriving-the-reverse-gaussian-conditioned-on-clean-data" class="level2">
+<h2 class="anchored" data-anchor-id="appendix-a.-deriving-the-reverse-gaussian-conditioned-on-clean-data">Appendix A. Deriving the reverse Gaussian conditioned on clean data</h2>
+<p>For <span class="math inline">\(t\ge2\)</span>, Bayes’ rule gives</p>
+<p><span class="math display">\[q(u\mid x_t,x_0)\propto q(x_t\mid u)q(u\mid x_0),\qquad u=x_{t-1}.\]</span></p>
+<p>The negative log density, up to constants, is</p>
+<p><span class="math display">\[\frac{\|x_t-\sqrt{\alpha_t}u\|^2}{2\beta_t}
++\frac{\|u-\sqrt{\bar\alpha_{t-1}}x_0\|^2}{2(1-\bar\alpha_{t-1})}.\]</span></p>
+<p>The scalar precision is</p>
+<p><span class="math display">\[\frac{\alpha_t}{\beta_t}+\frac1{1-\bar\alpha_{t-1}}
+=\frac{1-\bar\alpha_t}{\beta_t(1-\bar\alpha_{t-1})}.\]</span></p>
+<p>Its reciprocal is <span class="math inline">\(\widetilde\beta_t\)</span>. Multiply that variance by the linear coefficient</p>
+<p><span class="math display">\[\frac{\sqrt{\alpha_t}x_t}{\beta_t}+
+\frac{\sqrt{\bar\alpha_{t-1}}x_0}{1-\bar\alpha_{t-1}}\]</span></p>
+<p>to obtain <span class="math inline">\(\widetilde\mu_t\)</span> in Section 3. At <span class="math inline">\(t=1\)</span>, conditioning on <span class="math inline">\(x_0\)</span> gives a point mass; the interior KL argument does not apply to the reconstruction term unchanged.</p>
+</section>
+<section id="appendix-b.-deriving-the-exact-scalar-reverse-variance-from-tweedies-identity" class="level2">
+<h2 class="anchored" data-anchor-id="appendix-b.-deriving-the-exact-scalar-reverse-variance-from-tweedies-identity">Appendix B. Deriving the exact scalar reverse variance from Tweedie’s identity</h2>
+<p>Fix a step and put <span class="math inline">\(A=\sqrt{\alpha_t}x_{t-1}\)</span>, <span class="math inline">\(V=x_t\)</span>, so <span class="math inline">\(V=A+\sqrt{\beta_t}Z\)</span>. Write <span class="math inline">\(m(x)=\mathbb E[A\mid V=x]\)</span>. Gaussian Bayes differentiation gives</p>
+<p><span class="math display">\[\partial_x\log p(A=a\mid V=x)
+=\frac{a-x}{\beta_t}-\partial_x\log q_t(x).\]</span></p>
+<p>Taking its conditional expectation gives zero, hence</p>
+<p><span class="math display">\[m(x)=x+\beta_t\partial_x\log q_t(x).\]</span></p>
+<p>Substitution back into the posterior derivative yields</p>
+<p><span class="math display">\[\partial_xp(a\mid x)=\frac{a-m(x)}{\beta_t}p(a\mid x).\]</span></p>
+<p>Differentiate the posterior mean, assuming the required moments and differentiation under the integral are justified:</p>
+<p><span class="math display">\[\begin{aligned}
+m'(x)&amp;=\int a\,\partial_xp(a\mid x)\,da\\
+&amp;=\frac{\mathbb E[A^2\mid V=x]-m(x)^2}{\beta_t}
+=\frac{\operatorname{Var}(A\mid V=x)}{\beta_t}.
+\end{aligned}\]</span></p>
+<p>Also <span class="math inline">\(m'(x)=1+\beta_t\partial_x^2\log q_t(x)\)</span>. Equating the two expressions and dividing by <span class="math inline">\(\alpha_t\)</span> proves the identity in Section 6. In multiple dimensions, the corresponding covariance is <span class="math inline">\(\beta_t[ I+\beta_t\nabla^2\log q_t(x)]/\alpha_t\)</span>. A noisy learned Hessian need not yield a valid positive-semidefinite covariance.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Ho, Jain, and Abbeel. <a href="https://arxiv.org/abs/2006.11239"><em>Denoising Diffusion Probabilistic Models</em></a>. Algorithms 1–2 and Eqs. (3)–(14).</li>
+<li>Yang Song et al.&nbsp;<a href="https://arxiv.org/abs/2011.13456"><em>Score-Based Generative Modeling through Stochastic Differential Equations</em></a>. Section 2.2 expresses DDPM training and ancestral sampling in score form. Section 3.4 and Appendix E supply the later reverse-SDE interpretation.</li>
+<li>Nakkiran, Bradley, Zhou, and Advani. <a href="https://arxiv.org/abs/2406.08929"><em>Step-by-Step Diffusion: An Elementary Tutorial</em></a>. Section 2.1 and Appendix B.1 justify the small-step Gaussian approximation.</li>
+<li>Efron. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3325056/"><em>Tweedie’s Formula and Selection Bias</em></a>. Posterior-moment identities.</li>
+</ul>
 
 
 </section>
@@ -1208,13 +1572,13 @@ p(x_n\mid x_{n-1})p(x_{n-1}\mid x_0).\]</span></p>
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/29-variational-autoencoders.html" class="pagination-link" aria-label="10 · Variational Autoencoders (VAEs)">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">10 · Variational Autoencoders (VAEs)</span>
+      <a href="../tutorials/39-denoising-score-matching.html" class="pagination-link" aria-label="11 · Denoising Score Matching and Langevin Sampling">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">11 · Denoising Score Matching and Langevin Sampling</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/probability-flow-ode.html" class="pagination-link" aria-label="12 · Probability-Flow ODE">
-        <span class="nav-page-text">12 · Probability-Flow ODE</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/probability-flow-ode.html" class="pagination-link" aria-label="13 · Probability-Flow ODE">
+        <span class="nav-page-text">13 · Probability-Flow ODE</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
