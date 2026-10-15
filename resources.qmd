@@ -9,6 +9,8 @@
 - Peter Holderrieth, Ezra Erives. **An Introduction to Flow Matching and Diffusion Models.** [arXiv:2506.02070](https://arxiv.org/abs/2506.02070). The MIT 6.S184 lecture notes, and the closest thing to a parallel text for this course: self-contained, built from first principles, and it develops the ODE/SDE background before deriving flow matching and denoising diffusion. Read it alongside the primary text when you want a second derivation of the same result — it reaches the reverse-time and probability-flow material of Modules 5–6 by a flow-matching route rather than a score-matching one.
 - G. A. Pavliotis. *Stochastic Processes and Applications: Diffusion Processes, the Fokker-Planck and Langevin Equations.* Springer, 2014 — for the stochastic-processes machinery of Modules 5–6.
 
+- Preetum Nakkiran, Arwen Bradley, Hattie Zhou, Madhu Advani. **Step-by-Step Diffusion: An Elementary Tutorial.** [arXiv:2406.08929](https://arxiv.org/abs/2406.08929). An accessible development of DDPM, DDIM, and flow matching. Section 2.1 gives the Bayes-and-Taylor explanation of the small-step Gaussian reverse approximation; Lemma 1 and Appendix B.1 quantify its KL error.
+
 ## Supplementary Reading
 
 - [How to Build a Diffusion Language Model](https://kuleshov-group.github.io/blog/blog/2026/how-to-build-a-diffusion-language-model/) — Kuleshov Group. A modern application of the ideas in this course to language modeling.

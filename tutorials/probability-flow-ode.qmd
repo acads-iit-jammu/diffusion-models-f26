@@ -1,10 +1,12 @@
-# 12 · Probability-Flow ODE {.unnumbered}
+# 13 · Probability-Flow ODE {.unnumbered}
 
 ::: {.callout-note}
 ## Draft topic
 
-This ten-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–10, and can be read in sequence. The notes and worked examples are in development.
+This eleven-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–11, and can be read in sequence. The notes and worked examples are in development.
 :::
+
+This topic follows [denoising score matching and Langevin sampling](./39-denoising-score-matching.qmd) and the [original DDPM lecture](./30-ddpm.qmd).
 
 Start with particle trajectories and density evolution in one dimension. Then extend the construction to vectors, learn the score from clean/noisy pairs, and implement sampling. The later parts provide experiments and an image-model recipe, then connect probability-flow ODEs to Neural ODEs, normalizing flows, and flow matching.
 
@@ -19,8 +21,9 @@ Start with particle trajectories and density evolution in one dimension. Then ex
 | [07 · Empirical-score sampling](./41-empirical-score-interpolation.qmd) | Compute an exact bank-based score, inspect interpolation and retrieval, and sample scalars and MNIST without training. |
 | [08 · Neural ODEs and normalizing flows](./36-probability-flow-ode-part-7.qmd) | Connect velocity models, invertible transport, and likelihood. |
 | [09 · Flow matching](./37-probability-flow-ode-part-8.qmd) | Learn the velocity directly from conditional-path regression. |
-| [10 · DDPM, DDIM, and probability flow](./38-probability-flow-ode-part-9.qmd) | Relate discrete samplers to the reverse SDE and probability-flow ODE. |
+| [10 · DDPM through the reverse VP SDE](./42-ddpm-reverse-vp-sde.qmd) | Reinterpret ancestral DDPM as a numerical discretization of the reverse VP SDE. |
+| [11 · DDIM and the probability-flow ODE](./38-probability-flow-ode-part-9.qmd) | Derive DDIM as Euler integration in transformed probability-flow coordinates. |
 
-Parts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Part 07 provides an exact empirical alternative and makes the supporting observations visible. Parts 08–09 connect the construction to other continuous generative models; Part 10 relates it to discrete diffusion samplers.
+Parts 01–03 develop the mathematical argument. Part 04 contains focused laptop experiments; Part 06 combines training and sampling in one worked example. Part 05 is the extension to image models. Part 07 provides an exact empirical alternative and makes the supporting observations visible. Parts 08–09 connect the construction to other continuous generative models; Parts 10–11 reinterpret DDPM and DDIM through reverse-SDE and probability-flow dynamics, respectively.
 
 [Download all notebooks and code](../materials/probability-flow/probability-flow-code.zip).

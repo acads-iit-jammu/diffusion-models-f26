@@ -37,8 +37,19 @@ Multivariate CDFs exist, but a single cumulative probability does not uniquely
 identify a position in $\mathbb R^d$. Applying a separate CDF transform to
 each coordinate does not generally remove dependence between coordinates.
 The scalar percentile construction in Part 1 therefore has no direct
-coordinatewise extension. The continuity equation and score-based
-probability-flow construction do extend to $d$ dimensions.
+coordinatewise extension. This does not prevent us from specifying a density
+path: a mixture of the data density and a Gaussian still defines one. What
+is missing is the scalar CDF rule that directly recovers its transport field.
+In higher dimensions, continuity generally admits several velocity fields for
+the same path, and evaluating explicit constructions may require difficult
+joint-density or conditional-distribution estimates.
+
+Our alternative is to specify forward Gaussian corruption, whose associated
+SDE determines a density path through the Fokker–Planck equation. Writing that
+equation in continuity form supplies a particular compatible velocity in
+terms of the score. This construction extends to all coordinates jointly
+without estimating multivariate CDFs. Other transport constructions are
+possible; the SDE provides the one used here.
 
 ## 2. Notation and differential operators
 

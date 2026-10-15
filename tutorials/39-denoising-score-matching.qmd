@@ -1,10 +1,12 @@
-# 01 · Denoising Score Matching {.unnumbered}
+# 11 · Denoising Score Matching and Langevin Sampling {.unnumbered}
 
 ::: {.callout-note}
-## Draft — Standalone topic outline
+## Draft — Learn a score, then sample with it
 
-This topic develops score estimation and Langevin sampling independently of probability-flow ODEs. The aim is to learn a score from samples, then use it to sample a fixed density. Start with one dimension; vector formulas replace derivatives by gradients. The sections below establish the main results and the planned teaching sequence.
+This topic develops score estimation and Langevin sampling independently of probability-flow ODEs. The aim is to learn a score from samples, then use it to sample a fixed density. Start with one dimension; vector formulas replace derivatives by gradients. This lecture comes before DDPM: it separates the regression problem used to learn a score from the sampling algorithm that uses it.
 :::
+
+For a smooth positive density $p$, its scalar score is $s(x)=\partial_x\log p(x)$. It measures the local rate of change of log density. We first learn this quantity for a Gaussian-smoothed data distribution, then use it as the drift in a sampling procedure. No probability-flow ODE is needed here.
 
 ## 1. Learn from clean/noisy pairs
 
@@ -35,7 +37,31 @@ $$\mathcal L_{\mathrm{DSM}}(\theta;\sigma)
 
 At the unrestricted optimum, $s_*(y,\sigma)=\mathbb E[U\mid Y=y]=s_\sigma(y)$. The conditional target is known even though the marginal score is not. The loss differs from marginal-score regression by a conditional-variance term independent of the predictor. This is the denoising/score-matching connection developed by [Vincent (2011)](https://gwern.net/doc/ai/nn/diffusion/2011-vincent.pdf).
 
-Planned derivation: expand the conditional squared error, differentiate the Gaussian convolution, and show explicitly why the posterior mean appears. Finite-data training targets the corrupted empirical law at its unrestricted optimum.
+To verify the identity, differentiate the marginal density:
+
+$$\begin{aligned}
+\partial_y p_\sigma(y)
+&=\int \frac{x_0-y}{\sigma^2}p(y\mid x_0)p_{\mathrm{data}}(x_0)\,dx_0,\\
+\partial_y\log p_\sigma(y)
+&=\int \frac{x_0-y}{\sigma^2}
+\frac{p(y\mid x_0)p_{\mathrm{data}}(x_0)}{p_\sigma(y)}\,dx_0\\
+&=\int \frac{x_0-y}{\sigma^2}p(x_0\mid y)\,dx_0
+=\mathbb E[U\mid Y=y].
+\end{aligned}$$
+
+Although the posterior is not explicitly available during training, sampling clean/noisy pairs supplies draws from their joint law. Squared-error regression performs the conditional averaging:
+
+$$\mathbb E[(s_\theta(Y,\sigma)-U)^2\mid Y]
+=(s_\theta(Y,\sigma)-\mathbb E[U\mid Y])^2
++\operatorname{Var}(U\mid Y).$$
+
+The second term is independent of the predictor. For an empirical training distribution, the unrestricted population objective over corrupted training pairs targets its smoothed empirical score.
+
+Equivalently, train a noise predictor with squared error and set $s_\theta=-\varepsilon_\theta/\sigma$. Then
+
+$$\mathbb E[(\varepsilon-\varepsilon_\theta)^2]=\sigma^2\mathcal L_{\mathrm{DSM}}.$$
+
+This exact reparameterization will reappear in DDPM, with a different cumulative noise scale at every discrete step.
 
 ## 3. Once a fixed score is known: Langevin sampling
 
@@ -63,13 +89,17 @@ For $0<\eta<2$, the discrete chain's stationary variance solves
 $$V=(1-\eta)^2V+2\eta,
 \qquad V=\frac1{1-\eta/2}.$$
 
-It approaches the target variance 1 as $\eta\to0$, but is not exactly 1 at a finite step. This will anchor simulations of step-size bias, convergence, and multimodal mixing.
+It approaches the target variance 1 as $\eta\to0$, but is not exactly 1 at a finite step. This separates finite-step sampling bias from score-estimation error.
 
 ## 5. Several noise levels and annealed Langevin dynamics
 
 Train $s_\theta(x,\sigma)$ at a decreasing sequence $\sigma_1>\cdots>\sigma_L>0$, averaging the DSM loss over a stated distribution of noise levels with positive weights. At each level, perform several Langevin steps targeting $p_{\sigma_i}$, then lower the noise scale. Large smoothing can make movement between modes easier; short runs at each level do not guarantee equilibrium.
 
 This is the approach of [Song and Ermon (2019)](https://arxiv.org/abs/1907.05600). It differs from a reverse diffusion SDE designed to follow prescribed changing marginals without equilibrating at every level. The final positive noise level retains smoothing error.
+
+## 6. Next: a learned reverse Markov chain
+
+The training problem is now familiar: use known conditional Gaussian targets to estimate an unknown marginal score. Langevin supplies one sampling method, with a fixed target at each noise level. [DDPM](./30-ddpm.qmd) next builds a reverse Markov chain and motivates its training through the ELBO. Its simplified noise-prediction loss is another weighted denoising score objective, but its ancestral sampler follows different dynamics. After DDPM, [Probability-Flow ODE](./probability-flow-ode.qmd) develops deterministic transport and later reinterprets DDPM through a reverse SDE.
 
 ## Appendix A: why score-driven Langevin dynamics preserves the target density {#sec-langevin-stationarity}
 

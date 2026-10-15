@@ -729,22 +729,53 @@ This separates three parts of the construction:
 3. Estimate the unknown functions in that field from data, then use the field
    in a numerical solver to generate samples.
 
-#### Why seek an alternative to the CDF construction?
+#### Why the CDF construction does not extend directly to higher dimensions
 
-The special advantage of one dimension is that particles can be ordered from
-left to right and labeled by a single percentile. Multivariate CDFs exist,
-but a single cumulative probability no longer specifies a unique position.
-The scalar inverse-CDF construction therefore does not extend directly.
-Applying separate CDF transformations to individual coordinates also does
-not generally remove their statistical dependence.
+The preceding construction did not require an SDE. We chose a density path,
+used continuity to recover its vector field, and obtained a sampling procedure
+by reversing the resulting ODE. In one dimension, integrating from the left
+boundary gives the probability flux directly:
 
-Higher-dimensional constructions require additional information about that
-joint dependence. Estimating and using these distributions becomes difficult
-as the dimension increases. This motivates an alternative that can be learned
-from samples without explicitly constructing CDFs. We continue to develop it
-in one dimension.
+$$p_t(x)v(x,t)=-\partial_tF_t(x).$$
 
-### The score: an alternative quantity to estimate
+This works because a point divides the line into a left side and a right side.
+The change in probability on the left determines the net flux through that
+point. A single percentile also identifies a unique position when the CDF
+is strictly increasing.
+
+In higher dimensions, we can still specify an explicit density path. For
+example, a mixture of the data density and a standard multivariate Gaussian
+is a valid path between the desired endpoints. The difficulty is recovering
+and evaluating a vector field that realizes it. A point no longer divides
+space into two sides, and a single cumulative probability does not identify
+a unique position. Multivariate CDFs exist, but the scalar inverse-CDF
+construction does not extend directly. Applying separate CDF transforms to
+individual coordinates also fails to account for their joint dependence.
+
+There is an additional ambiguity: knowing how much probability enters or
+leaves each region does not specify all directions in which particles move
+inside it. In higher dimensions, several vector fields can produce the same
+density evolution. The continuity equation therefore needs an additional
+choice of transport field; Part 2 states this nonuniqueness precisely.
+Estimating the joint data density and the conditional distributions needed
+for more general cumulative transforms can also be difficult from samples.
+
+Thus an explicit density path remains possible, but it no longer supplies
+the simple CDF-based construction available on the line. We seek a different
+way to specify a path together with a computable field that realizes it.
+For score-based diffusion, we choose forward Gaussian corruption. Its
+continuous-time SDE supplies a density-evolution equation, the Fokker–Planck
+equation. Rewriting that equation in continuity form will identify one
+compatible deterministic vector field without constructing multivariate CDFs.
+An SDE is a useful choice for this purpose, not a requirement for every
+higher-dimensional transport method.
+
+We will carry out this alternative construction in one dimension first.
+The resulting velocity involves a spatial derivative of the log density,
+called the score. We define that quantity next, then derive why it appears;
+we do not assume in advance that the score itself is the required velocity.
+
+### The score: a quantity that will appear in the diffusion-derived field
 
 For a smooth positive density $p_t$, define its **score** by
 
@@ -798,8 +829,10 @@ then determines its evolution through the continuity equation. Specifying
 the initial and terminal distributions does not uniquely determine either
 the intermediate densities or the vector field.
 
-In the CDF construction, we selected intermediate densities explicitly. We
-now consider another construction: specify a **forward stochastic process**
+In the CDF construction, we selected intermediate densities explicitly and
+used one-dimensional cumulative probabilities to recover their flux. To
+obtain a construction that extends directly to higher dimensions, we now
+specify a **forward stochastic process**
 whose distributions evolve from the data distribution toward a standard
 Gaussian. We can then use its density equation to derive a deterministic
 vector field with the same density evolution.

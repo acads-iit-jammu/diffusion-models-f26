@@ -1,165 +1,664 @@
-# 11 · Denoising Diffusion Probabilistic Models (DDPM) {.unnumbered}
+# 12 · Denoising Diffusion Probabilistic Models (DDPM) {.unnumbered}
 
 ::: {.callout-note}
-## Draft
+## Draft — Ho's training and sampling algorithms
 
-These lecture notes are in development and may be revised. This lecture uses finite Gaussian transitions; no knowledge of Brownian motion or SDEs is required. The aim is to understand what is trained and how the trained model generates samples.
+A denoising diffusion probabilistic model learns to generate data by reversing a prescribed sequence of noisy transformations. The forward transformations are known and can be applied to training observations. The reverse transformations must be learned because a noisy observation can have several possible clean origins.
+
+We first state Ho et al.'s training and sampling algorithms so that the computational task is visible. We then derive the training criterion from the likelihood of a reverse Markov model, explain its reduction to noise regression, and then derive the sampling rule. The sampling discussion begins with why repeatedly applying the predicted mean is insufficient. We then justify the approximately Gaussian reverse kernel and explain the two fixed variance choices. The discussion uses **Ho's notation throughout**. It builds on [denoising score matching and Langevin sampling](./39-denoising-score-matching.qmd); the later [Probability Flow discussion](./42-ddpm-reverse-vp-sde.qmd) provides the continuous-time reinterpretation.
 :::
 
-## 1. Generation by reversing a corruption sequence
+## 1. Ho’s DDPM algorithms: training a noise predictor and generating samples
 
-Start with a data observation $X_0$. Repeatedly contract its current value and add independent Gaussian noise. With enough corruption, its distribution is close to a standard normal. We then train a model to generate observations by traversing a learned reverse sequence, starting from a normal sample.
+DDPM has two computational stages. During training, a neural network learns from pairs of clean observations and artificially corrupted observations. During generation, the trained network determines the means of successive reverse transitions, starting from a Gaussian prior. We state both algorithms first, then derive the training objective and the sampling rule in the sections that follow.
 
-Use $N$ steps and normalized times $t_n=n/N$. Data are at $t_0=0$; the terminal prior is at $t_N=1$. For now every observation is scalar. The same formulas later apply coordinatewise to vectors and images with independent Gaussian corruption noise.
+Let $x_0\sim q(x_0)$ be clean data and let $t=1,\ldots,T$ be a **discrete step index**. Choose forward noise variances $0<\beta_t<1$ and define
 
-## 2. One step and its cumulative form
+$$\alpha_t=1-\beta_t,\qquad \bar\alpha_t=\prod_{s=1}^t\alpha_s,\qquad\bar\alpha_0=1.$$
 
-Choose a discrete noise variance $0<\beta_n<1$ and set $a_n=1-\beta_n$. One step is
-
-$$X_n=\sqrt{a_n}X_{n-1}+\sqrt{\beta_n}\varepsilon_n,
-\qquad \varepsilon_n\overset{\mathrm{iid}}\sim\mathcal N(0,1).$$
-
-Here $X_n$ means $X_{t_n}$. With $\bar a_n=\prod_{j=1}^n a_j$, the conditional law after $n$ steps is
-
-$$\boxed{X_n\mid X_0=x_0\sim
-\mathcal N\left(\sqrt{\bar a_n}x_0,1-\bar a_n\right).}$$
-
-Consequently, a training example at step $n$ can be drawn directly:
-
-$$X_n=\sqrt{\bar a_n}X_0+\sqrt{1-\bar a_n}\,\varepsilon.$$
-
-This equality constructs the conditional distribution at one chosen time. Using a single shared $\varepsilon$ at every time does not simulate the forward Markov chain's joint trajectories.
+Here $\alpha_t$ is one-step variance retention; $\sqrt{\bar\alpha_t}$ is the cumulative signal amplitude. The symbol $\sigma_t^2$ below denotes a chosen **reverse-step variance**, not cumulative forward noise variance. The network $\varepsilon_\theta(x_t,t)$ takes a noisy observation and its step index as inputs. The same parameters are used at every noise level, with the index identifying how much corruption has been applied. We write vector observations below; the scalar case follows by replacing the identity covariance by one and squared norms by squares.
 
 ::: {.callout-note}
-## Notation across the lectures
+## Algorithm 1 — Train the noise-prediction network
 
-| Quantity | Discrete DDPM notation here | Continuous lectures |
-|---|---|---|
-| One-step noise variance | $\beta_n$ | Approximately $\beta(t_n)\Delta t$ |
-| One-step variance retention | $a_n=1-\beta_n$ | One-step amplitude squared |
-| Cumulative amplitude | $\sqrt{\bar a_n}$ | $\alpha_{t_n}$ |
-| Cumulative noise variance | $1-\bar a_n$ | $1-\alpha_{t_n}^2$ |
+Initialize the network parameters $\theta$. Repeat:
 
-Many DDPM sources call our $a_n$ “$\alpha_n$.” We use $a_n$ here to reserve $\alpha_t$ for the cumulative **amplitude** used throughout Parts 1–5. A discrete $\beta_n$ is a variance, whereas a continuous $\beta(t)$ is a rate.
+1. Draw independently
+
+   $$x_0\sim q(x_0),\qquad t\sim\operatorname{Uniform}\{1,\ldots,T\},\qquad\varepsilon\sim\mathcal N(0,I).$$
+
+2. Construct the noisy observation:
+
+   $$x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\varepsilon.$$
+
+3. Take an optimizer step on the squared prediction error. For gradient descent with learning rate $\rho$,
+
+   $$\boxed{\theta\leftarrow\theta-\rho\nabla_\theta
+   \|\varepsilon-\varepsilon_\theta(x_t,t)\|^2.}$$
+
+Return the trained predictor. Minibatches average this loss over independently constructed examples.
 :::
 
-If $\bar a_N$ is small, the terminal distribution is approximately normal. It is not exactly normal for arbitrary data at finite nonzero $\bar a_N$. For example, its mean is $\sqrt{\bar a_N}\mathbb E[X_0]$ and its variance is $\bar a_N\operatorname{Var}(X_0)+1-\bar a_N$.
+Training uses clean observations to construct supervised pairs, but generation begins without a clean observation. Algorithm 2 uses the fitted predictor at its current generated state to determine a reverse-step mean. It then draws the next state around that mean using a prescribed variance. The coefficients in this update will follow from the Gaussian conditioning calculation in Section 3.
 
-## 3. What is known about a reverse step?
+::: {.callout-note}
+## Algorithm 2 — Generate data by ancestral sampling
 
-If the clean observation is also known, the forward process gives an exactly computable conditional distribution:
+Draw $x_T\sim\mathcal N(0,I)$. For $t=T,T-1,\ldots,1$:
 
-$$p(x_{n-1}\mid x_n,x_0)=\mathcal N(\widetilde m_n,\widetilde\beta_n),\qquad n\ge2,$$
+1. Draw a fresh $z\sim\mathcal N(0,I)$ if $t>1$; set $z=0$ if $t=1$.
+2. Update
+
+   $$\boxed{x_{t-1}=\frac1{\sqrt{\alpha_t}}
+   \left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\varepsilon_\theta(x_t,t)\right)+\sigma_tz.}$$
+
+Return $x_0$. The fixed choices considered here are
+
+$$\sigma_t^2=\beta_t
+\quad\text{or}\quad
+\sigma_t^2=\widetilde\beta_t
+:=\beta_t\frac{1-\bar\alpha_{t-1}}{1-\bar\alpha_t}.$$
+
+Fresh noise is suppressed in the final step for either choice.
+:::
+
+These are Ho et al.'s Algorithms 1 and 2, with the learning-rate update made explicit. Although both contain Gaussian random variables, those variables have different roles. In training, the sampled noise creates a known target for regression. In generation, a fresh noise draw samples uncertainty in a reverse transition. The derivation must therefore explain both why noise regression learns an appropriate mean and why the sampler needs a distribution around that mean. We begin with the forward process, which determines the joint laws used in these arguments. [Ho et al. (2020)](https://arxiv.org/abs/2006.11239)
+
+## 2. Forward Gaussian corruption: constructing noisy training examples
+
+The forward process is fixed before fitting the neural network. At each step it reduces the signal amplitude and adds independent Gaussian noise. In distributional form, one transition is
+
+$$q(x_t\mid x_{t-1})=\mathcal N(x_t;\sqrt{\alpha_t}\,x_{t-1},\beta_tI).$$
+
+Conditioned on a particular clean observation, every subsequent state is a linear combination of that observation and independent Gaussian variables. Its conditional distribution is therefore Gaussian. Multiplying the successive signal factors and accumulating their noise variances gives
+
+$$\boxed{q(x_t\mid x_0)=\mathcal N(x_t;\sqrt{\bar\alpha_t}\,x_0,(1-\bar\alpha_t)I).}$$
+
+To verify the noise variance, suppose the conditional variance at step $t-1$ is $1-\bar\alpha_{t-1}$. The next contraction multiplies it by $\alpha_t$, while the independent new noise contributes variance $\beta_t$. Thus
+
+$$\alpha_t(1-\bar\alpha_{t-1})+\beta_t=1-\bar\alpha_t.$$
+
+The conditional mean similarly becomes $\sqrt{\alpha_t\bar\alpha_{t-1}}x_0$. This establishes the cumulative law by induction and justifies drawing a training input at any selected time in one operation.
+
+The conditional law is available even though the marginal data density is unknown. Given a stored observation $x_0$, we can evaluate the corruption kernel and draw from it; averaging over training observations produces noisy data examples. When $\bar\alpha_T$ is small, the contribution of clean data is small and the terminal law is approximately standard normal. It is generally not exactly normal at a finite schedule. Algorithm 1 needs only a sample at one selected time. If we instead wished to simulate a complete forward trajectory, we would use independent noise increments in the successive transitions. Reusing a single Gaussian vector in the cumulative formula at all times would give the same one-time conditional laws but a different joint trajectory law.
+
+This construction supplies a terminal distribution that is easy to approximate by a normal prior. To turn it into a generative model, we now specify transitions that start at that prior and move toward the data.
+
+## 3. Deriving DDPM’s training objective: from the reverse model to the simplified loss
+
+We seek network parameters that assign high likelihood to the training data. This section starts with the reverse generative model, derives a lower bound on its log likelihood, and reduces the learnable interior terms to weighted noise regression. Ho’s simplified loss then follows by changing those weights; it is not an exact equality to the original likelihood bound.
+
+The latent variables $x_1,\ldots,x_T$ represent the intermediate states of the generative model. We specify their joint density together with the generated observation by
+
+$$p_\theta(x_{0:T})=p(x_T)\prod_{t=1}^T p_\theta(x_{t-1}\mid x_t),
+\qquad p(x_T)=\mathcal N(0,I),$$
+
+$$p_\theta(x_{t-1}\mid x_t)=\mathcal N(x_{t-1};\mu_\theta(x_t,t),\sigma_t^2I).$$
+
+The Gaussian transition is a modeling choice, whose approximation quality we discuss in Section 5. For the present derivation, it gives a tractable conditional density once its mean and variance have been specified. The mean will be learned; the basic algorithm holds the variance schedule fixed.
+
+The notation $q$ denotes the data distribution together with the prescribed forward corruption, whereas $p_\theta$ denotes the generative model. We can sample from $q$ using data and known corruption kernels without being able to evaluate the unknown data density $q(x_0)$. The training problem is to make the generated marginal $p_\theta(x_0)$ fit the data. Direct likelihood evaluation requires integrating out all intermediate states, so we use a variational bound.
+
+### 3.1. Express the data likelihood as an expectation over forward trajectories
+
+Fix one observed datum $x_0$. The likelihood integrates out all latent states:
+
+$$p_\theta(x_0)=\int p_\theta(x_{0:T})\,dx_1\cdots dx_T.$$
+
+The prescribed forward conditional is
+
+$$q(x_{1:T}\mid x_0)=\prod_{t=1}^Tq(x_t\mid x_{t-1}).$$
+
+Insert this density into the integral by multiplying and dividing by it:
+
+$$\begin{aligned}
+p_\theta(x_0)
+&=\int q(x_{1:T}\mid x_0)
+\frac{p_\theta(x_{0:T})}{q(x_{1:T}\mid x_0)}\,dx_1\cdots dx_T\\
+&=\mathbb E_{x_{1:T}\sim q(\cdot\mid x_0)}
+\left[\frac{p_\theta(x_{0:T})}{q(x_{1:T}\mid x_0)}\right].
+\end{aligned}$$
+
+Here $x_0$ is fixed; the expectation is over the entire forward trajectory conditional on it. For continuous data, these expressions use densities and integrals. For discrete observations, $p_\theta(x_0\mid x_1)$ is an observation probability, while the intermediate states remain continuous. We assume the needed support and integrability conditions throughout.
+
+### 3.2. Derive the likelihood lower bound and its exact KL gap
+
+Because the logarithm is concave, $\log\mathbb E[R]\ge\mathbb E[\log R]$ for a positive random variable $R$. Consequently,
+
+$$\begin{aligned}
+\log p_\theta(x_0)
+&=\log\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\frac{p_\theta(x_{0:T})}{q(x_{1:T}\mid x_0)}\right]\\
+&\ge\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\log p_\theta(x_{0:T})-\log q(x_{1:T}\mid x_0)\right]\\
+&=: \mathcal E_\theta(x_0).
+\end{aligned}$$
+
+The quantity $\mathcal E_\theta(x_0)$ is the **evidence lower bound**, or ELBO. The exact gap follows from the model's posterior identity
+
+$$p_\theta(x_{1:T}\mid x_0)=\frac{p_\theta(x_{0:T})}{p_\theta(x_0)}.$$
+
+Indeed,
+
+$$\begin{aligned}
+D_{\mathrm{KL}}\!\left(q(x_{1:T}\mid x_0)\,\|\,p_\theta(x_{1:T}\mid x_0)\right)
+&=\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\log q(x_{1:T}\mid x_0)-\log p_\theta(x_{1:T}\mid x_0)\right]\\
+&=\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\log q(x_{1:T}\mid x_0)-\log p_\theta(x_{0:T})+\log p_\theta(x_0)\right]\\
+&=\log p_\theta(x_0)-\mathcal E_\theta(x_0).
+\end{aligned}$$
+
+The last log likelihood is constant inside the trajectory expectation. Thus maximizing the ELBO maximizes a lower bound on the likelihood; equality holds when the forward conditional over trajectories equals the model posterior for that observation. DDPM fixes the forward conditional rather than learning a separate inference network for it.
+
+Define the negative ELBO for this datum by $\mathcal L_\theta(x_0)=-\mathcal E_\theta(x_0)$. Averaging over training observations gives
+
+$$\boxed{
+L_{\mathrm{VLB}}:=\mathbb E_{x_0\sim q(x_0)}[\mathcal L_\theta(x_0)]
+\ge \mathbb E_{x_0\sim q(x_0)}[-\log p_\theta(x_0)].}$$
+
+Only samples from $q(x_0)$ are needed to estimate this expectation. The unknown data density itself is never evaluated.
+
+### 3.3. Factor the forward trajectory law backward and telescope the log terms
+
+Substitute the generative and forward factorizations into $\mathcal L_\theta(x_0)$:
+
+$$\begin{aligned}
+\mathcal L_\theta(x_0)
+&=\mathbb E_{q(x_{1:T}\mid x_0)}
+\left[\log q(x_{1:T}\mid x_0)-\log p_\theta(x_{0:T})\right]\\
+&=\mathbb E_{q(x_{1:T}\mid x_0)}\left[
+-\log p(x_T)+\sum_{t=1}^T\log q(x_t\mid x_{t-1})
+-\sum_{t=1}^T\log p_\theta(x_{t-1}\mid x_t)\right].
+\end{aligned}$$
+
+This expression is already a valid bound, but the forward and reverse transition terms condition on different variables. To obtain tractable Gaussian KL terms, we rewrite the forward factors in the reverse direction **while retaining the observed $x_0$ in the conditioning**.
+
+For $t\ge2$, Bayes' rule and the forward Markov property give
+
+$$q(x_{t-1}\mid x_t,x_0)
+=\frac{q(x_t\mid x_{t-1})q(x_{t-1}\mid x_0)}{q(x_t\mid x_0)}.$$
+
+Rearranging and taking logarithms,
+
+$$\log q(x_t\mid x_{t-1})
+=\log q(x_{t-1}\mid x_t,x_0)
++\log q(x_t\mid x_0)-\log q(x_{t-1}\mid x_0).$$
+
+Sum this identity from $t=2$ to $T$. The last two terms telescope:
+
+$$\begin{aligned}
+\sum_{t=2}^T\big[\log q(x_t\mid x_0)-\log q(x_{t-1}\mid x_0)\big]
+&=\log q(x_T\mid x_0)-\log q(x_1\mid x_0).
+\end{aligned}$$
+
+Adding the $t=1$ forward term cancels the remaining $-\log q(x_1\mid x_0)$. Therefore
+
+$$\sum_{t=1}^T\log q(x_t\mid x_{t-1})
+=\log q(x_T\mid x_0)+\sum_{t=2}^T\log q(x_{t-1}\mid x_t,x_0).$$
+
+Equivalently, the forward trajectory law has the reverse factorization
+
+$$q(x_{1:T}\mid x_0)=q(x_T\mid x_0)\prod_{t=2}^Tq(x_{t-1}\mid x_t,x_0).$$
+
+This is a factorization of the same joint law, not a new generative model. Substitution into the negative ELBO gives
+
+$$\begin{aligned}
+\mathcal L_\theta(x_0)
+=\mathbb E_{q(x_{1:T}\mid x_0)}\Bigg[
+&\log\frac{q(x_T\mid x_0)}{p(x_T)}\\
+&+\sum_{t=2}^T\log\frac{q(x_{t-1}\mid x_t,x_0)}{p_\theta(x_{t-1}\mid x_t)}
+-\log p_\theta(x_0\mid x_1)\Bigg].
+\end{aligned}$$
+
+### 3.4. Decompose the negative ELBO into prior, reverse-transition, and reconstruction losses
+
+The first log ratio depends only on $x_T$, so integrating out the other states yields
+
+$$\mathbb E_{x_T\sim q(\cdot\mid x_0)}
+\left[\log\frac{q(x_T\mid x_0)}{p(x_T)}\right]
+=D_{\mathrm{KL}}(q(x_T\mid x_0)\|p(x_T)).$$
+
+For an interior term, integrate out every state except $(x_{t-1},x_t)$, then factor their conditional joint law:
+
+$$q(x_{t-1},x_t\mid x_0)=q(x_t\mid x_0)q(x_{t-1}\mid x_t,x_0).$$
+
+Hence the expectation of that log ratio is
+
+$$\begin{aligned}
+&\int q(x_t\mid x_0)\int q(x_{t-1}\mid x_t,x_0)
+\log\frac{q(x_{t-1}\mid x_t,x_0)}{p_\theta(x_{t-1}\mid x_t)}\,dx_{t-1}\,dx_t\\
+&\qquad=\mathbb E_{x_t\sim q(\cdot\mid x_0)}
+D_{\mathrm{KL}}\!\left(q(x_{t-1}\mid x_t,x_0)\|p_\theta(x_{t-1}\mid x_t)\right).
+\end{aligned}$$
+
+The reconstruction term depends only on $x_1$ and the fixed $x_0$. Combining all three kinds of terms, and now averaging over $x_0$, gives Ho's variational decomposition:
+
+$$\boxed{L_{\mathrm{VLB}}=L_T+\sum_{t=2}^T L_{t-1}+L_0,}$$
 
 where
 
-$$\widetilde\beta_n=\beta_n\frac{1-\bar a_{n-1}}{1-\bar a_n},$$
+$$L_T=\mathbb E_{x_0\sim q(x_0)}
+D_{\mathrm{KL}}(q(x_T\mid x_0)\|p(x_T)),$$
 
-$$\widetilde m_n=
-\frac{\sqrt{\bar a_{n-1}}\beta_n}{1-\bar a_n}x_0
-+\frac{\sqrt{a_n}(1-\bar a_{n-1})}{1-\bar a_n}x_n.$$
+$$L_{t-1}=\mathbb E_{\substack{x_0\sim q(x_0)\\x_t\sim q(\cdot\mid x_0)}}
+D_{\mathrm{KL}}\!\left(q(x_{t-1}\mid x_t,x_0)\|p_\theta(x_{t-1}\mid x_t)\right),
+\qquad 2\le t\le T,$$
 
-At $n=1$, conditioning on $x_0$ gives a point mass at $x_0$, and the variance formula is zero.
+$$L_0=-\mathbb E_{\substack{x_0\sim q(x_0)\\x_1\sim q(\cdot\mid x_0)}}
+\log p_\theta(x_0\mid x_1).$$
 
-During generation we do **not** know $x_0$. The actual conditional $p(x_{n-1}\mid x_n)$ averages over the posterior possibilities for $x_0$ and generally is not Gaussian. A DDPM models it with a learned Gaussian transition. Inserting an estimate of $x_0$ into the displayed Gaussian is a model choice, not an exact finite-step inversion of arbitrary data corruption.
+The draws in each nested expectation are dependent: first draw the clean observation, then corrupt that observation. In particular, the interior KL is computable because training provides $x_0$; it does not require evaluating the generally unknown $q(x_{t-1}\mid x_t)$.
 
-## 4. Learn a noise predictor
+### 3.5. Evaluate the terminal-prior loss and specify the observation likelihood
 
-Train a network $\varepsilon_\theta(x_n,t_n)$ using pairs constructed from data and newly sampled noise:
+Let $d$ be the number of coordinates. The known terminal conditional is $\mathcal N(\sqrt{\bar\alpha_T}x_0,(1-\bar\alpha_T)I)$, and the chosen prior is $\mathcal N(0,I)$. The Gaussian KL formula gives
 
-$$\boxed{\mathcal J(\theta)=
-\mathbb E_{X_0,n,\varepsilon}\left[
-\left(\varepsilon-\varepsilon_\theta(\sqrt{\bar a_n}X_0+
-\sqrt{1-\bar a_n}\varepsilon,t_n)\right)^2\right].}$$
+$$\begin{aligned}
+D_{\mathrm{KL}}(q(x_T\mid x_0)\|p(x_T))
+&=\frac12\left[
+\bar\alpha_T\|x_0\|^2+d(1-\bar\alpha_T)-d-d\log(1-\bar\alpha_T)\right]\\
+&=\frac12\left[\bar\alpha_T\|x_0\|^2-d\bar\alpha_T-d\log(1-\bar\alpha_T)\right].
+\end{aligned}$$
 
-Here $n$ is commonly sampled uniformly from $1,\ldots,N$. For vectors, use squared Euclidean error, with an explicitly chosen sum or coordinate average.
+This term has no network parameters when the schedule and prior are fixed. With finite data second moment it tends to zero as $\bar\alpha_T\to0$, explaining the use of a sufficiently noisy terminal state.
 
-Squared-error regression estimates
+The observation term $L_0$ must be treated separately because $x_0$ is observed, rather than another noisy latent state. For continuous data, choosing a Gaussian decoder with positive variance $\sigma_1^2$ gives
 
-$$\varepsilon_\theta(x,t_n)\approx\mathbb E[\varepsilon\mid X_n=x].$$
+$$L_0=\mathbb E_{x_0\sim q,\,x_1\sim q(\cdot\mid x_0)}
+\left[\frac{\|x_0-\mu_\theta(x_1,1)\|^2}{2\sigma_1^2}
++\frac d2\log(2\pi\sigma_1^2)\right].$$
 
-An observed $x_n$ can arise from several clean observations and noise draws. The optimal network predicts their conditional mean noise, not the particular realized noise with certainty.
+For quantized images, Ho instead integrates a Gaussian over the bin corresponding to each pixel value. For a coordinate with bin boundaries $a$ and $b$, the assigned probability is
 
-Convert the output into a clean-data estimate:
+$$\Phi\!\left(\frac{b-\mu}{\sigma_1}\right)
+-\Phi\!\left(\frac{a-\mu}{\sigma_1}\right),$$
 
-$$\widehat x_0(x_n,n)=
-\frac{x_n-\sqrt{1-\bar a_n}\,\varepsilon_\theta(x_n,t_n)}{\sqrt{\bar a_n}}.$$
+with the outermost bins extended to infinity and $\Phi$ the standard-normal CDF. The decoder log probability sums the coordinate log probabilities. A continuous density evaluated at a pixel value is not its discrete probability. Also, $\widetilde\beta_1=0$ cannot be inserted as the variance of a nonsingular Gaussian likelihood: the endpoint observation model must be specified separately. Algorithm 2's final mean-only output is a sampling convention, not a justification for dropping $L_0$ from the likelihood bound.
 
-The simple noise loss is a standard DDPM training choice. It is related to, but is not the full weighted variational likelihood objective. See [Ho et al., *Denoising Diffusion Probabilistic Models*](https://arxiv.org/abs/2006.11239).
+The remaining terms $L_{t-1}$, for $t\ge2$, compare Gaussian distributions and yield the weighted denoising objective. We evaluate them next.
 
-## 5. The ancestral sampler
+The ELBO has reduced likelihood training to a sum of reverse-transition losses. We now evaluate those losses explicitly. First, the Gaussian KL becomes a weighted squared error between means. Expressing the model mean through a noise predictor then gives Ho’s weighted noise-regression objective. Finally, we distinguish that objective from the simplified loss used in Algorithm 1.
 
-Substituting the estimate into the posterior-mean expression yields the learned reverse mean
+### 3.6. Evaluate the Gaussian reverse-transition KL as a mean-regression loss
 
-$$m_\theta(x_n,n)=\frac{1}{\sqrt{a_n}}
-\left(x_n-\frac{\beta_n}{\sqrt{1-\bar a_n}}
-\varepsilon_\theta(x_n,t_n)\right).$$
+Conditioning on $x_0$ makes $x_{t-1}$ Gaussian, and $x_t$ is a noisy linear observation of it. Therefore, for $t\ge2$, ordinary Gaussian conditioning gives
 
-One common sampler uses the fixed posterior variance $\widetilde\beta_n$:
+$$q(x_{t-1}\mid x_t,x_0)=\mathcal N(x_{t-1};\widetilde\mu_t(x_t,x_0),\widetilde\beta_tI),$$
 
-$$\boxed{x_{n-1}=m_\theta(x_n,n)+\sqrt{\widetilde\beta_n}\,\varepsilon_n,
-\qquad \varepsilon_n\sim\mathcal N(0,1).}$$
+$$\widetilde\mu_t(x_t,x_0)=
+\frac{\sqrt{\bar\alpha_{t-1}}\beta_t}{1-\bar\alpha_t}x_0
++\frac{\sqrt{\alpha_t}(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}x_t.$$
 
-The $\varepsilon_n$ in this reverse update are fresh draws, unrelated to the forward-step noises. Start with $x_N\sim\mathcal N(0,1)$ and repeat for $n=N,\ldots,1$. At the final step, $\widetilde\beta_1=0$, so no fresh noise is added. Other DDPM variants use different variance choices; training and sampling must specify which one is used.
+Appendix A obtains these coefficients by completing the square. The dependence on $x_0$ is essential: this is a training-time conditional distribution, not the conditional available to a sampler that knows only $x_t$. Marginalizing over possible clean origins generally produces a non-Gaussian mixture for $q(x_{t-1}\mid x_t)$.
 
-This finite Gaussian chain is an **ancestral DDPM sampler**. It is not automatically the same algorithm as Euler–Maruyama for a continuous reverse SDE. Their connection requires an appropriate small-step limit.
+Although the target posterior uses $x_0$, the learned mean receives only $x_t$ and $t$. Fitting it across many clean/noisy pairs makes it average over the clean origins compatible with the input. This is exactly the conditional averaging performed by squared-error regression.
 
-## 6. A normal-data check
+To evaluate one interior KL, fix $(x_0,x_t)$ and write $u=x_{t-1}$. The log ratio of the two Gaussian densities is
 
-Suppose $X_0\sim\mathcal N(0,1)$. Every forward marginal is then $\mathcal N(0,1)$ and
+$$\log\frac{q(u\mid x_t,x_0)}{p_\theta(u\mid x_t)}
+=\frac d2\log\frac{\sigma_t^2}{\widetilde\beta_t}
+-\frac{\|u-\widetilde\mu_t\|^2}{2\widetilde\beta_t}
++\frac{\|u-\mu_\theta\|^2}{2\sigma_t^2}.$$
 
-$$\mathbb E[\varepsilon\mid X_n=x]=\sqrt{1-\bar a_n}\,x.$$
+Take expectations over $u\sim\mathcal N(\widetilde\mu_t,\widetilde\beta_tI)$. The first squared distance has expectation $d\widetilde\beta_t$. For the second, expand around the target mean:
 
-The learned reverse mean at the population optimum becomes $\sqrt{a_n}x_n$. The **exact** reverse conditional for this stationary normal chain has variance $\beta_n$. The fixed posterior variance $\widetilde\beta_n$ above is smaller: it conditions additionally on $x_0$.
+$$\begin{aligned}
+\mathbb E_u\|u-\mu_\theta\|^2
+&=\mathbb E_u\|(u-\widetilde\mu_t)+(\widetilde\mu_t-\mu_\theta)\|^2\\
+&=\mathbb E_u\|u-\widetilde\mu_t\|^2
++2\mathbb E_u[u-\widetilde\mu_t]^\mathsf T(\widetilde\mu_t-\mu_\theta)
++\|\widetilde\mu_t-\mu_\theta\|^2\\
+&=d\widetilde\beta_t+\|\widetilde\mu_t-\mu_\theta\|^2.
+\end{aligned}$$
 
-This provides a useful diagnostic. Even a perfect noise predictor does not make a finite-step Gaussian sampler with an arbitrary variance choice exact. Increasing resolution, changing the variance convention, and improving score estimation are different changes.
+The cross term vanishes because $\mathbb E_u[u]=\widetilde\mu_t$. Consequently,
 
-## 7. From discrete denoising to a vector field
+$$\begin{aligned}
+D_{\mathrm{KL}}(q(u\mid x_t,x_0)\|p_\theta(u\mid x_t))
+&=\frac{\|\widetilde\mu_t-\mu_\theta\|^2}{2\sigma_t^2}
++\frac d2\left[
+\frac{\widetilde\beta_t}{\sigma_t^2}-1+
+\log\frac{\sigma_t^2}{\widetilde\beta_t}\right].
+\end{aligned}$$
 
-At a positive noise level, the marginal score satisfies
+Define the second term as $C_t$. It depends on the schedules and dimension but not on $\theta$ when the reverse variance is fixed. Averaging over the training pair gives
 
-$$s_{t_n}(x)=\frac{d}{dx}\log p_{t_n}(x)
-=-\frac{\mathbb E[\varepsilon\mid X_n=x]}{\sqrt{1-\bar a_n}}.$$
+$$L_{t-1}=\mathbb E_{x_0\sim q,\,x_t\sim q(\cdot\mid x_0)}
+\left[\frac{\|\widetilde\mu_t(x_t,x_0)-\mu_\theta(x_t,t)\|^2}{2\sigma_t^2}\right]+C_t.$$
 
-The network therefore provides a score estimate. [Part 3](./32-probability-flow-ode-part-3.qmd) derives this identity and its relationship to the posterior mean denoiser.
+Thus optimizing the interior variational loss reduces to predicting a known posterior mean. If the variance were learned, $C_t$ would also depend on model parameters and could not be discarded. Ho's fixed-variance construction next reparameterizes the mean using the noise that generated the training pair.
 
-With a continuous corruption schedule, that score determines a probability-flow velocity. For a VP process,
+### 3.7. Express the reverse mean through noise prediction and derive the loss weight
 
-$$v(x,t)=-\frac{\beta(t)}2\bigl[x+s_t(x)\bigr].$$
+From $x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\varepsilon$, substitute
 
-[Part 1](./07-probability-flow-ode.qmd) develops why this velocity transports the required densities. Generation follows its ODE from $t=1$ toward $t=0$. This deterministic sampler and the stochastic reverse sampler share marginal densities under exact continuous-time conditions; their individual trajectories differ.
+$$x_0=\frac{x_t-\sqrt{1-\bar\alpha_t}\varepsilon}{\sqrt{\bar\alpha_t}}$$
 
-## Appendix A. The cumulative corruption law
+into $\widetilde\mu_t$. Keeping the coefficients explicit,
 
-Suppose the accumulated signal coefficient after $n-1$ steps is $\sqrt{\bar a_{n-1}}$ and the conditional noise variance is $1-\bar a_{n-1}$. The next step multiplies that variance by $a_n$ and adds independent variance $\beta_n$:
+$$\begin{aligned}
+\widetilde\mu_t
+&=\frac{\beta_t}{\sqrt{\alpha_t}(1-\bar\alpha_t)}
+\left(x_t-\sqrt{1-\bar\alpha_t}\varepsilon\right)
++\frac{\sqrt{\alpha_t}(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}x_t\\
+&=\frac{\beta_t+\alpha_t(1-\bar\alpha_{t-1})}
+{\sqrt{\alpha_t}(1-\bar\alpha_t)}x_t
+-\frac{\beta_t}{\sqrt{\alpha_t}\sqrt{1-\bar\alpha_t}}\varepsilon.
+\end{aligned}$$
 
-$$a_n(1-\bar a_{n-1})+\beta_n=1-\bar a_n.$$
+The numerator of the first coefficient simplifies because
 
-The mean becomes $\sqrt{a_n\bar a_{n-1}}x_0$. Induction establishes the formula without simulating intermediate states.
+$$\beta_t+\alpha_t(1-\bar\alpha_{t-1})
+=\beta_t+\alpha_t-\bar\alpha_t=1-\bar\alpha_t.$$
 
-## Appendix B. The conditional reverse Gaussian
+Therefore
 
-For $n\ge2$, Bayes' rule gives
+$$\widetilde\mu_t=\frac1{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\varepsilon\right).$$
 
-$$p(x_{n-1}\mid x_n,x_0)\propto
-p(x_n\mid x_{n-1})p(x_{n-1}\mid x_0).$$
+The noise $\varepsilon$ is known for a constructed training pair, but it is unavailable at generation time. The expression above shows that learning its conditional estimate is sufficient to parameterize the reverse mean. We therefore define
 
-As a function of $u=x_{n-1}$, the negative log density, up to constants, is
+$$\boxed{\mu_\theta(x_t,t)=\frac1{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\varepsilon_\theta(x_t,t)\right).}$$
 
-$$\frac{(x_n-\sqrt{a_n}u)^2}{2\beta_n}
-+\frac{(u-\sqrt{\bar a_{n-1}}x_0)^2}{2(1-\bar a_{n-1})}.$$
+The part involving $x_t$ cancels when we subtract the two means:
 
-The coefficient of $u^2/2$ is
+$$\widetilde\mu_t-\mu_\theta
+=-\frac{\beta_t}{\sqrt{\alpha_t}\sqrt{1-\bar\alpha_t}}
+(\varepsilon-\varepsilon_\theta).$$
 
-$$\frac{a_n}{\beta_n}+\frac{1}{1-\bar a_{n-1}}
-=\frac{1-\bar a_n}{\beta_n(1-\bar a_{n-1})}.$$
+Squaring this expression and inserting it into the Gaussian KL gives Ho's Eq. (12):
 
-Its reciprocal is $\widetilde\beta_n$. Multiplying that reciprocal by the linear coefficient
-$\sqrt{a_n}x_n/\beta_n+\sqrt{\bar a_{n-1}}x_0/(1-\bar a_{n-1})$
-gives $\widetilde m_n$.
+$$L_{t-1}=\mathbb E_{x_0\sim q,\,\varepsilon\sim\mathcal N(0,I)}
+\left[\frac{\beta_t^2}{2\sigma_t^2\alpha_t(1-\bar\alpha_t)}
+\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2\right]+C_t.$$
 
-## Check your understanding
+The weight is determined by the forward schedule and the chosen reverse variance. Up to this point, the noise-regression expression is an algebraic rewriting of the interior variational loss. The simplified objective used in Algorithm 1 makes an additional change to the relative weights of the time steps.
 
-1. Why can training draw $X_n$ in one operation, even though generation uses many steps?
-2. Which conditional distribution is exactly Gaussian: $p(x_{n-1}\mid x_n,x_0)$ or $p(x_{n-1}\mid x_n)$?
-3. Explain the difference between prediction error, discretization error, and a terminal prior that only approximates $p_1$.
+For completeness, collecting the interior terms gives the full objective in this parameterization:
+
+$$L_{\mathrm{VLB}}=L_T+L_0+
+\sum_{t=2}^T\left[
+\mathbb E_{x_0\sim q,\,\varepsilon\sim\mathcal N(0,I)}
+ w_t\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2+C_t\right],$$
+
+$$w_t:=\frac{\beta_t^2}{2\sigma_t^2\alpha_t(1-\bar\alpha_t)}.$$
+
+The interior sum can be estimated without constructing a complete trajectory. Draw $t$ uniformly from $\{2,\ldots,T\}$, independently of $x_0$ and $\varepsilon$, and use
+
+$$(T-1)\,w_t\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2.$$
+
+Its expectation equals the sum of the parameter-dependent interior losses. The factor $T-1$ comes from converting a uniform average to a sum. The separate observation loss $L_0$ is still part of the full likelihood bound. This distinguishes an unbiased estimator of the variational objective from Ho's simplified training rule below, which changes the weighting and includes $t=1$ in the noise-regression objective.
+
+### 3.8. Obtain Ho’s simplified loss by reweighting the noise-regression objective
+
+Algorithm 1 drops the time-dependent coefficient and samples the step uniformly:
+
+$$\boxed{L_{\mathrm{simple}}=
+\mathbb E_{t\sim\mathrm{Unif}\{1,\ldots,T\},\,x_0\sim q,\,\varepsilon\sim\mathcal N(0,I)}
+\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2.}$$
+
+The three draws are independent. This is Ho's Eq. (14), a reweighted training objective rather than the full ELBO. Positive weights that depend only on the time step leave the unrestricted optimum at each time unchanged. They can nevertheless change the fitted result when a single finite-capacity network shares parameters across times.
+
+At a fixed step, the unrestricted optimal predictor is $\mathbb E[\varepsilon\mid x_t,t]$. Several combinations of clean data and corruption noise can produce the same noisy input, so the fitted function cannot generally identify the realized noise of an individual pair. It estimates their posterior average. This explains why the regression target can be a sampled noise vector while the trained function is a deterministic function of the noisy observation.
+
+### 3.9. Interpret the simplified loss as denoising score matching
+
+The preceding [score-matching lecture](./39-denoising-score-matching.qmd) explains why conditional Gaussian targets can estimate marginal scores. Here,
+
+$$\nabla_{x_t}\log q(x_t\mid x_0)=-\frac{\varepsilon}{\sqrt{1-\bar\alpha_t}}.$$
+
+Consequently, parameterizing the score estimate as $-\varepsilon_\theta/\sqrt{1-\bar\alpha_t}$ gives the exact loss identity
+
+$$\|\varepsilon-\varepsilon_\theta\|^2
+=(1-\bar\alpha_t)
+\left\|\frac{-\varepsilon_\theta}{\sqrt{1-\bar\alpha_t}}
+-\nabla_{x_t}\log q(x_t\mid x_0)\right\|^2.$$
+
+The simplified DDPM loss is therefore denoising score matching weighted by cumulative forward noise variance. At the unrestricted optimum, the rescaled predictor estimates the noisy marginal score, as established in the preceding score-matching lecture. Song et al.'s Section 2.2, Eq. (3), writes the DDPM objective in precisely this form.
+
+### 3.10. Collecting the loss terms: which depend on the network?
+
+With Ho's indexing, $L_t$ for $1\le t\le T-1$ trains the transition from $x_{t+1}$ to $x_t$. Thus the term previously written as $L_{t-1}$ can equivalently be indexed as $L_t$, and the complete negative ELBO is
+
+$$\boxed{L_{\mathrm{VLB}}=L_0+\sum_{t=1}^{T-1}L_t+L_T.}$$
+
+For a fixed forward schedule, fixed reverse variances, and a fixed standard-normal prior, the three kinds of terms are as follows.
+
+**Terminal-prior term.** Using the terminal Gaussian KL derived above,
+
+$$\boxed{L_T=\frac12\left[
+\bar\alpha_T\mathbb E_{x_0\sim q(x_0)}\|x_0\|^2
+-d\bar\alpha_T-d\log(1-\bar\alpha_T)\right].}$$
+
+This is **constant with respect to $\theta$**. It need not be zero, but it contributes no gradient when training only the denoising network. It would not be constant with respect to parameters of a learned schedule or learned prior.
+
+**Interior reverse-transition terms.** For $1\le t\le T-1$,
+
+$$\boxed{L_t=
+\mathbb E_{\substack{x_0\sim q(x_0)\\\varepsilon\sim\mathcal N(0,I)}}
+\left[\frac{\beta_{t+1}^2}
+{2\sigma_{t+1}^2\alpha_{t+1}(1-\bar\alpha_{t+1})}
+\|\varepsilon-\varepsilon_\theta(x_{t+1},t+1)\|^2\right]+C_{t+1},}$$
+
+where the clean observation and noise are independent,
+
+$$x_{t+1}=\sqrt{\bar\alpha_{t+1}}x_0+\sqrt{1-\bar\alpha_{t+1}}\varepsilon,$$
+
+and
+
+$$C_{t+1}=\frac d2\left[
+\frac{\widetilde\beta_{t+1}}{\sigma_{t+1}^2}-1+
+\log\frac{\sigma_{t+1}^2}{\widetilde\beta_{t+1}}\right].$$
+
+Each $L_t$ **depends on $\theta$** through the network prediction. Only $C_{t+1}$ is constant under the fixed-variance assumption; it is zero when $\sigma_{t+1}^2=\widetilde\beta_{t+1}$.
+
+**Reconstruction term.** The endpoint contribution is
+
+$$\boxed{L_0=-\mathbb E_{\substack{x_0\sim q(x_0)\\x_1\sim q(\cdot\mid x_0)}}
+\log p_\theta(x_0\mid x_1).}$$
+
+This is **not constant with respect to $\theta$**. For a continuous Gaussian decoder with a fixed positive variance $\sigma_1^2$, its explicit expression is
+
+$$L_0=\mathbb E_{x_0\sim q,\,x_1\sim q(\cdot\mid x_0)}
+\frac{\|x_0-\mu_\theta(x_1,1)\|^2}{2\sigma_1^2}
++\frac d2\log(2\pi\sigma_1^2).$$
+
+In this continuous-decoder case, $\bar\alpha_1=\alpha_1$ and $1-\bar\alpha_1=\beta_1$. Substituting the noise parameterization gives
+
+$$L_0=\mathbb E_{x_0\sim q,\,\varepsilon\sim\mathcal N(0,I)}
+\left[\frac{\beta_1}{2\sigma_1^2\alpha_1}
+\|\varepsilon-\varepsilon_\theta(x_1,1)\|^2\right]
++\frac d2\log(2\pi\sigma_1^2).$$
+
+Only the final additive term is constant. For Ho's discretized image decoder, use the bin probabilities in Section 3.5 in the negative log likelihood instead; the squared-error expression above is not its exact reconstruction loss.
+
+Consequently, likelihood training may omit $L_T$ and the fixed additive constants from its gradient calculation, but it cannot omit $L_0$ on the grounds that it is constant. Ho's simplified objective changes the time weighting and uses noise regression at every step, including $t=1$; it does not arise by declaring the reconstruction term constant.
+
+This establishes what Algorithm 1 learns and how its predictor determines the reverse mean $\mu_\theta$. We now return to Algorithm 2 and derive the sampling rule, including the fresh noise added at each intermediate step.
+
+## 4. The DDPM sampling update: why the predicted mean needs a noise term
+
+Recall that generation starts with $x_T\sim\mathcal N(0,I)$ and runs backward through $t=T,T-1,\ldots,1$. Algorithm 2 updates the current state according to
+
+$$\boxed{x_{t-1}=\underbrace{\frac1{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\varepsilon_\theta(x_t,t)\right)}_{\mu_\theta(x_t,t)}
++\underbrace{\sigma_t z}_{\text{fresh noise}},}$$
+
+where $z\sim\mathcal N(0,I)$ is drawn independently at each step with $t>1$. Ho sets $z=0$ for the final step $t=1$. The training derivation has explained the first term: at the ideal regression optimum, $\mu_\theta(x_t,t)$ is the conditional mean of the preceding state given the current noisy state. It has not yet explained why we should add fresh noise around that mean during generation.
+
+Since the initial state $x_T$ is already random, a natural alternative is to omit the second term and repeatedly apply
+
+$$x_{t-1}=\mu_\theta(x_t,t).$$
+
+This recursion still generates random outputs through its random initial state. The question is whether those outputs have the desired distribution. In general, they do not: a conditional mean summarizes the possible preceding states by their average, and replacing each conditional distribution by that average removes its remaining uncertainty.
+
+### 4.1. Mean-only recursion removes conditional variance
+
+To examine one step, let $U=x_{t-1}$ and $V=x_t$ be scalar states under the forward joint law, with finite second moments. Then
+
+$$\operatorname{Var}(U)=\operatorname{Var}(\mathbb E[U\mid V])+
+\mathbb E[\operatorname{Var}(U\mid V)].$$
+
+Replacing $U$ by $\mathbb E[U\mid V]$ preserves only the first term. Whenever the conditional variance is positive, the distribution of the conditional mean has less variance than the desired distribution of $U$. This failure can occur even when the predictor and the current marginal are exact.
+
+For a complete recursion that can be solved explicitly, let clean data be $\mathcal N(0,1)$, so every forward marginal is standard normal. The exact reverse mean is $\sqrt{\alpha_t}x_t$. Without fresh noise,
+
+$$x_{t-1}=\sqrt{\alpha_t}x_t
+\quad\Longrightarrow\quad
+x_0=\sqrt{\bar\alpha_T}x_T.$$
+
+Starting from $x_T\sim\mathcal N(0,1)$ therefore gives $x_0\sim\mathcal N(0,\bar\alpha_T)$, nearly a point mass when $\bar\alpha_T$ is small. The desired data variance is one. With reverse variance $\beta_t$, each non-final Gaussian step restores variance $\alpha_t+\beta_t=1$; Ho's final mean-only reconstruction remains a separate convention.
+
+This does not rule out deterministic generation. It shows that simply deleting noise from this particular reverse-mean recursion changes the output law. Deterministic transport and DDIM are developed later.
+
+### 4.2. Justifying fresh noise requires a reverse conditional distribution
+
+The variance calculation shows why the conditional mean alone is insufficient, but it does not establish that adding arbitrary Gaussian noise will produce the correct law. We need a distribution for the preceding state, conditional on the current state. The appropriate reference is the reverse conditional $q(x_{t-1}\mid x_t)$ induced by the forward process.
+
+If this conditional were Gaussian with mean $\mu_\theta(x_t,t)$ and covariance $\sigma_t^2I$, drawing from it would give exactly $\mu_\theta(x_t,t)+\sigma_tz$. The fresh noise would then represent the conditional uncertainty left after the current state is known. To justify Algorithm 2, we must therefore establish why sampling the reverse conditional recovers the preceding marginal, why a Gaussian is a reasonable approximation to that conditional, and how to choose its variance. Section 5 develops the reverse-kernel argument, and Section 6 examines the variance choices.
+
+## 5. Deriving ancestral sampling from an approximately Gaussian reverse kernel
+
+Suppose first that we could use the true reverse conditional induced by the forward process. If $x_t$ has the correct forward marginal, sampling the true conditional $q(x_{t-1}\mid x_t)$ recovers the preceding marginal:
+
+$$q(x_{t-1})=\int q(x_{t-1}\mid x_t)q(x_t)\,dx_t.$$
+
+DDPM approximates this conditional with its learned Gaussian model. Sampling a Gaussian with mean $\mu_\theta$ and covariance $\sigma_t^2I$ means computing $\mu_\theta+\sigma_tz$, exactly Algorithm 2's update. This is **ancestral sampling**: sample the root $x_T$, then each successive variable from its conditional given its parent in the reverse generative chain. Song et al. use this name in Section 2.2, Eq. (4).
+
+The remaining modeling question is whether a Gaussian is an adequate representation of the reverse conditional. For a small forward step, Bayes' rule multiplies a narrow Gaussian likelihood by the preceding density. Where that density is positive and sufficiently smooth on the scale of the step, a local expansion of its log changes the Gaussian's center to leading order. The resulting reverse conditional is approximately Gaussian. This argument is local and asymptotic; finite-step reverse conditionals can be multimodal. [Nakkiran et al., Section 2.1 and Appendix B.1](https://arxiv.org/abs/2406.08929) provide the intuition and a small-noise KL calculation.
+
+To see this approximation explicitly in one dimension, write $u=x_{t-1}$, $x=x_t$, and let $q_{t-1}$ denote the preceding marginal. Bayes' rule gives
+
+$$q(u\mid x)\propto
+\exp\!\left[-\frac{(x-\sqrt{\alpha_t}u)^2}{2\beta_t}
++\log q_{t-1}(u)\right].$$
+
+The Gaussian likelihood is centered at $u_*=x/\sqrt{\alpha_t}$ as a function of $u$, with variance $\beta_t/\alpha_t$. Expand the remaining log density locally:
+
+$$\log q_{t-1}(u)
+\approx\log q_{t-1}(u_*)+\ell'(u_*)(u-u_*),
+\qquad \ell(u)=\log q_{t-1}(u).$$
+
+Completing the square then gives the leading local approximation
+
+$$q(u\mid x)\approx\mathcal N\!\left(
+ u_*+\frac{\beta_t}{\alpha_t}\ell'(u_*),
+ \frac{\beta_t}{\alpha_t}\right).$$
+
+This calculation explains the Gaussian shape when the preceding log density varies smoothly across the narrow likelihood. It is not an exact finite-step formula: curvature changes the variance, and higher-order terms change the shape. Since $\alpha_t=1-\beta_t$, the displayed variance equals $\beta_t+O(\beta_t^2)$. Rather than use this local approximation to compute the mean, DDPM obtains it from the learned denoising predictor, as follows.
+
+The regression calculation also identifies the mean that the model should use. At each fixed step, the tower property gives
+
+$$\mathbb E[\widetilde\mu_t(x_t,x_0)\mid x_t]
+=\mathbb E[\mathbb E[x_{t-1}\mid x_t,x_0]\mid x_t]
+=\mathbb E[x_{t-1}\mid x_t].$$
+
+Thus the exact regression optimum supplies the true reverse conditional mean even when the conditional itself is non-Gaussian. The approximation concerns the shape and variance of the Gaussian model, as well as any error in the learned mean. We now examine the variance choices separately so that these sources of error remain distinguishable.
+
+## 6. Justifying Ho’s fixed reverse-step variance choices
+
+The ELBO calculation allowed us to specify a reverse variance independently of the learned mean. In the basic DDPM model, this variance is a function of the step index and is not predicted from the current state. Ho considers $\sigma_t^2=\beta_t$ and $\sigma_t^2=\widetilde\beta_t$. Two limiting cases explain these choices: a Gaussian marginal gives the first variance exactly, while a known clean origin gives the second.
+
+### 6.1. A standard-normal marginal gives reverse variance equal to the forward-step variance
+
+If the preceding state is standard normal, the forward step preserves that law. Gaussian conditioning then gives
+
+$$q(x_{t-1}\mid x_t)=\mathcal N(\sqrt{\alpha_t}\,x_t,\beta_t I).$$
+
+Thus $\beta_t$ is exactly the reverse variance in this case. Near a sufficiently Gaussian terminal regime, it is a natural approximation. The other choice is close when the preceding cumulative signal is small:
+
+$$\boxed{\beta_t-\widetilde\beta_t
+=\frac{\beta_t^2\bar\alpha_{t-1}}{1-\bar\alpha_t}.}$$
+
+This terminal-regime argument explains why the two choices can be close near the beginning of generation. It does not explain their difference at later steps, when the preceding marginal may have substantial structure. For that, we return to the posterior conditioned on the clean origin.
+
+### 6.2. Conditioning on the clean origin gives the posterior variance choice
+
+For a scalar observation, first condition on both $x_t$ and $x_0$, then average over the unknown $x_0$. The conditional variance in the first stage is $\widetilde\beta_t$, while the conditional mean varies with $x_0$. The law of total variance therefore gives
+
+$$\operatorname{Var}(x_{t-1}\mid x_t)=\widetilde\beta_t+
+\left(\frac{\sqrt{\bar\alpha_{t-1}}\beta_t}{1-\bar\alpha_t}\right)^2
+\operatorname{Var}(x_0\mid x_t).$$
+
+The first term is the variance when the clean origin is also known. The second accounts for uncertainty over that origin. The choice $\widetilde\beta_t$ is accurate when the entire second term is negligible; it is exact for data concentrated at a single point. Small posterior uncertainty alone is insufficient if its coefficient is large.
+
+::: {.callout-note}
+## Exact reverse variance from the second-order Tweedie identity
+
+For scalar data, a second-order Tweedie identity gives
+
+$$\operatorname{Var}(x_{t-1}\mid x_t=x)
+=\frac{\beta_t}{\alpha_t}
+\left[1+\beta_t\,\partial_x^2\log q_t(x)\right],$$
+
+where $q_t$ is the noisy marginal density. Appendix B derives it. For $q_t=\mathcal N(0,1)$, its log-density curvature is $-1$, recovering variance $\beta_t$. For small $\beta_t$ with bounded curvature, the variance is $\beta_t+O(\beta_t^2)$; this need not hold uniformly near the data endpoint.
+
+The fixed-variance algorithm avoids estimating this curvature. Using the identity might improve some finite-step approximations, but that possibility is **untested in these notes**. Estimated curvature can be inaccurate, and even exact first two moments do not capture a non-Gaussian conditional's full shape.
+:::
+
+An additional justification of the sampler, including its noise variance, appears later in [DDPM through the reverse VP SDE](./42-ddpm-reverse-vp-sde.qmd). There we first obtain the forward VP SDE as the small-step limit of DDPM's forward chain, then reverse that SDE and apply Euler–Maruyama. Its drift and Brownian noise recover the leading-order ancestral update, with reverse-step variance $\beta_t$. This explains the mean and variance together through the continuous-time dynamics. The later note also compares Song's discrete reverse-diffusion construction with ancestral sampling, making explicit their finite-step differences and common SDE limit.
+
+## 7. Connecting DDPM to reverse SDEs and probability-flow ODEs
+
+The construction above specifies both a training problem and a generative model. Its training criterion is motivated by the likelihood of the reverse Markov chain, and its implementation uses noise regression to parameterize the reverse means. Generation then draws from the chosen reverse transitions. The score interpretation explains the quantity learned by the predictor, but it does not require us to change Ho's sampling algorithm.
+
+This separation will be useful when we introduce other sampling dynamics. A trained denoising predictor may be reused, while the rule for updating the generated state changes. Such a change must be derived from the intended density evolution; removing one term from an existing sampler is not sufficient. The next topic develops this reasoning through continuous transport, before returning to DDPM as a discretization of a reverse stochastic process.
+
+Continue to [Probability-Flow ODE](./probability-flow-ode.qmd) for a different route to transport. Within that series, [DDPM through the reverse VP SDE](./42-ddpm-reverse-vp-sde.qmd) returns to this same ancestral sampler and shows how it discretizes stochastic reverse dynamics.
+
+## Appendix A. Deriving the reverse Gaussian conditioned on clean data
+
+For $t\ge2$, Bayes' rule gives
+
+$$q(u\mid x_t,x_0)\propto q(x_t\mid u)q(u\mid x_0),\qquad u=x_{t-1}.$$
+
+The negative log density, up to constants, is
+
+$$\frac{\|x_t-\sqrt{\alpha_t}u\|^2}{2\beta_t}
++\frac{\|u-\sqrt{\bar\alpha_{t-1}}x_0\|^2}{2(1-\bar\alpha_{t-1})}.$$
+
+The scalar precision is
+
+$$\frac{\alpha_t}{\beta_t}+\frac1{1-\bar\alpha_{t-1}}
+=\frac{1-\bar\alpha_t}{\beta_t(1-\bar\alpha_{t-1})}.$$
+
+Its reciprocal is $\widetilde\beta_t$. Multiply that variance by the linear coefficient
+
+$$\frac{\sqrt{\alpha_t}x_t}{\beta_t}+
+\frac{\sqrt{\bar\alpha_{t-1}}x_0}{1-\bar\alpha_{t-1}}$$
+
+to obtain $\widetilde\mu_t$ in Section 3. At $t=1$, conditioning on $x_0$ gives a point mass; the interior KL argument does not apply to the reconstruction term unchanged.
+
+## Appendix B. Deriving the exact scalar reverse variance from Tweedie’s identity
+
+Fix a step and put $A=\sqrt{\alpha_t}x_{t-1}$, $V=x_t$, so $V=A+\sqrt{\beta_t}Z$. Write $m(x)=\mathbb E[A\mid V=x]$. Gaussian Bayes differentiation gives
+
+$$\partial_x\log p(A=a\mid V=x)
+=\frac{a-x}{\beta_t}-\partial_x\log q_t(x).$$
+
+Taking its conditional expectation gives zero, hence
+
+$$m(x)=x+\beta_t\partial_x\log q_t(x).$$
+
+Substitution back into the posterior derivative yields
+
+$$\partial_xp(a\mid x)=\frac{a-m(x)}{\beta_t}p(a\mid x).$$
+
+Differentiate the posterior mean, assuming the required moments and differentiation under the integral are justified:
+
+$$\begin{aligned}
+m'(x)&=\int a\,\partial_xp(a\mid x)\,da\\
+&=\frac{\mathbb E[A^2\mid V=x]-m(x)^2}{\beta_t}
+=\frac{\operatorname{Var}(A\mid V=x)}{\beta_t}.
+\end{aligned}$$
+
+Also $m'(x)=1+\beta_t\partial_x^2\log q_t(x)$. Equating the two expressions and dividing by $\alpha_t$ proves the identity in Section 6. In multiple dimensions, the corresponding covariance is $\beta_t[ I+\beta_t\nabla^2\log q_t(x)]/\alpha_t$. A noisy learned Hessian need not yield a valid positive-semidefinite covariance.
+
+## References
+
+- Ho, Jain, and Abbeel. [*Denoising Diffusion Probabilistic Models*](https://arxiv.org/abs/2006.11239). Algorithms 1–2 and Eqs. (3)–(14).
+- Yang Song et al. [*Score-Based Generative Modeling through Stochastic Differential Equations*](https://arxiv.org/abs/2011.13456). Section 2.2 expresses DDPM training and ancestral sampling in score form. Section 3.4 and Appendix E supply the later reverse-SDE interpretation.
+- Nakkiran, Bradley, Zhou, and Advani. [*Step-by-Step Diffusion: An Elementary Tutorial*](https://arxiv.org/abs/2406.08929). Section 2.1 and Appendix B.1 justify the small-step Gaussian approximation.
+- Efron. [*Tweedie's Formula and Selection Bias*](https://pmc.ncbi.nlm.nih.gov/articles/PMC3325056/). Posterior-moment identities.

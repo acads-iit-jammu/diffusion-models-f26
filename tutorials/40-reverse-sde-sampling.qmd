@@ -1,9 +1,9 @@
-# 02 · Reverse-SDE sampling {.unnumbered}
+# 01 · Reverse-SDE sampling {.unnumbered}
 
 ::: {.callout-note}
 ## Draft — Stochastic generation from a learned score
 
-This is the next topic after [Denoising Score Matching and Langevin sampling](./39-denoising-score-matching.qmd). The goal is to transport a terminal distribution back to data using a stochastic process. Data are at $t=0$ and the terminal prior is at $t=1$. The additional clock $\tau=1-t$ increases during generation.
+This note builds on [denoising score matching and Langevin sampling](./39-denoising-score-matching.qmd), [DDPM](./30-ddpm.qmd), and the forward-process construction in [Probability Flow](./probability-flow-ode.qmd). The goal is to transport a terminal distribution back to data using a stochastic process. Data are at $t=0$ and the terminal prior is at $t=1$. The additional clock $\tau=1-t$ increases during generation.
 :::
 
 ## 1. From a fixed target to a prescribed density path

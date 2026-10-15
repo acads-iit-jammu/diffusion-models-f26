@@ -1,0 +1,253 @@
+# 10 · DDPM through the reverse VP SDE {.unnumbered}
+
+::: {.callout-note}
+## Draft — From Ho's ancestral sampler to a reverse stochastic differential equation
+
+In the earlier [DDPM lecture](./30-ddpm.qmd), we introduced a reverse Gaussian Markov model and trained its mean through a noise-prediction objective motivated by the ELBO. We have since learned how a forward diffusion defines a path of densities, how denoising regression estimates their scores, and how a probability-flow ODE transports samples through that path. We now return to DDPM to connect these two developments.
+
+The central result is that **DDPM ancestral sampling is a particular numerical discretization of the reverse variance-preserving SDE**. Establishing this requires more than identifying a common score predictor: we must compare the drift and noise in Ho's finite update with those of the continuous reverse process. The derivation below follows Song et al.'s Section 3.4 and Appendix E, with the notation used throughout this Probability Flow series.
+:::
+
+The [reverse-SDE note](./40-reverse-sde-sampling.qmd) provides the general time-reversal result. Here we specialize it to DDPM and work through the numerical updates. The [next part on DDIM](./38-probability-flow-ode-part-9.qmd) takes the deterministic route through the probability-flow ODE. Keeping these routes separate will explain how one trained predictor can be used by different samplers without making their finite updates identical.
+
+We establish the correspondence in three steps, which determine the section numbering below.
+
+1. **Identify the common forward process.** Starting from the discrete DDPM corruption, derive the VP SDE. It is the same forward SDE from which the probability-flow ODE in the earlier parts was constructed.
+2. **Compare ancestral sampling with reverse-SDE Euler–Maruyama.** Reverse the VP SDE and derive its Euler–Maruyama update. Expand the ancestral mean through first order in the step size; the discrepancy begins at second order. Both numerical schemes therefore have the same limiting drift and diffusion, under the regularity conditions needed for convergence.
+3. **Compare the two discrete constructions directly.** Substitute the DDPM forward displacement and noise coefficient into Song's reverse-diffusion rule. This gives a distinct finite update. Expanding its coefficients shows how it agrees with ancestral DDPM to leading order.
+
+The third step does not produce Ho's ancestral formula exactly at a finite step. It provides a second discrete approximation to the same reverse VP SDE and makes their correspondence explicit. Similarly, in the second step it is the reverse SDE that is the continuous limit of both schemes; Euler–Maruyama is itself a discretization.
+
+## Notation mapping
+
+Ho uses an integer time index and reserves $\alpha_t$ for one-step variance retention. In this series, time lies in $[0,1]$ and $\alpha_t$ denotes the cumulative signal amplitude. The two meanings are different, so we first make the correspondence explicit.
+
+Choose grid times $0=t_0<\cdots<t_N=1$. Data are at $t_0=0$ and the terminal reference is at $t_N=1$. The table uses $n$ for the discrete index in both descriptions, avoiding confusion between that index and continuous time.
+
+| Ho's notation at step $n$ | Notation in this part | Meaning |
+|---|---|---|
+| $T$ | $N$ | Number of discrete steps |
+| Integer index $n$ | Time $t_n$ | Location on the time grid |
+| $\beta_n$ | $b_n$ | One-step forward noise variance |
+| $\alpha_n=1-\beta_n$ | $1-b_n$ | One-step signal variance retention |
+| $\bar\alpha_n=\prod_{j=1}^n\alpha_j$ | $\alpha_{t_n}^2$ | Cumulative signal variance retention |
+| $\sqrt{\bar\alpha_n}$ | $\alpha_{t_n}$ | Cumulative signal amplitude |
+| $\sqrt{1-\bar\alpha_n}$ | $\sigma_{t_n}$ | Cumulative forward noise amplitude |
+| Reverse variance $\sigma_n^2$ | $\nu_n$ | Chosen variance of the reverse Gaussian transition |
+| $\widetilde\beta_n$ | $\widetilde b_n$ | Forward posterior variance given clean data |
+
+In particular, $\sigma_{t_n}$ in this part is not Ho's reverse-step standard deviation. We also reserve $\beta(t)$ for a continuous **rate**. Its relation to the discrete variance $b_n$ depends on the time interval and will be derived below.
+
+The forward chain and its cumulative conditional law become
+
+$$X_{t_n}=\sqrt{1-b_n}\,X_{t_{n-1}}+\sqrt{b_n}\,Z_n,
+\qquad Z_n\overset{\mathrm{iid}}\sim\mathcal N(0,1),$$
+
+$$X_{t_n}\mid X_0=x_0\sim
+\mathcal N(\alpha_{t_n}x_0,\sigma_{t_n}^2),\qquad
+\alpha_{t_n}^2=\prod_{j=1}^n(1-b_j),\quad\sigma_{t_n}^2=1-\alpha_{t_n}^2.$$
+
+We use scalar states to expose the coefficients. In higher dimensions, the same scalar coefficients multiply vectors, and each noise draw is a standard Gaussian vector. The symbol $p_t$ denotes the marginal density induced by the forward corruption, rather than its conditional density given a clean observation.
+
+### The learned predictor in this notation
+
+At a selected step, training draws $X_0\sim p_{\mathrm{data}}$ and independent $\varepsilon\sim\mathcal N(0,1)$, then forms $X_{t_n}=\alpha_{t_n}X_0+\sigma_{t_n}\varepsilon$. The simplified DDPM objective, with an independent uniformly sampled index, is
+
+$$\mathcal L_{\mathrm{simple}}=
+\mathbb E_{n\sim\mathrm{Unif}\{1,\ldots,N\},\,X_0\sim p_{\mathrm{data}},\,\varepsilon\sim\mathcal N(0,1)}
+[(\varepsilon-\varepsilon_\theta(X_{t_n},t_n))^2].$$
+
+A predictor trained using integer indices can be written with input $t_n$ by relabeling those indices on the grid. This alone does not specify its behavior at off-grid times. A continuous-time solver additionally needs a time-conditioning or interpolation rule.
+
+The conditional Gaussian score is $-\varepsilon/\sigma_{t_n}$. Define the learned score by
+
+$$\boxed{s_\theta(x,t_n)=-\frac{\varepsilon_\theta(x,t_n)}{\sigma_{t_n}}.}$$
+
+Substituting into the training loss gives
+
+$$\mathcal L_{\mathrm{simple}}=
+\mathbb E\left[\sigma_{t_n}^2
+\left(s_\theta(X_{t_n},t_n)-\partial_x\log p_{t_n}(X_{t_n}\mid X_0)\right)^2\right].$$
+
+The expectation is over the same three independent draws as above. This is precisely a weighted denoising score-matching objective. The conditional-expectation argument from [Part 03](./32-probability-flow-ode-part-3.qmd) implies that the unrestricted optimum is $\partial_x\log p_{t_n}(x)$. Thus no new training problem is needed for the reinterpretation: the DDPM predictor already estimates the marginal score required by the reverse dynamics. Song et al.'s Section 2.2, Eq. (3), expresses this connection directly.
+
+### The ancestral update to be interpreted
+
+With the notation translated, Ho's reverse mean is
+
+$$\begin{aligned}
+\mu_\theta(x,t_n)
+&=\frac1{\sqrt{1-b_n}}
+\left[x-\frac{b_n}{\sigma_{t_n}}\varepsilon_\theta(x,t_n)\right]\\
+&=\frac{x+b_ns_\theta(x,t_n)}{\sqrt{1-b_n}}.
+\end{aligned}$$
+
+For the variance choice $\nu_n=b_n$, the modeled reverse transition is therefore
+
+$$\boxed{p_\theta(x_{t_{n-1}}\mid x_{t_n}=x)
+=\mathcal N\!\left(x_{t_{n-1}};
+\frac{x+b_ns_\theta(x,t_n)}{\sqrt{1-b_n}},b_n\right).}$$
+
+Starting from $x_{t_N}\sim\mathcal N(0,1)$, drawing successively from these conditionals gives
+
+$$\boxed{x_{t_{n-1}}=
+\frac{x_{t_n}+b_ns_\theta(x_{t_n},t_n)}{\sqrt{1-b_n}}
++\sqrt{b_n}\,Z_n.}$$
+
+This is the ancestral sampler written in Song et al.'s Section 2.2, Eq. (4). The word ancestral refers to sampling the reverse graphical model in its directed order. Ho's final reconstruction suppresses the fresh noise; our comparison initially concerns positive-time transitions before that endpoint convention.
+
+The [original DDPM lecture](./30-ddpm.qmd) explains this kernel through conditional Gaussian approximation and posterior-mean regression. We now ask a different question: as the time intervals shrink, what stochastic dynamics does this particular update approximate? To answer it, we first identify the continuous process underlying the forward chain, then reverse that process.
+
+## 1. DDPM and probability flow share the forward VP SDE
+
+Let $h_n=t_n-t_{n-1}$ be the length of a forward interval. Subtract the preceding state from the forward DDPM update to obtain
+
+$$X_{t_n}-X_{t_{n-1}}
+=(\sqrt{1-b_n}-1)X_{t_{n-1}}+\sqrt{b_n}\,Z_n.$$
+
+To obtain a finite diffusion rate as the grid is refined, the per-step variance must shrink with the interval. For a smooth rate $\beta$, take $b_n=\beta(t_n)h_n+O(h_n^2)$. Expanding $\sqrt{1-b_n}=1-b_n/2+O(b_n^2)$ gives, conditional on $X_{t_{n-1}}=x$,
+
+$$\mathbb E[X_{t_n}-X_{t_{n-1}}\mid x]
+=-\tfrac12\beta(t_n)x h_n+O(h_n^2),$$
+
+$$\operatorname{Var}(X_{t_n}-X_{t_{n-1}}\mid x)
+=b_n=\beta(t_n)h_n+O(h_n^2).$$
+
+A Brownian increment over $h_n$ has variance $h_n$. These two expressions identify the drift rate and squared diffusion coefficient of the limiting process:
+
+$$\boxed{dX_t=-\frac{\beta(t)}2X_t\,dt+\sqrt{\beta(t)}\,dW_t.}$$
+
+The small-step calculation also has an exact finite-grid counterpart for the forward process. Solving the linear VP SDE over one interval gives contraction $\exp[-\tfrac12\int_{t_{n-1}}^{t_n}\beta(u)du]$ and conditional noise variance equal to one minus its square. Consequently, one exact grid matching is $b_n=1-\exp[-\int_{t_{n-1}}^{t_n}\beta(u)\,du]$. The cumulative amplitude then satisfies the same schedule relation as before:
+
+$$\alpha_t=\exp\left[-\frac12\int_0^t\beta(u)\,du\right].$$
+
+The forward chain therefore determines the continuous VP density path as its schedule is refined. The score learned at its noise levels is the score of this path. We can now apply the reverse-time result to that same forward process.
+
+## 2. Compare ancestral sampling with reverse-SDE Euler–Maruyama
+
+### 2.1. Reverse the common forward process
+
+For a forward SDE $dX_t=f(X_t,t)dt+g(t)dW_t$, the [reverse-SDE lecture](./40-reverse-sde-sampling.qmd) gives, in the increasing generation clock $\tau=1-t$,
+
+$$dY_\tau=[-f(Y_\tau,t)+g(t)^2s_t(Y_\tau)]d\tau
++g(t)d\overline W_\tau.$$
+
+Here $s_t=\partial_x\log p_t$ is the true forward marginal score. The minus sign on $f$ reverses the forward drift, and the score term accounts for the reversal of the probability evolution. Substituting $f(x,t)=-\beta(t)x/2$ and $g(t)^2=\beta(t)$ gives
+
+$$\boxed{dY_\tau=\beta(t)\left[\frac12Y_\tau+s_t(Y_\tau)\right]d\tau
++\sqrt{\beta(t)}\,d\overline W_\tau,\qquad t=1-\tau.}$$
+
+### 2.2. Discretize the reverse SDE
+
+Moving from forward time $t_n$ to $t_{n-1}$ advances the reverse clock by the positive amount $h_n$. Integrate the reverse SDE over this interval and freeze its drift and diffusion coefficients at the current state $x=x_{t_n}$ and time $t_n$. The Brownian integral with the frozen coefficient is distributed as $\sqrt{h_n\beta(t_n)}Z_n$. Replacing the true score by its trained estimate gives the Euler–Maruyama step
+
+$$\boxed{x_{t_{n-1}}=x+h_n\beta(t_n)[x/2+s_\theta(x,t_n)]
++\sqrt{h_n\beta(t_n)}Z_n.}$$
+
+The reversal of forward contraction produces the term $h_n\beta(t_n)x/2$. The learned score contributes $h_n\beta(t_n)s_\theta$, and the Brownian increment contributes the Gaussian term. These coefficients are now consequences of the reverse SDE. To interpret DDPM as a solver for this equation, we must check that its ancestral update has the same leading drift and noise variance.
+
+### 2.3. Expand ancestral sampling and compare the increments
+
+Use the DDPM variance choice $\nu_n=b_n$, as in Song's Appendix E comparison. At a positive-time step before final reconstruction,
+
+$$x_{t_{n-1}}^{\mathrm{DDPM}}=
+\frac{x+b_ns_\theta(x,t_n)}{\sqrt{1-b_n}}+\sqrt{b_n}Z_n.$$
+
+The Gaussian increment already has variance $b_n$, which agrees to leading order with $h_n\beta(t_n)$. The remaining difference lies in the mean. For fixed $x,t_n$ and bounded score, expand the factor multiplying the state and score:
+
+$$\begin{aligned}
+\frac{x+b_ns_\theta}{\sqrt{1-b_n}}
+&=(x+b_ns_\theta)\left[1+\frac{b_n}2+O(b_n^2)\right]\\
+&=x+b_n[x/2+s_\theta]+O(b_n^2).
+\end{aligned}$$
+
+More explicitly, the mean has expansion
+
+$$\frac{x+b_ns_\theta}{\sqrt{1-b_n}}
+=x+b_n(x/2+s_\theta)
++b_n^2(3x/8+s_\theta/2)+O(b_n^3).$$
+
+Thus the mean difference from the leading Euler–Maruyama form is $O(h_n^2)$, and the noise-variance difference is also $O(h_n^2)$ when $b_n=\beta(t_n)h_n+O(h_n^2)$. These are statements about the local conditional moments, not a claim that the whole stochastic sample update has a pathwise error of order $h_n^2$. Define the reverse increment $\Delta X=x_{t_{n-1}}^{\mathrm{DDPM}}-x$. Dividing its conditional mean and variance by the positive reverse-time increment gives
+
+$$\frac{\mathbb E[\Delta X\mid x]}{h_n}
+\longrightarrow\beta(t)[x/2+s_\theta(x,t)],\qquad
+\frac{\operatorname{Var}(\Delta X\mid x)}{h_n}
+\longrightarrow\beta(t).$$
+
+These limits identify the reverse VP drift and diffusion variance. With the exact score they identify the true reversed process; with an approximate score they identify the corresponding learned reverse SDE. Under the regularity conditions required for numerical convergence, ancestral DDPM is therefore a consistent discretization of those dynamics. It need not equal Euler–Maruyama at a finite grid spacing.
+
+Song’s Appendix E makes the same conclusion by comparing ancestral DDPM with another discretization, called reverse diffusion. Working through that construction makes clear why different finite formulas can belong to the same continuous framework.
+
+## 3. Match the discrete coefficients in Song's construction
+
+### 3.1. Insert the DDPM forward displacement and noise coefficient
+
+To express Appendix E in our indexing, write a forward numerical step as
+
+$$x_{t_n}=x_{t_{n-1}}+F_n(x_{t_{n-1}})+G_nZ_n.$$
+
+Here $F_n$ is the numerical forward displacement and $G_n^2$ is its noise variance; both already contain the step size. They are not the continuous coefficients $f$ and $g$. Song’s construction reverses the numerical displacement at the current state, adds the score correction using that same noise variance, and retains a Gaussian increment:
+
+$$x_{t_{n-1}}=x-F_n(x)+G_n^2s_\theta(x,t_n)+G_nZ_n.$$
+
+For DDPM, $F_n(x)=(\sqrt{1-b_n}-1)x$ and $G_n=\sqrt{b_n}$. Substitution gives
+
+$$\boxed{x_{t_{n-1}}^{\mathrm{RD}}
+=(2-\sqrt{1-b_n})x+b_ns_\theta(x,t_n)+\sqrt{b_n}Z_n.}$$
+
+### 3.2. Compare the resulting rule with ancestral DDPM
+
+The substitution has produced Song’s reverse-diffusion update, not Ho’s ancestral update. The coefficient comparison makes the relationship explicit:
+
+| Numerical update | Coefficient of $x$ | Coefficient of $s_\theta$ | Noise variance |
+|---|---|---|---|
+| Euler–Maruyama | $1+\beta(t_n)h_n/2$ | $\beta(t_n)h_n$ | $\beta(t_n)h_n$ |
+| DDPM ancestral, $\nu_n=b_n$ | $(1-b_n)^{-1/2}$ | $b_n(1-b_n)^{-1/2}$ | $b_n$ |
+| Song reverse diffusion | $2-\sqrt{1-b_n}$ | $b_n$ | $b_n$ |
+
+The table distinguishes the three numerical rules without changing their common limiting target. Expanding each row for a small interval shows that all three have the same leading coefficients as the grid is refined. In particular, $2-\sqrt{1-b_n}=1+b_n/2+O(b_n^2)$. This is the sense in which Song's framework includes DDPM as a numerical solver for the reverse VP SDE; it is stronger than merely observing that both methods use a score. [Song et al., Section 4.1 and Appendix E](https://arxiv.org/html/2011.13456v2#A5)
+
+For the two discrete rules using exactly the same $b_n$, we can make the difference still more explicit. Write $s=s_\theta(x,t_n)$. Their conditional means expand as
+
+$$\begin{aligned}
+\mu_{\mathrm{ancestral}}
+&=x+b_n(x/2+s)+b_n^2(3x/8+s/2)+O(b_n^3),\\
+\mu_{\mathrm{RD}}
+&=x+b_n(x/2+s)+b_n^2x/8+O(b_n^3).
+\end{aligned}$$
+
+Consequently,
+
+$$\boxed{\mu_{\mathrm{ancestral}}-\mu_{\mathrm{RD}}
+=b_n^2(x/4+s/2)+O(b_n^3).}$$
+
+Their noise variances are both $b_n$. If the two single-step updates start at the same state and use the same Gaussian draw, only this difference of means remains. This is the direct discrete comparison in the third step: equality of the leading terms, with a generally nonzero finite-step correction.
+
+## Variance choices and endpoint qualifications
+
+The comparison above uses the variance $\nu_n=b_n$, matching Song’s Section 2.2 and Appendix E. Ho also considers the forward-posterior variance. For this alternative, $\nu_n=\widetilde b_n$, at fixed positive time with $\sigma_{t_n}^2$ bounded away from zero,
+
+$$\widetilde b_n=b_n-
+\frac{b_n^2\alpha_{t_{n-1}}^2}{\sigma_{t_n}^2}
+=b_n+O(b_n^2).$$
+
+It therefore has the same leading diffusion variance on such intervals. This expansion is not uniform near zero noise. Ho's final-step convention $Z_1=0$ is a separate reconstruction operation, not the generic Euler–Maruyama rule.
+
+With the true score and correct terminal initialization, the continuous reverse SDE follows the reversed marginal path. A finite ancestral chain still has kernel and discretization error; a learned score and approximate terminal prior add their own errors. The SDE interpretation explains the sampler without asserting exact finite-step reversal.
+
+The probability-flow route studied earlier is related but uses different dynamics. Written with the same increasing reverse clock, its velocity is
+
+$$\frac{dy}{d\tau}=\frac{\beta(t)}2[y+s_t(y)].$$
+
+Its score coefficient is half the reverse SDE's, and it contains no Brownian term. With an exact score and matching initialization, the two continuous processes have the same one-time marginals, although their trajectories differ. Simply removing the Gaussian increment from DDPM retains the reverse-SDE drift and does not create this ODE.
+
+We can therefore reuse the learned denoising predictor while changing the numerical sampling problem. This part has shown how Ho's ancestral rule fits the stochastic problem. The [DDIM lecture](./38-probability-flow-ode-part-9.qmd) next derives a particular discretization of the deterministic probability-flow problem.
+
+## References and reading guide
+
+- [Ho, Jain, and Abbeel, *Denoising Diffusion Probabilistic Models*](https://arxiv.org/abs/2006.11239): the original training and ancestral sampling algorithms.
+- [Yang Song et al., *Score-Based Generative Modeling through Stochastic Differential Equations*](https://arxiv.org/abs/2011.13456): Section 2.2 expresses DDPM in score form; Section 3.4 and Appendix B identify the VP limit; Section 4.1 and Appendix E interpret ancestral sampling as reverse-SDE discretization; Section 4.3 develops probability flow.
+- [Yang Song's explanatory blog](https://yang-song.net/blog/2021/score/): an overview of learning scores and using them in stochastic and deterministic generation.
+
+
+[Previous: 09 · Flow matching](./37-probability-flow-ode-part-8.qmd) · [Next: 11 · DDIM](./38-probability-flow-ode-part-9.qmd)

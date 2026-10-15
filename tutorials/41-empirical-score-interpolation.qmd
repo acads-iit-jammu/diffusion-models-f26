@@ -3,7 +3,9 @@
 ::: {.callout-note}
 ## Draft — Exact denoising, interpolation, and retrieval
 
-[Part 06](./35-probability-flow-ode-part-6.qmd) trained a neural network to estimate a mixture score. Here we keep the sampling problem and evaluate the corrupted empirical score exactly from stored observations. The posterior mean is a softmax-weighted interpolation in the original sample space. We derive the scalar and vector formulas, integrate the probability-flow ODE, inspect which observations support a trajectory, and compare interpolation with retrieval as noise decreases.
+[Part 06](./35-probability-flow-ode-part-6.qmd) trained a neural network to estimate a mixture score. Here we evaluate the score directly from a finite observation bank. This reveals an exact mechanism inside empirical-score diffusion: the denoiser softly retrieves stored observations and interpolates them with posterior weights; the probability-flow ODE uses that estimate to move its current state. No neural network is needed to expose or implement this mechanism.
+
+This provides a concrete mathematical realization of the retrieval-and-interpolation viewpoint discussed in [*Towards a Testable Theory of Emergence*](https://dhavala.github.io/saddlepoint/2026-06-30-towards-testable-theory-of-emergence/). The claim established here concerns empirical-score diffusion. It does not assert that every neural generator has the same finite-bank representation, or that every weighted average is a useful new observation.
 
 The learning objectives are to derive an empirical score without training, use it in backward-time Euler sampling, and explain a denoised estimate through its posterior weights. The one-dimensional and MNIST notebooks provide executed examples. Keep data at $t=0$ and the terminal prior at $t=1$, as in the earlier parts.
 :::
@@ -11,6 +13,25 @@ The learning objectives are to derive an empirical score without training, use i
 [**One-dimensional notebook**](../materials/probability-flow/notebooks/06-empirical-score-1d.html) · [Download `.ipynb`](../materials/probability-flow/notebooks/06-empirical-score-1d.ipynb)
 
 [**MNIST notebook**](../materials/probability-flow/notebooks/07-empirical-score-mnist.html) · [Download `.ipynb`](../materials/probability-flow/notebooks/07-empirical-score-mnist.ipynb)
+
+The central identities, derived below in one and then multiple dimensions, are
+
+$$\boxed{m_t(x)=\sum_iw_i(x,t)x_i,\qquad
+\widehat s_t(x)=\frac{\alpha_tm_t(x)-x}{\sigma_t^2}.}$$
+
+Here $w_i$ is the posterior probability of bank observation $x_i$ given the
+current noisy state. The first identity is an exact convex interpolation;
+the second turns it into the score needed by the transport field. We first
+derive these identities and the sampler, then inspect the resulting outputs
+and their supporting observations. The final sections connect this mechanism
+to the blog's interpretation, explain what neural estimation can add, and
+separate the choice of probability path from the choice of score estimator.
+
+Throughout, distinguish **interpolation of observations by the denoiser** from
+**interpolation of probability densities over time**. They are different
+operations. Also distinguish a novel numerical value from a plausible new
+sample: the former follows readily from averaging, while the latter requires
+an evaluation of the resulting output distribution.
 
 ## 1. The empirical distribution gives an exact score model
 
@@ -210,7 +231,433 @@ $$x_{t_{k-1}}=x_{t_k}+\frac{h_k\beta(t_k)\alpha_{t_k}}{2\sigma_{t_k}^2}
 
 The procedure is identical for scalars and vectors. The notebooks refine the time grid near zero, avoid evaluating the singular empirical score at $t=0$, and compare step resolutions. No posterior sampling or neural training is needed. Directly sampling the known mixture remains a useful reference for checking whether the numerical transport reproduces its positive-time density.
 
-### 2.2. Exact scalar transport through quantiles {#sec-empirical-quantile-flow}
+The scalar flow also has a quantile representation. [Appendix A](#sec-empirical-quantile-flow) derives it as an independent check of the ODE and its atomic endpoint limit. The interpolation mechanism above holds in every dimension and does not require that scalar construction.
+
+## 3. Choosing an output: interpolated denoising or the empirical endpoint
+
+The sampler computes an interpolated denoising estimate at every positive time. Whether we return that estimate, the current noisy state, or an endpoint limit determines the output law. This distinction explains how interpolation during generation can coexist with retrieval in the zero-noise limit.
+
+**A positive-time ODE state.** Stop at $\epsilon>0$. Under the correct initialization and exact integration, the output has continuous density $\widehat p_\epsilon$. It equals one of finitely many stored points with probability zero. It also retains Gaussian corruption, so a nonmatching value alone is not evidence of useful interpolation.
+
+**A positive-time posterior mean.** Output $m_\epsilon(X_\epsilon)$ instead. This is explicitly a convex combination, generally different from every stored observation. Its law is the pushforward $(m_\epsilon)_\#\widehat P_\epsilon$, not $\widehat P_0$. Choosing this rule intentionally produces interpolated clean estimates. At small noise the weights may nevertheless concentrate almost completely on one observation.
+
+**A two-point example makes the averaging explicit.** For $\widehat P_0=(\delta_{-1}+\delta_{+1})/2$,
+
+$$m_t(x)=\tanh\left(\frac{\alpha_tx}{\sigma_t^2}\right).$$
+
+At positive time, $m_t(x)$ lies between the two stored values and varies continuously with the noisy input. It is an explicit interpolating denoiser. At $x=0$, both $m_t(0)$ and $v(0,t)$ are zero. The trajectory initialized exactly at zero stays there and its limit is not a training point. This confirms that an individual path need not terminate at a stored point. A continuous terminal initialization, however, gives that exact initial value probability zero; the example does not establish a positive probability of interpolated endpoints.
+
+**The matched-law zero-noise limit.** The exact marginals satisfy $\widehat P_t\Rightarrow\widehat P_0$ as $t\downarrow0$. This is a distributional statement about empirical atoms; a regular invertible flow is not asserted at the singular endpoint. Finite cutoffs and exceptional trajectories are consistent with this limit.
+
+## 4. Initializing the transport from fresh terminal samples
+
+A fresh draw from $\widehat p_1$ need not be obtained by recording a deterministic forward trajectory. Its distribution is sufficient. The empirical mixture is positive everywhere at positive noise.
+
+Starting instead from standard Gaussian noise replaces $\widehat P_1$ by an approximate prior $R_1$. At positive time,
+
+$$R_\epsilon=(\Psi_{\epsilon\leftarrow1})_\#R_1.$$
+
+Here $\Psi_{\epsilon\leftarrow1}$ is the ODE flow map. This generally differs from $\widehat P_\epsilon$. Prior mismatch alone does not guarantee interpolation: it may alter the frequencies of approach to training points. The notebooks compare fresh matched-mixture initialization with fresh standard Gaussian initialization. At the finite rate used here, $\alpha_1=e^{-5.025}>0$, so these terminal laws are not exactly equal.
+
+## 5. Computation and truncated softmax
+
+For vector data, cancel the common query norm in the logits:
+
+$$\ell_i(x,t)=\frac{\alpha_tx^Tx_i-\alpha_t^2\|x_i\|^2/2}{\sigma_t^2}.$$
+
+A batch of inner products and precomputed data norms suffices. Subtracting the largest logit before exponentiation avoids overflow. The complete calculation costs $O(nd)$ per query and does not require an $n\times d$ difference tensor for every query.
+
+One can retain a subset $S$ and renormalize its weights. Let $\delta=\sum_{i\notin S}w_i$ be the discarded mass and $m_S$ the retained weighted mean. Then
+
+$$m=(1-\delta)m_S+\delta m_{S^c},\qquad
+\|m-m_S\|\leq\delta\,\operatorname{diam}\{x_i\}.$$
+
+This directly controls denoiser error for the finite bank. The corresponding score error is multiplied by $\alpha_t/\sigma_t^2$, and velocity error by $\beta(t)\alpha_t/(2\sigma_t^2)$. Small omitted mass does not by itself provide an integrated trajectory-error bound.
+
+The notebooks test top-$k$ approximation but still evaluate all logits. They do not claim a search speedup. Efficient nearest-neighbor search is a separate implementation choice; diffuse high-noise responsibilities can require many observations.
+
+## 6. Scalar and MNIST experiments: from broad interpolation to near-retrieval
+
+The scalar notebook draws 128 observations from a two-component Gaussian population. It compares empirical and population scores, checks the analytic score against a finite difference, runs backward Euler sampling, checks positive-time distributions against directly sampled mixtures, and measures refinement error. The symmetry-fixed two-point trajectory is included explicitly.
+
+The MNIST notebook uses 1,000 original training images in 784-dimensional pixel space and generates 32 trajectories per initialization law on a CPU. It trains no model. Labels are used only for reporting, never in the score. At each cutoff it reports nearest-bank pixel RMSE for raw states and posterior means, effective posterior count $1/\sum_iw_i^2$, and maximum posterior weight. It displays the first eight trajectories and nearest bank images without selecting attractive outputs.
+
+The notebooks also plot posterior weights for a fixed trajectory across reverse times. The scalar plot shows all 128 weights against the stored observation values; the MNIST plot displays the six highest-weight bank images at each selected time. Both plot the effective support count as weights concentrate.
+
+These diagnostics distinguish interpolation, residual noise and near-retrieval. Pixel differences alone do not establish new digit structure, and this small experiment does not measure held-out generative quality. The notebooks include step refinement and discarded-mass checks so numerical error and truncation are visible.
+
+### Observations from the saved run
+
+For the scalar bank, the average effective posterior count decreases from 118.14 at $t=0.6$ to 2.12 at $t=0.001$. At the latter cutoff, the mean distance from the denoised output to a stored scalar is 0.00302. The outputs still interpolate at finite noise, with increasingly concentrated weights.
+
+For the MNIST run initialized from standard Gaussian noise:
+
+| Cutoff $t$ | Mean effective count | Denoised nearest-bank pixel RMSE | Raw-state nearest-bank pixel RMSE |
+|---|---:|---:|---:|
+| 0.8 | 912.26 | 0.19801 | 0.99550 |
+| 0.4 | 7.88 | 0.09780 | 0.89926 |
+| 0.2 | 1.03 | 0.00084 | 0.58494 |
+| 0.01 | approximately 1 | below $10^{-4}$ for all 32 outputs | 0.04448 |
+
+![Posterior means along the first eight MNIST trajectories, followed by their nearest stored images. Intermediate estimates blend images; the final estimates closely match stored observations.](figs/empirical-score-mnist-posterior-means.png)
+
+Both terminal initialization laws produced 32 near-bank denoised outputs at $t=0.01$. Doubling the Euler resolution changed the raw states by 0.000120 RMS at that cutoff on the first eight Gaussian-initialized trajectories; their final denoised outputs were unchanged at displayed precision. The experiment therefore makes the interpolation-to-retrieval transition visible: several observations support intermediate denoisers, while one observation dominates the low-noise result. It demonstrates the mechanism without a network; useful novel-image generation at low noise is not established.
+
+Top-32 truncation retains only 6.03% of the posterior mass at $t=0.8$, compared with 92.84% at $t=0.4$ and essentially all mass at $t=0.1$. Aggressive truncation is therefore not uniformly accurate across the schedule. These are results for one fixed bank and seed, not a general image-quality benchmark.
+
+## 7. Explainability through the observation bank
+
+For a fixed noisy input and time, the decomposition is exact:
+
+$$m_t(x)=\sum_i\underbrace{w_i(x,t)x_i}_{\text{contribution to the denoised estimate}},
+\qquad
+\widehat s_t(x)=\sum_i\underbrace{w_i(x,t)\frac{\alpha_tx_i-x}{\sigma_t^2}}_{\text{contribution to the score}}.$$
+
+We can display the highest-weight observations and the omitted mass. This answers a concrete question: **which stored observations contribute to the current estimate, and by how much?** The weights are probabilities of candidate clean origins under the specified empirical corruption model. Their interpretation does not require a surrogate explanation method.
+
+### 7.1. Track concentration over reverse time
+
+If $\alpha_t$ tends to zero while $x$ remains bounded, the likelihoods of all stored observations become identical and $w_i(x,t)\to1/n$. At the finite terminal schedule used here, they are only approximately uniform. As noise decreases, relative distances increasingly distinguish the candidates. Along the sampled trajectories the notebooks show concentration from broad averaging toward a small supporting set.
+
+Useful summaries are
+
+$$N_{\mathrm{eff}}(x,t)=\frac1{\sum_iw_i(x,t)^2},\qquad
+H(x,t)=-\sum_iw_i(x,t)\log w_i(x,t),\qquad
+w_{\max}(x,t)=\max_i w_i(x,t).$$
+
+Uniform weights give $N_{\mathrm{eff}}=n$ and $H=\log n$; a single supporting observation gives $N_{\mathrm{eff}}=1$ and $H=0$. The bank indices and the observations themselves provide the detailed explanation behind these summaries. Weight concentration need not be monotone for every trajectory: both the query position and the scale change during integration.
+
+![Posterior weights for one scalar trajectory. Columns are stored scalar values; decreasing time concentrates support on fewer observations. The red dots mark the posterior mean.](figs/empirical-score-1d-support.png)
+
+In the MNIST notebook, the first particle has approximately uniform weights initially. Around $t=0.4$, bank image 224 has posterior weight about 0.693, with several other images contributing. At lower noise, its weight becomes numerically indistinguishable from one. The displayed supporting images make the transition from blending to retrieval directly inspectable. Bank indices refer to this particular selected bank, not the original MNIST file order.
+
+![The six highest-weight MNIST bank images for one trajectory at each time. Near the terminal prior, weights are almost uniform; at low noise, one stored image dominates. Very small displayed weights may underflow to zero.](figs/empirical-score-mnist-support.png)
+
+### 7.2. Posterior contribution and causal influence
+
+The weights explain the current empirical Bayes estimate. They do not assign unique causes to the complete generated sample. Removing an observation changes the normalization of every remaining weight and can change all subsequent positions.
+
+A stronger influence experiment removes the top-weight observation, recomputes the field, and reruns generation from the same terminal point. Compare the denoised output, final nearest bank index and weight trajectory. Repeat with a random low-weight observation as a control. If using matched-law initialization, hold the terminal point fixed for this intervention; changing the initial law at the same time would introduce another effect.
+
+A neural predictor trained in Part 06 can also be compared with this exact empirical reference. Agreement supports approximation of the bank-based denoiser at the tested positions. The neural representation does not automatically expose the same explicit weights, and generalization to a population distribution remains a separate question.
+
+## 8. Empirical diffusion as a concrete retrieval-and-interpolation model
+
+Soma S Dhavala's [*Towards a Testable Theory of Emergence*](https://dhavala.github.io/saddlepoint/2026-06-30-towards-testable-theory-of-emergence/) explores retrieval and recombination over learned representations, with new compositions understood through the support available in the underlying geometry. The empirical-score model gives a concrete setting in which the retrieval operation is explicit and measurable.
+
+The stored observations act as values. The current noisy sample supplies the query. Gaussian distance determines the similarity weights, and the weighted average returns a denoised estimate. For $\alpha_t>0$, the same operation can be written as Gaussian kernel regression in clean-data coordinates:
+
+$$m_t(x)=\frac{\sum_i K_t(x/\alpha_t,x_i)x_i}
+{\sum_j K_t(x/\alpha_t,x_j)},\qquad
+K_t(y,x_i)=\exp\left[-\frac{\|y-x_i\|^2}{2(\sigma_t/\alpha_t)^2}\right].$$
+
+The effective kernel bandwidth $\sigma_t/\alpha_t$ decreases during reverse generation. Each step retrieves a new weighted estimate using the updated query. This realizes iterative soft retrieval in the original sample space, and at low noise it can approach selection of one stored item.
+
+The empirical-score construction therefore supplies an exact instance supporting the blog's retrieval-and-interpolation viewpoint. The denoiser repeatedly retrieves and recombines observations, and its output determines the reverse velocity. Retrieval and interpolation are not competing explanations here: concentrated posterior weights make interpolation approach selection of one observation. The scalar and MNIST diagnostics measure this transition directly.
+
+The scope of this result matters. It establishes a mechanism in an explicit diffusion model, not a universal representation theorem for neural generators. It also does not identify interpolation with useful novelty: pixel averaging can blur digits, and the low-noise MNIST outputs approach stored images. The broader question is whether learned representations can support recombinations that preserve data structure better than whole-image averaging. This motivates the discussion of neural estimation that follows.
+
+## 9. Exact empirical fitting, smoothing, and generalization
+
+The experiments raise a statistical question beyond whether the score can be
+computed. If the empirical score is already explicit, what can a learned
+score model contribute? The MNIST results illustrate the issue: at intermediate
+noise the posterior mean combines several images, but at low noise it becomes
+nearly identical to one stored image. A neural model can introduce assumptions
+that encourage shared structure across observations, rather than reproduce
+the exact finite-bank score. Whether those assumptions improve generation
+must be evaluated; the presence of a network alone does not establish it.
+
+### 9.1. The optimum for a fixed dataset is the empirical score
+
+Fix the bank and draw clean training inputs uniformly from
+$\widehat P_0=n^{-1}\sum_i\delta_{x_i}$. At any fixed positive time, construct
+$X_t=\alpha_tX_0+\sigma_t\varepsilon$, where
+$\varepsilon\sim\mathcal N(0,I_d)$ is independent of $X_0$. The empirical
+denoising-score objective is
+
+$$\mathcal L_t(s)=
+\mathbb E_{\substack{X_0\sim\widehat P_0\\
+\varepsilon\sim\mathcal N(0,I_d)}}
+\left\|s(X_t,t)+\frac{\varepsilon}{\sigma_t}\right\|^2.$$
+
+The expectation includes fresh Gaussian corruption, not merely a fixed list
+of noisy training pairs. Squared-error regression gives the unrestricted
+minimizer
+
+$$\begin{aligned}
+s^*(x,t)
+&=\mathbb E\!\left[-\frac{\varepsilon}{\sigma_t}\,\middle|\,X_t=x\right]\\
+&=\frac{\alpha_t\mathbb E[X_0\mid X_t=x]-x}{\sigma_t^2}\\
+&=\nabla_x\log\widehat p_t(x).
+\end{aligned}$$
+
+More explicitly, the conditional-expectation decomposition gives
+
+$$\mathcal L_t(s)=\mathcal L_t(s^*)+
+\mathbb E_{X_t\sim\widehat p_t}
+\|s(X_t,t)-s^*(X_t,t)\|^2.$$
+
+Thus a sufficiently expressive model that exactly minimizes this objective
+recovers the empirical mixture score, up to equality almost everywhere under
+$\widehat p_t$. Positive time-dependent loss weights do not change that
+unrestricted optimum at the trained times. Infinite capacity alone does not
+ensure exact optimization or accurate approximation across positions and
+noise levels.
+
+With the exact empirical score, matching terminal initialization, and exact
+reverse dynamics, the generated positive-time marginals are $\widehat p_t$.
+As $t\downarrow0$, they converge weakly to the atomic empirical law
+$\widehat P_0$. This endpoint is a singular limit of the transport, not a
+regular invertible map from a continuous density to finitely many atoms.
+Consequently, perfectly fitting the finite-bank objective does not by itself
+produce a generalizing, non-atomic endpoint distribution.
+
+### 9.2. Distinguish fixed-data fitting from increasing-data consistency
+
+The limiting behavior depends on what is held fixed and what the estimator
+targets. It is not correct to say that every nonparametric estimator must
+approach the same finite empirical law.
+
+| Estimation setting | Target and implication |
+|---|---|
+| Fixed finite bank; exact empirical denoising objective | The optimal positive-time score is the corrupted empirical-mixture score. Its matched reverse marginals approach the atoms as noise vanishes. |
+| Fixed finite bank; fixed positive endpoint bandwidth | A kernel density estimate defines a continuous endpoint model. A score estimator targeting its corruption path samples that smoothed model, rather than the atomic bank. |
+| Increasing dataset size; statistically consistent estimation | Under suitable regularity, bandwidth, and estimation conditions, the estimated score can approach the population score at fixed positive noise. This is a different limit from removing noise for a fixed bank. |
+
+For example, choosing
+
+$$\widehat p_{0,h}(x)=\frac1n\sum_i\mathcal N(x;x_i,h^2I_d),\qquad h>0,$$
+
+makes endpoint smoothing explicit. Holding $h$ positive retains a continuous
+mixture. Sending $h$ to zero for a fixed bank recovers its atoms in the weak
+limit. When the number of observations also grows, consistency for an
+underlying population requires appropriate control of bandwidth and sampling
+error; it does not follow merely from calling the estimator nonparametric.
+Likewise, consistency of a score at each fixed positive time does not alone
+guarantee accurate reverse integration all the way to zero.
+
+### 9.3. What a neural score model can add
+
+A network shares parameters across examples, locations, and noise levels.
+Its architecture, finite capacity, regularization, and optimization can favor
+common structure over exact reproduction of narrow empirical components.
+These restrictions can act like implicit smoothing and can support generation
+beyond near-retrieval. They can also introduce bias or fail to prevent
+memorization; meaningful novelty remains an empirical question.
+
+“Implicit smoothing of the data distribution” is an interpretation, not an
+identity valid for every learned network. An arbitrary learned vector field
+need not be the gradient of a log density, and its outputs across times need
+not be the scores of one consistently corrupted endpoint distribution.
+The network is therefore not automatically equivalent to choosing a kernel
+bandwidth for $p_0$.
+
+This separates two possible benefits of learning: approximating the empirical
+score efficiently, and using statistical assumptions to estimate structure
+beyond a finite bank. The first does not imply the second. Our non-neural
+experiments establish that empirical-score sampling is feasible; their
+low-noise MNIST retrieval behavior motivates testing whether a learned model
+improves generalization, rather than assuming that it does.
+
+### 9.4. Why minimize an empirical objective if its unrestricted optimum memorizes?
+
+The statistical objective is to estimate the population distribution from
+finite observations. Let $D=(x_1,\ldots,x_n)$ consist of independent draws from
+$p_{\mathrm{data}}$. For a fixed candidate score function $s$, define its
+per-observation loss by averaging over a chosen time distribution $\rho$ and
+independent Gaussian noise:
+
+$$\ell_s(x_0)=\mathbb E_{\substack{t\sim\rho\\
+\varepsilon\sim\mathcal N(0,I_d)}}
+\left[\lambda(t)\left\|
+ s(\alpha_tx_0+\sigma_t\varepsilon,t)
+ +\frac{\varepsilon}{\sigma_t}\right\|^2\right].$$
+
+Use positive noise levels and weights for which these expectations are
+finite. The empirical and population objectives are
+
+$$\mathcal L_D(s)=\frac1n\sum_{i=1}^n\ell_s(x_i),
+\qquad
+\mathcal L_{\mathrm{pop}}(s)=
+\mathbb E_{X_0\sim p_{\mathrm{data}}}[\ell_s(X_0)].$$
+
+Since each observation follows the population law,
+
+$$\boxed{\mathbb E_{D\sim p_{\mathrm{data}}^{\otimes n}}
+[\mathcal L_D(s)]=\mathcal L_{\mathrm{pop}}(s).}$$
+
+Thus the empirical objective is an unbiased estimate of the population
+objective for a fixed candidate function. Its population minimizer is the
+population's corrupted score, whereas its unrestricted minimizer for a fixed
+bank is that bank's empirical score. These statements are consistent: averaging
+over datasets and minimizing over functions are different operations.
+
+In particular, the displayed identity does not imply that the training loss
+of the fitted function $s_{\widehat\theta(D)}$ is an unbiased estimate of its
+population loss. That function was selected using the same dataset. An
+unrestricted fit can exploit dataset-specific structure and achieve a lower
+training loss without improving its population estimate. Restrictions on the
+function class, regularization, and optimization can reduce this overfitting,
+at the cost of approximation bias. The closed-form empirical optimum and its
+memorization implications are discussed in
+[*On Memorization in Diffusion Models*](https://arxiv.org/abs/2310.02664).
+
+### 9.5. A Gaussian example separates empirical fit from population estimation
+
+Suppose the unknown population is actually $\mathcal N(\mu,\tau^2)$, with
+$\tau^2>0$, and we observe a finite scalar dataset. The exact empirical
+construction treats the observations as atoms; its corrupted score is the
+finite-mixture score derived earlier. An alternative is to fit a Gaussian
+using the sample mean $\widehat\mu$ and a positive variance estimate
+$\widehat\tau^2$. Under VP corruption, this fitted model has score
+
+$$s_{\mathrm G}(x,t)=
+-\frac{x-\alpha_t\widehat\mu}
+{\alpha_t^2\widehat\tau^2+\sigma_t^2}.$$
+
+This score generally does not minimize the unrestricted empirical denoising
+loss. Nevertheless, when the Gaussian assumption is appropriate, its
+continuous endpoint can estimate the population more accurately than an
+atomic model of the same observations. With consistent parameter estimates,
+it approaches the population Gaussian and its positive-time score as the
+sample size grows. If the population is strongly multimodal, the same
+restriction can instead give a poor estimate. The benefit comes from an
+appropriate statistical assumption, not from making the training fit worse
+for its own sake.
+
+A neural model provides a richer set of possible restrictions. For images,
+shared filters and spatial structure can allow information from many image
+regions and observations to inform a denoising prediction. The isotropic
+empirical-bank formula instead assigns weights using whole-observation
+Euclidean distances. Learned representations and architectural inductive
+biases have been studied as mechanisms for diffusion generalization; they
+are not guarantees for every architecture or dataset.
+[*Generalization in diffusion models arises from geometry-adaptive harmonic representations*](https://proceedings.iclr.cc/paper_files/paper/2024/hash/cbaf319a4712385b5ba8a414808b5713-Abstract-Conference.html)
+
+### 9.6. Computational and statistical reasons to fit a neural score
+
+| Motivation | Possible contribution | What must still be checked |
+|---|---|---|
+| Efficient evaluation | A trained function can replace direct evaluation against the entire bank, whose straightforward cost is $O(nd)$ per query. | Training cost, network size, inference cost, and approximation error determine whether it is actually advantageous. |
+| Statistical regularization | Parameter sharing and regularization can limit the fit to finite-sample irregularities. | A restricted fit can still memorize or introduce harmful bias. |
+| Structured generalization | Architectural assumptions and learned representations can capture common structure beyond whole-example retrieval. | Held-out denoising performance and generated-sample quality must support this claim. |
+
+If the goal is exactly sampling the atomic empirical law, neither neural
+training nor diffusion is needed: select a stored observation uniformly.
+The stronger motivation for learning is to estimate a useful population model.
+A deviation from the empirical score is not itself evidence of improvement,
+and a different pixel array is not by itself evidence of meaningful novelty.
+For the MNIST comparison, evaluate held-out denoising losses, output quality,
+and distances to training observations together. This distinguishes efficient
+approximation of the bank from statistical generalization beyond it.
+
+## 10. An alternative path from linear interpolation of densities {#sec-empirical-linear-path}
+
+The neural-estimation discussion concerns how to evaluate a field for a fixed VP path. We now return to the separate question of how that path is chosen. The empirical-score construction makes two separate choices: a probability path produced by VP Gaussian corruption, and a method for evaluating its score. The empirical mixture evaluates that score directly; a neural network can estimate it instead. We can also change the probability path itself.
+
+The general sampling problem is to choose densities $p_t$, with data at $t=0$ and a tractable reference at $t=1$, and find a velocity satisfying
+
+$$\boxed{\partial_t p_t+\nabla\cdot(p_tv_t)=0.}$$
+
+If this velocity generates a well-defined flow with these marginals, start with $X_1\sim p_1$ and integrate $\dot X_t=v_t(X_t)$ backward. Gaussian corruption is one construction of the path, not a requirement of ODE sampling.
+
+### 10.1. Start with a smooth empirical density estimate
+
+The empirical measure $\widehat P_0=n^{-1}\sum_i\delta_{x_i}$ consists of point masses. To use ordinary densities and a regular scalar ODE, first choose a smooth density estimate. For example, with a fixed bandwidth $h>0$,
+
+$$\widehat p_0(x)=\frac1{nh}\sum_{i=1}^n K\!\left(\frac{x-x_i}{h}\right),$$
+
+where $K$ is a smooth, strictly positive probability density. If $H$ is its CDF, then
+
+$$\widehat F_0(x)=\frac1n\sum_{i=1}^n H\!\left(\frac{x-x_i}{h}\right).$$
+
+The bandwidth specifies the endpoint density estimate; it is held fixed throughout this construction. A Gaussian kernel is convenient but not required. This endpoint smoothing is distinct from specifying a time-dependent Gaussian corruption process.
+
+Choose $p_1=\phi$, the standard normal density, with CDF $\Phi$. Define
+
+$$\boxed{p_t(x)=(1-t)\widehat p_0(x)+t\phi(x),\qquad 0\le t\le1.}$$
+
+These are normalized densities with exactly the desired endpoints. This is a mixture of densities: a draw from $p_t$ selects the data-density estimate with probability $1-t$ or the reference with probability $t$. It is not the distribution obtained by linearly interpolating two sampled positions.
+
+### 10.2. Recover the scalar velocity from continuity
+
+Let $F_t(x)=\int_{-\infty}^x p_t(u)\,du$. Integrating the scalar continuity equation and imposing zero probability flux at $-\infty$ gives
+
+$$\partial_tF_t(x)=-p_t(x)v_t(x).$$
+
+For the linear density path,
+
+$$F_t(x)=(1-t)\widehat F_0(x)+t\Phi(x),\qquad
+\partial_tF_t(x)=\Phi(x)-\widehat F_0(x).$$
+
+Consequently,
+
+$$\boxed{v_t(x)=\frac{\widehat F_0(x)-\Phi(x)}
+{(1-t)\widehat p_0(x)+t\phi(x)}.}$$
+
+All quantities come from the observations, the chosen density estimator, and the reference law. No score network or forward SDE is needed. In tails, evaluating the ratio accurately may require care even when the mathematical density is positive.
+
+For a decreasing grid $1=t_K>\cdots>t_0=0$, backward Euler sampling is
+
+$$X_{t_K}\sim\mathcal N(0,1),\qquad
+X_{t_{k-1}}=X_{t_k}+(t_{k-1}-t_k)v_{t_k}(X_{t_k}).$$
+
+The time increment is negative. Numerical samples approximate $\widehat p_0$ to the extent that the solver resolves the flow; the endpoint model is the smooth density estimate, not the unknown population law.
+
+### 10.3. Quantiles verify the transport independently
+
+Along an exact trajectory,
+
+$$\frac{d}{dt}F_t(X_t)
+=\partial_tF_t(X_t)+p_t(X_t)v_t(X_t)=0.$$
+
+Thus each particle retains its quantile. For continuous strictly increasing CDFs,
+
+$$\boxed{X_t=F_t^{-1}\!\big(\Phi(X_1)\big),\qquad
+X_0=\widehat F_0^{-1}\!\big(\Phi(X_1)\big).}$$
+
+Since $\Phi(X_1)$ is uniform, $X_0$ has density $\widehat p_0$. This provides a reference against which to check backward Euler. Appendix A gives the same quantile argument for the VP path; here we prescribe a different path and obtain its corresponding velocity.
+
+### 10.4. What changes in several dimensions or for point masses?
+
+In several dimensions the continuity equation constrains the velocity but does not determine it uniquely. If $\nabla\cdot(p_tw_t)=0$, then $v_t+w_t$ produces the same density evolution as $v_t$. One possible additional choice is a gradient field $v_t=\nabla\psi_t$, obtained by solving
+
+$$\nabla\cdot(p_t\nabla\psi_t)=-\partial_t p_t$$
+
+with appropriate boundary conditions and regularity assumptions. This is a spatial differential equation to solve, not the scalar CDF formula applied coordinate by coordinate. Defining the density path is therefore easier than computing a useful velocity in high dimensions.
+
+If we use the unsmoothed empirical measure instead, $(1-t)\widehat P_0+tP_1$ retains atoms for every $t<1$. It has no ordinary Lebesgue density on which to use the formulas above. A regular invertible ODE flow cannot create those atoms from a continuous reference. Atomic transport requires a singular or generalized construction; the empirical quantile map still samples the atoms, but is not a regular invertible endpoint flow.
+
+::: {.callout-note}
+## The roles of the probability path and the score estimator
+
+In score-based diffusion, Gaussian corruption specifies a probability path, and its SDE supplies the relation $v_t=f-\tfrac12g^2s_t$. A neural network estimates the score needed to evaluate this velocity; an explicit empirical mixture supplies an alternative score estimator. Neural networks can also provide statistical generalization and efficient evaluation, so matching the empirical score is not their only possible modeling role.
+
+Linear interpolation of smooth empirical and reference densities supplies an alternative probability path. In one dimension, continuity gives its velocity directly through the CDFs. This construction needs neither a score estimator nor Gaussian corruption. The VP formula for velocity must not be reused for this different path without deriving compatible dynamics.
+
+Both constructions implement the same sampling principle: specify a probability path, construct a compatible velocity, and integrate from the reference distribution to the data model.
+:::
+
+## 11. Questions and extensions
+
+1. For a two-point bank, derive $w_+(x,t)=1/(1+e^{-2\alpha_tx/\sigma_t^2})$ and show that $m_t(x)=2w_+(x,t)-1$. Explain why the symmetric zero trajectory is exceptional under a continuous initialization law.
+2. In the scalar notebook, compare posterior weights, nearest-observation distance and effective support for two different terminal particles. Does the same cutoff produce the same degree of interpolation?
+3. In MNIST, choose a positive cutoff before the weights become concentrated. Inspect both the denoised image and its contributing bank images. How does pixel averaging affect visual quality?
+4. Remove a dominant bank observation and repeat a paired trajectory. Compare this intervention with removing a low-weight observation.
+5. Repeat with larger banks and several random seeds. Report discarded posterior mass if using top-$k$ truncation, and distinguish approximation error from any genuine search speedup.
+
+6. Fit a smooth scalar empirical density, construct the linear path in Section 10, and compare backward Euler samples with $\widehat F_0^{-1}(\Phi(X_1))$ using the same terminal particles. Separate solver error from the effect of the bandwidth on the endpoint distribution.
+
+## 12. What empirical diffusion establishes about interpolation
+
+Empirical-score diffusion gives an exact, inspectable realization of generation driven by soft retrieval and interpolation. Its posterior mean is a weighted combination of stored observations; its score and reverse velocity follow algebraically from that mean. The supporting observations change with the current state and noise level, and the notebooks expose those changes directly.
+
+The output rule determines how this mechanism is used. Returning a posterior mean at positive time intentionally generates interpolated estimates. Continuing the exact matched-law dynamics to zero noise recovers the atomic empirical law in distribution. The latter does not invalidate the interpolation mechanism along the path; it describes its limiting behavior. The MNIST results illustrate both intermediate blending and low-noise near-retrieval, without establishing useful novel-image generation.
+
+Neural estimation is not necessary to implement this construction. Its potential contributions are computational approximation and statistical generalization through model assumptions. Perfect unrestricted fitting of the fixed-bank denoising objective recovers the empirical score; useful population modeling therefore requires more than an exact empirical fit. These distinctions make the blog's retrieval interpretation testable while keeping the claims about novelty and neural generalization separate.
+
+## Appendix A. Exact scalar transport through quantiles {#sec-empirical-quantile-flow}
 
 In one dimension, the empirical-mixture ODE also has an exact representation through quantiles. We can derive it independently of the softmax formula by using the continuity equation, just as in [Part 01's CDF construction](./07-probability-flow-ode.qmd#sec-cdf-velocity).
 
@@ -300,232 +747,10 @@ The boundary ranks have probability zero under any terminal law with a density, 
 
 The scalar result provides a second route to the same probability-flow trajectories and can serve as a numerical reference. At very low noise, the CDF becomes nearly flat between stored atoms; inversion near boundary ranks can require stable Gaussian-tail evaluation and greater numerical precision. In multiple dimensions, a scalar CDF inverse does not determine this flow; the empirical vector score is still explicit, but the ODE generally needs numerical integration.
 
-## 3. An output need not equal a training point
-
-There are several distinct meanings of this statement.
-
-**A positive-time ODE state.** Stop at $\epsilon>0$. Under the correct initialization and exact integration, the output has continuous density $\widehat p_\epsilon$. It equals one of finitely many stored points with probability zero. It also retains Gaussian corruption, so a nonmatching value alone is not evidence of useful interpolation.
-
-**A positive-time posterior mean.** Output $m_\epsilon(X_\epsilon)$ instead. This is explicitly a convex combination, generally different from every stored observation. Its law is the pushforward $(m_\epsilon)_\#\widehat P_\epsilon$, not $\widehat P_0$. Choosing this rule intentionally produces interpolated clean estimates. At small noise the weights may nevertheless concentrate almost completely on one observation.
-
-**An exceptional zero-noise trajectory.** For $\widehat P_0=(\delta_{-1}+\delta_{+1})/2$,
-
-$$m_t(x)=\tanh\left(\frac{\alpha_tx}{\sigma_t^2}\right).$$
-
-At $x=0$, both $m_t(0)$ and $v(0,t)$ are zero. The trajectory initialized exactly at zero stays there and its limit is not a training point. This confirms that an individual path need not terminate at a stored point. A continuous terminal initialization, however, gives that exact initial value probability zero; the example does not establish a positive probability of interpolated endpoints.
-
-**The matched-law zero-noise limit.** The exact marginals satisfy $\widehat P_t\Rightarrow\widehat P_0$ as $t\downarrow0$. This is a distributional statement about empirical atoms; a regular invertible flow is not asserted at the singular endpoint. Finite cutoffs and exceptional trajectories are consistent with this limit.
-
-## 4. Fresh terminal noise does not need a recorded origin
-
-A fresh draw from $\widehat p_1$ need not be obtained by recording a deterministic forward trajectory. Its distribution is sufficient. The empirical mixture is positive everywhere at positive noise.
-
-Starting instead from standard Gaussian noise replaces $\widehat P_1$ by an approximate prior $R_1$. At positive time,
-
-$$R_\epsilon=(\Psi_{\epsilon\leftarrow1})_\#R_1.$$
-
-Here $\Psi_{\epsilon\leftarrow1}$ is the ODE flow map. This generally differs from $\widehat P_\epsilon$. Prior mismatch alone does not guarantee interpolation: it may alter the frequencies of approach to training points. The notebooks compare fresh matched-mixture initialization with fresh standard Gaussian initialization. At the finite rate used here, $\alpha_1=e^{-5.025}>0$, so these terminal laws are not exactly equal.
-
-## 5. Computation and truncated softmax
-
-For vector data, cancel the common query norm in the logits:
-
-$$\ell_i(x,t)=\frac{\alpha_tx^Tx_i-\alpha_t^2\|x_i\|^2/2}{\sigma_t^2}.$$
-
-A batch of inner products and precomputed data norms suffices. Subtracting the largest logit before exponentiation avoids overflow. The complete calculation costs $O(nd)$ per query and does not require an $n\times d$ difference tensor for every query.
-
-One can retain a subset $S$ and renormalize its weights. Let $\delta=\sum_{i\notin S}w_i$ be the discarded mass and $m_S$ the retained weighted mean. Then
-
-$$m=(1-\delta)m_S+\delta m_{S^c},\qquad
-\|m-m_S\|\leq\delta\,\operatorname{diam}\{x_i\}.$$
-
-This directly controls denoiser error for the finite bank. The corresponding score error is multiplied by $\alpha_t/\sigma_t^2$, and velocity error by $\beta(t)\alpha_t/(2\sigma_t^2)$. Small omitted mass does not by itself provide an integrated trajectory-error bound.
-
-The notebooks test top-$k$ approximation but still evaluate all logits. They do not claim a search speedup. Efficient nearest-neighbor search is a separate implementation choice; diffuse high-noise responsibilities can require many observations.
-
-## 6. What the notebooks measure
-
-The scalar notebook draws 128 observations from a two-component Gaussian population. It compares empirical and population scores, checks the analytic score against a finite difference, runs backward Euler sampling, checks positive-time distributions against directly sampled mixtures, and measures refinement error. The symmetry-fixed two-point trajectory is included explicitly.
-
-The MNIST notebook uses 1,000 original training images in 784-dimensional pixel space and generates 32 trajectories per initialization law on a CPU. It trains no model. Labels are used only for reporting, never in the score. At each cutoff it reports nearest-bank pixel RMSE for raw states and posterior means, effective posterior count $1/\sum_iw_i^2$, and maximum posterior weight. It displays the first eight trajectories and nearest bank images without selecting attractive outputs.
-
-The notebooks also plot posterior weights for a fixed trajectory across reverse times. The scalar plot shows all 128 weights against the stored observation values; the MNIST plot displays the six highest-weight bank images at each selected time. Both plot the effective support count as weights concentrate.
-
-These diagnostics distinguish interpolation, residual noise and near-retrieval. Pixel differences alone do not establish new digit structure, and this small experiment does not measure held-out generative quality. The notebooks include step refinement and discarded-mass checks so numerical error and truncation are visible.
-
-### Observations from the saved run
-
-For the scalar bank, the average effective posterior count decreases from 118.14 at $t=0.6$ to 2.12 at $t=0.001$. At the latter cutoff, the mean distance from the denoised output to a stored scalar is 0.00302. The outputs still interpolate at finite noise, with increasingly concentrated weights.
-
-For the MNIST run initialized from standard Gaussian noise:
-
-| Cutoff $t$ | Mean effective count | Denoised nearest-bank pixel RMSE | Raw-state nearest-bank pixel RMSE |
-|---|---:|---:|---:|
-| 0.8 | 912.26 | 0.19801 | 0.99550 |
-| 0.4 | 7.88 | 0.09780 | 0.89926 |
-| 0.2 | 1.03 | 0.00084 | 0.58494 |
-| 0.01 | approximately 1 | below $10^{-4}$ for all 32 outputs | 0.04448 |
-
-![Posterior means along the first eight MNIST trajectories, followed by their nearest stored images. Intermediate estimates blend images; the final estimates closely match stored observations.](figs/empirical-score-mnist-posterior-means.png)
-
-Both terminal initialization laws produced 32 near-bank denoised outputs at $t=0.01$. Doubling the Euler resolution changed the raw states by 0.000120 RMS at that cutoff on the first eight Gaussian-initialized trajectories; their final denoised outputs were unchanged at displayed precision. Thus the absence of a network is demonstrated, but useful novel-image interpolation at low noise is not.
-
-Top-32 truncation retains only 6.03% of the posterior mass at $t=0.8$, compared with 92.84% at $t=0.4$ and essentially all mass at $t=0.1$. Aggressive truncation is therefore not uniformly accurate across the schedule. These are results for one fixed bank and seed, not a general image-quality benchmark.
-
-## 7. Explainability through the observation bank
-
-For a fixed noisy input and time, the decomposition is exact:
-
-$$m_t(x)=\sum_i\underbrace{w_i(x,t)x_i}_{\text{contribution to the denoised estimate}},
-\qquad
-\widehat s_t(x)=\sum_i\underbrace{w_i(x,t)\frac{\alpha_tx_i-x}{\sigma_t^2}}_{\text{contribution to the score}}.$$
-
-We can display the highest-weight observations and the omitted mass. This answers a concrete question: **which stored observations contribute to the current estimate, and by how much?** The weights are probabilities of candidate clean origins under the specified empirical corruption model. Their interpretation does not require a surrogate explanation method.
-
-### 7.1. Track concentration over reverse time
-
-If $\alpha_t$ tends to zero while $x$ remains bounded, the likelihoods of all stored observations become identical and $w_i(x,t)\to1/n$. At the finite terminal schedule used here, they are only approximately uniform. As noise decreases, relative distances increasingly distinguish the candidates. Along the sampled trajectories the notebooks show concentration from broad averaging toward a small supporting set.
-
-Useful summaries are
-
-$$N_{\mathrm{eff}}(x,t)=\frac1{\sum_iw_i(x,t)^2},\qquad
-H(x,t)=-\sum_iw_i(x,t)\log w_i(x,t),\qquad
-w_{\max}(x,t)=\max_i w_i(x,t).$$
-
-Uniform weights give $N_{\mathrm{eff}}=n$ and $H=\log n$; a single supporting observation gives $N_{\mathrm{eff}}=1$ and $H=0$. The bank indices and the observations themselves provide the detailed explanation behind these summaries. Weight concentration need not be monotone for every trajectory: both the query position and the scale change during integration.
-
-![Posterior weights for one scalar trajectory. Columns are stored scalar values; decreasing time concentrates support on fewer observations. The red dots mark the posterior mean.](figs/empirical-score-1d-support.png)
-
-In the MNIST notebook, the first particle has approximately uniform weights initially. Around $t=0.4$, bank image 224 has posterior weight about 0.693, with several other images contributing. At lower noise, its weight becomes numerically indistinguishable from one. The displayed supporting images make the transition from blending to retrieval directly inspectable. Bank indices refer to this particular selected bank, not the original MNIST file order.
-
-![The six highest-weight MNIST bank images for one trajectory at each time. Near the terminal prior, weights are almost uniform; at low noise, one stored image dominates. Very small displayed weights may underflow to zero.](figs/empirical-score-mnist-support.png)
-
-### 7.2. Posterior contribution and causal influence
-
-The weights explain the current empirical Bayes estimate. They do not assign unique causes to the complete generated sample. Removing an observation changes the normalization of every remaining weight and can change all subsequent positions.
-
-A stronger influence experiment removes the top-weight observation, recomputes the field, and reruns generation from the same terminal point. Compare the denoised output, final nearest bank index and weight trajectory. Repeat with a random low-weight observation as a control. If using matched-law initialization, hold the terminal point fixed for this intervention; changing the initial law at the same time would introduce another effect.
-
-A neural predictor trained in Part 06 can also be compared with this exact empirical reference. Agreement supports approximation of the bank-based denoiser at the tested positions. The neural representation does not automatically expose the same explicit weights, and generalization to a population distribution remains a separate question.
-
-## 8. Connection to generation as approximate retrieval
-
-Soma S Dhavala's [*Towards a Testable Theory of Emergence*](https://dhavala.github.io/saddlepoint/2026-06-30-towards-testable-theory-of-emergence/) explores retrieval and recombination over learned representations, with new compositions understood through the support available in the underlying geometry. The empirical-score model gives a concrete setting in which the retrieval operation is explicit and measurable.
-
-The stored observations act as values. The current noisy sample supplies the query. Gaussian distance determines the similarity weights, and the weighted average returns a denoised estimate. For $\alpha_t>0$, the same operation can be written as Gaussian kernel regression in clean-data coordinates:
-
-$$m_t(x)=\frac{\sum_i K_t(x/\alpha_t,x_i)x_i}
-{\sum_j K_t(x/\alpha_t,x_j)},\qquad
-K_t(y,x_i)=\exp\left[-\frac{\|y-x_i\|^2}{2(\sigma_t/\alpha_t)^2}\right].$$
-
-The effective kernel bandwidth $\sigma_t/\alpha_t$ decreases during reverse generation. Each step retrieves a new weighted estimate using the updated query. This realizes iterative soft retrieval in the original sample space, and at low noise it can approach selection of one stored item.
-
-This example supplies a testable instance of the retrieval interpretation. A convex combination is not sufficient evidence of a coherent new composition: averaged pixels can blur digits, and the MNIST experiment approaches stored images at low noise. The blog's broader discussion of learned geometry and held-out composition suggests additional experiments, rather than being proved by this empirical pixel-space construction.
-
-## 9. An alternative path from linear interpolation of densities {#sec-empirical-linear-path}
-
-The preceding construction makes two separate choices: a probability path produced by VP Gaussian corruption, and a method for evaluating its score. The empirical mixture evaluates that score directly; a neural network can estimate it instead. We can also change the probability path itself.
-
-The general sampling problem is to choose densities $p_t$, with data at $t=0$ and a tractable reference at $t=1$, and find a velocity satisfying
-
-$$\boxed{\partial_t p_t+\nabla\cdot(p_tv_t)=0.}$$
-
-If this velocity generates a well-defined flow with these marginals, start with $X_1\sim p_1$ and integrate $\dot X_t=v_t(X_t)$ backward. Gaussian corruption is one construction of the path, not a requirement of ODE sampling.
-
-### 9.1. Start with a smooth empirical density estimate
-
-The empirical measure $\widehat P_0=n^{-1}\sum_i\delta_{x_i}$ consists of point masses. To use ordinary densities and a regular scalar ODE, first choose a smooth density estimate. For example, with a fixed bandwidth $h>0$,
-
-$$\widehat p_0(x)=\frac1{nh}\sum_{i=1}^n K\!\left(\frac{x-x_i}{h}\right),$$
-
-where $K$ is a smooth, strictly positive probability density. If $H$ is its CDF, then
-
-$$\widehat F_0(x)=\frac1n\sum_{i=1}^n H\!\left(\frac{x-x_i}{h}\right).$$
-
-The bandwidth specifies the endpoint density estimate; it is held fixed throughout this construction. A Gaussian kernel is convenient but not required. This endpoint smoothing is distinct from specifying a time-dependent Gaussian corruption process.
-
-Choose $p_1=\phi$, the standard normal density, with CDF $\Phi$. Define
-
-$$\boxed{p_t(x)=(1-t)\widehat p_0(x)+t\phi(x),\qquad 0\le t\le1.}$$
-
-These are normalized densities with exactly the desired endpoints. This is a mixture of densities: a draw from $p_t$ selects the data-density estimate with probability $1-t$ or the reference with probability $t$. It is not the distribution obtained by linearly interpolating two sampled positions.
-
-### 9.2. Recover the scalar velocity from continuity
-
-Let $F_t(x)=\int_{-\infty}^x p_t(u)\,du$. Integrating the scalar continuity equation and imposing zero probability flux at $-\infty$ gives
-
-$$\partial_tF_t(x)=-p_t(x)v_t(x).$$
-
-For the linear density path,
-
-$$F_t(x)=(1-t)\widehat F_0(x)+t\Phi(x),\qquad
-\partial_tF_t(x)=\Phi(x)-\widehat F_0(x).$$
-
-Consequently,
-
-$$\boxed{v_t(x)=\frac{\widehat F_0(x)-\Phi(x)}
-{(1-t)\widehat p_0(x)+t\phi(x)}.}$$
-
-All quantities come from the observations, the chosen density estimator, and the reference law. No score network or forward SDE is needed. In tails, evaluating the ratio accurately may require care even when the mathematical density is positive.
-
-For a decreasing grid $1=t_K>\cdots>t_0=0$, backward Euler sampling is
-
-$$X_{t_K}\sim\mathcal N(0,1),\qquad
-X_{t_{k-1}}=X_{t_k}+(t_{k-1}-t_k)v_{t_k}(X_{t_k}).$$
-
-The time increment is negative. Numerical samples approximate $\widehat p_0$ to the extent that the solver resolves the flow; the endpoint model is the smooth density estimate, not the unknown population law.
-
-### 9.3. Quantiles verify the transport independently
-
-Along an exact trajectory,
-
-$$\frac{d}{dt}F_t(X_t)
-=\partial_tF_t(X_t)+p_t(X_t)v_t(X_t)=0.$$
-
-Thus each particle retains its quantile. For continuous strictly increasing CDFs,
-
-$$\boxed{X_t=F_t^{-1}\!\big(\Phi(X_1)\big),\qquad
-X_0=\widehat F_0^{-1}\!\big(\Phi(X_1)\big).}$$
-
-Since $\Phi(X_1)$ is uniform, $X_0$ has density $\widehat p_0$. This provides a reference against which to check backward Euler. The same quantile argument appeared in Section 2.2 for the VP path; here we prescribe a different path and obtain its corresponding velocity.
-
-### 9.4. What changes in several dimensions or for point masses?
-
-In several dimensions the continuity equation constrains the velocity but does not determine it uniquely. If $\nabla\cdot(p_tw_t)=0$, then $v_t+w_t$ produces the same density evolution as $v_t$. One possible additional choice is a gradient field $v_t=\nabla\psi_t$, obtained by solving
-
-$$\nabla\cdot(p_t\nabla\psi_t)=-\partial_t p_t$$
-
-with appropriate boundary conditions and regularity assumptions. This is a spatial differential equation to solve, not the scalar CDF formula applied coordinate by coordinate. Defining the density path is therefore easier than computing a useful velocity in high dimensions.
-
-If we use the unsmoothed empirical measure instead, $(1-t)\widehat P_0+tP_1$ retains atoms for every $t<1$. It has no ordinary Lebesgue density on which to use the formulas above. A regular invertible ODE flow cannot create those atoms from a continuous reference. Atomic transport requires a singular or generalized construction; the empirical quantile map still samples the atoms, but is not a regular invertible endpoint flow.
-
-::: {.callout-note}
-## The roles of the probability path and the score estimator
-
-In score-based diffusion, Gaussian corruption specifies a probability path, and its SDE supplies the relation $v_t=f-\tfrac12g^2s_t$. A neural network estimates the score needed to evaluate this velocity; an explicit empirical mixture supplies an alternative score estimator. Neural networks can also provide statistical generalization and efficient evaluation, so matching the empirical score is not their only possible modeling role.
-
-Linear interpolation of smooth empirical and reference densities supplies an alternative probability path. In one dimension, continuity gives its velocity directly through the CDFs. This construction needs neither a score estimator nor Gaussian corruption. The VP formula for velocity must not be reused for this different path without deriving compatible dynamics.
-
-Both constructions implement the same sampling principle: specify a probability path, construct a compatible velocity, and integrate from the reference distribution to the data model.
-:::
-
-## 10. Questions and extensions
-
-1. For a two-point bank, derive $w_+(x,t)=1/(1+e^{-2\alpha_tx/\sigma_t^2})$ and show that $m_t(x)=2w_+(x,t)-1$. Explain why the symmetric zero trajectory is exceptional under a continuous initialization law.
-2. In the scalar notebook, compare posterior weights, nearest-observation distance and effective support for two different terminal particles. Does the same cutoff produce the same degree of interpolation?
-3. In MNIST, choose a positive cutoff before the weights become concentrated. Inspect both the denoised image and its contributing bank images. How does pixel averaging affect visual quality?
-4. Remove a dominant bank observation and repeat a paired trajectory. Compare this intervention with removing a low-weight observation.
-5. Repeat with larger banks and several random seeds. Report discarded posterior mass if using top-$k$ truncation, and distinguish approximation error from any genuine search speedup.
-
-6. Fit a smooth scalar empirical density, construct the linear path in Section 9, and compare backward Euler samples with $\widehat F_0^{-1}(\Phi(X_1))$ using the same terminal particles. Separate solver error from the effect of the bandwidth on the endpoint distribution.
-
-## 11. What this construction establishes
-
-A neural network is unnecessary for the empirical-score construction. The exact denoiser is already available as a data-dependent softmax average. For sampling the empirical endpoint itself, uniformly selecting a stored observation is simpler; for sampling its positive-time Gaussian mixture, select an observation and add the specified corruption directly.
-
-The ODE is useful here as an explicit transport experiment. Positive-time denoising provides a deliberate interpolation rule. Whether that rule produces useful new observations, particularly images, must be evaluated separately. Neural networks are one way to approximate the score and impose a model restriction, not a mathematical prerequisite for this transport.
-
 ## References
+
+- [*On Memorization in Diffusion Models*](https://arxiv.org/abs/2310.02664): the empirical denoising optimum and memorization.
+- [*Generalization in diffusion models arises from geometry-adaptive harmonic representations*](https://proceedings.iclr.cc/paper_files/paper/2024/hash/cbaf319a4712385b5ba8a414808b5713-Abstract-Conference.html): learned representations and inductive biases associated with generalization.
 
 - [Song et al., *Score-Based Generative Modeling through Stochastic Differential Equations*](https://arxiv.org/abs/2011.13456): VP corruption and probability-flow ODE.
 - [Park et al., *Random Walks with Tweedie: A Unified View of Score-Based Diffusion Models*](https://arxiv.org/abs/2411.18702): denoising and score-based sampling.
