@@ -422,7 +422,94 @@ The effective kernel bandwidth $\sigma_t/\alpha_t$ decreases during reverse gene
 
 This example supplies a testable instance of the retrieval interpretation. A convex combination is not sufficient evidence of a coherent new composition: averaged pixels can blur digits, and the MNIST experiment approaches stored images at low noise. The blog's broader discussion of learned geometry and held-out composition suggests additional experiments, rather than being proved by this empirical pixel-space construction.
 
-## 9. Questions and extensions
+## 9. An alternative path from linear interpolation of densities {#sec-empirical-linear-path}
+
+The preceding construction makes two separate choices: a probability path produced by VP Gaussian corruption, and a method for evaluating its score. The empirical mixture evaluates that score directly; a neural network can estimate it instead. We can also change the probability path itself.
+
+The general sampling problem is to choose densities $p_t$, with data at $t=0$ and a tractable reference at $t=1$, and find a velocity satisfying
+
+$$\boxed{\partial_t p_t+\nabla\cdot(p_tv_t)=0.}$$
+
+If this velocity generates a well-defined flow with these marginals, start with $X_1\sim p_1$ and integrate $\dot X_t=v_t(X_t)$ backward. Gaussian corruption is one construction of the path, not a requirement of ODE sampling.
+
+### 9.1. Start with a smooth empirical density estimate
+
+The empirical measure $\widehat P_0=n^{-1}\sum_i\delta_{x_i}$ consists of point masses. To use ordinary densities and a regular scalar ODE, first choose a smooth density estimate. For example, with a fixed bandwidth $h>0$,
+
+$$\widehat p_0(x)=\frac1{nh}\sum_{i=1}^n K\!\left(\frac{x-x_i}{h}\right),$$
+
+where $K$ is a smooth, strictly positive probability density. If $H$ is its CDF, then
+
+$$\widehat F_0(x)=\frac1n\sum_{i=1}^n H\!\left(\frac{x-x_i}{h}\right).$$
+
+The bandwidth specifies the endpoint density estimate; it is held fixed throughout this construction. A Gaussian kernel is convenient but not required. This endpoint smoothing is distinct from specifying a time-dependent Gaussian corruption process.
+
+Choose $p_1=\phi$, the standard normal density, with CDF $\Phi$. Define
+
+$$\boxed{p_t(x)=(1-t)\widehat p_0(x)+t\phi(x),\qquad 0\le t\le1.}$$
+
+These are normalized densities with exactly the desired endpoints. This is a mixture of densities: a draw from $p_t$ selects the data-density estimate with probability $1-t$ or the reference with probability $t$. It is not the distribution obtained by linearly interpolating two sampled positions.
+
+### 9.2. Recover the scalar velocity from continuity
+
+Let $F_t(x)=\int_{-\infty}^x p_t(u)\,du$. Integrating the scalar continuity equation and imposing zero probability flux at $-\infty$ gives
+
+$$\partial_tF_t(x)=-p_t(x)v_t(x).$$
+
+For the linear density path,
+
+$$F_t(x)=(1-t)\widehat F_0(x)+t\Phi(x),\qquad
+\partial_tF_t(x)=\Phi(x)-\widehat F_0(x).$$
+
+Consequently,
+
+$$\boxed{v_t(x)=\frac{\widehat F_0(x)-\Phi(x)}
+{(1-t)\widehat p_0(x)+t\phi(x)}.}$$
+
+All quantities come from the observations, the chosen density estimator, and the reference law. No score network or forward SDE is needed. In tails, evaluating the ratio accurately may require care even when the mathematical density is positive.
+
+For a decreasing grid $1=t_K>\cdots>t_0=0$, backward Euler sampling is
+
+$$X_{t_K}\sim\mathcal N(0,1),\qquad
+X_{t_{k-1}}=X_{t_k}+(t_{k-1}-t_k)v_{t_k}(X_{t_k}).$$
+
+The time increment is negative. Numerical samples approximate $\widehat p_0$ to the extent that the solver resolves the flow; the endpoint model is the smooth density estimate, not the unknown population law.
+
+### 9.3. Quantiles verify the transport independently
+
+Along an exact trajectory,
+
+$$\frac{d}{dt}F_t(X_t)
+=\partial_tF_t(X_t)+p_t(X_t)v_t(X_t)=0.$$
+
+Thus each particle retains its quantile. For continuous strictly increasing CDFs,
+
+$$\boxed{X_t=F_t^{-1}\!\big(\Phi(X_1)\big),\qquad
+X_0=\widehat F_0^{-1}\!\big(\Phi(X_1)\big).}$$
+
+Since $\Phi(X_1)$ is uniform, $X_0$ has density $\widehat p_0$. This provides a reference against which to check backward Euler. The same quantile argument appeared in Section 2.2 for the VP path; here we prescribe a different path and obtain its corresponding velocity.
+
+### 9.4. What changes in several dimensions or for point masses?
+
+In several dimensions the continuity equation constrains the velocity but does not determine it uniquely. If $\nabla\cdot(p_tw_t)=0$, then $v_t+w_t$ produces the same density evolution as $v_t$. One possible additional choice is a gradient field $v_t=\nabla\psi_t$, obtained by solving
+
+$$\nabla\cdot(p_t\nabla\psi_t)=-\partial_t p_t$$
+
+with appropriate boundary conditions and regularity assumptions. This is a spatial differential equation to solve, not the scalar CDF formula applied coordinate by coordinate. Defining the density path is therefore easier than computing a useful velocity in high dimensions.
+
+If we use the unsmoothed empirical measure instead, $(1-t)\widehat P_0+tP_1$ retains atoms for every $t<1$. It has no ordinary Lebesgue density on which to use the formulas above. A regular invertible ODE flow cannot create those atoms from a continuous reference. Atomic transport requires a singular or generalized construction; the empirical quantile map still samples the atoms, but is not a regular invertible endpoint flow.
+
+::: {.callout-note}
+## The roles of the probability path and the score estimator
+
+In score-based diffusion, Gaussian corruption specifies a probability path, and its SDE supplies the relation $v_t=f-\tfrac12g^2s_t$. A neural network estimates the score needed to evaluate this velocity; an explicit empirical mixture supplies an alternative score estimator. Neural networks can also provide statistical generalization and efficient evaluation, so matching the empirical score is not their only possible modeling role.
+
+Linear interpolation of smooth empirical and reference densities supplies an alternative probability path. In one dimension, continuity gives its velocity directly through the CDFs. This construction needs neither a score estimator nor Gaussian corruption. The VP formula for velocity must not be reused for this different path without deriving compatible dynamics.
+
+Both constructions implement the same sampling principle: specify a probability path, construct a compatible velocity, and integrate from the reference distribution to the data model.
+:::
+
+## 10. Questions and extensions
 
 1. For a two-point bank, derive $w_+(x,t)=1/(1+e^{-2\alpha_tx/\sigma_t^2})$ and show that $m_t(x)=2w_+(x,t)-1$. Explain why the symmetric zero trajectory is exceptional under a continuous initialization law.
 2. In the scalar notebook, compare posterior weights, nearest-observation distance and effective support for two different terminal particles. Does the same cutoff produce the same degree of interpolation?
@@ -430,7 +517,9 @@ This example supplies a testable instance of the retrieval interpretation. A con
 4. Remove a dominant bank observation and repeat a paired trajectory. Compare this intervention with removing a low-weight observation.
 5. Repeat with larger banks and several random seeds. Report discarded posterior mass if using top-$k$ truncation, and distinguish approximation error from any genuine search speedup.
 
-## 10. What this construction establishes
+6. Fit a smooth scalar empirical density, construct the linear path in Section 9, and compare backward Euler samples with $\widehat F_0^{-1}(\Phi(X_1))$ using the same terminal particles. Separate solver error from the effect of the bandwidth on the endpoint distribution.
+
+## 11. What this construction establishes
 
 A neural network is unnecessary for the empirical-score construction. The exact denoiser is already available as a data-dependent softmax average. For sampling the empirical endpoint itself, uniformly selecting a stored observation is simpler; for sampling its positive-time Gaussian mixture, select an observation and add the specified corruption directly.
 
