@@ -622,8 +622,15 @@ window.Quarto = {
   <li><a href="#posterior-contribution-and-causal-influence" id="toc-posterior-contribution-and-causal-influence" class="nav-link" data-scroll-target="#posterior-contribution-and-causal-influence">7.2. Posterior contribution and causal influence</a></li>
   </ul></li>
   <li><a href="#connection-to-generation-as-approximate-retrieval" id="toc-connection-to-generation-as-approximate-retrieval" class="nav-link" data-scroll-target="#connection-to-generation-as-approximate-retrieval">8. Connection to generation as approximate retrieval</a></li>
-  <li><a href="#questions-and-extensions" id="toc-questions-and-extensions" class="nav-link" data-scroll-target="#questions-and-extensions">9. Questions and extensions</a></li>
-  <li><a href="#what-this-construction-establishes" id="toc-what-this-construction-establishes" class="nav-link" data-scroll-target="#what-this-construction-establishes">10. What this construction establishes</a></li>
+  <li><a href="#sec-empirical-linear-path" id="toc-sec-empirical-linear-path" class="nav-link" data-scroll-target="#sec-empirical-linear-path">9. An alternative path from linear interpolation of densities</a>
+  <ul class="collapse">
+  <li><a href="#start-with-a-smooth-empirical-density-estimate" id="toc-start-with-a-smooth-empirical-density-estimate" class="nav-link" data-scroll-target="#start-with-a-smooth-empirical-density-estimate">9.1. Start with a smooth empirical density estimate</a></li>
+  <li><a href="#recover-the-scalar-velocity-from-continuity" id="toc-recover-the-scalar-velocity-from-continuity" class="nav-link" data-scroll-target="#recover-the-scalar-velocity-from-continuity">9.2. Recover the scalar velocity from continuity</a></li>
+  <li><a href="#quantiles-verify-the-transport-independently" id="toc-quantiles-verify-the-transport-independently" class="nav-link" data-scroll-target="#quantiles-verify-the-transport-independently">9.3. Quantiles verify the transport independently</a></li>
+  <li><a href="#what-changes-in-several-dimensions-or-for-point-masses" id="toc-what-changes-in-several-dimensions-or-for-point-masses" class="nav-link" data-scroll-target="#what-changes-in-several-dimensions-or-for-point-masses">9.4. What changes in several dimensions or for point masses?</a></li>
+  </ul></li>
+  <li><a href="#questions-and-extensions" id="toc-questions-and-extensions" class="nav-link" data-scroll-target="#questions-and-extensions">10. Questions and extensions</a></li>
+  <li><a href="#what-this-construction-establishes" id="toc-what-this-construction-establishes" class="nav-link" data-scroll-target="#what-this-construction-establishes">11. What this construction establishes</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -1011,18 +1018,85 @@ K_t(y,x_i)=\exp\left[-\frac{\|y-x_i\|^2}{2(\sigma_t/\alpha_t)^2}\right].\]</span
 <p>The effective kernel bandwidth <span class="math inline">\(\sigma_t/\alpha_t\)</span> decreases during reverse generation. Each step retrieves a new weighted estimate using the updated query. This realizes iterative soft retrieval in the original sample space, and at low noise it can approach selection of one stored item.</p>
 <p>This example supplies a testable instance of the retrieval interpretation. A convex combination is not sufficient evidence of a coherent new composition: averaged pixels can blur digits, and the MNIST experiment approaches stored images at low noise. The blog’s broader discussion of learned geometry and held-out composition suggests additional experiments, rather than being proved by this empirical pixel-space construction.</p>
 </section>
+<section id="sec-empirical-linear-path" class="level2">
+<h2 class="anchored" data-anchor-id="sec-empirical-linear-path">9. An alternative path from linear interpolation of densities</h2>
+<p>The preceding construction makes two separate choices: a probability path produced by VP Gaussian corruption, and a method for evaluating its score. The empirical mixture evaluates that score directly; a neural network can estimate it instead. We can also change the probability path itself.</p>
+<p>The general sampling problem is to choose densities <span class="math inline">\(p_t\)</span>, with data at <span class="math inline">\(t=0\)</span> and a tractable reference at <span class="math inline">\(t=1\)</span>, and find a velocity satisfying</p>
+<p><span class="math display">\[\boxed{\partial_t p_t+\nabla\cdot(p_tv_t)=0.}\]</span></p>
+<p>If this velocity generates a well-defined flow with these marginals, start with <span class="math inline">\(X_1\sim p_1\)</span> and integrate <span class="math inline">\(\dot X_t=v_t(X_t)\)</span> backward. Gaussian corruption is one construction of the path, not a requirement of ODE sampling.</p>
+<section id="start-with-a-smooth-empirical-density-estimate" class="level3">
+<h3 class="anchored" data-anchor-id="start-with-a-smooth-empirical-density-estimate">9.1. Start with a smooth empirical density estimate</h3>
+<p>The empirical measure <span class="math inline">\(\widehat P_0=n^{-1}\sum_i\delta_{x_i}\)</span> consists of point masses. To use ordinary densities and a regular scalar ODE, first choose a smooth density estimate. For example, with a fixed bandwidth <span class="math inline">\(h&gt;0\)</span>,</p>
+<p><span class="math display">\[\widehat p_0(x)=\frac1{nh}\sum_{i=1}^n K\!\left(\frac{x-x_i}{h}\right),\]</span></p>
+<p>where <span class="math inline">\(K\)</span> is a smooth, strictly positive probability density. If <span class="math inline">\(H\)</span> is its CDF, then</p>
+<p><span class="math display">\[\widehat F_0(x)=\frac1n\sum_{i=1}^n H\!\left(\frac{x-x_i}{h}\right).\]</span></p>
+<p>The bandwidth specifies the endpoint density estimate; it is held fixed throughout this construction. A Gaussian kernel is convenient but not required. This endpoint smoothing is distinct from specifying a time-dependent Gaussian corruption process.</p>
+<p>Choose <span class="math inline">\(p_1=\phi\)</span>, the standard normal density, with CDF <span class="math inline">\(\Phi\)</span>. Define</p>
+<p><span class="math display">\[\boxed{p_t(x)=(1-t)\widehat p_0(x)+t\phi(x),\qquad 0\le t\le1.}\]</span></p>
+<p>These are normalized densities with exactly the desired endpoints. This is a mixture of densities: a draw from <span class="math inline">\(p_t\)</span> selects the data-density estimate with probability <span class="math inline">\(1-t\)</span> or the reference with probability <span class="math inline">\(t\)</span>. It is not the distribution obtained by linearly interpolating two sampled positions.</p>
+</section>
+<section id="recover-the-scalar-velocity-from-continuity" class="level3">
+<h3 class="anchored" data-anchor-id="recover-the-scalar-velocity-from-continuity">9.2. Recover the scalar velocity from continuity</h3>
+<p>Let <span class="math inline">\(F_t(x)=\int_{-\infty}^x p_t(u)\,du\)</span>. Integrating the scalar continuity equation and imposing zero probability flux at <span class="math inline">\(-\infty\)</span> gives</p>
+<p><span class="math display">\[\partial_tF_t(x)=-p_t(x)v_t(x).\]</span></p>
+<p>For the linear density path,</p>
+<p><span class="math display">\[F_t(x)=(1-t)\widehat F_0(x)+t\Phi(x),\qquad
+\partial_tF_t(x)=\Phi(x)-\widehat F_0(x).\]</span></p>
+<p>Consequently,</p>
+<p><span class="math display">\[\boxed{v_t(x)=\frac{\widehat F_0(x)-\Phi(x)}
+{(1-t)\widehat p_0(x)+t\phi(x)}.}\]</span></p>
+<p>All quantities come from the observations, the chosen density estimator, and the reference law. No score network or forward SDE is needed. In tails, evaluating the ratio accurately may require care even when the mathematical density is positive.</p>
+<p>For a decreasing grid <span class="math inline">\(1=t_K&gt;\cdots&gt;t_0=0\)</span>, backward Euler sampling is</p>
+<p><span class="math display">\[X_{t_K}\sim\mathcal N(0,1),\qquad
+X_{t_{k-1}}=X_{t_k}+(t_{k-1}-t_k)v_{t_k}(X_{t_k}).\]</span></p>
+<p>The time increment is negative. Numerical samples approximate <span class="math inline">\(\widehat p_0\)</span> to the extent that the solver resolves the flow; the endpoint model is the smooth density estimate, not the unknown population law.</p>
+</section>
+<section id="quantiles-verify-the-transport-independently" class="level3">
+<h3 class="anchored" data-anchor-id="quantiles-verify-the-transport-independently">9.3. Quantiles verify the transport independently</h3>
+<p>Along an exact trajectory,</p>
+<p><span class="math display">\[\frac{d}{dt}F_t(X_t)
+=\partial_tF_t(X_t)+p_t(X_t)v_t(X_t)=0.\]</span></p>
+<p>Thus each particle retains its quantile. For continuous strictly increasing CDFs,</p>
+<p><span class="math display">\[\boxed{X_t=F_t^{-1}\!\big(\Phi(X_1)\big),\qquad
+X_0=\widehat F_0^{-1}\!\big(\Phi(X_1)\big).}\]</span></p>
+<p>Since <span class="math inline">\(\Phi(X_1)\)</span> is uniform, <span class="math inline">\(X_0\)</span> has density <span class="math inline">\(\widehat p_0\)</span>. This provides a reference against which to check backward Euler. The same quantile argument appeared in Section 2.2 for the VP path; here we prescribe a different path and obtain its corresponding velocity.</p>
+</section>
+<section id="what-changes-in-several-dimensions-or-for-point-masses" class="level3">
+<h3 class="anchored" data-anchor-id="what-changes-in-several-dimensions-or-for-point-masses">9.4. What changes in several dimensions or for point masses?</h3>
+<p>In several dimensions the continuity equation constrains the velocity but does not determine it uniquely. If <span class="math inline">\(\nabla\cdot(p_tw_t)=0\)</span>, then <span class="math inline">\(v_t+w_t\)</span> produces the same density evolution as <span class="math inline">\(v_t\)</span>. One possible additional choice is a gradient field <span class="math inline">\(v_t=\nabla\psi_t\)</span>, obtained by solving</p>
+<p><span class="math display">\[\nabla\cdot(p_t\nabla\psi_t)=-\partial_t p_t\]</span></p>
+<p>with appropriate boundary conditions and regularity assumptions. This is a spatial differential equation to solve, not the scalar CDF formula applied coordinate by coordinate. Defining the density path is therefore easier than computing a useful velocity in high dimensions.</p>
+<p>If we use the unsmoothed empirical measure instead, <span class="math inline">\((1-t)\widehat P_0+tP_1\)</span> retains atoms for every <span class="math inline">\(t&lt;1\)</span>. It has no ordinary Lebesgue density on which to use the formulas above. A regular invertible ODE flow cannot create those atoms from a continuous reference. Atomic transport requires a singular or generalized construction; the empirical quantile map still samples the atoms, but is not a regular invertible endpoint flow.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The roles of the probability path and the score estimator
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In score-based diffusion, Gaussian corruption specifies a probability path, and its SDE supplies the relation <span class="math inline">\(v_t=f-\tfrac12g^2s_t\)</span>. A neural network estimates the score needed to evaluate this velocity; an explicit empirical mixture supplies an alternative score estimator. Neural networks can also provide statistical generalization and efficient evaluation, so matching the empirical score is not their only possible modeling role.</p>
+<p>Linear interpolation of smooth empirical and reference densities supplies an alternative probability path. In one dimension, continuity gives its velocity directly through the CDFs. This construction needs neither a score estimator nor Gaussian corruption. The VP formula for velocity must not be reused for this different path without deriving compatible dynamics.</p>
+<p>Both constructions implement the same sampling principle: specify a probability path, construct a compatible velocity, and integrate from the reference distribution to the data model.</p>
+</div>
+</div>
+</section>
+</section>
 <section id="questions-and-extensions" class="level2">
-<h2 class="anchored" data-anchor-id="questions-and-extensions">9. Questions and extensions</h2>
+<h2 class="anchored" data-anchor-id="questions-and-extensions">10. Questions and extensions</h2>
 <ol type="1">
-<li>For a two-point bank, derive <span class="math inline">\(w_+(x,t)=1/(1+e^{-2\alpha_tx/\sigma_t^2})\)</span> and show that <span class="math inline">\(m_t(x)=2w_+(x,t)-1\)</span>. Explain why the symmetric zero trajectory is exceptional under a continuous initialization law.</li>
-<li>In the scalar notebook, compare posterior weights, nearest-observation distance and effective support for two different terminal particles. Does the same cutoff produce the same degree of interpolation?</li>
-<li>In MNIST, choose a positive cutoff before the weights become concentrated. Inspect both the denoised image and its contributing bank images. How does pixel averaging affect visual quality?</li>
-<li>Remove a dominant bank observation and repeat a paired trajectory. Compare this intervention with removing a low-weight observation.</li>
-<li>Repeat with larger banks and several random seeds. Report discarded posterior mass if using top-<span class="math inline">\(k\)</span> truncation, and distinguish approximation error from any genuine search speedup.</li>
+<li><p>For a two-point bank, derive <span class="math inline">\(w_+(x,t)=1/(1+e^{-2\alpha_tx/\sigma_t^2})\)</span> and show that <span class="math inline">\(m_t(x)=2w_+(x,t)-1\)</span>. Explain why the symmetric zero trajectory is exceptional under a continuous initialization law.</p></li>
+<li><p>In the scalar notebook, compare posterior weights, nearest-observation distance and effective support for two different terminal particles. Does the same cutoff produce the same degree of interpolation?</p></li>
+<li><p>In MNIST, choose a positive cutoff before the weights become concentrated. Inspect both the denoised image and its contributing bank images. How does pixel averaging affect visual quality?</p></li>
+<li><p>Remove a dominant bank observation and repeat a paired trajectory. Compare this intervention with removing a low-weight observation.</p></li>
+<li><p>Repeat with larger banks and several random seeds. Report discarded posterior mass if using top-<span class="math inline">\(k\)</span> truncation, and distinguish approximation error from any genuine search speedup.</p></li>
+<li><p>Fit a smooth scalar empirical density, construct the linear path in Section 9, and compare backward Euler samples with <span class="math inline">\(\widehat F_0^{-1}(\Phi(X_1))\)</span> using the same terminal particles. Separate solver error from the effect of the bandwidth on the endpoint distribution.</p></li>
 </ol>
 </section>
 <section id="what-this-construction-establishes" class="level2">
-<h2 class="anchored" data-anchor-id="what-this-construction-establishes">10. What this construction establishes</h2>
+<h2 class="anchored" data-anchor-id="what-this-construction-establishes">11. What this construction establishes</h2>
 <p>A neural network is unnecessary for the empirical-score construction. The exact denoiser is already available as a data-dependent softmax average. For sampling the empirical endpoint itself, uniformly selecting a stored observation is simpler; for sampling its positive-time Gaussian mixture, select an observation and add the specified corruption directly.</p>
 <p>The ODE is useful here as an explicit transport experiment. Positive-time denoising provides a deliberate interpolation rule. Whether that rule produces useful new observations, particularly images, must be evaluated separately. Neural networks are one way to approximate the score and impose a model restriction, not a mathematical prerequisite for this transport.</p>
 </section>
