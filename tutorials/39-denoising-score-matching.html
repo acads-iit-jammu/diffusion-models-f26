@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>11 · Denoising Score Matching and Langevin Sampling – ID-5-02 (TO)</title>
+<title>02 · Denoising Score Matching and Langevin Sampling – ID-5-02 (TO)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/30-ddpm.html" rel="next">
-<link href="../tutorials/29-variational-autoencoders.html" rel="prev">
+<link href="../tutorials/probability-flow-ode.html" rel="next">
+<link href="../tutorials/44-langevin-gaussian.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -117,7 +117,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">11 · Denoising Score Matching and Langevin Sampling</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/langevin-diffusion.html">11 · Langevin Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">02 · Denoising Score Matching and Langevin Sampling</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -249,27 +249,44 @@ window.Quarto = {
  <span class="menu-text">10 · Variational Autoencoders (VAEs)</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">11 · Denoising Score Matching and Langevin Sampling</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
-  </div>
-</li>
-      <li class="sidebar-item sidebar-item-section">
+          <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">13 · Probability-Flow ODE</span></a>
+            <a href="../tutorials/langevin-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Langevin Diffusion</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/44-langevin-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Gaussian Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">02 · Denoising Score Matching and Langevin Sampling</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 · Probability-Flow ODE</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
@@ -340,13 +357,13 @@ window.Quarto = {
   </li>
 <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
  <span class="menu-text">14 · Reverse-SDE Sampling</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/40-reverse-sde-sampling.html" class="sidebar-item-text sidebar-link">
@@ -355,19 +372,26 @@ window.Quarto = {
 </li>
       </ul>
   </li>
-</ul>
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/43-score-to-sampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 · From Score to Sampling</span></a>
+  </div>
+</li>
+      </ul>
   </li>
+        
         
         
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
  <span class="menu-text">Decks</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
@@ -426,13 +450,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
@@ -449,13 +473,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
  <span class="menu-text">Perspectives</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
@@ -508,13 +532,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
  <span class="menu-text">Draft</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/21-one-estimator-many-parameterizations.html" class="sidebar-item-text sidebar-link">
@@ -555,13 +579,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true">
  <span class="menu-text">Retired</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
@@ -625,9 +649,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">11 · Denoising Score Matching and Langevin Sampling</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/langevin-diffusion.html">11 · Langevin Diffusion</a></li><li class="breadcrumb-item"><a href="../tutorials/39-denoising-score-matching.html">02 · Denoising Score Matching and Langevin Sampling</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">11 · Denoising Score Matching and Langevin Sampling</h1>
+<h1 class="title">02 · Denoising Score Matching and Langevin Sampling</h1>
 </div>
 
 
@@ -699,11 +723,27 @@ p_\sigma(y)=\int\mathcal N(y;x_0,\sigma^2)p_{\mathrm{data}}(x_0)\,dx_0.\]</span>
 </section>
 <section id="once-a-fixed-score-is-known-langevin-sampling" class="level2">
 <h2 class="anchored" data-anchor-id="once-a-fixed-score-is-known-langevin-sampling">3. Once a fixed score is known: Langevin sampling</h2>
+<p>For a fully worked example with trajectories, density plots, code, and numerical error checks, see <a href="../tutorials/44-langevin-gaussian.html">Langevin Diffusion: Sampling a Gaussian Through Dynamics</a>.</p>
 <p>Let <span class="math inline">\(p\)</span> be a smooth positive target density and <span class="math inline">\(s=\partial_x\log p\)</span>. Use sampling time <span class="math inline">\(\tau\)</span>, with <span class="math inline">\(p\)</span> held fixed:</p>
 <p><span class="math display">\[dX_\tau=s(X_\tau)\,d\tau+\sqrt2\,dW_\tau.\]</span></p>
 <p>Brownian increments over an interval of length <span class="math inline">\(\eta\)</span> are independent Gaussians with variance <span class="math inline">\(\eta\)</span>. Euler–Maruyama therefore gives</p>
 <p><span class="math display">\[\boxed{x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k,
 \qquad z_k\overset{\mathrm{iid}}{\sim}\mathcal N(0,1).}\]</span></p>
+<div class="callout callout-style-simple callout-note callout-titled" title="A fixed score, a chosen initial law, and fresh noise">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>A fixed score, a chosen initial law, and fresh noise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The score <span class="math inline">\(s(x)=\partial_x\log p(x)\)</span> has <strong>no explicit dependence on sampling time</strong> <span class="math inline">\(\tau\)</span> or step index <span class="math inline">\(k\)</span>. Every Euler–Maruyama step evaluates the same function at the current position <span class="math inline">\(x_k\)</span>. Its value can change because the particle moves; the target density and its score field remain fixed. Changing the numerical step size does not change the target score.</p>
+<p>Choose an initial law <span class="math inline">\(P_{\mathrm{init}}\)</span> and draw <span class="math inline">\(X_0\sim P_{\mathrm{init}}\)</span> independently of the driving Brownian motion. The initial law need not be Gaussian or equal to the target: it may, for example, be uniform, Gaussian, or a point mass at a chosen position. This initialization is separate from the fresh <span class="math inline">\(z_k\sim\mathcal N(0,1)\)</span> used at every step. Each <span class="math inline">\(z_k\)</span> is independent of <span class="math inline">\(X_0\)</span> and all earlier increments, and therefore of the current state <span class="math inline">\(x_k\)</span>. The initial law may itself be Gaussian, but its draw and the subsequent Gaussian increments have different roles. Initial and target supports need not coincide, but the dynamics must be defined at the starting positions. Restricted-support targets may require boundary conditions; zeros of the target density can make its score undefined. Convergence requires a separate argument, not merely a choice of initial law.</p>
+<p>The score term is the <strong>drift</strong>; the Brownian term is the <strong>diffusion or noise term</strong>, not a Brownian drift. For a well-defined, ergodic Langevin process, suitable initializations approach the target as sampling time grows. Initialization affects how long this takes; neither an arbitrary finite running time nor a finite Euler step guarantees exact target samples. For example, the standard logistic target admits fixed starting points such as zero or six.</p>
+</div>
+</div>
 <p>Score-directed drift and random spreading balance at the target distribution. For the continuous SDE, <span class="math inline">\(p\)</span> is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error. <a href="#sec-langevin-stationarity">Appendix A</a> derives the stationary density and illustrates convergence with a Gaussian target.</p>
 <p>If the learned score is <span class="math inline">\(s_\sigma\)</span>, the intended stationary target is <span class="math inline">\(p_\sigma\)</span>. Langevin does not remove the smoothing merely by running longer. Its sampling clock is not a schedule that automatically reduces <span class="math inline">\(\sigma\)</span>.</p>
 </section>
@@ -1217,13 +1257,13 @@ V=\frac{1}{1-\eta/2},\qquad 0&lt;\eta&lt;2.\]</span></p>
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/29-variational-autoencoders.html" class="pagination-link" aria-label="10 · Variational Autoencoders (VAEs)">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">10 · Variational Autoencoders (VAEs)</span>
+      <a href="../tutorials/44-langevin-gaussian.html" class="pagination-link" aria-label="01 · Gaussian Langevin Sampling">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">01 · Gaussian Langevin Sampling</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/30-ddpm.html" class="pagination-link" aria-label="12 · Denoising Diffusion Probabilistic Models (DDPM)">
-        <span class="nav-page-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/probability-flow-ode.html" class="pagination-link" aria-label="13 · Probability-Flow ODE">
+        <span class="nav-page-text">13 · Probability-Flow ODE</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

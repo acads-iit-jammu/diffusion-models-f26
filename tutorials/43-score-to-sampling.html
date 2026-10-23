@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>15 · From Score to Sampling – ID-5-02 (TO)</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/langevin-diffusion.html" rel="next">
+<link href="../tutorials/30-ddpm.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-970586c648819a176f05aa782ae30df3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-4e42ae105fa35cf935172ecd058ec8f7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/43-score-to-sampling.html">15 · From Score to Sampling</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">ID-5-02 (TO)</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/acads-iit-jammu/diffusion-models-f26" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../syllabus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Syllabus</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../curriculum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Curriculum</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../assignments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assignments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lecture Notes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/04-genai-simplest-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">00 · Introduction and Motivation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/16-joints-conditionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Joint, Conditional, Marginal — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/02-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/12-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · The Multivariate Gaussian — A Working Reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/17-density-estimation-many-dimensions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Estimating a Density in Many Dimensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/15-comparing-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Comparing Distributions: From CDFs to KL, and the Two Families</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/18-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Metropolis–Hastings: Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/19-generative-adversarial-networks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/29-variational-autoencoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · Variational Autoencoders (VAEs)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../tutorials/langevin-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · Langevin Diffusion</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/44-langevin-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Gaussian Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/39-denoising-score-matching.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Denoising Score Matching and Langevin Sampling</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/30-ddpm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../tutorials/probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 · Probability-Flow ODE</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/07-probability-flow-ode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Transport in one dimension</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/31-probability-flow-ode-part-2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Higher-dimensional transport</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/32-probability-flow-ode-part-3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · Learning the score</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/33-probability-flow-ode-part-4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · One-dimensional experiments</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/34-probability-flow-ode-part-5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Image-model recipe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/35-probability-flow-ode-part-6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Train and sample a mixture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/41-empirical-score-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · Empirical-score sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/36-probability-flow-ode-part-7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Neural ODEs and normalizing flows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/37-probability-flow-ode-part-8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Flow matching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/42-ddpm-reverse-vp-sde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 · DDPM through the reverse VP SDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/38-probability-flow-ode-part-9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 · DDIM and the probability-flow ODE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+<li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">14 · Reverse-SDE Sampling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/40-reverse-sde-sampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Reverse-SDE sampling</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/43-score-to-sampling.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">15 · From Score to Sampling</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        
+        
+        
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Decks</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-01-mechanics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · Course Mechanics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-02-motivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02 · Why Diffusion Models?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w01-deck-03-toy-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-00-probability-joints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04 · Probability, Joints, Conditionals and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-01-distributions-mle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05 · Distributions and Maximum Likelihood</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-02-genai-maps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06 · Generative AI, in Its Simplest Form</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w03-deck-01-multivariate-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 · The Multivariate Gaussian</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-01-metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08 · Sampling What You Cannot Normalise</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w04-deck-02-gans.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 · Generative Adversarial Networks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/13-inequalities.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inequalities Worth Knowing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/20-random-walk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Random Walk: Forward, and Backward</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Perspectives</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/03-transport-story.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Moving Distributions: The Transport Story</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/06-map-proved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Deterministic Map, Proved</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/08-transport-rigorous.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generative Models as Transport: History and Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/09-discrete-transport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transport You Can Compute: Histograms, Flows, and the Price of Moving Mass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/10-measuring-things.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Things — From Length to Probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/11-joint-conditional-bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint, Marginal, Conditional — and Bayes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/14-why-gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why the Gaussian? Four Arguments for One Density</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/w02-deck-03-map-limit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deck · The Map, Proved</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Draft</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/21-one-estimator-many-parameterizations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">One Estimator, Many Parameterizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/22-vector-fields-to-score-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From Local Arrows to Score-Based Diffusion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/24-sampling-with-scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling with Scores: Worked Examples of the Probability-Flow ODE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/23-tweedie-bayes-denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tweedie’s Formula: The Score as a Bayes-Optimal Denoiser</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resources</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true">
+ <span class="menu-text">Retired</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/score-based-diffusion-guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Score-Based Diffusion: A One-Dimensional Learning Sequence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/25-learning-the-score.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODEs in One Dimension: Particles, Flows, and Densities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/26-probability-flow-sampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SDEs in One Dimension: Brownian Motion, Itô Calculus, and Langevin Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/27-diffusion-neural-odes-normalizing-flows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Score-Based Diffusion in One Dimension: Corruption, Sampling, and Denoising</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/28-langevin-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From One-Dimensional Transport to Neural ODEs and Higher Dimensions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-integrated-recipe" id="toc-sec-integrated-recipe" class="nav-link active" data-scroll-target="#sec-integrated-recipe">The complete recipe before the derivations</a></li>
+  <li><a href="#the-score-describes-a-density-through-its-spatial-derivative" id="toc-the-score-describes-a-density-through-its-spatial-derivative" class="nav-link" data-scroll-target="#the-score-describes-a-density-through-its-spatial-derivative">1. The score describes a density through its spatial derivative</a>
+  <ul class="collapse">
+  <li><a href="#what-would-it-mean-to-learn-the-score" id="toc-what-would-it-mean-to-learn-the-score" class="nav-link" data-scroll-target="#what-would-it-mean-to-learn-the-score">What would it mean to learn the score?</a></li>
+  </ul></li>
+  <li><a href="#langevin-dynamics-the-first-sampler-built-from-a-score" id="toc-langevin-dynamics-the-first-sampler-built-from-a-score" class="nav-link" data-scroll-target="#langevin-dynamics-the-first-sampler-built-from-a-score">2. Langevin dynamics: the first sampler built from a score</a>
+  <ul class="collapse">
+  <li><a href="#why-the-target-density-can-be-stationary" id="toc-why-the-target-density-can-be-stationary" class="nav-link" data-scroll-target="#why-the-target-density-can-be-stationary">Why the target density can be stationary</a></li>
+  </ul></li>
+  <li><a href="#ddpm-constructs-the-noisy-distributions-and-the-training-pairs" id="toc-ddpm-constructs-the-noisy-distributions-and-the-training-pairs" class="nav-link" data-scroll-target="#ddpm-constructs-the-noisy-distributions-and-the-training-pairs">3. DDPM constructs the noisy distributions and the training pairs</a>
+  <ul class="collapse">
+  <li><a href="#one-step-many-steps-and-a-direct-training-example" id="toc-one-step-many-steps-and-a-direct-training-example" class="nav-link" data-scroll-target="#one-step-many-steps-and-a-direct-training-example">One step, many steps, and a direct training example</a></li>
+  <li><a href="#a-small-notation-table-used-throughout-this-tutorial" id="toc-a-small-notation-table-used-throughout-this-tutorial" class="nav-link" data-scroll-target="#a-small-notation-table-used-throughout-this-tutorial">A small notation table used throughout this tutorial</a></li>
+  <li><a href="#where-is-the-score-in-this-forward-process" id="toc-where-is-the-score-in-this-forward-process" class="nav-link" data-scroll-target="#where-is-the-score-in-this-forward-process">Where is the score in this forward process?</a></li>
+  </ul></li>
+  <li><a href="#small-forward-steps-give-the-vp-sde" id="toc-small-forward-steps-give-the-vp-sde" class="nav-link" data-scroll-target="#small-forward-steps-give-the-vp-sde">4. Small forward steps give the VP SDE</a>
+  <ul class="collapse">
+  <li><a href="#an-sde-drift-is-not-the-whole-transport-velocity" id="toc-an-sde-drift-is-not-the-whole-transport-velocity" class="nav-link" data-scroll-target="#an-sde-drift-is-not-the-whole-transport-velocity">An SDE drift is not the whole transport velocity</a></li>
+  </ul></li>
+  <li><a href="#the-same-density-path-gives-two-reverse-sampling-dynamics" id="toc-the-same-density-path-gives-two-reverse-sampling-dynamics" class="nav-link" data-scroll-target="#the-same-density-path-gives-two-reverse-sampling-dynamics">5. The same density path gives two reverse sampling dynamics</a>
+  <ul class="collapse">
+  <li><a href="#put-both-reverse-samplers-on-an-increasing-clock" id="toc-put-both-reverse-samplers-on-an-increasing-clock" class="nav-link" data-scroll-target="#put-both-reverse-samplers-on-an-increasing-clock">Put both reverse samplers on an increasing clock</a></li>
+  <li><a href="#why-merely-removing-the-noise-is-wrong" id="toc-why-merely-removing-the-noise-is-wrong" class="nav-link" data-scroll-target="#why-merely-removing-the-noise-is-wrong">Why merely removing the noise is wrong</a></li>
+  </ul></li>
+  <li><a href="#turn-the-dynamics-into-algorithms" id="toc-turn-the-dynamics-into-algorithms" class="nav-link" data-scroll-target="#turn-the-dynamics-into-algorithms">6. Turn the dynamics into algorithms</a>
+  <ul class="collapse">
+  <li><a href="#deterministic-sampler-euler-for-the-probability-flow-ode" id="toc-deterministic-sampler-euler-for-the-probability-flow-ode" class="nav-link" data-scroll-target="#deterministic-sampler-euler-for-the-probability-flow-ode">Deterministic sampler: Euler for the probability-flow ODE</a></li>
+  <li><a href="#stochastic-sampler-eulermaruyama-for-the-reverse-sde" id="toc-stochastic-sampler-eulermaruyama-for-the-reverse-sde" class="nav-link" data-scroll-target="#stochastic-sampler-eulermaruyama-for-the-reverse-sde">Stochastic sampler: Euler–Maruyama for the reverse SDE</a></li>
+  <li><a href="#ddpm-ancestral-sampling-is-another-discretization-of-the-stochastic-route" id="toc-ddpm-ancestral-sampling-is-another-discretization-of-the-stochastic-route" class="nav-link" data-scroll-target="#ddpm-ancestral-sampling-is-another-discretization-of-the-stochastic-route">DDPM ancestral sampling is another discretization of the stochastic route</a></li>
+  <li><a href="#what-happens-to-the-ddim-noise-term" id="toc-what-happens-to-the-ddim-noise-term" class="nav-link" data-scroll-target="#what-happens-to-the-ddim-noise-term">What happens to the DDIM noise term?</a></li>
+  </ul></li>
+  <li><a href="#train-the-score-using-the-same-denoising-regression-as-ddpm" id="toc-train-the-score-using-the-same-denoising-regression-as-ddpm" class="nav-link" data-scroll-target="#train-the-score-using-the-same-denoising-regression-as-ddpm">7. Train the score using the same denoising regression as DDPM</a>
+  <ul class="collapse">
+  <li><a href="#why-conditional-score-labels-learn-the-marginal-score" id="toc-why-conditional-score-labels-learn-the-marginal-score" class="nav-link" data-scroll-target="#why-conditional-score-labels-learn-the-marginal-score">Why conditional-score labels learn the marginal score</a></li>
+  <li><a href="#noise-prediction-is-a-scaled-version-of-this-regression" id="toc-noise-prediction-is-a-scaled-version-of-this-regression" class="nav-link" data-scroll-target="#noise-prediction-is-a-scaled-version-of-this-regression">Noise prediction is a scaled version of this regression</a></li>
+  <li><a href="#the-denoising-interpretation-through-tweedies-formula" id="toc-the-denoising-interpretation-through-tweedies-formula" class="nav-link" data-scroll-target="#the-denoising-interpretation-through-tweedies-formula">The denoising interpretation through Tweedie’s formula</a></li>
+  </ul></li>
+  <li><a href="#solve-one-complete-example-before-training-a-network" id="toc-solve-one-complete-example-before-training-a-network" class="nav-link" data-scroll-target="#solve-one-complete-example-before-training-a-network">8. Solve one complete example before training a network</a>
+  <ul class="collapse">
+  <li><a href="#an-exact-ode-solution-is-available-for-verification" id="toc-an-exact-ode-solution-is-available-for-verification" class="nav-link" data-scroll-target="#an-exact-ode-solution-is-available-for-verification">An exact ODE solution is available for verification</a></li>
+  </ul></li>
+  <li><a href="#assemble-training-and-inference-into-one-implementation" id="toc-assemble-training-and-inference-into-one-implementation" class="nav-link" data-scroll-target="#assemble-training-and-inference-into-one-implementation">9. Assemble training and inference into one implementation</a>
+  <ul class="collapse">
+  <li><a href="#training-algorithm" id="toc-training-algorithm" class="nav-link" data-scroll-target="#training-algorithm">Training algorithm</a></li>
+  <li><a href="#inference-algorithm-choose-the-update-after-training" id="toc-inference-algorithm-choose-the-update-after-training" class="nav-link" data-scroll-target="#inference-algorithm-choose-the-update-after-training">Inference algorithm: choose the update after training</a></li>
+  </ul></li>
+  <li><a href="#reassemble-the-argument" id="toc-reassemble-the-argument" class="nav-link" data-scroll-target="#reassemble-the-argument">10. Reassemble the argument</a>
+  <ul class="collapse">
+  <li><a href="#questions-to-answer-before-implementing-a-new-sampler" id="toc-questions-to-answer-before-implementing-a-new-sampler" class="nav-link" data-scroll-target="#questions-to-answer-before-implementing-a-new-sampler">Questions to answer before implementing a new sampler</a></li>
+  </ul></li>
+  <li><a href="#appendix-a.-langevin-stationarity-and-its-finite-step-gaussian-bias" id="toc-appendix-a.-langevin-stationarity-and-its-finite-step-gaussian-bias" class="nav-link" data-scroll-target="#appendix-a.-langevin-stationarity-and-its-finite-step-gaussian-bias">Appendix A. Langevin stationarity and its finite-step Gaussian bias</a></li>
+  <li><a href="#appendix-b.-from-discrete-contraction-to-the-cumulative-schedule" id="toc-appendix-b.-from-discrete-contraction-to-the-cumulative-schedule" class="nav-link" data-scroll-target="#appendix-b.-from-discrete-contraction-to-the-cumulative-schedule">Appendix B. From discrete contraction to the cumulative schedule</a></li>
+  <li><a href="#appendix-c.-check-the-reverse-density-evolution-and-the-factor-of-two" id="toc-appendix-c.-check-the-reverse-density-evolution-and-the-factor-of-two" class="nav-link" data-scroll-target="#appendix-c.-check-the-reverse-density-evolution-and-the-factor-of-two">Appendix C. Check the reverse density evolution and the factor of two</a></li>
+  <li><a href="#further-reading-within-the-course" id="toc-further-reading-within-the-course" class="nav-link" data-scroll-target="#further-reading-within-the-course">Further reading within the course</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/04-genai-simplest-form.html">Lecture Notes</a></li><li class="breadcrumb-item"><a href="../tutorials/43-score-to-sampling.html">15 · From Score to Sampling</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">15 · From Score to Sampling</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Training a predictor and using it to generate samples
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The goal is to generate new observations from a data distribution. We will construct a family of noisy data distributions, learn their scores, and use that one learned function in different sampling algorithms. All arguments begin in <strong>one dimension</strong>. Data are at <strong>time <span class="math inline">\(t=0\)</span></strong>, and the nearly standard Gaussian reference is at <strong>time <span class="math inline">\(t=1\)</span></strong>.</p>
+<p>This tutorial contains the complete argument in one place. It assumes differentiation, Gaussian random variables, and squared-error regression; the required ODE and SDE ideas are introduced below. Longer derivations are collected at the end. Nothing here requires reading the other lecture notes first.</p>
+</div>
+</div>
+<section id="sec-integrated-recipe" class="level2">
+<h2 class="anchored" data-anchor-id="sec-integrated-recipe">The complete recipe before the derivations</h2>
+<p>Suppose a dataset contains samples from an unknown density <span class="math inline">\(p_{\mathrm{data}}\)</span>. We can sample this density by selecting a training observation, but we want a model that generates observations without being handed a clean example at inference time.</p>
+<p>We divide the construction into a <strong>training problem</strong> and a <strong>sampling problem</strong>.</p>
+<ol type="1">
+<li><strong>Choose how to corrupt data.</strong> Contract each observation and add Gaussian noise. The chosen noise schedule defines a sequence of distributions, beginning with data and ending close to a standard Gaussian.</li>
+<li><strong>Construct supervised examples.</strong> Select a clean observation, a noise level, and a Gaussian noise draw. Combine them to produce the noisy input. The noise draw supplies a known regression target.</li>
+<li><strong>Train one predictor.</strong> Given a noisy input and its time, predict its noise. A known scaling converts this prediction into the score of the noisy density.</li>
+<li><strong>Choose a sampler.</strong> Start with a new standard Gaussian draw. Repeatedly evaluate the trained predictor and update the current sample toward time zero.</li>
+</ol>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+    A["Training data and a chosen noise schedule"] --&gt; B["Construct clean and noisy training pairs"]
+    B --&gt; C["Train one noise predictor"]
+    C --&gt; D["Convert the prediction into a score"]
+    D --&gt; E["Reverse SDE: stochastic dynamics"]
+    D --&gt; F["Probability-flow ODE: deterministic dynamics"]
+    E --&gt; G["DDPM ancestral sampling or Euler–Maruyama"]
+    F --&gt; H["Euler integration toward data time"]
+    G --&gt; I["Generated samples"]
+    H --&gt; I
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>The network does not learn one function for DDPM and another for the probability-flow ODE. Both can use the same score estimate when the schedule and time inputs agree. The numerical update is a separate choice.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>The connection we will establish
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>DDPM’s forward corruption has a continuous limit: the variance-preserving (VP) SDE. DDPM ancestral sampling is a discretization of its reverse SDE. The probability-flow ODE is a different, deterministic dynamics with the same ideal marginal densities.</strong></p>
+<p>Thus the useful comparison is a shared density path and closely related training, followed by two sampling routes. It is not correct to identify the probability-flow ODE itself as the direct continuous limit of the stochastic DDPM sampler. An ODE also needs a numerical discretization when implemented.</p>
+</div>
+</div>
+<p>Our main references are <a href="https://arxiv.org/html/2006.11239v2">Ho, Jain, and Abbeel, DDPM</a>, especially Algorithms 1–2 and Section 3, and <a href="https://arxiv.org/html/2011.13456v2">Song et al., score-based SDEs</a>, especially Sections 2.2, 3.2–3.4, 4.3, and Appendix E. <a href="https://yang-song.net/blog/2021/score/">Yang Song’s blog</a> provides an accompanying visual explanation.</p>
+</section>
+<section id="the-score-describes-a-density-through-its-spatial-derivative" class="level2">
+<h2 class="anchored" data-anchor-id="the-score-describes-a-density-through-its-spatial-derivative">1. The score describes a density through its spatial derivative</h2>
+<p>For a positive differentiable density <span class="math inline">\(p(x)\)</span>, define</p>
+<p><span class="math display">\[\boxed{s(x)=\frac{d}{dx}\log p(x)=\frac{p'(x)}{p(x)}.}\]</span></p>
+<p>The derivative is with respect to the <strong>observation <span class="math inline">\(x\)</span></strong>, not a neural-network parameter. A positive score indicates that density increases locally as <span class="math inline">\(x\)</span> increases. A negative score indicates the opposite. Its magnitude measures the local slope of log density.</p>
+<p>For a Gaussian,</p>
+<p><span class="math display">\[p(x)=\mathcal N(x;\mu,a^2)
+\quad\Longrightarrow\quad
+s(x)=-\frac{x-\mu}{a^2}.\]</span></p>
+<p>In particular, the standard Gaussian has score <span class="math inline">\(-x\)</span>. If a density is written as <span class="math inline">\(p(x)=e^{-E(x)}/Z\)</span>, its score is <span class="math inline">\(-E'(x)\)</span>: the normalizing constant disappears under differentiation. This explains why scores can be useful even when evaluating a normalized density is difficult.</p>
+<section id="what-would-it-mean-to-learn-the-score" class="level3">
+<h3 class="anchored" data-anchor-id="what-would-it-mean-to-learn-the-score">What would it mean to learn the score?</h3>
+<p>An ideal regression problem would minimize</p>
+<p><span class="math display">\[\frac12\mathbb E_{X\sim p}[(s_\theta(X)-s(X))^2].\]</span></p>
+<p>But samples from <span class="math inline">\(p\)</span> do not give us the target <span class="math inline">\(s(X)\)</span>. <strong>Score matching</strong> refers to objectives that recover the score without requiring these unknown target values. In this tutorial we use <em>denoising score matching</em>: deliberately add Gaussian noise so that a conditional score becomes a known label.</p>
+<p>For example, form <span class="math inline">\(Y=X_0+\sigma\varepsilon\)</span> at a fixed <span class="math inline">\(\sigma&gt;0\)</span>, with <span class="math inline">\(X_0\sim p_{\mathrm{data}}\)</span> and independent <span class="math inline">\(\varepsilon\sim\mathcal N(0,1)\)</span>. For each constructed pair, we know</p>
+<p><span class="math display">\[\partial_y\log p(y\mid X_0)\big|_{y=Y}
+=-\frac{Y-X_0}{\sigma^2}=-\frac{\varepsilon}{\sigma}.\]</span></p>
+<p>Regressing these labels on <span class="math inline">\(Y\)</span> learns the score of the <strong>noisy marginal density</strong>, not a separate score conditioned on each clean observation. Section 7 will derive why conditional averaging gives precisely the required target. First, suppose the score is available and ask how it can generate samples.</p>
+</section>
+</section>
+<section id="langevin-dynamics-the-first-sampler-built-from-a-score" class="level2">
+<h2 class="anchored" data-anchor-id="langevin-dynamics-the-first-sampler-built-from-a-score">2. Langevin dynamics: the first sampler built from a score</h2>
+<p>A vector field specifies velocity. In one dimension it is a scalar function: the ODE <span class="math inline">\(dx/d\tau=s(x)\)</span> tells a particle how to move. For <span class="math inline">\(s(x)=-x\)</span>, the solution is <span class="math inline">\(x(\tau)=e^{-\tau}x(0)\)</span>. Every particle approaches zero.</p>
+<p>That does <strong>not</strong> sample a standard Gaussian. A Gaussian needs a nonzero spread of particles. Following its score alone moves particles toward its mode and contracts their distribution.</p>
+<p>Langevin dynamics adds a random increment at every step:</p>
+<p><span class="math display">\[\boxed{x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k,
+\qquad z_k\overset{\mathrm{iid}}\sim\mathcal N(0,1).}\]</span></p>
+<p>Here <span class="math inline">\(\eta&gt;0\)</span> is the algorithm’s step size. Its continuous-time description is</p>
+<p><span class="math display">\[dX_\tau=s(X_\tau)\,d\tau+\sqrt2\,dW_\tau.\]</span></p>
+<p><span class="math inline">\(W_\tau\)</span> is Brownian motion: over a time interval of length <span class="math inline">\(\eta\)</span>, its increment is Gaussian with mean zero and variance <span class="math inline">\(\eta\)</span>, independently of earlier increments. Replacing that increment by <span class="math inline">\(\sqrt\eta\,z_k\)</span> gives the displayed <strong>Euler–Maruyama</strong> update. This is the SDE counterpart of Euler integration for an ODE.</p>
+<section id="why-the-target-density-can-be-stationary" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-target-density-can-be-stationary">Why the target density can be stationary</h3>
+<p>Let <span class="math inline">\(q_\tau\)</span> denote the evolving density of the sampler, while <span class="math inline">\(p\)</span> remains its fixed target. The score drift transports probability with flux <span class="math inline">\(q_\tau s\)</span>, while Brownian noise contributes the flux <span class="math inline">\(-\partial_x q_\tau\)</span>. At <span class="math inline">\(q_\tau=p\)</span> these cancel:</p>
+<p><span class="math display">\[p\,s-\partial_xp=p\,\partial_x\log p-\partial_xp=0.\]</span></p>
+<div class="callout callout-style-simple callout-note callout-titled" title="A fixed score, a chosen initial law, and fresh noise">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>A fixed score, a chosen initial law, and fresh noise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The score <span class="math inline">\(s(x)=\partial_x\log p(x)\)</span> has <strong>no explicit dependence on sampling time</strong> <span class="math inline">\(\tau\)</span> or step index <span class="math inline">\(k\)</span>. Every Euler–Maruyama step evaluates the same function at the current position <span class="math inline">\(x_k\)</span>. Its value can change because the particle moves; the target density and its score field remain fixed. Changing the numerical step size does not change the target score.</p>
+<p>Choose an initial law <span class="math inline">\(P_{\mathrm{init}}\)</span> and draw <span class="math inline">\(X_0\sim P_{\mathrm{init}}\)</span> independently of the driving Brownian motion. The initial law need not be Gaussian or equal to the target: it may, for example, be uniform, Gaussian, or a point mass at a chosen position. This initialization is separate from the fresh <span class="math inline">\(z_k\sim\mathcal N(0,1)\)</span> used at every step. Each <span class="math inline">\(z_k\)</span> is independent of <span class="math inline">\(X_0\)</span> and all earlier increments, and therefore of the current state <span class="math inline">\(x_k\)</span>. The initial law may itself be Gaussian, but its draw and the subsequent Gaussian increments have different roles. Initial and target supports need not coincide, but the dynamics must be defined at the starting positions. Restricted-support targets may require boundary conditions; zeros of the target density can make its score undefined. Convergence requires a separate argument, not merely a choice of initial law.</p>
+<p>The score term is the <strong>drift</strong>; the Brownian term is the <strong>diffusion or noise term</strong>, not a Brownian drift. For a well-defined, ergodic Langevin process, suitable initializations approach the target as sampling time grows. Initialization affects how long this takes; neither an arbitrary finite running time nor a finite Euler step guarantees exact target samples. For example, the standard logistic target admits fixed starting points such as zero or six.</p>
+</div>
+</div>
+<p>Therefore the continuous Langevin dynamics preserves <span class="math inline">\(p\)</span> when initialized from <span class="math inline">\(p\)</span>. Convergence from another initial law needs additional regularity and mixing conditions. A finite Euler–Maruyama step introduces numerical bias. Appendix A gives the density equation and a Gaussian check.</p>
+<div id="fig-integrated-langevin" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-integrated-langevin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../materials/score-to-sampling/langevin-balance.png" class="img-fluid figure-img" style="width:85.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-integrated-langevin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The same score has different consequences with and without stochastic spreading. These simulations start with variance 4. Langevin approaches a variance close to 1, while deterministic score ascent contracts the cloud toward zero. The finite Langevin step is 0.02.
+</figcaption>
+</figure>
+</div>
+<p><strong>What this establishes:</strong> a score can define a sampling algorithm. However, Langevin targets one fixed density and may mix slowly between separated modes. Diffusion modeling next constructs an entire path of increasingly noisy densities. Its reverse sampler moves through that path rather than equilibrating at one fixed target.</p>
+</section>
+</section>
+<section id="ddpm-constructs-the-noisy-distributions-and-the-training-pairs" class="level2">
+<h2 class="anchored" data-anchor-id="ddpm-constructs-the-noisy-distributions-and-the-training-pairs">3. DDPM constructs the noisy distributions and the training pairs</h2>
+<p>We now use <span class="math inline">\(t\)</span> for the <strong>corruption time</strong>, with data at zero. Write <span class="math inline">\(p_t\)</span> for the marginal density at time <span class="math inline">\(t\)</span>. Choose grid times</p>
+<p><span class="math display">\[0=t_0&lt;t_1&lt;\cdots&lt;t_N=1.\]</span></p>
+<p>At step <span class="math inline">\(n\)</span>, choose a noise variance <span class="math inline">\(b_n\in(0,1)\)</span> and form</p>
+<p><span class="math display">\[\boxed{X_{t_n}=\sqrt{1-b_n}\,X_{t_{n-1}}+\sqrt{b_n}\,Z_n,
+\qquad Z_n\overset{\mathrm{iid}}\sim\mathcal N(0,1).}\]</span></p>
+<p>This is a contraction followed by independent Gaussian noise. Repeating these steps progressively reduces the influence of the original observation.</p>
+<section id="one-step-many-steps-and-a-direct-training-example" class="level3">
+<h3 class="anchored" data-anchor-id="one-step-many-steps-and-a-direct-training-example">One step, many steps, and a direct training example</h3>
+<p>Define the cumulative signal amplitude and noise amplitude by</p>
+<p><span class="math display">\[\boxed{\alpha_{t_n}^2=\prod_{j=1}^n(1-b_j),
+\qquad \sigma_{t_n}^2=1-\alpha_{t_n}^2.}\]</span></p>
+<p>Combining the independent Gaussian increments gives</p>
+<p><span class="math display">\[\boxed{X_{t_n}\mid X_0=x_0\sim
+\mathcal N(\alpha_{t_n}x_0,\sigma_{t_n}^2).}\]</span></p>
+<p>Consequently, one training example at a selected time can be generated directly:</p>
+<p><span class="math display">\[X_{t_n}=\alpha_{t_n}X_0+\sigma_{t_n}\varepsilon,
+\qquad \varepsilon\sim\mathcal N(0,1),\quad \varepsilon\perp X_0.\]</span></p>
+<p>There is no need to simulate all the preceding steps to construct this example. This direct formula gives the correct conditional distribution at the selected time. Reusing one fixed <span class="math inline">\(\varepsilon\)</span> at every time would not reproduce the joint trajectories of the forward DDPM chain.</p>
+</section>
+<section id="a-small-notation-table-used-throughout-this-tutorial" class="level3">
+<h3 class="anchored" data-anchor-id="a-small-notation-table-used-throughout-this-tutorial">A small notation table used throughout this tutorial</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol here</th>
+<th>Meaning</th>
+<th>Ho’s DDPM notation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(b_n\)</span></td>
+<td>One discrete forward-step noise variance</td>
+<td><span class="math inline">\(\beta_n\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\alpha_{t_n}\)</span></td>
+<td>Cumulative signal amplitude</td>
+<td><span class="math inline">\(\sqrt{\bar\alpha_n}\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\sigma_{t_n}\)</span></td>
+<td>Cumulative noise amplitude</td>
+<td><span class="math inline">\(\sqrt{1-\bar\alpha_n}\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\beta(t)\)</span></td>
+<td>Continuous noise <strong>rate</strong> introduced next</td>
+<td>Not a single discrete <span class="math inline">\(\beta_n\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(s_t(x)\)</span></td>
+<td>Marginal score <span class="math inline">\(\partial_x\log p_t(x)\)</span></td>
+<td>Converted from the noise predictor</td>
+</tr>
+</tbody>
+</table>
+<p>Using <span class="math inline">\(b_n\)</span> for a variance and <span class="math inline">\(\beta(t)\)</span> for a rate avoids treating them as interchangeable. We retain <span class="math inline">\(\alpha_t\)</span> for an amplitude throughout; it is not Ho’s one-step retention <span class="math inline">\(1-\beta_n\)</span>.</p>
+</section>
+<section id="where-is-the-score-in-this-forward-process" class="level3">
+<h3 class="anchored" data-anchor-id="where-is-the-score-in-this-forward-process">Where is the score in this forward process?</h3>
+<p><strong>The forward corruption does not need the score.</strong> Its contraction and noise are prescribed. Their purpose is to supply a tractable density path and supervised training pairs.</p>
+<p>The score becomes necessary when we want to generate data by reversing the progression of densities. It describes how the current noisy distribution depends on position. At a late time the distribution is simple; nearer the data it becomes increasingly structured. A time-conditioned network will estimate all these scores.</p>
+</section>
+</section>
+<section id="small-forward-steps-give-the-vp-sde" class="level2">
+<h2 class="anchored" data-anchor-id="small-forward-steps-give-the-vp-sde">4. Small forward steps give the VP SDE</h2>
+<p>Let <span class="math inline">\(h_n=t_n-t_{n-1}\)</span> and take <span class="math inline">\(b_n=\beta(t_{n-1})h_n+O(h_n^2)\)</span> for a smooth nonnegative rate. Expanding <span class="math inline">\(\sqrt{1-b_n}\)</span> gives</p>
+<p><span class="math display">\[X_{t_n}-X_{t_{n-1}}
+\approx-\frac{\beta(t_{n-1})}{2}X_{t_{n-1}}h_n
++\sqrt{\beta(t_{n-1})h_n}\,Z_n.\]</span></p>
+<p>The first term is proportional to elapsed time; the random term is proportional to its square root. These are the drift and Brownian increment of</p>
+<p><span class="math display">\[\boxed{dX_t=-\frac{\beta(t)}2X_t\,dt+\sqrt{\beta(t)}\,dW_t.}\]</span></p>
+<p>This is the <strong>variance-preserving SDE</strong>. Its conditional distribution remains Gaussian:</p>
+<p><span class="math display">\[\alpha_t=\exp\left(-\frac12\int_0^t\beta(u)\,du\right),
+\qquad \sigma_t^2=1-\alpha_t^2,
+\qquad X_t=\alpha_tX_0+\sigma_t\varepsilon.\]</span></p>
+<p>Equivalently, <span class="math inline">\(\beta(t)=-2\,d\log\alpha_t/dt\)</span>. Thus the rate in the SDE and the amplitudes in the training examples describe the <strong>same schedule</strong>. Appendix B derives the relation from the discrete chain. On a grid, choosing</p>
+<p><span class="math display">\[b_n=1-\exp\left(-\int_{t_{n-1}}^{t_n}\beta(u)\,du\right)\]</span></p>
+<p>makes the discrete conditional transition agree exactly with this linear SDE’s forward transition.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What “variance preserving” and the terminal Gaussian mean
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If <span class="math inline">\(X_0\sim\mathcal N(0,1)\)</span>, the forward VP process preserves that law. For arbitrary data, its variance need not remain constant. In fact,</p>
+<p><span class="math display">\[\operatorname{Var}(X_t)=\alpha_t^2\operatorname{Var}(X_0)+1-\alpha_t^2.\]</span></p>
+<p>With a finite integrated rate, <span class="math inline">\(\alpha_1&gt;0\)</span>, so the terminal law generally retains a small data contribution. Starting generation from <span class="math inline">\(\mathcal N(0,1)\)</span> is then an approximation to <span class="math inline">\(p_1\)</span>. Exact Gaussian termination for arbitrary data requires a limiting construction; we do not assume it for a finite schedule.</p>
+</div>
+</div>
+<section id="an-sde-drift-is-not-the-whole-transport-velocity" class="level3">
+<h3 class="anchored" data-anchor-id="an-sde-drift-is-not-the-whole-transport-velocity">An SDE drift is not the whole transport velocity</h3>
+<p>The forward SDE has drift <span class="math inline">\(f(x,t)=-\beta(t)x/2\)</span>. But that drift alone does not describe its density evolution: the random increments also spread probability. To construct a deterministic ODE with the same density path, we must account for both effects. This is where the score enters the probability-flow velocity.</p>
+</section>
+</section>
+<section id="the-same-density-path-gives-two-reverse-sampling-dynamics" class="level2">
+<h2 class="anchored" data-anchor-id="the-same-density-path-gives-two-reverse-sampling-dynamics">5. The same density path gives two reverse sampling dynamics</h2>
+<p>For a general scalar forward SDE</p>
+<p><span class="math display">\[dX_t=f(X_t,t)\,dt+g(t)\,dW_t,\]</span></p>
+<p>the density evolves according to the Fokker–Planck equation:</p>
+<p><span class="math display">\[\partial_t p_t=-\partial_x(f p_t)+\frac12g(t)^2\partial_x^2p_t.\]</span></p>
+<p>The first term describes drift transport. The second describes random spreading. A deterministic ODE <span class="math inline">\(\dot x=v(x,t)\)</span> instead has the continuity equation</p>
+<p><span class="math display">\[\partial_t p_t=-\partial_x(p_tv).\]</span></p>
+<p>Since <span class="math inline">\(\partial_xp_t=p_ts_t\)</span>, rewrite Fokker–Planck as</p>
+<p><span class="math display">\[\partial_t p_t=-\partial_x\left[p_t\left(f-\frac12g^2s_t\right)\right].\]</span></p>
+<p>We have identified the deterministic probability-flow velocity:</p>
+<p><span class="math display">\[\boxed{v(x,t)=f(x,t)-\frac12g(t)^2s_t(x).}\]</span></p>
+<p>For VP, this is <span class="math inline">\(v(x,t)=-\beta(t)[x+s_t(x)]/2\)</span>. It moves the density <strong>forward</strong> when integrated from zero to one. Integrating the same ODE toward decreasing <span class="math inline">\(t\)</span> gives generation.</p>
+<section id="put-both-reverse-samplers-on-an-increasing-clock" class="level3">
+<h3 class="anchored" data-anchor-id="put-both-reverse-samplers-on-an-increasing-clock">Put both reverse samplers on an increasing clock</h3>
+<p>To keep signs unambiguous, define the sampling clock <span class="math inline">\(\tau=1-t\)</span> and write <span class="math inline">\(Y_\tau\)</span> for the current generated particle. As <span class="math inline">\(\tau\)</span> increases, the corruption time <span class="math inline">\(t\)</span> decreases.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Dynamics</th>
+<th>Equation in the increasing sampling clock, with <span class="math inline">\(t=1-\tau\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reverse SDE</td>
+<td><span class="math inline">\(dY_\tau=[-f(Y_\tau,t)+g(t)^2s_t(Y_\tau)]\,d\tau+g(t)\,d\overline W_\tau\)</span></td>
+</tr>
+<tr class="even">
+<td>Probability-flow ODE</td>
+<td><span class="math inline">\(dY_\tau/d\tau=-f(Y_\tau,t)+\tfrac12g(t)^2s_t(Y_\tau)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>The reverse-SDE equation is a time-reversal result, stated here under the usual smoothness and density assumptions. It is not obtained by just negating the forward drift. Appendix C verifies that its density evolves along the same reversed path.</p>
+<p>For the VP construction the two equations become</p>
+<p><span class="math display">\[\boxed{dY_\tau=\beta(t)\left[\frac{Y_\tau}{2}+s_t(Y_\tau)\right]d\tau
++\sqrt{\beta(t)}\,d\overline W_\tau,}\]</span></p>
+<p><span class="math display">\[\boxed{\frac{dY_\tau}{d\tau}=\frac{\beta(t)}2\left[Y_\tau+s_t(Y_\tau)\right].}\]</span></p>
+<p>With the exact score and correct initial law <span class="math inline">\(Y_0\sim p_1\)</span>, their one-time densities agree: <span class="math inline">\(Y_\tau\sim p_{1-\tau}\)</span>. Their trajectories and joint distributions across times differ. Learned scores, finite numerical steps, and an approximate terminal prior can all cause discrepancies in practice.</p>
+</section>
+<section id="why-merely-removing-the-noise-is-wrong" class="level3">
+<h3 class="anchored" data-anchor-id="why-merely-removing-the-noise-is-wrong">Why merely removing the noise is wrong</h3>
+<p>Removing the Brownian increment from the reverse SDE leaves drift <span class="math inline">\(\beta(t)[x/2+s_t(x)]\)</span>. The probability-flow drift is <span class="math inline">\(\beta(t)[x+s_t(x)]/2\)</span>. The score coefficient must also change.</p>
+<p>A standard Gaussian checks this immediately. Its score is <span class="math inline">\(-x\)</span> at every time under VP. The probability-flow velocity is zero, so Gaussian particles stay where they are. The reverse SDE is an Ornstein–Uhlenbeck process with drift <span class="math inline">\(-\beta x/2\)</span> and noise amplitude <span class="math inline">\(\sqrt\beta\)</span>; the Gaussian is stationary. Removing its noise alone would instead contract the particles to zero.</p>
+</section>
+</section>
+<section id="turn-the-dynamics-into-algorithms" class="level2">
+<h2 class="anchored" data-anchor-id="turn-the-dynamics-into-algorithms">6. Turn the dynamics into algorithms</h2>
+<p>At the current corruption time <span class="math inline">\(t=t_n\)</span>, choose a positive backward step <span class="math inline">\(h_n=t_n-t_{n-1}\)</span>. Suppose we can evaluate <span class="math inline">\(s_\theta(x,t)\)</span>.</p>
+<section id="deterministic-sampler-euler-for-the-probability-flow-ode" class="level3">
+<h3 class="anchored" data-anchor-id="deterministic-sampler-euler-for-the-probability-flow-ode">Deterministic sampler: Euler for the probability-flow ODE</h3>
+<p>Euler evaluates the velocity at the current particle and takes a short step:</p>
+<p><span class="math display">\[\boxed{x_{t_{n-1}}=x_{t_n}+\frac{h_n\beta(t_n)}2
+\left[x_{t_n}+s_\theta(x_{t_n},t_n)\right].}\]</span></p>
+<p>The initial draw is random, but no new noise is added during this recursion. This is <strong>explicit Euler integrated backward in corruption time</strong>, not the implicit numerical method called backward Euler.</p>
+</section>
+<section id="stochastic-sampler-eulermaruyama-for-the-reverse-sde" class="level3">
+<h3 class="anchored" data-anchor-id="stochastic-sampler-eulermaruyama-for-the-reverse-sde">Stochastic sampler: Euler–Maruyama for the reverse SDE</h3>
+<p>The reverse SDE gives</p>
+<p><span class="math display">\[\boxed{x_{t_{n-1}}=x_{t_n}+h_n\beta(t_n)
+\left[\frac{x_{t_n}}2+s_\theta(x_{t_n},t_n)\right]
++\sqrt{h_n\beta(t_n)}\,z_n,}\]</span></p>
+<p>where each <span class="math inline">\(z_n\sim\mathcal N(0,1)\)</span> is independent. Both this update and the ODE update use the score at the current time and position. They differ in the score coefficient and the presence of new Gaussian noise.</p>
+</section>
+<section id="ddpm-ancestral-sampling-is-another-discretization-of-the-stochastic-route" class="level3">
+<h3 class="anchored" data-anchor-id="ddpm-ancestral-sampling-is-another-discretization-of-the-stochastic-route">DDPM ancestral sampling is another discretization of the stochastic route</h3>
+<p>The one-step forward observation is <span class="math inline">\(X_{t_n}=\sqrt{1-b_n}X_{t_{n-1}}+\sqrt{b_n}Z_n\)</span>. Gaussian denoising gives <span class="math inline">\(\sqrt{1-b_n}\,\mathbb E[X_{t_{n-1}}\mid X_{t_n}=x]=x+b_ns_t(x)\)</span>, the single-step form of the identity derived in Section 7. Thus the score determines the reverse conditional mean. Ho’s parameterization replaces it by the learned score:</p>
+<p><span class="math display">\[\mu_\theta(x,t_n)=\frac1{\sqrt{1-b_n}}
+\left[x-\frac{b_n}{\sigma_{t_n}}\varepsilon_\theta(x,t_n)\right]
+=\frac{x+b_ns_\theta(x,t_n)}{\sqrt{1-b_n}}.\]</span></p>
+<p>The ancestral update samples from a modeled Gaussian reverse transition:</p>
+<p><span class="math display">\[\boxed{x_{t_{n-1}}=\mu_\theta(x_{t_n},t_n)+\sqrt{\nu_n}\,z_n.}\]</span></p>
+<p>Two fixed reverse-variance choices are <span class="math inline">\(\nu_n=b_n\)</span> and <span class="math inline">\(\nu_n=\widetilde b_n=b_n\sigma_{t_{n-1}}^2/\sigma_{t_n}^2\)</span>. Ho’s sampling algorithm sets <span class="math inline">\(z_1=0\)</span> at the final data step. This endpoint convention is separate from the interior reverse transitions.</p>
+<p>For an interior step with standard Gaussian marginals, the exact score is <span class="math inline">\(-x\)</span>, so this mean becomes <span class="math inline">\(\sqrt{1-b_n}x\)</span>. Recurring with only that mean reduces variance from 1 to <span class="math inline">\(1-b_n\)</span>. Adding independent noise with variance <span class="math inline">\(b_n\)</span> restores variance 1. The noise accounts for reverse conditional uncertainty; it is not an arbitrary perturbation added after denoising.</p>
+<p>To see the SDE connection, first use <span class="math inline">\(\nu_n=b_n\)</span> and expand the mean:</p>
+<p><span class="math display">\[\frac{x+b_ns_\theta}{\sqrt{1-b_n}}
+=x+b_n\left(\frac x2+s_\theta\right)+O(b_n^2).\]</span></p>
+<p>With <span class="math inline">\(b_n=\beta(t_n)h_n+O(h_n^2)\)</span>, this has the leading drift of reverse-SDE Euler–Maruyama. Its noise variance also has the required leading term <span class="math inline">\(\beta(t_n)h_n\)</span>. The posterior-variance choice has the same limit on intervals bounded away from zero noise. Endpoint behavior needs separate care.</p>
+<p>Thus DDPM and reverse-SDE Euler–Maruyama share a continuous limit; their finite updates need not be identical. The <span class="math inline">\(O(h_n^2)\)</span> comparison concerns conditional means and variances, not a claim of second-order stochastic trajectory accuracy. Song et al.’s Appendix E develops this correspondence. The Gaussian reverse kernel is a modeling/small-step approximation for general data, even when its conditional mean is exact.</p>
+</section>
+<section id="what-happens-to-the-ddim-noise-term" class="level3">
+<h3 class="anchored" data-anchor-id="what-happens-to-the-ddim-noise-term">What happens to the DDIM noise term?</h3>
+<p>Deterministic DDIM is another discretization of the probability-flow route, using transformed coordinates rather than the direct Euler step above. <a href="https://arxiv.org/html/2010.02502v4#S4.SS1">The DDIM paper</a> first gives a generalized update with fresh Gaussian noise, then sets its step-noise coefficient to zero in Section 4.1 after Eq. (12); Eq. (16) denotes this choice by <span class="math inline">\(\eta=0\)</span>. It is not obtained by deleting the noise from Ho’s ancestral update while keeping Ho’s mean. We keep DDIM’s derivation outside the main recipe here so that the two primary routes remain distinguishable.</p>
+</section>
+</section>
+<section id="train-the-score-using-the-same-denoising-regression-as-ddpm" class="level2">
+<h2 class="anchored" data-anchor-id="train-the-score-using-the-same-denoising-regression-as-ddpm">7. Train the score using the same denoising regression as DDPM</h2>
+<p>We have constructed the samplers assuming a score. Now we supply the missing function. At a selected time, form</p>
+<p><span class="math display">\[X_t=\alpha_tX_0+\sigma_t\varepsilon,
+\qquad X_0\sim p_{\mathrm{data}},\quad\varepsilon\sim\mathcal N(0,1).\]</span></p>
+<p>The conditional score of this Gaussian observation is known:</p>
+<p><span class="math display">\[U_t=\partial_x\log p_t(x\mid X_0)\big|_{x=X_t}
+=-\frac{X_t-\alpha_tX_0}{\sigma_t^2}
+=-\frac{\varepsilon}{\sigma_t}.\]</span></p>
+<p>The training target <span class="math inline">\(U_t\)</span> depends on the sampled clean/noisy pair. The network receives only <span class="math inline">\((X_t,t)\)</span>, so it cannot generally recover the particular <span class="math inline">\(X_0\)</span> or <span class="math inline">\(\varepsilon\)</span> used for every pair. Squared-error regression averages the possible labels conditional on those inputs.</p>
+<section id="why-conditional-score-labels-learn-the-marginal-score" class="level3">
+<h3 class="anchored" data-anchor-id="why-conditional-score-labels-learn-the-marginal-score">Why conditional-score labels learn the marginal score</h3>
+<p>At a fixed positive time, differentiate the noisy marginal density:</p>
+<p><span class="math display">\[\begin{aligned}
+p_t(x)&amp;=\int p_t(x\mid x_0)p_{\mathrm{data}}(x_0)\,dx_0,\\
+\partial_x\log p_t(x)
+&amp;=\int \partial_x\log p_t(x\mid x_0)
+\frac{p_t(x\mid x_0)p_{\mathrm{data}}(x_0)}{p_t(x)}\,dx_0\\
+&amp;=\int \partial_x\log p_t(x\mid x_0)p(x_0\mid X_t=x)\,dx_0\\
+&amp;=\mathbb E[U_t\mid X_t=x].
+\end{aligned}\]</span></p>
+<p>The posterior appears in this proof, but we never have to evaluate it during training. Drawing clean observations and independent noise supplies samples from their joint law. The regression identity</p>
+<p><span class="math display">\[\mathbb E[(s_\theta(X_t,t)-U_t)^2\mid X_t,t]
+=(s_\theta(X_t,t)-s_t(X_t))^2+\operatorname{Var}(U_t\mid X_t,t)\]</span></p>
+<p>shows that the unknown conditional-variance term cannot affect the optimal predictor. This is why a known <em>conditional</em> score is a valid target for learning the unknown <em>marginal</em> score.</p>
+</section>
+<section id="noise-prediction-is-a-scaled-version-of-this-regression" class="level3">
+<h3 class="anchored" data-anchor-id="noise-prediction-is-a-scaled-version-of-this-regression">Noise prediction is a scaled version of this regression</h3>
+<p>Set <span class="math inline">\(s_\theta(x,t)=-\varepsilon_\theta(x,t)/\sigma_t\)</span>. Then, for each training time,</p>
+<p><span class="math display">\[\boxed{(\varepsilon_\theta(X_t,t)-\varepsilon)^2
+=\sigma_t^2\left(s_\theta(X_t,t)+\frac{\varepsilon}{\sigma_t}\right)^2.}\]</span></p>
+<p>Unweighted noise prediction is score regression weighted by <span class="math inline">\(\sigma_t^2\)</span>. It avoids training directly against targets whose scale grows as <span class="math inline">\(1/\sigma_t\)</span> near the clean endpoint. It does not mean the network knows the noise realization; its unrestricted optimum is the posterior mean</p>
+<p><span class="math display">\[\varepsilon_*(x,t)=\mathbb E[\varepsilon\mid X_t=x],\qquad
+s_t(x)=-\frac{\varepsilon_*(x,t)}{\sigma_t}.\]</span></p>
+<p>Ho’s simplified DDPM loss uses a uniformly sampled discrete index:</p>
+<p><span class="math display">\[\mathcal L_{\mathrm{DDPM}}=
+\mathbb E_{\substack{n\sim\mathrm{Unif}\{1,\ldots,N\}\\X_0\sim p_{\mathrm{data}},\ \varepsilon\sim\mathcal N(0,1)}}
+\left[(\varepsilon_\theta(\alpha_{t_n}X_0+\sigma_{t_n}\varepsilon,t_n)-\varepsilon)^2\right].\]</span></p>
+<p>The analogous continuous-time noise loss replaces <span class="math inline">\(n\)</span> by an independently drawn <span class="math inline">\(t\sim\mathrm{Unif}(0,1)\)</span> and uses the continuous schedule. Song’s general score objective additionally permits a positive time weight <span class="math inline">\(\lambda(t)\)</span>. Choosing <span class="math inline">\(\lambda(t)=\sigma_t^2\)</span> recovers the noise-prediction weighting above.</p>
+<p>That is the precise meaning of <strong>almost the same training</strong>: the corruption and regression target can coincide, while the time distribution and loss weighting may differ. Positive time-only weights preserve the unrestricted pointwise optimum, but affect how a finite network allocates its capacity. A network trained only at integer steps also needs an explicit continuous time-conditioning or interpolation rule before off-grid ODE evaluations are justified. The original weighted ELBO loss is not numerically identical to Ho’s simplified noise loss.</p>
+</section>
+<section id="the-denoising-interpretation-through-tweedies-formula" class="level3">
+<h3 class="anchored" data-anchor-id="the-denoising-interpretation-through-tweedies-formula">The denoising interpretation through Tweedie’s formula</h3>
+<p>Since <span class="math inline">\(\varepsilon=(X_t-\alpha_tX_0)/\sigma_t\)</span>, conditional averaging gives</p>
+<p><span class="math display">\[\boxed{D_*(x,t):=\mathbb E[X_0\mid X_t=x]
+=\frac{x+\sigma_t^2s_t(x)}{\alpha_t}.}\]</span></p>
+<p>For <span class="math inline">\(\alpha_t&gt;0\)</span> and <span class="math inline">\(\sigma_t&gt;0\)</span>, the posterior-mean denoiser, noise predictor, and score are interchangeable descriptions of the same conditional information. The score itself is the <strong>scaled displacement</strong> <span class="math inline">\((\alpha_tD_*(x,t)-x)/\sigma_t^2\)</span>, not the posterior mean alone. The sampler uses this information locally over many times; a single denoising mean is not generally a sample from the clean distribution.</p>
+</section>
+</section>
+<section id="solve-one-complete-example-before-training-a-network" class="level2">
+<h2 class="anchored" data-anchor-id="solve-one-complete-example-before-training-a-network">8. Solve one complete example before training a network</h2>
+<p>Take</p>
+<p><span class="math display">\[X_0\sim\mathcal N(2,0.25),\qquad\beta(t)=8.\]</span></p>
+<p>The cumulative amplitudes are <span class="math inline">\(\alpha_t=e^{-4t}\)</span> and <span class="math inline">\(\sigma_t^2=1-e^{-8t}\)</span>. Gaussian addition gives</p>
+<p><span class="math display">\[p_t=\mathcal N(m_t,V_t),\qquad
+m_t=2\alpha_t,\qquad V_t=0.25\alpha_t^2+\sigma_t^2.\]</span></p>
+<p>Here <span class="math inline">\(V_t\)</span> is the <strong>marginal variance</strong>, whereas <span class="math inline">\(\sigma_t^2\)</span> is the <strong>conditional corruption variance</strong>. They are not the same. The exact marginal score and optimal noise predictor are</p>
+<p><span class="math display">\[s_t(x)=-\frac{x-m_t}{V_t},\qquad
+\varepsilon_*(x,t)=\frac{\sigma_t(x-m_t)}{V_t}.\]</span></p>
+<p>Insert this score into either update in Section 6. No training is needed for this check. At time one,</p>
+<p><span class="math display">\[p_1\approx\mathcal N(0.0366,0.99975),\]</span></p>
+<p>which is close to, but not exactly, the standard Gaussian.</p>
+<section id="an-exact-ode-solution-is-available-for-verification" class="level3">
+<h3 class="anchored" data-anchor-id="an-exact-ode-solution-is-available-for-verification">An exact ODE solution is available for verification</h3>
+<p>For a constant standardized label <span class="math inline">\(z\)</span>, the trajectory</p>
+<p><span class="math display">\[x_t=m_t+\sqrt{V_t}\,z\]</span></p>
+<p>satisfies the probability-flow ODE. Thus integrating from time one to zero gives the exact transport</p>
+<p><span class="math display">\[\boxed{x_0=2+\sqrt{\frac{0.25}{V_1}}(x_1-m_1).}\]</span></p>
+<p>If <span class="math inline">\(x_1\sim p_1\)</span>, the result has exactly the required data law. Starting instead from <span class="math inline">\(\mathcal N(0,1)\)</span> gives a slightly different law even with an exact integrator. This separates <strong>terminal-prior error</strong> from <strong>numerical error</strong>.</p>
+<div id="fig-integrated-vp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-integrated-vp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../materials/score-to-sampling/vp-path-and-samplers.png" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-integrated-vp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Top: the known forward density path. Bottom: DDPM ancestral sampling, reverse-SDE Euler–Maruyama, and probability-flow Euler use the same analytic score. All are initialized from the exact terminal law for this diagnostic, isolating numerical error. There are 12,000 particles and 2,000 steps per sampler.
+</figcaption>
+</figure>
+</div>
+<p>The <a href="../materials/score-to-sampling/generate_examples.py">reproducible simulation script</a> contains all three samplers and generates both figures. It checks sampled moments against the exact finite-grid recurrences, verifies improvement under grid refinement, and compares ODE trajectories with the closed-form transport. <a href="../materials/score-to-sampling/verification.json">Saved numerical checks</a> record the results. This experiment verifies the equations and solvers; it is not a trained-model performance claim.</p>
+</section>
+</section>
+<section id="assemble-training-and-inference-into-one-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="assemble-training-and-inference-into-one-implementation">9. Assemble training and inference into one implementation</h2>
+<p>The analytic example supplies an exact noise predictor. For unknown data, replace it with a neural network and train it using the regression in Section 7. Every other component remains prescribed.</p>
+<section id="training-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="training-algorithm">Training algorithm</h3>
+<p><strong>Inputs:</strong> clean observations, one consistent schedule <span class="math inline">\((\alpha_t,\sigma_t,\beta(t))\)</span>, and a time-conditioned noise predictor <span class="math inline">\(\varepsilon_\theta\)</span>.</p>
+<pre class="text"><code>Repeat for each training minibatch:
+    Select clean observations x0 from the training set.
+    Select times t independently (grid indices for DDPM, continuous times for an ODE model).
+    Draw independent standard Gaussian noise epsilon.
+    Form xt = alpha(t) * x0 + sigma(t) * epsilon.
+    Predict epsilon_hat = network(xt, t).
+    Compute mean squared error between epsilon_hat and epsilon.
+    Update the network parameters using the gradient of this loss.</code></pre>
+<p>The network must receive time because the same observation value has different scores at different noise levels. Training needs neither reverse trajectories nor an ODE solve. A minibatch element supplies one independently selected time, not an entire forward trajectory.</p>
+<p>For example, the continuous-time loss for a batch in PyTorch is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># x0: a batch of scalar observations; noise_net(xt, t) returns the same shape.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># beta(t)=8, matching the example and the inference schedule below.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> torch.rand_like(x0).clamp(<span class="bu">min</span><span class="op">=</span><span class="fl">1e-5</span>, <span class="bu">max</span><span class="op">=</span><span class="dv">1</span> <span class="op">-</span> <span class="fl">1e-5</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> torch.randn_like(x0)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> torch.exp(<span class="op">-</span><span class="dv">4</span> <span class="op">*</span> t)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>sigma <span class="op">=</span> torch.sqrt(<span class="op">-</span>torch.expm1(<span class="op">-</span><span class="dv">8</span> <span class="op">*</span> t))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>xt <span class="op">=</span> alpha <span class="op">*</span> x0 <span class="op">+</span> sigma <span class="op">*</span> epsilon</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> ((noise_net(xt, t) <span class="op">-</span> epsilon) <span class="op">**</span> <span class="dv">2</span>).mean()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>optimizer.zero_grad()</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>loss.backward()</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>optimizer.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The small clipping interval is a numerical implementation choice that excludes the zero-noise endpoint. It slightly changes the time distribution. For images, draw one time per image and broadcast its amplitudes over pixels; replace scalar squared error by a sum or mean over coordinates.</p>
+</section>
+<section id="inference-algorithm-choose-the-update-after-training" class="level3">
+<h3 class="anchored" data-anchor-id="inference-algorithm-choose-the-update-after-training">Inference algorithm: choose the update after training</h3>
+<pre class="text"><code>Draw x from a standard Gaussian reference.
+For grid times t descending from 1 toward 0:
+    Evaluate epsilon_hat = network(x, t).
+    Convert to s = -epsilon_hat / sigma(t).
+
+    Probability-flow ODE:
+        x = x + h * beta(t) / 2 * (x + s).
+
+    OR reverse-SDE Euler–Maruyama:
+        draw a new standard Gaussian z;
+        x = x + h * beta(t) * (x / 2 + s) + sqrt(h * beta(t)) * z.
+
+    OR DDPM ancestral:
+        use the matching discrete variance b;
+        draw z, except use z=0 at the final step;
+        x = (x + b * s) / sqrt(1-b) + sqrt(reverse_variance) * z.
+Return the resulting approximate data sample.</code></pre>
+<p>Use <strong>one</strong> chosen update throughout a run. The standard Gaussian initialization approximates <span class="math inline">\(p_1\)</span> for the finite VP schedule. In the analytic verification, replace it by a draw from the known exact <span class="math inline">\(p_1\)</span>.</p>
+<p>All score evaluations occur at positive current times; there is no division by <span class="math inline">\(\sigma_0=0\)</span>. For data with a singular clean law or an unreliable learned endpoint, stop at a small positive time. A final posterior-mean denoising step is an optional additional approximation and changes the output distribution; it is not an exact replacement for the remaining transport.</p>
+<p>For a complete learned example beyond the analytic check, the existing <a href="../tutorials/35-probability-flow-ode-part-6.html">mixture training notebook</a> implements training and inference with a small network. The recipe above is the same separation of tasks.</p>
+</section>
+</section>
+<section id="reassemble-the-argument" class="level2">
+<h2 class="anchored" data-anchor-id="reassemble-the-argument">10. Reassemble the argument</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>Answer supplied by this tutorial</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>What do we want?</td>
+<td>New samples from a data distribution.</td>
+</tr>
+<tr class="even">
+<td>What distributional information will we learn?</td>
+<td>The marginal score at each noise level.</td>
+</tr>
+<tr class="odd">
+<td>Where do noisy distributions come from?</td>
+<td>A prescribed contraction-plus-Gaussian-noise construction.</td>
+</tr>
+<tr class="even">
+<td>What is its continuous limit?</td>
+<td>The forward VP SDE.</td>
+</tr>
+<tr class="odd">
+<td>What labels can we compute?</td>
+<td>The injected noise, equivalently the conditional Gaussian score.</td>
+</tr>
+<tr class="even">
+<td>Why do these labels recover the needed score?</td>
+<td>Regression takes the conditional expectation of the target given the noisy input.</td>
+</tr>
+<tr class="odd">
+<td>What changes between DDPM and probability flow?</td>
+<td>The reverse dynamics and numerical sampling rule.</td>
+</tr>
+<tr class="even">
+<td>What is shared?</td>
+<td>The forward density path, schedule, and compatible denoising predictor.</td>
+</tr>
+<tr class="odd">
+<td>Where can approximation enter?</td>
+<td>The learned predictor, terminal prior, reverse-kernel model, and finite integration steps.</td>
+</tr>
+</tbody>
+</table>
+<p>A final check is to explain the standard Gaussian case without looking at the equations. Its score is <span class="math inline">\(-x\)</span>. Langevin needs noise to maintain its spread. The forward VP process preserves it. The reverse VP SDE also preserves it. Its probability-flow ODE has zero velocity. These facts would be inconsistent if we treated every appearance of the score as the same sampling rule.</p>
+<section id="questions-to-answer-before-implementing-a-new-sampler" class="level3">
+<h3 class="anchored" data-anchor-id="questions-to-answer-before-implementing-a-new-sampler">Questions to answer before implementing a new sampler</h3>
+<ol type="1">
+<li>Does time zero denote data or noise in this implementation?</li>
+<li>Is the schedule parameter a one-step variance, a continuous rate, or a cumulative amplitude?</li>
+<li>Is the network predicting noise, a clean posterior mean, or the score? What conversion is required?</li>
+<li>Does the chosen update use the reverse-SDE score coefficient or the probability-flow coefficient?</li>
+<li>Are the terminal law and score known exactly, or are we testing approximations to them?</li>
+</ol>
+</section>
+</section>
+<section id="appendix-a.-langevin-stationarity-and-its-finite-step-gaussian-bias" class="level2">
+<h2 class="anchored" data-anchor-id="appendix-a.-langevin-stationarity-and-its-finite-step-gaussian-bias">Appendix A. Langevin stationarity and its finite-step Gaussian bias</h2>
+<p>For Langevin, the Fokker–Planck equation is</p>
+<p><span class="math display">\[\partial_\tau q_\tau=-\partial_x(q_\tau s)+\partial_x^2q_\tau.\]</span></p>
+<p>At the proposed stationary density <span class="math inline">\(q_\tau=p\)</span>, substituting <span class="math inline">\(s=p'/p\)</span> gives</p>
+<p><span class="math display">\[-\partial_x(p s)+\partial_x^2p=-p''+p''=0.\]</span></p>
+<p>With suitable boundary behavior this establishes invariance. It does not by itself establish convergence from every starting distribution. For the standard Gaussian, the SDE is <span class="math inline">\(dX_\tau=-X_\tau d\tau+\sqrt2dW_\tau\)</span>. Its mean and variance obey</p>
+<p><span class="math display">\[m'=-m,\qquad V'=-2V+2,\]</span></p>
+<p>so <span class="math inline">\(m(\tau)=e^{-\tau}m(0)\)</span> and <span class="math inline">\(V(\tau)=1+e^{-2\tau}(V(0)-1)\)</span>. This explicitly shows convergence of Gaussian initial laws.</p>
+<p>The Euler–Maruyama chain is instead <span class="math inline">\(x_{k+1}=(1-\eta)x_k+\sqrt{2\eta}z_k\)</span>. For <span class="math inline">\(0&lt;\eta&lt;2\)</span>, its stationary variance solves</p>
+<p><span class="math display">\[V=(1-\eta)^2V+2\eta
+\quad\Longrightarrow\quad V=\frac1{1-\eta/2}.\]</span></p>
+<p>At the figure’s step <span class="math inline">\(\eta=0.02\)</span>, this is about <span class="math inline">\(1.0101\)</span>. That discrepancy is a solver effect even with a perfect score.</p>
+</section>
+<section id="appendix-b.-from-discrete-contraction-to-the-cumulative-schedule" class="level2">
+<h2 class="anchored" data-anchor-id="appendix-b.-from-discrete-contraction-to-the-cumulative-schedule">Appendix B. From discrete contraction to the cumulative schedule</h2>
+<p>For one step, expand the coefficient:</p>
+<p><span class="math display">\[\sqrt{1-b_n}=1-\frac12b_n+O(b_n^2).\]</span></p>
+<p>With <span class="math inline">\(b_n=\beta(t_{n-1})h_n+O(h_n^2)\)</span>, the conditional increment has mean <span class="math inline">\(-\beta(t_{n-1})x h_n/2+O(h_n^2)\)</span> and variance <span class="math inline">\(\beta(t_{n-1})h_n+O(h_n^2)\)</span>. These identify the VP SDE’s drift and diffusion variance.</p>
+<p>Across steps, the clean-data coefficient is <span class="math inline">\(\prod_j\sqrt{1-b_j}\)</span>. Therefore</p>
+<p><span class="math display">\[\log\alpha_{t_n}=\frac12\sum_{j=1}^n\log(1-b_j)
+\longrightarrow-\frac12\int_0^{t_n}\beta(u)\,du.\]</span></p>
+<p>The conditional noise variance follows a recursion. If it is <span class="math inline">\(S_{n-1}\)</span> before the next step, then</p>
+<p><span class="math display">\[S_n=(1-b_n)S_{n-1}+b_n,\qquad S_0=0.\]</span></p>
+<p>Consequently <span class="math inline">\(1-S_n=(1-b_n)(1-S_{n-1})=\prod_{j=1}^n(1-b_j)\)</span>, giving <span class="math inline">\(S_n=1-\alpha_{t_n}^2\)</span>. The limiting Gaussian conditional law has variance <span class="math inline">\(1-\alpha_t^2\)</span>. This derivation also explains why independently choosing incompatible formulas for <span class="math inline">\(\alpha_t\)</span> and <span class="math inline">\(\beta(t)\)</span> would train and sample different paths.</p>
+</section>
+<section id="appendix-c.-check-the-reverse-density-evolution-and-the-factor-of-two" class="level2">
+<h2 class="anchored" data-anchor-id="appendix-c.-check-the-reverse-density-evolution-and-the-factor-of-two">Appendix C. Check the reverse density evolution and the factor of two</h2>
+<p>For the forward SDE, write</p>
+<p><span class="math display">\[\partial_t p_t=-\partial_x(fp_t)+\frac12g^2\partial_x^2p_t.\]</span></p>
+<p>The desired reverse-clock density is <span class="math inline">\(r_\tau(x)=p_{1-\tau}(x)\)</span>. It must satisfy</p>
+<p><span class="math display">\[\partial_\tau r_\tau=\partial_x(fr_\tau)-\frac12g^2\partial_x^2r_\tau,\]</span></p>
+<p>with coefficients evaluated at <span class="math inline">\(t=1-\tau\)</span>.</p>
+<p>For the proposed reverse SDE with drift <span class="math inline">\(-f+g^2s_t\)</span> and noise amplitude <span class="math inline">\(g\)</span>, its Fokker–Planck right-hand side is</p>
+<p><span class="math display">\[\begin{aligned}
+-\partial_x[(-f+g^2s_t)r_\tau]+\frac12g^2\partial_x^2r_\tau
+&amp;=\partial_x(fr_\tau)-g^2\partial_x(r_\tau s_t)+\frac12g^2\partial_x^2r_\tau\\
+&amp;=\partial_x(fr_\tau)-\frac12g^2\partial_x^2r_\tau,
+\end{aligned}\]</span></p>
+<p>because <span class="math inline">\(r_\tau s_t=\partial_xr_\tau\)</span>. The stochastic spreading cancels half of the score-induced contribution.</p>
+<p>For the reverse probability-flow ODE with velocity <span class="math inline">\(-f+g^2s_t/2\)</span>, the continuity equation gives the same result directly:</p>
+<p><span class="math display">\[-\partial_x[(-f+\tfrac12g^2s_t)r_\tau]
+=\partial_x(fr_\tau)-\frac12g^2\partial_x^2r_\tau.\]</span></p>
+<p>This verifies the matching density path and explains the coefficient difference. Density agreement alone does not prove that their trajectory couplings are the same; they are not. The identification of the stochastic process as the actual time reversal uses the reverse-time SDE theorem.</p>
+</section>
+<section id="further-reading-within-the-course" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading-within-the-course">Further reading within the course</h2>
+<ul>
+<li><a href="../tutorials/39-denoising-score-matching.html">Denoising score matching and Langevin sampling</a>: fixed-noise training and equilibrium sampling.</li>
+<li><a href="../tutorials/30-ddpm.html">DDPM in Ho’s notation</a>: training from the ELBO and the original sampling algorithm.</li>
+<li><a href="../tutorials/07-probability-flow-ode.html">Probability-flow transport in one dimension</a>: trajectories, densities, and construction of velocity fields.</li>
+<li><a href="../tutorials/32-probability-flow-ode-part-3.html">Learning the score and Tweedie’s formula</a>: denoising regression and posterior averaging in detail.</li>
+<li><a href="../tutorials/42-ddpm-reverse-vp-sde.html">DDPM through the reverse VP SDE</a>: finite-update comparisons and Song’s reverse-diffusion rule.</li>
+<li><a href="../tutorials/38-probability-flow-ode-part-9.html">DDIM and the probability-flow ODE</a>: deterministic and stochastic DDIM, with the transformed-coordinate Euler interpretation.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/acads-iit-jammu\.github\.io\/diffusion-models-f26");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../tutorials/30-ddpm.html" class="pagination-link" aria-label="12 · Denoising Diffusion Probabilistic Models (DDPM)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">12 · Denoising Diffusion Probabilistic Models (DDPM)</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../tutorials/langevin-diffusion.html" class="pagination-link" aria-label="11 · Langevin Diffusion">
+        <span class="nav-page-text">11 · Langevin Diffusion</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · Monsoon 2026 (2026-01) · IIT Jammu</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
