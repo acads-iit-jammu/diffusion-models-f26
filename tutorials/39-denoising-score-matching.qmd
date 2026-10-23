@@ -1,4 +1,4 @@
-# 11 · Denoising Score Matching and Langevin Sampling {.unnumbered}
+# 02 · Denoising Score Matching and Langevin Sampling {.unnumbered}
 
 ::: {.callout-note}
 ## Draft — Learn a score, then sample with it
@@ -65,6 +65,8 @@ This exact reparameterization will reappear in DDPM, with a different cumulative
 
 ## 3. Once a fixed score is known: Langevin sampling
 
+For a fully worked example with trajectories, density plots, code, and numerical error checks, see [Langevin Diffusion: Sampling a Gaussian Through Dynamics](./44-langevin-gaussian.qmd).
+
 Let $p$ be a smooth positive target density and $s=\partial_x\log p$. Use sampling time $\tau$, with $p$ held fixed:
 
 $$dX_\tau=s(X_\tau)\,d\tau+\sqrt2\,dW_\tau.$$
@@ -73,6 +75,14 @@ Brownian increments over an interval of length $\eta$ are independent Gaussians 
 
 $$\boxed{x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k,
 \qquad z_k\overset{\mathrm{iid}}{\sim}\mathcal N(0,1).}$$
+
+::: {.callout-note title="A fixed score, a chosen initial law, and fresh noise"}
+The score $s(x)=\partial_x\log p(x)$ has **no explicit dependence on sampling time** $\tau$ or step index $k$. Every Euler–Maruyama step evaluates the same function at the current position $x_k$. Its value can change because the particle moves; the target density and its score field remain fixed. Changing the numerical step size does not change the target score.
+
+Choose an initial law $P_{\mathrm{init}}$ and draw $X_0\sim P_{\mathrm{init}}$ independently of the driving Brownian motion. The initial law need not be Gaussian or equal to the target: it may, for example, be uniform, Gaussian, or a point mass at a chosen position. This initialization is separate from the fresh $z_k\sim\mathcal N(0,1)$ used at every step. Each $z_k$ is independent of $X_0$ and all earlier increments, and therefore of the current state $x_k$. The initial law may itself be Gaussian, but its draw and the subsequent Gaussian increments have different roles. Initial and target supports need not coincide, but the dynamics must be defined at the starting positions. Restricted-support targets may require boundary conditions; zeros of the target density can make its score undefined. Convergence requires a separate argument, not merely a choice of initial law.
+
+The score term is the **drift**; the Brownian term is the **diffusion or noise term**, not a Brownian drift. For a well-defined, ergodic Langevin process, suitable initializations approach the target as sampling time grows. Initialization affects how long this takes; neither an arbitrary finite running time nor a finite Euler step guarantees exact target samples. For example, the standard logistic target admits fixed starting points such as zero or six.
+:::
 
 Score-directed drift and random spreading balance at the target distribution. For the continuous SDE, $p$ is invariant under suitable conditions; convergence from a starting law requires additional ergodicity conditions. A finite unadjusted Euler step generally has bias, and a learned score adds approximation error. [Appendix A](#sec-langevin-stationarity) derives the stationary density and illustrates convergence with a Gaussian target.
 

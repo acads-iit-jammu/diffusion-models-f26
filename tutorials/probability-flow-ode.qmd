@@ -6,6 +6,8 @@
 This eleven-part topic develops sampling by transporting a simple distribution into a data distribution. The parts use their own index, 01–11, and can be read in sequence. The notes and worked examples are in development.
 :::
 
+For the complete training-and-sampling argument in one place, start with [**15 · From Score to Sampling**](./43-score-to-sampling.qmd). It develops the algorithmic recipe, a solved scalar example, and the distinction between the reverse-SDE and probability-flow samplers.
+
 This topic follows [denoising score matching and Langevin sampling](./39-denoising-score-matching.qmd) and the [original DDPM lecture](./30-ddpm.qmd).
 
 Start with particle trajectories and density evolution in one dimension. Then extend the construction to vectors, learn the score from clean/noisy pairs, and implement sampling. The later parts provide experiments and an image-model recipe, then connect probability-flow ODEs to Neural ODEs, normalizing flows, and flow matching.

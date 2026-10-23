@@ -41,6 +41,8 @@ project:
     - materials/img/**
     - materials/site_libs/**
     - homeworks/*.pdf
+    - materials/score-to-sampling/**
+    - materials/langevin-gaussian/**
 
 book:
   title: "ID-5-02 (TO)"
@@ -78,8 +80,12 @@ book:
         - tutorials/18-metropolis-hastings.qmd
         - tutorials/19-generative-adversarial-networks.qmd
         - tutorials/29-variational-autoencoders.qmd
-        - tutorials/39-denoising-score-matching.qmd
         - tutorials/30-ddpm.qmd
+        - tutorials/43-score-to-sampling.qmd
+    - part: tutorials/langevin-diffusion.qmd
+      chapters:
+        - tutorials/44-langevin-gaussian.qmd
+        - tutorials/39-denoising-score-matching.qmd
     - part: tutorials/probability-flow-ode.qmd
       chapters:
         - tutorials/07-probability-flow-ode.qmd

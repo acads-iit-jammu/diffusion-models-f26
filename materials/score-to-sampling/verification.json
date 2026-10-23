@@ -1,0 +1,38 @@
+{
+  "ddpm": {
+    "sample_mean": 2.002938933300435,
+    "sample_variance": 0.2470437834560681,
+    "finite_grid": {
+      "mean": 1.9999999999999967,
+      "variance": 0.2475139749933841
+    }
+  },
+  "reverse_sde": {
+    "sample_mean": 2.0017558920168206,
+    "sample_variance": 0.2502850588673354,
+    "finite_grid": {
+      "mean": 1.9995367618777213,
+      "variance": 0.2518933560696903
+    }
+  },
+  "ode": {
+    "sample_mean": 2.000190889430093,
+    "sample_variance": 0.24778622909915687,
+    "finite_grid": {
+      "mean": 1.9988067592151058,
+      "variance": 0.2510983825452355
+    }
+  },
+  "ode_pathwise_rmse": 0.0016138533036225459,
+  "terminal": {
+    "mean": 0.03663127777746836,
+    "variance": 0.9997484030290731
+  },
+  "setup": {
+    "seed": 2026,
+    "particles": 12000,
+    "beta": 8.0,
+    "steps": 2000,
+    "initialization": "exact p_1 to isolate solver error"
+  }
+}

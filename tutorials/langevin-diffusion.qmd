@@ -1,0 +1,8 @@
+# 11 · Langevin Diffusion {.unnumbered}
+
+This topic develops sampling through a stochastic dynamical system. Begin with a Gaussian target whose score is known, then extend the construction to estimated scores and more general target densities.
+
+1. [**Gaussian Langevin Sampling**](./44-langevin-gaussian.qmd) derives a non-standard Gaussian score, substitutes it into Euler–Maruyama, and compares trajectories and densities with and without noise. It separates stationarity, convergence, and numerical error.
+2. [**Denoising Score Matching and Langevin Sampling**](./39-denoising-score-matching.qmd) develops score estimation, sampling a fixed density, and annealing across noise levels. Its appendix explains the stationary-density argument.
+
+The subsequent [DDPM lecture](./30-ddpm.qmd) introduces a reverse generative chain. [Lecture 15: From Score to Sampling](./43-score-to-sampling.qmd) brings score training, DDPM, and probability-flow sampling together in one place.

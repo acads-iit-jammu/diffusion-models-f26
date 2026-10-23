@@ -26,7 +26,7 @@ count = 0
 for path in Path('_site').rglob('*.html'):
     html = path.read_text()
     changed = False
-    for label in ('13 · Probability-Flow ODE', '14 · Reverse-SDE Sampling'):
+    for label in ('11 · Langevin Diffusion', '13 · Probability-Flow ODE', '14 · Reverse-SDE Sampling'):
         lecture = group_span(html, 'Lecture Notes')
         topic = group_span(html, label)
         if lecture is None or topic is None:
@@ -36,7 +36,12 @@ for path in Path('_site').rglob('*.html'):
         block = html[topic[0]:topic[1]].replace('sidebar-section depth1', 'sidebar-section depth2')
         html = html[:topic[0]] + html[topic[1]:]
         lecture = group_span(html, 'Lecture Notes')
-        insert = html.rfind('</ul>', lecture[0], lecture[1])
+        # Keep lecture numbers ordered within the enclosing group.
+        next_lecture = ('12 · Denoising Diffusion Probabilistic Models (DDPM)'
+                        if label.startswith('11') else '15 · From Score to Sampling')
+        next_pos = html.find(f'<span class="menu-text">{next_lecture}</span>', lecture[0], lecture[1])
+        insert = (html.rfind('<li ', lecture[0], next_pos) if next_pos >= 0
+                  else html.rfind('</ul>', lecture[0], lecture[1]))
         if insert < 0:
             raise ValueError(f'Missing lecture list: {path}')
         html = html[:insert] + block + '\n' + html[insert:]
