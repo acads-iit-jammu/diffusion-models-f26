@@ -1,0 +1,442 @@
+% ID-5-02 (TO) · Mathematical Foundations of Diffusion Models · IIT Jammu
+% HW 3 — From a Known Score to Langevin Sampling
+% HW3 release handout. Build: xelatex hw3.tex
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue]{hyperref}
+
+\newcommand{\pts}[1]{\hfill\textbf{(#1pts)}}
+\newcommand{\pt}[1]{\hfill\textbf{(#1pt)}}
+\newcommand{\total}[1]{\par\medskip\noindent\textbf{Total: #1 points}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\sig}{\operatorname{\sigma}}
+
+% (a) (b) (c) labelling, without enumitem
+
+
+\newenvironment{parts}
+  {\begin{enumerate}\setlength{\itemsep}{0.45em}\setlength{\parskip}{0pt}}
+  {\end{enumerate}}
+
+
+\usepackage{iftex}
+\ifPDFTeX\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\fi
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-1}
+\setlength{\emergencystretch}{2em}
+\begin{document}
+\begin{center}
+  {\Large\bfseries HW 3 — From a Known Score to Langevin Sampling}\\[0.4em]
+  {\small Mathematical Foundations of Diffusion Models · Monsoon 2026 · IIT Jammu}
+\end{center}
+\medskip
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Released} & Friday 23 October 2026 \\
+\textbf{Due} & Monday 26 October 2026 \\
+\textbf{Marks} & 40 points --- graded on correctness \\
+\bottomrule
+\end{tabular}
+\end{center}
+\medskip
+\noindent\textbf{Individual homework: derivations and programming.}
+Show your working and explain your numerical results. Submit an executed notebook
+with the mathematical steps, code, labeled figures, and comparison table.
+\bigskip\hrule\bigskip
+\subsection{Background: the sampling
+problem}\label{background-the-sampling-problem}
+
+Suppose we know a probability density but want to generate observations
+from it using its score. In this homework, the target is the
+\textbf{standard logistic distribution} on the real line:
+
+\[
+p(x)=\frac{e^{-x}}{(1+e^{-x})^2},\qquad
+F(x)=\frac{1}{1+e^{-x}},\qquad x\in\mathbb R.
+\]
+
+This is a smooth, non-Gaussian density with mean zero and variance
+\(\pi^2/3\). We will derive its score, use it to construct a Langevin
+sampler, and compare the generated samples with the known target.
+
+Work entirely in \textbf{one dimension}. Write
+
+\[s(x)=\frac{d}{dx}\log p(x).\]
+
+The time variable \(\tau\) denotes elapsed sampling time. The target
+\(p\) stays fixed as \(\tau\) increases. This differs from
+diffusion-model time, which indexes a changing family of noisy data
+distributions.
+
+The distinction between a deterministic velocity and a stochastic drift
+matters here. We will first examine the ODE \(\dot x=s(x)\), then use
+the same score as the drift of an SDE with an additional noise term. You
+will show why the latter can preserve the target distribution while the
+former cannot.
+
+\textbf{How to read this assignment.} ``Background'' and ``Given''
+blocks supply explanations, formulas, or assumptions; they are not
+additional questions. The lettered \textbf{Tasks}, the \textbf{Required
+implementation and experiment settings}, and the \textbf{Submission}
+section specify required work. The marks total 40.
+
+\subsection{Problem 1 --- Derive and interpret the
+score}\label{problem-1-derive-and-interpret-the-score}
+
+\subsubsection{(a) Differentiate the log density (4
+points)}\label{a-differentiate-the-log-density-4-points}
+
+Starting from \(p(x)\), derive \(s(x)\) with all intermediate steps.
+Express your answer both in terms of \(F(x)\) and in terms of the
+hyperbolic tangent.
+
+\par\noindent\textbf{Given: hyperbolic tangent identity}\par\nopagebreak[4]
+\[\tanh(u)=\frac{e^u-e^{-u}}{e^u+e^{-u}}.\]
+
+\subsubsection{(b) Interpret the vector field (4
+points)}\label{b-interpret-the-vector-field-4-points}
+
+Plot \(p(x)\) and \(s(x)\) on \([-8,8]\) in separate panels. Determine
+the sign of \(s(x)\) for positive and negative \(x\), locate its zero,
+and calculate its limits as \(x\to\pm\infty\). Explain how the score
+directs the motion of a particle at each position.
+
+\noindent\textbf{Total: 8 points}
+
+\bigskip\hrule\bigskip
+
+\subsection{Problem 2 --- From deterministic motion to a stochastic
+sampler}\label{problem-2-from-deterministic-motion-to-a-stochastic-sampler}
+
+\subsubsection{Given: dynamics and numerical
+rules}\label{given-dynamics-and-numerical-rules}
+
+The deterministic score ODE is
+
+\[\frac{dx}{d\tau}=s(x),\qquad x(0)=x_{\mathrm{init}}.\]
+
+Its explicit Euler update is
+
+\[x_{k+1}=x_k+\eta s(x_k).\]
+
+The Langevin SDE adds Brownian noise:
+
+\[dX_\tau=s(X_\tau)\,d\tau+\sqrt{2}\,dW_\tau.\]
+
+Its \textbf{Euler--Maruyama update is provided}:
+
+\[x_{k+1}=x_k+\eta s(x_k)+\sqrt{2\eta}\,z_k,
+\qquad z_k\overset{\mathrm{iid}}{\sim}\mathcal N(0,1).\]
+
+A Brownian increment over a step of length \(\eta\) has variance
+\(\eta\). Multiplication by the SDE coefficient \(\sqrt{2}\) therefore
+gives the numerical noise amplitude \(\sqrt{2\eta}\). \textbf{Neither
+numerical rule needs to be derived. No stochastic-calculus derivation is
+required.}
+
+\par\noindent\textbf{Background: fixed score, initialization, and noise (no proof
+required)}\par\nopagebreak[4]
+The score \(s(x)=\partial_x\log p(x)\) has \textbf{no explicit
+dependence on sampling time} \(\tau\) or step index \(k\). Every
+Euler--Maruyama step evaluates the same function at the current position
+\(x_k\). Its value can change because the particle moves; the target
+density and its score field remain fixed. Changing the numerical step
+size does not change the target score.
+
+For the logistic target in this homework, \(p(x)>0\) for every
+\(x\in\mathbb R\), and its score is smooth, bounded, and globally
+Lipschitz. Thus the Langevin SDE is well-defined from every finite
+starting position. We may also draw \(X_0\sim P_{\mathrm{init}}\) from
+an initial probability distribution on \(\mathbb R\), independently of
+the driving Brownian motion. Examples include a Gaussian, a uniform
+distribution on a finite interval, or a point mass at zero or six.
+
+\textbf{The initial law need not have the same support as the target.}
+Starting all particles at zero is valid even though the logistic target
+has support throughout \(\mathbb R\). Brownian noise allows the
+particles to spread into regions absent from the initial distribution;
+the score drift alone would keep particles initialized at zero there.
+Having full support, however, does not mean having the correct
+probabilities: reaching the target distribution still requires
+convergence.
+
+This freedom of initialization is not a claim about every target
+density. If \(p\) vanishes on a region, the expression
+\(\partial_x\log p\) is generally undefined there, so we cannot simply
+initialize there and expect the drift to repair the problem. Targets
+confined to a domain may need boundary conditions, such as reflection.
+Disconnected supports may prevent movement between components. For
+general targets, the SDE must be well-defined at the starting points,
+and convergence requires appropriate accessibility and ergodicity
+conditions. Equality of initial and target supports is neither required
+in general nor sufficient to establish convergence.
+
+Initialization is separate from the fresh \(z_k\sim\mathcal N(0,1)\)
+used at every numerical step. Each \(z_k\) is independent of \(X_0\) and
+all earlier increments, and therefore of the current state \(x_k\). The
+initial law may itself be Gaussian, but its draw and the subsequent
+Gaussian increments have different roles. The score term is the
+\textbf{drift}; the Brownian term is the \textbf{diffusion or noise
+term}, not a Brownian drift.
+
+For this logistic target, the exact continuous-time Langevin process
+converges to the target from the stated initializations; you may use
+this fact without proving it. Initialization affects how long
+convergence takes. This does not imply exact target samples at a finite
+running time, and the Euler--Maruyama implementation introduces an
+additional discretization error. Problem 4 distinguishes these issues
+from stationarity and finite-sample fluctuations.
+
+\subsubsection{(a) Examine deterministic score motion (4
+points)}\label{a-examine-deterministic-score-motion-4-points}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Show that every trajectory of the score ODE approaches zero as
+  \(\tau\to\infty\). A sign and monotonicity argument is sufficient; a
+  closed-form solution is not required.
+\item
+  Explain why this limiting behavior does not reproduce the logistic
+  target density.
+\item
+  Plot explicit Euler trajectories from
+  \(x_{\mathrm{init}}\in\{-6,-3,-1,1,3,6\}\) with step size \(0.02\)
+  until \(\tau=20\).
+\end{enumerate}
+
+\subsubsection{(b) Substitute the score into the Langevin sampler (6
+points)}\label{b-substitute-the-score-into-the-langevin-sampler-6-points}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Substitute your Problem 1 score into the given Langevin SDE and
+  Euler--Maruyama update. Write the update explicitly in terms of
+  \(x_k\), \(\eta\), and \(z_k\), and identify its drift and noise
+  terms.
+\item
+  For \(\eta=0.02\), explain why the update without noise moves nonzero
+  particles toward zero. State what happens if all particles start
+  exactly at zero.
+\item
+  Explain why restoring independent Gaussian increments allows particles
+  to spread from this common initial position, whereas the deterministic
+  score drift alone cannot maintain the logistic target's nonzero
+  variance.
+\end{enumerate}
+
+\noindent\textbf{Total: 10 points}
+
+\bigskip\hrule\bigskip
+
+\subsection{Problem 3 --- Implement the
+sampler}\label{problem-3-implement-the-sampler}
+
+\subsubsection{Required implementation and experiment
+settings}\label{required-implementation-and-experiment-settings}
+
+Implement the given Euler--Maruyama update, with your explicit logistic
+score substituted in Problem 2(b), using NumPy or an equivalent
+numerical library. At each step, evaluate the score at the current
+particle positions, draw fresh standard Gaussian values, and apply the
+update. Write this loop yourself; you do not need to derive a numerical
+solver. No neural network is needed because the score is available
+analytically.
+
+Use the following experiment:
+
+\begin{itemize}
+\tightlist
+\item
+  Simulate \(M=5{,}000\) independent particles, initially all at zero.
+\item
+  Compare step sizes \(\eta\in\{0.2,0.05,0.01\}\).
+\item
+  Run each experiment to the same elapsed time \(\tau_{\max}=40\), using
+  \(K=\tau_{\max}/\eta\) steps.
+\item
+  Draw fresh, independent Gaussian noise for every particle at every
+  step.
+\item
+  Retain snapshots at \(\tau=0,2,10,40\) and record your random seed.
+\end{itemize}
+
+Use only the \textbf{final position of each independent particle} for
+the main distribution comparisons.
+
+\par\noindent\textbf{Background: independent observations}\par\nopagebreak[4]
+Successive positions along a single trajectory are correlated. Using one
+final position from each independently simulated particle avoids
+treating those successive positions as independent observations.
+
+\subsubsection{(a) Implement and show the evolving distribution (5
+points)}\label{a-implement-and-show-the-evolving-distribution-5-points}
+
+For \(\eta=0.05\), plot the particle histograms at the positive snapshot
+times and overlay the target density. Describe how the initially
+concentrated population spreads and approaches the target.
+
+\subsubsection{(b) Compare numerical resolutions (5
+points)}\label{b-compare-numerical-resolutions-5-points}
+
+For each step size, report the final sample mean, variance, and elapsed
+computational time. Repeat the \(\eta=0.05\) experiment with all
+particles initially at \(x=6\) and compare the final empirical CDFs from
+the two initializations. Discuss whether these runs provide evidence
+that initialization effects have become small.
+
+\noindent\textbf{Total: 10 points}
+
+\bigskip\hrule\bigskip
+
+\subsection{Problem 4 --- Explain and check the target
+distribution}\label{problem-4-explain-and-check-the-target-distribution}
+
+\subsubsection{Given: density evolution and comparison
+formulas}\label{given-density-evolution-and-comparison-formulas}
+
+Let \(q_\tau(x)\) denote the evolving density of the Langevin particles
+and \(p(x)\) the fixed target. The Fokker--Planck equation is provided:
+
+\[\frac{\partial q_\tau}{\partial\tau}
+=-\frac{\partial}{\partial x}\bigl[s(x)q_\tau(x)\bigr]
++\frac{\partial^2q_\tau(x)}{\partial x^2}.\]
+
+The empirical CDF error is
+
+\[D_M=\sup_x\left|\widehat F_M(x)-F(x)\right|.\]
+
+For sorted samples \(x_{(1)}\le\cdots\le x_{(M)}\), use the supplied
+formula
+
+\[D_M=\max_{1\le i\le M}\left\{
+\frac{i}{M}-F(x_{(i)}),\quad
+F(x_{(i)})-\frac{i-1}{M}\right\}.\]
+
+An independent exact logistic observation can be generated by
+
+\[U\sim\operatorname{Uniform}(0,1),\qquad X=\log\frac{U}{1-U}.\]
+
+No derivation of these three formulas is required. The inverse-CDF
+sampler is supplied only to construct a reference sample, not to replace
+the Langevin implementation.
+
+\par\noindent\textbf{Background: what the diagnostics tell us}\par\nopagebreak[4]
+\textbf{Density plots are qualitative diagnostics; empirical CDF errors
+quantify discrepancies.} A histogram estimates the generated density,
+and its appearance depends on sample size and bin choices. \(D_M\)
+compares the empirical CDF with the known target without choosing bins.
+Here the target plays the role of the data distribution, but there is no
+training stage because its score is known analytically.
+
+Even exact independent target samples have nonzero \(D_M\) due to
+finite-sample fluctuations. Repeated exact samples give a reference for
+interpreting whether the Langevin discrepancy is small or large at the
+same sample size. The range from 20 reference runs is descriptive, not a
+formal acceptance threshold.
+
+Finite running time, numerical discretization, and finite-sample
+fluctuations are distinct sources of discrepancy. Smaller step sizes
+reduce discretization error but need not produce a smaller observed
+\(D_M\) in every experiment. Plots and sample comparisons provide
+evidence of approximation, not a proof of exact equality for a
+finite-step sampler.
+
+\par\noindent\textbf{Stationarity and convergence are different statements --- not an
+assessed proof}\par\nopagebreak[4]
+For this logistic Langevin SDE, the target density is stationary: if the
+particles already follow the target distribution, their distribution
+remains the target as time passes. The score drift concentrates
+probability toward the center, while Brownian noise spreads it; at the
+target density, these effects balance.
+
+Stationarity alone does \textbf{not} show that particles initialized
+from a different distribution converge to the target. Convergence
+requires a separate argument. For this homework, convergence of the
+exact logistic Langevin process from the stated initializations is
+supplied as a fact. \textbf{You are not asked to prove convergence,
+establish ergodicity, or derive conditions guaranteeing either.} The
+simulations provide a numerical comparison at finite running times, not
+a convergence proof.
+
+\subsubsection{(a) Verify stationarity (6
+points)}\label{a-verify-stationarity-6-points}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Rewrite the supplied Fokker--Planck equation as
+  \(\partial_\tau q_\tau=-\partial_x J_\tau\) and identify the
+  probability flux \(J_\tau\).
+\item
+  Show that \(s(x)p(x)=p'(x)\) and hence that the flux is zero when
+  \(q_\tau=p\). Conclude that the target is stationary for the
+  continuous-time Langevin SDE.
+\item
+  State the conclusion precisely: if \(q_0=p\), then \(q_\tau=p\) for
+  all sampling times \(\tau\ge0\). No convergence argument is required.
+\end{enumerate}
+
+\subsubsection{(b) Compare generated samples with the target (6
+points)}\label{b-compare-generated-samples-with-the-target-6-points}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Plot densities.} For each step size, overlay the analytic
+  target density \(p(x)\) and a density-normalized histogram of the
+  final generated samples. Label them ``Target density'' and ``Generated
+  samples.'' Use the same bin edges and axis limits across panels.
+  Describe differences in the center, spread, and tails.
+\item
+  \textbf{Quantify discrepancies.} Plot each final empirical CDF against
+  \(F\), compute \(D_M\) using the supplied formula, and add it to the
+  comparison table from Problem 3.
+\item
+  \textbf{Construct an exact-sampling reference.} Generate \(M=5{,}000\)
+  independent logistic observations using the supplied inverse-CDF
+  formula. In a reference panel, overlay their density-normalized
+  histogram with \(p\), using the same bins and axes as above. Compute
+  their \(D_M\) against \(F\).
+\item
+  \textbf{Calibrate the error size.} Repeat the exact-sampling
+  experiment 20 times with independent draws. Report the median and
+  range of its \(D_M\) values alongside the Langevin errors. State
+  whether the Langevin discrepancies are comparable to ordinary
+  finite-sample fluctuations or noticeably larger.
+\item
+  \textbf{Interpret the results.} Discuss finite running time,
+  discretization error, and finite-sample fluctuations separately.
+  Explain what your numerical results support and what they do not
+  establish.
+\end{enumerate}
+
+\noindent\textbf{Total: 12 points}
+
+\bigskip\hrule\bigskip
+
+\subsection{Submission}\label{submission}
+
+Submit one executed Jupyter notebook containing the derivations in
+LaTeX, code, labeled figures, comparison table, and conclusions. Include
+package versions and seeds. The notebook should run on a laptop CPU and
+explain each experiment before presenting its code and output.
+
+\par\noindent\textbf{Background: scope of the conclusion}\par\nopagebreak[4]
+Keep the main conclusion precise: \textbf{the logistic density is
+invariant for the continuous-time Langevin SDE; a sufficiently long,
+sufficiently well-resolved Euler--Maruyama simulation approximates that
+density.} The deterministic score ODE has a different limiting behavior.
+
+\end{document}
