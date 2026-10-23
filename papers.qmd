@@ -1,0 +1,19 @@
+# Papers {.unnumbered}
+
+This page will collect important papers for implementation on **small or toy datasets**. Each entry will identify a manageable part of the paper to reproduce, so that the mathematical construction, training procedure, and sampler can be studied through a working experiment.
+
+The paper implementation component carries **40 marks**. It is separate from the three homeworks and the **10-mark mini coding project**. Selection instructions, submission requirements, evaluation criteria, and deadlines will be announced on the [Assignments](./assignments.qmd) page.
+
+## Implementation candidates
+
+Papers will be added here as they are selected. For each paper, the entry will provide:
+
+- **Reference:** title, authors, and a link to the paper.
+- **Core idea:** the result or algorithm to understand and implement.
+- **Implementation scope:** the equations and algorithm steps to reproduce, with any simplifications stated explicitly.
+- **Small-scale experiment:** a toy distribution or small dataset, together with an appropriate computational budget.
+- **Checks:** a baseline, plots, or numerical comparisons that assess whether the implementation behaves as expected.
+
+## Interpreting a small-scale implementation
+
+The aim is to reproduce and examine a paper's central mechanism at a tractable scale. A successful toy experiment does not reproduce the paper's full benchmark results. Each entry will distinguish the original method from the reduced experiment and identify what can reasonably be concluded from it.

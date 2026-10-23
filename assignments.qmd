@@ -1,10 +1,10 @@
 # Assignments {.unnumbered}
 
-All graded work for the course is listed here. Dates and details will be posted as each item is released. The weights below follow the (tentative) [assessment scheme](./course.qmd#assessment).
+All graded work for the course is listed here. Dates and details will be posted as each item is released. The weights below follow the [assessment scheme](./course.qmd#assessment).
 
 ## Homeworks
 
-Five homeworks, together worth **20%**. The points and problem format are specified in each sheet.
+**Best two of HW 1, HW 2, and HW 3: 20 marks.** Each homework score is first converted to a percentage; the best two percentages are averaged and scaled to 20 marks. The maximum points and problem format are specified in each sheet. There are **three homeworks**. The separate **mini coding project is worth 10 marks** and is not a fourth homework.
 Problem sets are distributed as PDF; solution sets are posted after the
 submission deadline. HW 1 is **graded for completion** — credit is for a genuine
 attempt at every part rather than for correct answers. HW 2 onwards are **graded
@@ -15,8 +15,6 @@ on correctness**, with marks carried by the reasoning as much as the answer.
 | HW 1 | Random variables, joints, conditionals, Bayes | Mon 10 Aug 2026 | Tue 18 Aug 2026, in class | [PDF](./homeworks/hw1.pdf) | [PDF](./homeworks/hw1-solutions.pdf) |
 | HW 2 | Distributions and maximum likelihood | Mon 10 Aug 2026 | Tue 25 Aug 2026, in class | [PDF](./homeworks/hw2.pdf) | [PDF](./homeworks/hw2-solutions.pdf) |
 | HW 3 | From a known score to Langevin sampling (40 points) | Fri 23 Oct 2026 | Mon 26 Oct 2026 | [PDF](./homeworks/hw3.pdf) | After the deadline |
-| HW 4 | — | TBA | TBA | — | — |
-| HW 5 | — | TBA | TBA | — | — |
 
 : {tbl-colwidths="[8,34,14,14,15,15]"}
 
@@ -43,17 +41,24 @@ also embedded in the tutorial [The Random Walk](./tutorials/20-random-walk.qmd).
 
 : {tbl-colwidths="[12,52,18,18]"}
 
-## Examinations
+## Mid-semester examination
 
-Both examinations are **pen & paper**, held in the institute examination windows.
+The mid-semester examination is **pen & paper**, worth **30 marks**, in the institute examination window **Sep 18–23, 2026**.
 
-| Exam | Window | Weight |
-|---|---|:---:|
-| Mid-semester examination | Sep 18 – Sep 23, 2026 | 30% |
-| End-semester examination | Nov 23 – Nov 30, 2026 | 40% |
+## Mini coding project
 
-: {tbl-colwidths="[40,40,20]"}
+The mini coding project is worth **10 marks**, separate from the best-two homework component. Topic, deliverables, and deadline will be announced.
 
-## Coding Assignment
+## Paper implementation
 
-One mini coding project, worth **10%**. Topic, deliverables, and timeline will be announced in class.
+Paper implementation is worth **40 marks**. Candidate papers and scoped implementation exercises will be listed on the [Papers](./papers.qmd) page. The paper-selection process, deliverables, evaluation criteria, and deadline will be announced. This is the 40-mark assessment component in place of a separate end-semester written examination.
+
+## Assessment summary
+
+| Component | Marks |
+|---|:---:|
+| Assignments — best two of HW 1, HW 2, and HW 3 | 20 |
+| Mini coding project | 10 |
+| Mid-semester examination | 30 |
+| Paper implementation | 40 |
+| **Total** | **100** |

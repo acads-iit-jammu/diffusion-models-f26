@@ -1,6 +1,6 @@
 # Syllabus {.unnumbered}
 
-This page reproduces the official course template for **ID-5-02 (TO) — Mathematical Foundations of Diffusion Models** (Interdisciplinary Programs, Scheme 2022, Level 6).
+This page presents the course template and current assessment scheme for **ID-5-02 (TO) — Mathematical Foundations of Diffusion Models** (Interdisciplinary Programs, Scheme 2022, Level 6).
 
 ## Basic Information
 
@@ -50,6 +50,20 @@ Gaussian noise and Markov chains; denoising and score functions; forward diffusi
 | | **Total lecture hours** | **40** |
 
 : {tbl-colwidths="[10,75,15]"}
+
+## Assessment
+
+| Component | Marks |
+|---|:---:|
+| Assignments — best two of HW 1, HW 2, and HW 3 | 20 |
+| Mini coding project | 10 |
+| Mid-semester examination | 30 |
+| Paper implementation | 40 |
+| **Total** | **100** |
+
+For the assignment component, convert each homework score to a percentage, select the best two, and average them before scaling to 20 marks. This accounts for the different maximum marks of HW 1–3. There are three homeworks and one separate mini coding project. Details and deadlines for the coding project and paper implementation will be announced.
+
+See [Assignments](./assignments.qmd) for handouts and submission dates.
 
 ## Texts and References
 
