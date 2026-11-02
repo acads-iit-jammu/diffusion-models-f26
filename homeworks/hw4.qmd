@@ -1,0 +1,72 @@
+---
+title: "HW 4 · Learn a Score and Sample with a Probability-Flow ODE"
+subtitle: "Programming Assignment · Mathematical Foundations of Diffusion Models · Monsoon 2026 · IIT Jammu"
+format:
+  pdf:
+    pdf-engine: xelatex
+    keep-tex: true
+    papersize: a4
+    fontsize: 11pt
+    geometry: margin=24mm
+    toc: false
+    number-sections: false
+  html:
+    toc: false
+    number-sections: false
+    embed-resources: true
+---
+
+**Release date:** TBA<br>
+**Due:** Tuesday, 10 November 2026<br>
+**Format:** individual programming assignment; submit one executed Jupyter notebook (`.ipynb`)<br>
+**Marks:** 36 points
+
+## Problem setup
+
+Use one-dimensional data from the standard Laplace distribution
+
+$$p_0(x)=\frac12e^{-|x|},\qquad x\in\mathbb R.$$
+
+Compare these two signal schedules on $0\le t\le1$:
+
+$$\alpha_t^{\mathrm{lin}}=1-t,
+\qquad
+\alpha_t^{\mathrm{exp}}=e^{-\beta t},\quad \beta=8.$$
+
+For either schedule, form forward-corrupted data as
+
+$$X_t=\alpha_tX_0+\sqrt{1-\alpha_t^2}\,\varepsilon,
+\qquad \varepsilon\sim\mathcal N(0,1).$$
+
+The linear schedule reaches a standard Gaussian exactly at $t=1$. The exponential schedule retains a small data contribution at $t=1$.
+
+## Problem 1. Generate and inspect the forward data — 8 points
+
+1. Simulate independent training, validation, and test data from $p_0$.
+2. For both schedules, generate noisy training examples at randomly sampled times.
+3. Plot the clean data and forward-corrupted distributions at several times. Compare the terminal distributions with a standard Gaussian.
+
+## Problem 2. Train score-estimation networks — 8 points
+
+For each schedule, train a neural network using forward-corrupted training data. Compare:
+
+1. a network that receives raw time $t$;
+2. a network that receives $t$ with Fourier positional encodings.
+
+Use held-out data to compare the models. Include the training setup and a plot of the training and validation losses.
+
+### Optional 2(b). Inspect the estimated score — ungraded
+
+Plot the estimated marginal score at selected times and compare it with a numerical reference from the known Laplace distribution.
+
+## Problem 3. Sample with the probability-flow ODE — 12 points
+
+For each trained model, construct the probability-flow vector field for its forward schedule. Initialize samples from a standard Gaussian and integrate the ODE backward with an explicit Euler solver. Compare at least two solver resolutions.
+
+## Problem 4. Compare generated and target samples — 8 points
+
+Compare the generated samples with the standard Laplace target using density plots and numerical summaries. Discuss the effect of the schedule, time encoding, and ODE resolution.
+
+## Submission
+
+Submit one executed Jupyter notebook (`.ipynb`). Write the theoretical parts in Jupyter Markdown cells using LaTeX, and place them before the code that implements each part. Include the code, plots, results, and a brief explanation of what the results show. The notebook should run on a laptop CPU.
