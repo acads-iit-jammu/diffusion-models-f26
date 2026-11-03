@@ -197,6 +197,12 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/05-two-point-diffusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01 · The World’s Smallest Diffusion Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/01-probability-101.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">02 · Probability &amp; Random Variables</span></a>
   </div>
@@ -605,7 +611,7 @@ p(y \mid x) = \frac{p(x, y)}{p(x)} .
 <p><span class="math display">\[
 \boxed{\;p(x \mid y) = \frac{p(y \mid x)\, p(x)}{p(y)}\;}
 \]</span></p>
-<p>which converts a conditional in one direction into the conditional in the other. The tanh denoiser of W01 is an application of this identity, with <span class="math inline">\(x\)</span> the clean data point and <span class="math inline">\(y\)</span> the noisy observation; it is derived in full in <a href="./05-two-point-diffusion.qmd">The World’s Smallest Diffusion Model</a>.</p>
+<p>which converts a conditional in one direction into the conditional in the other. The tanh denoiser of W01 is an application of this identity, with <span class="math inline">\(x\)</span> the clean data point and <span class="math inline">\(y\)</span> the noisy observation; it is derived in full in <a href="../tutorials/05-two-point-diffusion.html">The World’s Smallest Diffusion Model</a>.</p>
 <p><span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>independent</strong> if <span class="math inline">\(p(x, y) = p(x)\, p(y)\)</span> for all <span class="math inline">\(x, y\)</span> — equivalently, if <span class="math inline">\(p(y \mid x) = p(y)\)</span>, so that conditioning on <span class="math inline">\(X\)</span> conveys no information about <span class="math inline">\(Y\)</span>. In the table, <span class="math inline">\(0.20 \ne 0.45 \times 0.25\)</span>, so the two variables are dependent. The i.i.d. assumption underlying the likelihoods of <a href="../tutorials/02-distributions-mle.html">Distributions and Maximum Likelihood</a> are an independence statement applied to repeated observations.</p>
 </section>
 <section id="bayes-rule-and-why-inference-is-the-inverse-problem" class="level2">
@@ -872,7 +878,7 @@ L^{+} \;=\; \frac{L\,(1 - P(S))}{L\,(1 - P(S)) + (1-L)\,P(G)} ,
 <li>For the sky-and-rain table above, compute <span class="math inline">\(\mathbb{P}(\text{cloudy} \mid \text{rain})\)</span> by Bayes’ rule from <span class="math inline">\(\mathbb{P}(\text{rain} \mid \text{cloudy})\)</span> and the marginals, then confirm it by reading the table directly.</li>
 <li>Construct two <em>different</em> joint distributions on <span class="math inline">\(\{0,1\}^2\)</span> that have the same pair of marginals. What does this show about whether marginals determine a joint?</li>
 <li>Show that if <span class="math inline">\(p(x,y) = p(x)p(y)\)</span> then every conditional <span class="math inline">\(p(y \mid x)\)</span> equals <span class="math inline">\(p(y)\)</span> — independence means the conditional does not move as you change what you condition on.</li>
-<li>In the mixture model <span class="math inline">\(z \sim \text{Bernoulli}(\pi)\)</span>, <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)\)</span>: identify the joint <span class="math inline">\(p(x,z)\)</span>, both marginals, and both conditionals. State which of these the <a href="./05-two-point-diffusion.qmd">W01 denoiser</a> computes, and which the ancestral sampler of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> uses.</li>
+<li>In the mixture model <span class="math inline">\(z \sim \text{Bernoulli}(\pi)\)</span>, <span class="math inline">\(x \mid z \sim \mathcal{N}(\mu_z, \sigma^2)\)</span>: identify the joint <span class="math inline">\(p(x,z)\)</span>, both marginals, and both conditionals. State which of these the <a href="../tutorials/05-two-point-diffusion.html">W01 denoiser</a> computes, and which the ancestral sampler of <a href="../tutorials/04-genai-simplest-form.html">Generative AI, in Its Simplest Form</a> uses.</li>
 <li>A generative model produces a noisy observation <span class="math inline">\(x_t\)</span> from a clean signal <span class="math inline">\(x_0\)</span>. Which direction is easy to write down, <span class="math inline">\(p(x_t \mid x_0)\)</span> or <span class="math inline">\(p(x_0 \mid x_t)\)</span>? Which one does generation require? Name the rule that converts one into the other.</li>
 </ol>
 
