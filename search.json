@@ -3282,122 +3282,122 @@
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "",
     "text": "1. The generative question\nLet the data distribution be \\(q_0(x)\\). We define a known forward Markov chain\n\\[X_0\\longrightarrow X_1\\longrightarrow\\cdots\\longrightarrow X_T,\\]\nwhose transitions progressively remove information about \\(X_0\\). The terminal law is chosen to be simple, so that generation can start from it. The generative model then runs a learned Markov chain in reverse:\n\\[X_T\\sim\\pi,\\qquad X_{t-1}\\sim p_\\theta(\\cdot\\mid X_t),\\quad t=T,T-1,\\ldots,1.\\]\nThe forward kernel \\(q(x_t\\mid x_{t-1})\\) is known. The desired marginal reverse kernel,\n\\[q(x_{t-1}\\mid x_t),\\]\ndepends on the data distribution and is generally not available in closed form. But if a training example \\(x_0\\) is also given, Bayes’ rule gives an analytical target:\n\\[\\boxed{q(x_{t-1}\\mid x_t,x_0).}\\]\nThe central training question is how learning against this example-conditioned target can teach a model that only sees \\(x_t\\) at generation time. We first solve that question for a single binary variable.",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#a-two-state-forward-markov-chain",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#a-two-state-forward-markov-chain",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "2. A two-state forward Markov chain",
     "text": "2. A two-state forward Markov chain\nLet \\(X_t\\in\\{0,1\\}\\). At step \\(t\\), replace the current bit by a fresh fair bit with probability \\(\\beta_t\\); otherwise copy it. Because a replacement can equal the old bit, the probability that the bit actually flips is \\(r_t=\\beta_t/2\\). Thus\n\\[Q_t=\\begin{pmatrix}\n1-\\beta_t/2&\\beta_t/2\\\\\n\\beta_t/2&1-\\beta_t/2\n\\end{pmatrix},\\qquad 0&lt;\\beta_t\\le 1.\\]\nRows index \\(X_{t-1}\\) and columns index \\(X_t\\). Equivalently,\n\\[q(X_t=1\\mid X_{t-1}=x)=\\frac{\\beta_t}{2}+(1-\\beta_t)x.\\]\nWhen \\(\\beta_t=0\\), the bit is copied with certainty. When \\(\\beta_t=1\\), the next bit is a new fair Bernoulli sample, independent of the previous bit.\n\n2.1. Stationary distribution\nThe fair distribution \\(\\pi=(1/2,1/2)\\) is stationary:\n\\[\\pi Q_t=\\pi.\\]\nFor \\(0&lt;\\beta_t\\le1\\), both entries in each row are positive, so this is the unique stationary distribution of that step. Stationarity is a statement about the marginal law. Individual bit trajectories continue to change even when their marginal distribution is already fair.\n\n\n2.2. Repeated transitions\nThe eigenvectors of \\(Q_t\\) do not depend on \\(t\\). The constant vector has eigenvalue \\(1\\), and the contrast between states \\(0\\) and \\(1\\) has eigenvalue \\(1-\\beta_t\\). Define\n\\[\\alpha_t=1-\\beta_t,\\qquad\n\\bar\\alpha_t=\\prod_{s=1}^t\\alpha_s,\\qquad \\bar\\alpha_0=1.\\]\nThe product of the first \\(t\\) transition matrices is therefore\n\\[Q_1Q_2\\cdots Q_t=\n\\frac12\\begin{pmatrix}\n1+\\bar\\alpha_t&1-\\bar\\alpha_t\\\\\n1-\\bar\\alpha_t&1+\\bar\\alpha_t\n\\end{pmatrix}.\\]\nIn particular,\n\\[\\boxed{q(X_t=1\\mid X_0=x_0)\n=\\frac12+\\bar\\alpha_t\\left(x_0-\\frac12\\right).}\\]\nThe coefficient \\(\\bar\\alpha_t\\) is the fraction of the initial bit’s contrast with a fair bit that remains at time \\(t\\). We can sample \\(X_t\\) directly from this formula without simulating every intermediate transition.\nFor a constant replacement rate \\(\\beta\\), this reduces to\n\\[Q^n=\\frac12\\begin{pmatrix}\n1+(1-\\beta)^n&1-(1-\\beta)^n\\\\\n1-(1-\\beta)^n&1+(1-\\beta)^n\n\\end{pmatrix}.\\]\nAs \\(n\\) increases, the state-dependent part vanishes and each row approaches the fair distribution.\n\n\n2.3. The paper’s binomial schedule\nSohl-Dickstein et al. choose a schedule that removes an equal fraction of the original signal at each step:\n\\[\\beta_t=\\frac1{T-t+1},\\qquad\n\\bar\\alpha_t=\\frac{T-t}{T}.\\]\nThis schedule reaches \\(\\bar\\alpha_T=0\\), so the terminal bit is exactly fair and independent of its initial value.\n\n\n2.4. A general Bernoulli reference distribution\nFair-bit replacement is the special case where the reference law is \\(\\operatorname{Bernoulli}(1/2)\\). More generally, let the desired stationary reference be \\(\\pi=\\operatorname{Bernoulli}(p_\\star)\\). At each step, copy the current bit with probability \\(1-\\beta_t\\) and otherwise draw a fresh bit from \\(\\operatorname{Bernoulli}(p_\\star)\\). Then\n\\[q(X_t=1\\mid X_{t-1}=x)=(1-\\beta_t)x+\\beta_t p_\\star.\\]\nIf \\(X_{t-1}\\sim\\operatorname{Bernoulli}(p_\\star)\\), this transition leaves its law unchanged. The cumulative conditional probability is\n\\[q(X_t=1\\mid X_0=x_0)=p_\\star+\\bar\\alpha_t(x_0-p_\\star).\\]\nThus the same schedule with \\(\\bar\\alpha_T=0\\) ends exactly at the chosen reference law. Table App.1 displays the fair-bit case; Appendix D.1.2 uses an independent Bernoulli terminal prior with \\(p_\\star=0.2\\) for the binary-heartbeat experiment, matching its data’s mean activity. Both fit the general replace-from-\\(\\pi\\) construction; the fair-bit chain above is the symmetric special case.",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#forward-corruption-of-a-binary-vector",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#forward-corruption-of-a-binary-vector",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "3. Forward corruption of a binary vector",
     "text": "3. Forward corruption of a binary vector\nNow let \\(X_0\\in\\{0,1\\}^d\\). The forward process corrupts coordinates independently, conditional on the preceding vector:\n\\[q(x_t\\mid x_{t-1})=\\prod_{i=1}^d q(x_{t,i}\\mid x_{t-1,i}).\\]\nIt follows that\n\\[q(x_t\\mid x_0)=\\prod_{i=1}^d q(x_{t,i}\\mid x_{0,i}),\\]\nwith each factor given by the single-bit formula above. This conditional factorization holds even if the coordinates in the data distribution \\(q_0\\) are strongly dependent. The marginal \\(q_t(x_t)\\) can still have dependencies because it averages over dependent clean data.\nAt the final step of the schedule above, \\(\\bar\\alpha_T=0\\) and, for the fair-bit case,\n\\[q(x_T\\mid x_0)=2^{-d}.\\]\nThus the terminal prior is a vector of independent fair bits in the symmetric case. Under the general reference in Section 2.4, it is instead a vector of independent \\(\\operatorname{Bernoulli}(p_\\star)\\) bits. The forward process has produced a tractable starting law for the reverse generative chain.",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#an-analytical-reverse-target-for-one-bit",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#an-analytical-reverse-target-for-one-bit",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "4. An analytical reverse target for one bit",
     "text": "4. An analytical reverse target for one bit\nFor a single bit, Bayes’ rule and the forward Markov property give\n\\[q(x_{t-1}\\mid x_t,x_0)\n=\\frac{q(x_t\\mid x_{t-1})q(x_{t-1}\\mid x_0)}\n{q(x_t\\mid x_0)}.\\]\nEvery quantity on the right is known. Set\n\\[a_{t-1}=q(X_{t-1}=1\\mid X_0=x_0)\n=p_\\star+\\bar\\alpha_{t-1}(x_0-p_\\star).\\]\nFor an observed noisy bit \\(b=x_t\\), the likelihoods under the two possible previous bits are\n\\[L_1(b)=q(X_t=b\\mid X_{t-1}=1)\n=\\left(1-\\beta_t(1-p_\\star)\\right)^b\n\\left(\\beta_t(1-p_\\star)\\right)^{1-b},\\]\n\\[L_0(b)=q(X_t=b\\mid X_{t-1}=0)\n=\\left(\\beta_t p_\\star\\right)^b\n\\left(1-\\beta_t p_\\star\\right)^{1-b}.\\]\nFor the symmetric fair-bit example, \\(p_\\star=1/2\\) and these reduce to the likelihoods with actual flip probability \\(r_t=\\beta_t/2\\).\nThe posterior probability that the previous bit was one is\n\\[\\boxed{\\rho_t(x_0,b)\n=q(X_{t-1}=1\\mid X_t=b,X_0=x_0)\n=\\frac{a_{t-1}L_1(b)}\n{a_{t-1}L_1(b)+(1-a_{t-1})L_0(b)}.}\\]\nSo the example-conditioned reverse target is a Bernoulli distribution:\n\\[q(X_{t-1}\\mid X_t=b,X_0=x_0)\n=\\operatorname{Bernoulli}(\\rho_t(x_0,b)).\\]\n\nA three-step calculation\nTake \\(T=3\\) and Sohl-Dickstein’s schedule. Then \\(\\beta_1=1/3\\), \\(\\beta_2=1/2\\), and \\(\\beta_3=1\\). Suppose \\(X_0=1\\) and at step \\(t=2\\) we observe \\(X_2=1\\). Since \\(\\bar\\alpha_1=2/3\\),\n\\[a_1=q(X_1=1\\mid X_0=1)=\\frac12+\\frac23\\frac12=\\frac56.\\]\nAt step 2, \\(r_2=1/4\\). The likelihoods are \\(L_1(1)=3/4\\) and \\(L_0(1)=1/4\\), so\n\\[q(X_1=1\\mid X_2=1,X_0=1)\n=\\frac{(5/6)(3/4)}{(5/6)(3/4)+(1/6)(1/4)}\n=\\frac{15}{16}.\\]\nThis is a soft posterior target. In another forward draw with the same \\(x_0\\) and observed \\(x_t\\), the sampled \\(x_{t-1}\\) could differ; the posterior probability summarizes that uncertainty.",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#cross-entropy-training-recovers-the-marginal-reverse-probability",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#cross-entropy-training-recovers-the-marginal-reverse-probability",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "5. Cross-entropy training recovers the marginal reverse probability",
     "text": "5. Cross-entropy training recovers the marginal reverse probability\nThe neural network sees the noisy bit and its time, not the clean origin. Let\n\\[f_\\theta(x_t,t)\\in(0,1)\\]\nbe its predicted probability that \\(X_{t-1}=1\\). Train it against the analytical posterior target \\(\\rho_t(X_0,X_t)\\) using binary cross-entropy:\n\\[\\ell_t(\\theta;X_0,X_t)\n=-\\rho_t\\log f_\\theta(X_t,t)\n-(1-\\rho_t)\\log\\left(1-f_\\theta(X_t,t)\\right).\\]\nThe population objective averages over the data and the known forward corruption:\n\\[\\mathcal L_t(\\theta)\n=\\mathbb E_{X_0\\sim q_0,\\,X_t\\sim q(\\cdot\\mid X_0)}\n\\left[\\ell_t(\\theta;X_0,X_t)\\right].\\]\nThe target depends on \\(X_0\\), but the model output depends only on \\(X_t\\) and \\(t\\). To see why this is appropriate, condition on \\(X_t\\) and average the target over possible clean origins:\n\\[\\begin{aligned}\n\\eta_t(x_t)\n&=q(X_{t-1}=1\\mid X_t=x_t)\\\\\n&=\\sum_{x_0}q(X_{t-1}=1\\mid X_t=x_t,X_0=x_0)\nq(X_0=x_0\\mid X_t=x_t)\\\\\n&=\\mathbb E[\\rho_t(X_0,X_t)\\mid X_t=x_t].\n\\end{aligned}\\]\nConditioning the loss on \\(X_t=x_t\\) therefore gives\n\\[\\begin{aligned}\n\\mathbb E[\\ell_t\\mid X_t=x_t]\n=-&\\eta_t(x_t)\\log f_\\theta(x_t,t)\\\\\n&-\\left(1-\\eta_t(x_t)\\right)\\log\\left(1-f_\\theta(x_t,t)\\right).\n\\end{aligned}\\]\nFor a fixed \\(x_t\\), this binary cross-entropy is minimized at \\(f_\\theta(x_t,t)=\\eta_t(x_t)\\). Thus, for one bit and a sufficiently expressive model,\n\\[\\boxed{f_{\\theta^*}(x_t,t)=q(X_{t-1}=1\\mid X_t=x_t).}\\]\nWe did not need to calculate \\(q(x_0\\mid x_t)\\). Sampling clean/noisy pairs makes the regression average over those possible clean origins automatically.",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#the-kl-identity-behind-the-training-objective",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#the-kl-identity-behind-the-training-objective",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "6. The KL identity behind the training objective",
     "text": "6. The KL identity behind the training objective\nThe same argument can be stated for arbitrary discrete or continuous states. At a fixed time \\(t\\), define\n\\[\\mathcal J_t(\\theta)=\n\\mathbb E_{q(x_0,x_t)}\nD_{\\mathrm{KL}}\\left(\nq(x_{t-1}\\mid x_t,x_0)\n\\,\\middle\\|\\,\np_\\theta(x_{t-1}\\mid x_t)\n\\right).\\]\nAdd and subtract \\(\\log q(x_{t-1}\\mid x_t)\\) inside the expected log ratio:\n\\[\\begin{aligned}\n\\mathcal J_t(\\theta)\n={}&\\mathbb E_q\\left[\n\\log\\frac{q(X_{t-1}\\mid X_t,X_0)}\n{q(X_{t-1}\\mid X_t)}\\right]\\\\\n&+\\mathbb E_q\\left[\n\\log\\frac{q(X_{t-1}\\mid X_t)}\n{p_\\theta(X_{t-1}\\mid X_t)}\\right].\n\\end{aligned}\\]\nThe first term is the conditional mutual information \\(I_q(X_0;X_{t-1}\\mid X_t)\\). The second is the expected KL divergence between the desired marginal reverse kernel and the learned reverse kernel. Hence\n\\[\\boxed{\\begin{aligned}\n&\\mathbb E_{q(x_0,x_t)}D_{\\mathrm{KL}}\\left(\nq(x_{t-1}\\mid x_t,x_0)\\parallel p_\\theta(x_{t-1}\\mid x_t)\\right)\\\\\n&=I_q(X_0;X_{t-1}\\mid X_t)\n+\\mathbb E_{q(x_t)}D_{\\mathrm{KL}}\\left(\nq(x_{t-1}\\mid x_t)\\parallel p_\\theta(x_{t-1}\\mid x_t)\\right).\n\\end{aligned}}\\tag{1}\\]\nFor a fixed forward process, the conditional mutual information does not depend on \\(\\theta\\). Minimizing the example-conditioned KL objective therefore minimizes the true reverse-kernel KL objective. This is an equality between objectives up to a constant; the two KL values are not generally equal.\n\n6.1. Where the KL term appears in the paper’s likelihood bound\nSohl-Dickstein et al. define a forward trajectory \\(q(x_{0:T})\\) and a reverse generative trajectory \\(p(x_{0:T})\\). Jensen’s inequality gives a lower bound \\(K\\) on the data log likelihood. Their decomposition has the form\n\\[\\begin{aligned}\nK={}&-\\sum_{t=2}^{T}\\mathbb E_{q(x_0,x_t)}\nD_{\\mathrm{KL}}\\left(\nq(x_{t-1}\\mid x_t,x_0)\\parallel p_\\theta(x_{t-1}\\mid x_t)\n\\right)\\\\\n&+H_q(X_T\\mid X_0)-H_q(X_1\\mid X_0)-H_p(X_T).\n\\end{aligned}\\]\nWith the forward schedule and terminal prior fixed, the entropy terms do not depend on the reverse-kernel parameters. Maximizing this bound with respect to \\(\\theta\\) is therefore equivalent to minimizing the sum of example-conditioned KL terms. Equation (1) explains why those tractable terms train the marginal reverse kernel that is used at generation time.\nIf the schedule is learned as well, the conditional mutual information and entropy terms generally depend on that schedule. They may not then be dropped when optimizing the schedule. The equivalence in Equation (1) is for optimizing the reverse model while holding the forward process fixed.",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#extending-the-target-to-binary-vectors",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#extending-the-target-to-binary-vectors",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "7. Extending the target to binary vectors",
     "text": "7. Extending the target to binary vectors\nFor a binary vector, the example-conditioned posterior factorizes coordinate by coordinate:\n\\[q(x_{t-1}\\mid x_t,x_0)\n=\\prod_{i=1}^d\\operatorname{Bernoulli}\n\\left(x_{t-1,i};\\rho_{t,i}(x_0,x_t)\\right).\\]\nThis follows because both \\(q(x_{t-1}\\mid x_0)\\) and the one-step likelihood \\(q(x_t\\mid x_{t-1})\\) factorize. A network can output probabilities \\(f_{\\theta,i}(x_t,t)\\) and be trained with the sum of coordinatewise soft-label cross-entropies.\nThere is an important distinction after averaging over \\(X_0\\). A mixture of factorized distributions need not itself factorize. Thus the true marginal reverse distribution \\(q(x_{t-1}\\mid x_t)\\) can have dependencies between coordinates, even though every example-conditioned target factorizes. Independent Bernoulli outputs recover the correct marginal probability for each bit, but do not in general represent the full joint reverse kernel. They represent the exact joint kernel only when it factorizes, or when the model has a richer joint-output parameterization.\nThe KL identity in Equation (1) still holds for a full joint model. With a factorized reverse model, it says that the training objective finds the best reverse approximation within that restricted family; it does not make the factorized approximation exact. This distinction matters when moving from the scalar derivation to sequences and images.\n\n7.1. The minimum KL need not be zero\nEven if the learned model matches the desired marginal reverse kernel exactly,\n\\[p_{\\theta^*}(x_{t-1}\\mid x_t)=q(x_{t-1}\\mid x_t),\\]\nthe example-conditioned KL objective generally has the positive value\n\\[\\mathcal J_t(\\theta^*)=I_q(X_0;X_{t-1}\\mid X_t).\\]\nThis residual is not reverse-model error. It is the information advantage of knowing the clean origin \\(X_0\\) in the training target. The model at generation time sees only \\(X_t\\).",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#reverse-ancestral-sampling",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#reverse-ancestral-sampling",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "8. Reverse ancestral sampling",
     "text": "8. Reverse ancestral sampling\nOnce the reverse probabilities have been learned, generation starts from the terminal prior. For the schedule with \\(\\bar\\alpha_T=0\\), draw the bits independently:\n\\[X_{T,i}\\overset{\\mathrm{iid}}{\\sim}\\operatorname{Bernoulli}(p_\\star).\\]\nThen, for \\(t=T,T-1,\\ldots,1\\), sample\n\\[X_{t-1}\\sim p_\\theta(\\cdot\\mid X_t,t).\\]\nFor one bit, this is simply\n\\[X_{t-1}\\sim\\operatorname{Bernoulli}(f_\\theta(X_t,t)).\\]\nFor a factorized vector model, sample each coordinate independently conditional on \\(X_t\\). No score function, Gaussian noise predictor, SDE, or ODE is required for this discrete model. Its sampler is the ancestral sampling procedure associated with the learned reverse Markov chain.\nIn the paper’s binary-heartbeat experiment, the data consist of length-20 sequences with one pulse in each block of five positions; the phase is uniform over the five possible positions. The model uses 2,000 binomial diffusion steps and initializes from independent \\(\\operatorname{Bernoulli}(0.2)\\) bits, matching the data’s mean activity. A multilayer perceptron predicts the reverse Bernoulli probabilities. This is an instance of the general reference law in Section 2.4 with \\(p_\\star=0.2\\).",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#why-noise-prediction-is-not-the-fundamental-principle",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#why-noise-prediction-is-not-the-fundamental-principle",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "9. Why noise prediction is not the fundamental principle",
     "text": "9. Why noise prediction is not the fundamental principle\nA common introduction to diffusion models says: add Gaussian noise, train a network to predict that noise, then subtract its prediction during generation. That is a useful description of one Gaussian DDPM parameterization, but it can hide the more general probabilistic construction.\n\n9.1. The reverse transition is the object being learned\nThe generative objective is to learn a reverse process that transforms a simple reference distribution into the data distribution. In a discrete-time model, the learned object is the reverse kernel\n\\[\\boxed{p_\\theta(x_{t-1}\\mid x_t).}\\]\nThe forward process supplies tractable conditional targets for fitting this kernel. The binomial model makes this direct: the network predicts Bernoulli transition probabilities. No Gaussian noise variable is involved.\n\n\n9.2. Noise prediction is a Gaussian parameterization\nFor the variance-preserving Gaussian forward process,\n\\[X_t=\\sqrt{\\bar\\alpha_t}X_0+\n\\sqrt{1-\\bar\\alpha_t}\\,\\epsilon,\\qquad\n\\epsilon\\sim\\mathcal N(0,I),\\quad \\epsilon\\perp X_0,\\]\nwhere \\(\\alpha_t=1-\\beta_t\\) and \\(\\bar\\alpha_t=\\prod_{s=1}^t\\alpha_s\\).\nThe exact conditional reverse mean is\n\\[\\tilde\\mu_t(X_t,X_0)=\n\\frac{1}{\\sqrt{\\alpha_t}}\\left(\nX_t-\\frac{\\beta_t}{\\sqrt{1-\\bar\\alpha_t}}\\epsilon\n\\right).\\]\nOne can parameterize the learned reverse mean using a network that predicts \\(\\epsilon\\):\n\\[\\mu_\\theta(x_t,t)=\n\\frac{1}{\\sqrt{\\alpha_t}}\\left(\nx_t-\\frac{\\beta_t}{\\sqrt{1-\\bar\\alpha_t}}\n\\epsilon_\\theta(x_t,t)\\right).\\]\nWith a fixed isotropic reverse covariance \\(\\sigma_t^2 I\\), the mean-dependent part of the Gaussian KL becomes a weighted noise-prediction loss:\n\\[\\mathcal L_t^{\\mathrm{Gaussian}}=\nw_t\\,\\mathbb E_{X_0\\sim q_0,\\,\\epsilon\\sim\\mathcal N(0,I)}\\left[\n\\lVert\\epsilon-\\epsilon_\\theta(X_t,t)\\rVert^2\n\\right]+\\text{constant},\\]\nwhere\n\\[w_t=\\frac{\\beta_t^2}\n{2\\sigma_t^2\\alpha_t(1-\\bar\\alpha_t)}.\\]\nThe familiar unweighted noise-prediction MSE is a further choice of objective or timestep weighting. Thus noise prediction follows from a convenient parameterization of Gaussian reverse-mean learning; it is not the defining objective of diffusion modeling. In practice, predicting standardized Gaussian noise can be numerically useful, but that is a separate point from the probabilistic derivation. This is the parameterization used in later Gaussian DDPM work, including Ho, Jain, and Abbeel (2020).\nThe general sequence is\n\\[\\text{forward corruption}\\;\\longrightarrow\\;\n\\text{tractable posterior targets}\\;\\longrightarrow\\;\n\\text{learned reverse kernels}\\;\\longrightarrow\\;\n\\text{ancestral sampling}.\\]\nThe state space may be discrete or continuous. In the binomial model, the learned reverse transition is Bernoulli; in Gaussian diffusion it may be parameterized through its mean, variance, clean-data estimate, score, or noise estimate.",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#summary-the-central-result",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#summary-the-central-result",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "10. Summary: The central result",
     "text": "10. Summary: The central result\nThe binary construction isolates the central logic of diffusion training:\n\nSpecify a forward corruption kernel whose cumulative effect is analytically available.\nUse Bayes’ rule to compute an example-conditioned reverse posterior.\nTrain a reverse model that sees only the current noisy state.\nAverage the posterior target over possible clean origins through the expected loss.\nSample from the learned reverse chain starting at a tractable terminal law.\n\nFor one bit, cross-entropy directly recovers the marginal reverse probability. For vectors, the same per-coordinate loss recovers reverse marginals; exact joint recovery depends on the reverse model’s factorization assumptions. The KL decomposition makes the role of the hidden clean origin explicit and links this denoising objective to the log-likelihood lower bound in the original paper.",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
     "objectID": "tutorials/binomial-diffusion-sohl-dickstein.html#references-and-attribution",
     "href": "tutorials/binomial-diffusion-sohl-dickstein.html#references-and-attribution",
-    "title": "Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective",
+    "title": "Binomial Diffusion",
     "section": "References and attribution",
     "text": "References and attribution\nPrimary paper. Jascha Sohl-Dickstein, Eric A. Weiss, Niru Maheswaranathan, and Surya Ganguli. “Deep Unsupervised Learning using Nonequilibrium Thermodynamics.” Proceedings of the 32nd International Conference on Machine Learning, PMLR 37, 2015, pp. 2256–2265. Paper PDF · arXiv:1503.03585. Relevant parts include Sections 2.1, 2.2, and 2.4; Appendix B; Table App.1; and Appendix D.1.2.\nGaussian noise-prediction parameterization. Jonathan Ho, Ajay Jain, and Pieter Abbeel. “Denoising Diffusion Probabilistic Models.” Advances in Neural Information Processing Systems 33, 2020. arXiv:2006.11239.\nThe forward and reverse diffusion construction and the likelihood lower bound are from Sohl-Dickstein et al. The conditional-mutual-information decomposition and the detailed comparison with Gaussian noise prediction are derivations and interpretations supplied in this tutorial; they are not equations explicitly stated by the 2015 authors.",
     "crumbs": [
       "Paper Readings",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Binomial Diffusion</span>"
     ]
   },
   {
