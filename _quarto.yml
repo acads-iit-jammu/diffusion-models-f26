@@ -67,6 +67,7 @@ book:
     - syllabus.qmd
     - curriculum.qmd
     - assignments.qmd
+    - paper-implementation.qmd
     - part: "Lecture Notes"
       chapters:
         - tutorials/04-genai-simplest-form.qmd
@@ -126,9 +127,8 @@ book:
       chapters:
         - tutorials/13-inequalities.qmd
         - tutorials/20-random-walk.qmd
-    - part: "Paper Readings"
+    - part: "Papers"
       chapters:
-        - papers.qmd
         - tutorials/binomial-diffusion-sohl-dickstein.qmd
     - resources.qmd
 

@@ -1,0 +1,34 @@
+# Paper Implementation {.unnumbered}
+
+This page is for the **40-mark paper implementation project**. Students will
+choose a paper and reproduce a carefully scoped part of its method on a small
+or toy dataset. Candidate papers and project specifications will be added here
+as they are selected. The grading component is separate from the three
+homeworks and the 10-mark mini coding project.
+
+Selection instructions, submission requirements, evaluation criteria, and the
+deadline will be announced here and on the [Assignments](./assignments.qmd)
+page.
+
+## What each project entry will include
+
+- **Reference:** title, authors, and a link to the paper.
+- **Core idea:** the result or algorithm to understand and implement.
+- **Implementation scope:** equations and algorithm steps to reproduce, with
+  simplifications stated explicitly.
+- **Small-scale experiment:** a toy distribution or small dataset, together
+  with an appropriate computational budget.
+- **Checks:** baselines, plots, or numerical comparisons that assess whether
+  the implementation behaves as expected.
+
+## Interpreting a small-scale implementation
+
+The aim is to reproduce and examine a paper's central mechanism at a tractable
+scale. A successful toy experiment does not reproduce the paper's full
+benchmark results. Each project will distinguish the original method from the
+reduced experiment and state what can reasonably be concluded.
+
+The **Papers** section in the navigation contains separate reading tutorials,
+such as [Binomial Diffusion](./tutorials/binomial-diffusion-sohl-dickstein.qmd).
+Their presence does not by itself make a paper an implementation-project
+choice.
