@@ -15,14 +15,9 @@ arbitrary subsets as events and splits the world into "discrete" and
 "continuous". That is the standard undergraduate presentation and is entirely
 serviceable for every computation in the course.
 
-If you want to know what that presentation is glossing over — why "arbitrary
-subsets" is not quite allowed, what happens to laws that are neither discrete nor
-continuous, and why the noisy density in a diffusion model has a score when the
-data density may not — the **Advanced** tutorials
-[Measuring Things](./10-measuring-things.qmd) and
-[Joint, Marginal, Conditional](./11-joint-conditional-bayes.qmd) rebuild the same
-objects on a $\sigma$-algebra. They are optional, and nothing here depends on
-them.
+The elementary treatment here is enough for the probability calculations used in
+the course. Later notes introduce joint and conditional distributions when they
+are needed for diffusion models.
 :::
 
 Probability theory is built on two distinct maps: the probability measure, which

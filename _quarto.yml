@@ -14,7 +14,6 @@ project:
     - materials/w02-deck-00-probability-joints.html
     - materials/w02-deck-01-distributions-mle.html
     - materials/w02-deck-02-genai-maps.html
-    - materials/w02-deck-03-map-limit.html
     - materials/distributions-playground.html
     - materials/likelihood-lens.html
     - materials/sampling-as-a-map.html
@@ -126,33 +125,8 @@ book:
       chapters:
         - tutorials/13-inequalities.qmd
         - tutorials/20-random-walk.qmd
-    - part: "Perspectives"
-      chapters:
-        - tutorials/03-transport-story.qmd
-        - tutorials/06-map-proved.qmd
-        - tutorials/08-transport-rigorous.qmd
-        - tutorials/09-discrete-transport.qmd
-        - tutorials/10-measuring-things.qmd
-        - tutorials/11-joint-conditional-bayes.qmd
-        - tutorials/14-why-gaussian.qmd
-        - href: materials/w02-deck-03-map-limit.html
-          text: "Deck · The Map, Proved"
-    - part: "Draft"
-      chapters:
-        - tutorials/21-one-estimator-many-parameterizations.qmd
-        - tutorials/05-two-point-diffusion.qmd
-        - tutorials/22-vector-fields-to-score-diffusion.qmd
-        - tutorials/24-sampling-with-scores.qmd
-        - tutorials/23-tweedie-bayes-denoising.qmd
     - papers.qmd
     - resources.qmd
-    - part: "Retired"
-      chapters:
-        - tutorials/score-based-diffusion-guide.qmd
-        - tutorials/25-learning-the-score.qmd
-        - tutorials/26-probability-flow-sampling.qmd
-        - tutorials/27-diffusion-neural-odes-normalizing-flows.qmd
-        - tutorials/28-langevin-dynamics.qmd
 
 format:
   html:

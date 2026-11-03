@@ -80,10 +80,8 @@ diagonal covariance means independent coordinates.
 ## Diagonal $\Sigma$ means independent — but only because it is Gaussian
 
 For a general joint distribution, zero correlation does **not** imply
-independence: [Joint, Marginal, Conditional](./11-joint-conditional-bayes.qmd)
-exhibits four Gaussian lumps that are uncorrelated and strongly dependent. What
-makes the implication valid here is *joint* normality. Gaussian marginals are not
-enough; the pair must be jointly Gaussian.
+independence. What makes the implication valid here is *joint* normality. Gaussian
+marginals are not enough; the pair must be jointly Gaussian.
 :::
 
 This is also why diffusion models add $\mathcal{N}(0, \sigma^2 I)$ noise and never
@@ -310,9 +308,8 @@ diffusion models are analytically tractable.
 **Degenerate case.** If $A$ has rank $< d$ then $A\Sigma A^{\!\top}$ is singular,
 $\det = 0$, and the density formula of §1 breaks down — the law is still Gaussian,
 but it is concentrated on a lower-dimensional subspace and has no density with
-respect to Lebesgue measure on $\mathbb{R}^m$. (Compare the manifold discussion in
-[Measuring Things](./10-measuring-things.qmd): this is the same singularity, arrived
-at deliberately.) The demo's *singular* preset shows the cloud collapsing to a line.
+respect to Lebesgue measure on $\mathbb{R}^m$. The demo's *singular* preset shows
+the cloud collapsing to a line.
 
 **Interactive demo** — [The Gaussian Lab](../materials/gaussian-lab.html){target="_blank"}
 
@@ -348,8 +345,7 @@ is exactly right under joint normality and only an approximation otherwise. And
 the conditional **variance does not depend on the observed value** at all: you
 learn the same amount whatever $x_2$ turns out to be.
 
-In two dimensions with correlation $\rho$ this reduces to the formula in
-[Joint, Marginal, Conditional](./11-joint-conditional-bayes.qmd):
+In two dimensions with correlation $\rho$ this reduces to:
 $Y \mid X = x \sim \mathcal{N}(\rho x,\, 1-\rho^2)$ for standard marginals.
 
 ## 6. Sums, and why noise accumulates the way it does

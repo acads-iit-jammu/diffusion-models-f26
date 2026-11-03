@@ -64,10 +64,9 @@ $$
 \int_{-\infty}^{\infty} \big| F(x) - G(x)\big|\,dx \;=\; W_1(P,Q),
 $$
 
-the **Wasserstein-1 distance** — and this is exactly the quantity
-[Transport You Can Compute](./09-discrete-transport.qmd) derives as the cheapest
-way to move the mass of $P$ onto $Q$ when moving a unit of mass a distance $|x-y|$
-costs $|x-y|$. The area between the CDF curves *is* the transport bill.
+the **Wasserstein-1 distance** — the cheapest way to move the mass of $P$ onto $Q$
+when moving a unit of mass a distance $|x-y|$ costs $|x-y|$. The area between the
+CDF curves *is* the transport bill.
 
 So the bridge to transport is not an analogy. In one dimension the optimal
 transport cost and an $L^1$ norm of the CDF gap are the same number, and the
@@ -90,10 +89,10 @@ further — but they belong on the map.
 
 For distributions on a finite ordered set of bins, the integral becomes a sum and
 $W_1$ becomes the **Earth Mover's Distance**:
-$W_1(p,q) = \sum_k |F_p(k) - F_q(k)|$, which is the discrete transport problem of
-[tutorial 09](./09-discrete-transport.qmd) — solvable exactly as a min-cost flow,
-with the [Transport Plan Lab](../materials/transport-plan-lab.html){target="_blank"}
-to play with.
+$W_1(p,q) = \sum_k |F_p(k) - F_q(k)|$, which is the discrete transport problem,
+solvable exactly as a min-cost flow, with the
+[Transport Plan Lab](../materials/transport-plan-lab.html){target="_blank"} to
+play with.
 
 ::: {.callout-warning}
 ## Where this whole approach stops working
@@ -570,8 +569,7 @@ $W_1$ reports $d$. It keeps growing, and its gradient points home.
 
 Arjovsky, Chintala and Bottou (2017) built Wasserstein GAN on exactly this
 observation. A generator's output distribution is supported on a
-low-dimensional manifold in a high-dimensional space — the manifold hypothesis of
-[Measuring Things](./10-measuring-things.qmd) — and so is the data. Two such
+low-dimensional manifold in a high-dimensional space, and so is the data. Two such
 manifolds generically intersect in a set of measure zero, so the supports are
 *essentially disjoint from the start*, and JS (which the original GAN minimises at
 an optimal discriminator) is pinned at $\log 2$ with vanishing gradient. Replacing

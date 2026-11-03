@@ -3,8 +3,8 @@
 *The second concept in the spine, and the point at which probability starts being
 useful. One new move — put **two** numbers on the same outcome instead of one —
 produces the whole multivariate vocabulary: joints, marginals, conditionals, and
-Bayes' rule. Everything here is elementary; the measure-theoretic version is
-[in Perspectives](./11-joint-conditional-bayes.qmd) and is not needed.*
+Bayes' rule. Everything here is elementary and uses the standard discrete and
+continuous probability tools from the preceding note.*
 
 ::: {.callout-note}
 ## Where this sits
@@ -312,9 +312,7 @@ $$
 = \tanh\!\Big(\frac{x_\sigma}{\sigma^2}\Big)
 \quad\text{for the two-point dataset of }
 $$
-W01 — which, as
-[Joint, Marginal, Conditional](./11-joint-conditional-bayes.qmd) shows,
-is nothing but Bayes' rule applied to two Gaussian shelves and then averaged.
+W01 — which is Bayes' rule applied to two Gaussian components and then averaged.
 Swap "understands the concept" for "was a $+1$", and "ten marks" for "one noisy
 measurement", and it is the same calculation you did above.
 

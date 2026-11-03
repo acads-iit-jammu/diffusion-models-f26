@@ -4,9 +4,7 @@
 justify most of the "and therefore it concentrates" steps in this course. Each is
 stated, proved in a few lines, and given the job it actually does. The last two
 sections are the payoff: how a bound that knows only the mean and variance
-already forces data to cluster, and where that bound is far too pessimistic — a
-gap the [Advanced](./14-why-gaussian.qmd) tutorial then turns into an argument for
-the Gaussian.*
+already forces data to cluster, and where that bound is far too pessimistic.*
 
 ## 1. Markov: the one everything else comes from
 
@@ -56,8 +54,8 @@ summary of spread; it is a *budget* that limits how much mass can be far out.
 | 3 | 0.111 | 0.0027 |
 | 4 | 0.0625 | 0.0000633 |
 
-The right column is the point of the [Advanced tutorial](./14-why-gaussian.qmd).
-Chebyshev is tight — there are distributions attaining it — but for the Gaussian
+The right column shows how much sharper the Gaussian tail bound is. Chebyshev is
+tight — there are distributions attaining it — but for the Gaussian
 it is wildly pessimistic, off by a factor of nearly $1000$ at $k=4$. Something
 much stronger is true for the shapes we actually meet, and asking *why* leads
 straight to the normal distribution.
