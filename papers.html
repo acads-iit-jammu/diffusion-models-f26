@@ -36,7 +36,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./resources.html" rel="next">
+<link href="./tutorials/binomial-diffusion-sohl-dickstein.html" rel="next">
 <link href="./tutorials/20-random-walk.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -88,7 +88,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./papers.html">Papers</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./papers.html">Paper Readings</a></li><li class="breadcrumb-item"><a href="./papers.html">Papers</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -448,12 +448,28 @@ ul.task-list li input[type="checkbox"] {
 </li>
       </ul>
   </li>
-        <li class="sidebar-item">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Paper Readings</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./papers.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Papers</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/binomial-diffusion-sohl-dickstein.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./resources.html" class="sidebar-item-text sidebar-link">
@@ -470,7 +486,11 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#implementation-candidates" id="toc-implementation-candidates" class="nav-link active" data-scroll-target="#implementation-candidates">Implementation candidates</a></li>
+  <li><a href="#reading-notes" id="toc-reading-notes" class="nav-link active" data-scroll-target="#reading-notes">Reading notes</a>
+  <ul class="collapse">
+  <li><a href="#sohl-dickstein-et-al.-2015-binomial-diffusion" id="toc-sohl-dickstein-et-al.-2015-binomial-diffusion" class="nav-link" data-scroll-target="#sohl-dickstein-et-al.-2015-binomial-diffusion">Sohl-Dickstein et al.&nbsp;(2015): binomial diffusion</a></li>
+  </ul></li>
+  <li><a href="#implementation-candidates" id="toc-implementation-candidates" class="nav-link" data-scroll-target="#implementation-candidates">Implementation candidates</a></li>
   <li><a href="#interpreting-a-small-scale-implementation" id="toc-interpreting-a-small-scale-implementation" class="nav-link" data-scroll-target="#interpreting-a-small-scale-implementation">Interpreting a small-scale implementation</a></li>
   </ul>
 </nav>
@@ -478,7 +498,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./papers.html">Paper Readings</a></li><li class="breadcrumb-item"><a href="./papers.html">Papers</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Papers</h1>
 </div>
@@ -497,8 +517,17 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This page will collect important papers for implementation on <strong>small or toy datasets</strong>. Each entry will identify a manageable part of the paper to reproduce, so that the mathematical construction, training procedure, and sampler can be studied through a working experiment.</p>
+<p>This page collects paper readings and implementation projects built around <strong>small or toy datasets</strong>. Each reading note develops a paper’s mathematical construction; each implementation project identifies a manageable part to reproduce in code.</p>
 <p>The paper implementation component carries <strong>40 marks</strong>. It is separate from the three homeworks and the <strong>10-mark mini coding project</strong>. Selection instructions, submission requirements, evaluation criteria, and deadlines will be announced on the <a href="./assignments.html">Assignments</a> page.</p>
+<section id="reading-notes" class="level2">
+<h2 class="anchored" data-anchor-id="reading-notes">Reading notes</h2>
+<section id="sohl-dickstein-et-al.-2015-binomial-diffusion" class="level3">
+<h3 class="anchored" data-anchor-id="sohl-dickstein-et-al.-2015-binomial-diffusion">Sohl-Dickstein et al.&nbsp;(2015): binomial diffusion</h3>
+<p><strong>Paper:</strong> Jascha Sohl-Dickstein, Eric A. Weiss, Niru Maheswaranathan, and Surya Ganguli, “Deep Unsupervised Learning using Nonequilibrium Thermodynamics,” ICML 2015. <a href="https://proceedings.mlr.press/v37/sohl-dickstein15.pdf">Paper PDF</a> · <a href="https://arxiv.org/abs/1503.03585">arXiv:1503.03585</a>.</p>
+<p>The accompanying <a href="./tutorials/binomial-diffusion-sohl-dickstein.html">binomial diffusion tutorial</a> works through the paper’s discrete Bernoulli example: a two-state forward Markov chain, its example-conditioned reverse target, the likelihood-bound training objective, and ancestral sampling. It also explains how the binary heartbeat experiment uses an independent Bernoulli terminal law with mean activity 0.2.</p>
+<p>This is a paper-reading tutorial. Its presence here does not select the paper as an implementation project or change the paper-implementation assessment.</p>
+</section>
+</section>
 <section id="implementation-candidates" class="level2">
 <h2 class="anchored" data-anchor-id="implementation-candidates">Implementation candidates</h2>
 <p>Papers will be added here as they are selected. For each paper, the entry will provide:</p>
@@ -930,8 +959,8 @@ ul.task-list li input[type="checkbox"] {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./resources.html" class="pagination-link" aria-label="Resources">
-        <span class="nav-page-text">Resources</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./tutorials/binomial-diffusion-sohl-dickstein.html" class="pagination-link" aria-label="Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective">
+        <span class="nav-page-text"><span class="chapter-title">Binomial Diffusion: Forward Kernels, Reverse Sampling, and the Training Objective</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
