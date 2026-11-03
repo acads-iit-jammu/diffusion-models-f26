@@ -314,7 +314,7 @@
     "href": "paper-implementation.html#interpreting-a-small-scale-implementation",
     "title": "Paper Implementation",
     "section": "Interpreting a small-scale implementation",
-    "text": "Interpreting a small-scale implementation\nThe aim is to reproduce and examine a paper’s central mechanism at a tractable scale. A successful toy experiment does not reproduce the paper’s full benchmark results. Each project will distinguish the original method from the reduced experiment and state what can reasonably be concluded.\nThe course also has separate paper-reading notes. Those notes explain selected papers for learning; their presence does not by itself make a paper an implementation-project choice.",
+    "text": "Interpreting a small-scale implementation\nThe aim is to reproduce and examine a paper’s central mechanism at a tractable scale. A successful toy experiment does not reproduce the paper’s full benchmark results. Each project will distinguish the original method from the reduced experiment and state what can reasonably be concluded.\nThe Papers section in the navigation contains separate reading tutorials, such as Binomial Diffusion. Their presence does not by itself make a paper an implementation-project choice.",
     "crumbs": [
       "Paper Implementation"
     ]
@@ -3263,28 +3263,6 @@
     "crumbs": [
       "Tutorials",
       "The Random Walk: Forward, and Backward"
-    ]
-  },
-  {
-    "objectID": "papers.html",
-    "href": "papers.html",
-    "title": "Papers",
-    "section": "",
-    "text": "Reading notes\nThis section contains teaching notes that explain selected research papers. These readings are for learning and discussion. They do not automatically designate a paper for the graded implementation project; project choices and requirements are listed separately on the Paper Implementation page.",
-    "crumbs": [
-      "Papers",
-      "Papers"
-    ]
-  },
-  {
-    "objectID": "papers.html#reading-notes",
-    "href": "papers.html#reading-notes",
-    "title": "Papers",
-    "section": "",
-    "text": "Sohl-Dickstein et al. (2015): binomial diffusion\nPaper: Jascha Sohl-Dickstein, Eric A. Weiss, Niru Maheswaranathan, and Surya Ganguli, “Deep Unsupervised Learning using Nonequilibrium Thermodynamics,” ICML 2015. Paper PDF · arXiv:1503.03585.\nThe accompanying binomial diffusion tutorial works through the paper’s discrete Bernoulli example: a two-state forward Markov chain, its example-conditioned reverse target, the likelihood-bound training objective, and ancestral sampling. It also explains how the binary heartbeat experiment uses an independent Bernoulli terminal law with mean activity 0.2.\nThis note is a paper-reading tutorial. It is not, by itself, an implementation project selection.",
-    "crumbs": [
-      "Papers",
-      "Papers"
     ]
   },
   {
