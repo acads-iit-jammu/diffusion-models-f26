@@ -126,7 +126,10 @@ book:
       chapters:
         - tutorials/13-inequalities.qmd
         - tutorials/20-random-walk.qmd
-    - papers.qmd
+    - part: "Paper Readings"
+      chapters:
+        - papers.qmd
+        - tutorials/binomial-diffusion-sohl-dickstein.qmd
     - resources.qmd
 
 format:
