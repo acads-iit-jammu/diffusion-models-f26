@@ -4659,10 +4659,24 @@ r_t&amp;1-r_t
 </section>
 <section id="repeated-transitions" class="level3">
 <h3 class="anchored" data-anchor-id="repeated-transitions">2.2. Repeated transitions</h3>
-<p>The eigenvectors of <span class="math inline">\(Q_t\)</span> do not depend on <span class="math inline">\(t\)</span>. The constant vector has eigenvalue <span class="math inline">\(1\)</span>, and the contrast between states <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span> has eigenvalue <span class="math inline">\(1-2r_t\)</span>. Since <span class="math inline">\(r_t=\beta_t/2\)</span>, this eigenvalue is also <span class="math inline">\(\alpha_t=1-\beta_t\)</span>. Define</p>
+<p>The eigenvectors of <span class="math inline">\(Q_t\)</span> do not depend on <span class="math inline">\(t\)</span>. The vector that treats the two states equally and the vector that contrasts them are</p>
+<p><span class="math display">\[u_+=\frac1{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix},\qquad
+u_-=\frac1{\sqrt2}\begin{pmatrix}1\\-1\end{pmatrix}.\]</span></p>
+<p>The first is unchanged by the transition, so its eigenvalue is <span class="math inline">\(1\)</span>. The second is multiplied by <span class="math inline">\(1-2r_t\)</span>: each flip reduces the difference between the probabilities of states <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>. Put these eigenvectors into the orthogonal matrix <span class="math inline">\(U=[u_+\;u_-]\)</span>. Then</p>
+<p><span class="math display">\[Q_t=U\begin{pmatrix}1&amp;0\\0&amp;1-2r_t\end{pmatrix}U^\mathsf T.\]</span></p>
+<p>For a constant flip rate <span class="math inline">\(r\)</span>, all steps use the same matrix <span class="math inline">\(Q\)</span>, so its <span class="math inline">\(n\)</span>-step transition is obtained by raising each eigenvalue to the <span class="math inline">\(n\)</span>th power:</p>
+<p><span class="math display">\[Q^n=U\begin{pmatrix}1&amp;0\\0&amp;(1-2r)^n\end{pmatrix}U^\mathsf T
+=\frac12\begin{pmatrix}
+1+(1-2r)^n&amp;1-(1-2r)^n\\
+1-(1-2r)^n&amp;1+(1-2r)^n
+\end{pmatrix}.\]</span></p>
+<p>For a time-varying rate, the matrices still share the same eigenvectors. Multiplying the diagonal forms therefore multiplies the contrast eigenvalues:</p>
+<p><span class="math display">\[Q_1Q_2\cdots Q_t
+=U\begin{pmatrix}1&amp;0\\0&amp;\prod_{s=1}^t(1-2r_s)\end{pmatrix}U^\mathsf T.\]</span></p>
+<p>Since <span class="math inline">\(r_s=\beta_s/2\)</span>, define</p>
 <p><span class="math display">\[\alpha_t=1-\beta_t,\qquad
 \bar\alpha_t=\prod_{s=1}^t\alpha_s,\qquad \bar\alpha_0=1.\]</span></p>
-<p>The product of the first <span class="math inline">\(t\)</span> transition matrices is therefore</p>
+<p>Expanding the product gives the closed-form forward kernel:</p>
 <p><span class="math display">\[Q_1Q_2\cdots Q_t=
 \frac12\begin{pmatrix}
 1+\prod_{s=1}^{t}(1-2r_s)&amp;1-\prod_{s=1}^{t}(1-2r_s)\\
@@ -4672,15 +4686,15 @@ r_t&amp;1-r_t
 1+\bar\alpha_t&amp;1-\bar\alpha_t\\
 1-\bar\alpha_t&amp;1+\bar\alpha_t
 \end{pmatrix}.\]</span></p>
+<p>The <span class="math inline">\((x_0,x_t)\)</span> entry of this matrix sums over every possible intermediate state:</p>
+<p><span class="math display">\[q(x_t\mid x_0)
+=\sum_{x_1,\ldots,x_{t-1}}
+q(x_1\mid x_0)q(x_2\mid x_1)\cdots q(x_t\mid x_{t-1}).\]</span></p>
+<p>Thus matrix multiplication has already summed out the unobserved intermediate bits. We can evaluate the distribution at any time <span class="math inline">\(t\)</span> directly from <span class="math inline">\(x_0\)</span> and the schedule, without simulating or recording the intervening states.</p>
 <p>In particular,</p>
 <p><span class="math display">\[\boxed{q(X_t=1\mid X_0=x_0)
 =\frac12+\bar\alpha_t\left(x_0-\frac12\right).}\]</span></p>
 <p>The coefficient <span class="math inline">\(\bar\alpha_t\)</span> is the fraction of the initial bit’s contrast with a fair bit that remains at time <span class="math inline">\(t\)</span>. We can sample <span class="math inline">\(X_t\)</span> directly from this formula without simulating every intermediate transition.</p>
-<p>For a constant flip rate <span class="math inline">\(r\)</span>, this reduces to</p>
-<p><span class="math display">\[Q^n=\frac12\begin{pmatrix}
-1+(1-2r)^n&amp;1-(1-2r)^n\\
-1-(1-2r)^n&amp;1+(1-2r)^n
-\end{pmatrix}.\]</span></p>
 <p>For a fixed <span class="math inline">\(0&lt;r\le 1/2\)</span>, the state-dependent part vanishes as <span class="math inline">\(n\)</span> increases, and each row approaches the fair distribution. At the edge case <span class="math inline">\(r=0\)</span>, no mixing occurs and the initial state is retained forever.</p>
 </section>
 <section id="the-papers-binomial-schedule" class="level3">
