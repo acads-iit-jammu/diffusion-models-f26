@@ -36,30 +36,59 @@ The central training question is how learning against this example-conditioned t
 
 ## 2. A two-state forward Markov chain
 
-Let $X_t\in\{0,1\}$. At step $t$, replace the current bit by a fresh fair bit with probability $\beta_t$; otherwise copy it. Because a replacement can equal the old bit, the probability that the bit actually flips is $r_t=\beta_t/2$. Thus
+Let $X_t\in\{0,1\}$. Sohl-Dickstein et al. define the forward corruption
+step this way: with probability $1-\beta_t$, keep the current bit; with
+probability $\beta_t$, replace it by a fresh fair bit. Replacement does not
+always change the bit: the new fair bit matches the old one half of the time.
+Therefore the probability of an actual flip is
+
+$$r_t=\frac{\beta_t}{2}.$$
+
+The same forward step can now be written directly as a transition kernel:
 
 $$Q_t=\begin{pmatrix}
-1-\beta_t/2&\beta_t/2\\
-\beta_t/2&1-\beta_t/2
-\end{pmatrix},\qquad 0<\beta_t\le 1.$$
+1-r_t&r_t\\
+r_t&1-r_t
+\end{pmatrix},\qquad 0\le\beta_t\le 1.$$
 
-Rows index $X_{t-1}$ and columns index $X_t$. Equivalently,
+Rows index $X_{t-1}$ and columns index $X_t$. Thus each bit flips with
+probability $r_t$ and stays the same with probability $1-r_t$. In scalar
+form, the same kernel is
 
-$$q(X_t=1\mid X_{t-1}=x)=\frac{\beta_t}{2}+(1-\beta_t)x.$$
+$$q(X_t=1\mid X_{t-1}=x)
+=r_t+(1-2r_t)x
+=\frac{\beta_t}{2}+(1-\beta_t)x.$$
 
-When $\beta_t=0$, the bit is copied with certainty. When $\beta_t=1$, the next bit is a new fair Bernoulli sample, independent of the previous bit.
+When $r_t=0$, the bit is copied with certainty. When $r_t=1/2$, the next
+bit is a fresh fair Bernoulli sample, independent of the previous bit.
 
-### 2.1. Stationary distribution
+### 2.1. The common invariant distribution
 
-The fair distribution $\pi=(1/2,1/2)$ is stationary:
+The rate can vary with time, so the forward process is generally
+time-inhomogeneous. Still, the fair distribution $\pi=(1/2,1/2)$ is
+unchanged by every individual forward kernel:
 
 $$\pi Q_t=\pi.$$
 
-For $0<\beta_t\le1$, both entries in each row are positive, so this is the unique stationary distribution of that step. Stationarity is a statement about the marginal law. Individual bit trajectories continue to change even when their marginal distribution is already fair.
+To see why it is the stationary law, write a general distribution as
+$\pi=(\pi_0,\pi_1)$. After one transition, the probability of state $1$ is
+
+$$\pi_0r_t+\pi_1(1-r_t).$$
+
+At stationarity this must equal $\pi_1$. If $r_t>0$, rearranging gives
+$\pi_0=\pi_1$, and because the probabilities sum to one,
+$\pi_0=\pi_1=1/2$. Thus the fair distribution is unique whenever the bit
+can actually flip. When $r_t=0$, the chain never changes state, so every
+initial distribution is stationary. Stationarity describes the marginal
+law; individual bit trajectories can continue to change even when their
+marginal distribution is already fair.
 
 ### 2.2. Repeated transitions
 
-The eigenvectors of $Q_t$ do not depend on $t$. The constant vector has eigenvalue $1$, and the contrast between states $0$ and $1$ has eigenvalue $1-\beta_t$. Define
+The eigenvectors of $Q_t$ do not depend on $t$. The constant vector has
+eigenvalue $1$, and the contrast between states $0$ and $1$ has eigenvalue
+$1-2r_t$. Since $r_t=\beta_t/2$, this eigenvalue is also
+$\alpha_t=1-\beta_t$. Define
 
 $$\alpha_t=1-\beta_t,\qquad
 \bar\alpha_t=\prod_{s=1}^t\alpha_s,\qquad \bar\alpha_0=1.$$
@@ -68,6 +97,10 @@ The product of the first $t$ transition matrices is therefore
 
 $$Q_1Q_2\cdots Q_t=
 \frac12\begin{pmatrix}
+1+\prod_{s=1}^{t}(1-2r_s)&1-\prod_{s=1}^{t}(1-2r_s)\\
+1-\prod_{s=1}^{t}(1-2r_s)&1+\prod_{s=1}^{t}(1-2r_s)
+\end{pmatrix}
+=\frac12\begin{pmatrix}
 1+\bar\alpha_t&1-\bar\alpha_t\\
 1-\bar\alpha_t&1+\bar\alpha_t
 \end{pmatrix}.$$
@@ -79,14 +112,16 @@ $$\boxed{q(X_t=1\mid X_0=x_0)
 
 The coefficient $\bar\alpha_t$ is the fraction of the initial bit's contrast with a fair bit that remains at time $t$. We can sample $X_t$ directly from this formula without simulating every intermediate transition.
 
-For a constant replacement rate $\beta$, this reduces to
+For a constant flip rate $r$, this reduces to
 
 $$Q^n=\frac12\begin{pmatrix}
-1+(1-\beta)^n&1-(1-\beta)^n\\
-1-(1-\beta)^n&1+(1-\beta)^n
+1+(1-2r)^n&1-(1-2r)^n\\
+1-(1-2r)^n&1+(1-2r)^n
 \end{pmatrix}.$$
 
-As $n$ increases, the state-dependent part vanishes and each row approaches the fair distribution.
+For a fixed $0<r\le 1/2$, the state-dependent part vanishes as $n$ increases,
+and each row approaches the fair distribution. At the edge case $r=0$, no
+mixing occurs and the initial state is retained forever.
 
 ### 2.3. The paper's binomial schedule
 
@@ -149,23 +184,22 @@ $$q(x_{t-1}\mid x_t,x_0)
 =\frac{q(x_t\mid x_{t-1})q(x_{t-1}\mid x_0)}
 {q(x_t\mid x_0)}.$$
 
-Every quantity on the right is known. Set
+We derive the target for the symmetric forward kernel from Section 2, where
+the actual bit-flip probability is $r_t=\beta_t/2$. Every quantity on the
+right is known once $x_0$ and $x_t$ are given. The distribution of the
+previous bit before observing $x_t$ is
 
 $$a_{t-1}=q(X_{t-1}=1\mid X_0=x_0)
-=p_\star+\bar\alpha_{t-1}(x_0-p_\star).$$
+=\frac12+\bar\alpha_{t-1}\left(x_0-\frac12\right).$$
 
-For an observed noisy bit $b=x_t$, the likelihoods under the two possible previous bits are
+For the observed bit $b=x_t$, the forward kernel gives the likelihoods
+under the two possible previous bits:
 
 $$L_1(b)=q(X_t=b\mid X_{t-1}=1)
-=\left(1-\beta_t(1-p_\star)\right)^b
-\left(\beta_t(1-p_\star)\right)^{1-b},$$
+=\left(1-r_t\right)^b r_t^{1-b},$$
 
 $$L_0(b)=q(X_t=b\mid X_{t-1}=0)
-=\left(\beta_t p_\star\right)^b
-\left(1-\beta_t p_\star\right)^{1-b}.$$
-
-For the symmetric fair-bit example, $p_\star=1/2$ and these reduce to the
-likelihoods with actual flip probability $r_t=\beta_t/2$.
+=r_t^b\left(1-r_t\right)^{1-b}.$$
 
 The posterior probability that the previous bit was one is
 
@@ -233,33 +267,134 @@ For a fixed $x_t$, this binary cross-entropy is minimized at $f_\theta(x_t,t)=\e
 
 $$\boxed{f_{\theta^*}(x_t,t)=q(X_{t-1}=1\mid X_t=x_t).}$$
 
+The same loss can be written as a KL divergence plus the entropy of the
+known posterior target:
+
+$$\begin{aligned}
+\ell_t(\theta; x_0,x_t)
+={}&D_{\mathrm{KL}}\left(
+\operatorname{Bernoulli}(\rho_t(x_0,x_t))
+\,\middle\|\,
+\operatorname{Bernoulli}(f_\theta(x_t,t))
+\right)\\
+&+H\!\left(\operatorname{Bernoulli}(\rho_t(x_0,x_t))\right).
+\end{aligned}$$
+
+The entropy term depends on the training pair but not on $\theta$. Therefore,
+minimizing the expected cross-entropy in this section is equivalent to
+minimizing the example-conditioned KL objective in Section 6.
+
 We did not need to calculate $q(x_0\mid x_t)$. Sampling clean/noisy pairs makes the regression average over those possible clean origins automatically.
 
 ## 6. The KL identity behind the training objective
 
-The same argument can be stated for arbitrary discrete or continuous states. At a fixed time $t$, define
+We now show, one step at a time, why training against the posterior that also
+knows $X_0$ can teach a model that only receives $X_t$. This argument directly
+justifies the reverse-kernel training objective; it does not require deriving
+the full likelihood bound first. Assume the relevant conditional probabilities
+or densities exist and the KL quantities are finite. For discrete states use
+sums; for continuous states use integrals. Fix a time $t$ and abbreviate
+
+$$U=X_0,\qquad V=X_{t-1},\qquad W=X_t.$$
+
+The forward process gives us the tractable conditional distribution
+$q(v\mid u,w)$. At generation time, however, the model only has $w$, so it
+must learn the marginal reverse distribution $q(v\mid w)$. Let
 
 $$\mathcal J_t(\theta)=
-\mathbb E_{q(x_0,x_t)}
+\mathbb E_{q(u,w)}
 D_{\mathrm{KL}}\left(
-q(x_{t-1}\mid x_t,x_0)
-\,\middle\|\,
-p_\theta(x_{t-1}\mid x_t)
+q(v\mid u,w)\,\middle\|\,p_\theta(v\mid w)
 \right).$$
 
-Add and subtract $\log q(x_{t-1}\mid x_t)$ inside the expected log ratio:
+The expectation over $q(u,w)$ means: draw a clean point $u$ from the data,
+then draw its noisy version $w$ from the forward process. Inside each KL,
+the variable $v$ is averaged under the known posterior $q(v\mid u,w)$. Write
+out the definition of KL divergence:
+
+$$\mathcal J_t(\theta)=
+\mathbb E_{q(u,w)}\mathbb E_{q(v\mid u,w)}
+\left[\log\frac{q(v\mid u,w)}{p_\theta(v\mid w)}\right].$$
+
+The numerator knows both the clean origin $u$ and the noisy observation $w$;
+the learned reverse model only knows $w$. Insert the intermediate distribution
+$q(v\mid w)$ by multiplying and dividing inside the logarithm:
+
+$$\frac{q(v\mid u,w)}{p_\theta(v\mid w)}
+=\frac{q(v\mid u,w)}{q(v\mid w)}
+\frac{q(v\mid w)}{p_\theta(v\mid w)}.$$
+
+Taking logarithms turns this product into a sum. Substituting that sum into
+the expectation gives
 
 $$\begin{aligned}
 \mathcal J_t(\theta)
-={}&\mathbb E_q\left[
-\log\frac{q(X_{t-1}\mid X_t,X_0)}
-{q(X_{t-1}\mid X_t)}\right]\\
-&+\mathbb E_q\left[
-\log\frac{q(X_{t-1}\mid X_t)}
-{p_\theta(X_{t-1}\mid X_t)}\right].
+={}&\mathbb E_{q(u,w)}\mathbb E_{q(v\mid u,w)}
+\left[\log\frac{q(v\mid u,w)}{q(v\mid w)}\right]\\
+&+\mathbb E_{q(u,w)}\mathbb E_{q(v\mid u,w)}
+\left[\log\frac{q(v\mid w)}{p_\theta(v\mid w)}\right].
 \end{aligned}$$
 
-The first term is the conditional mutual information $I_q(X_0;X_{t-1}\mid X_t)$. The second is the expected KL divergence between the desired marginal reverse kernel and the learned reverse kernel. Hence
+We identify these two terms separately.
+
+### First term: information supplied by the clean origin
+
+The nested expectations over $q(u,w)$ and $q(v\mid u,w)$ together form an
+expectation over the joint distribution $q(u,v,w)$. The first term is
+therefore
+
+$$\mathbb E_{q(u,v,w)}
+\left[\log\frac{q(v\mid u,w)}{q(v\mid w)}\right].$$
+
+By definition, conditional mutual information is
+
+$$I_q(U;V\mid W)
+=\mathbb E_{q(u,v,w)}
+\left[\log\frac{q(v\mid u,w)}{q(v\mid w)}\right].$$
+
+It measures how much knowing the clean origin $U$ tells us about the previous
+state $V$, after we already know the current state $W$. This term depends on
+the data distribution and the forward process, but not on the model
+parameters $\theta$.
+
+### Second term: error in the learned reverse distribution
+
+The logarithm in the second term depends on $v$ and $w$, but not on $u$.
+Consequently, averaging over all possible clean origins leaves the marginal
+joint distribution $q(v,w)$. The marginalization is the law of total
+probability:
+
+$$q(v,w)=\int q(u,v,w)\,du
+=\int q(u,w)q(v\mid u,w)\,du.$$
+
+For discrete variables, replace the integrals by sums. If we call the
+logarithm in this term $h(v,w)$, the same step can be written as
+
+$$\begin{aligned}
+&\mathbb E_{q(u,w)}\mathbb E_{q(v\mid u,w)}[h(v,w)]\\
+&=\int\!\int\!\int q(u,w)q(v\mid u,w)h(v,w)\,dv\,dw\,du\\
+&=\int\!\int q(v,w)h(v,w)\,dv\,dw\\
+&=\mathbb E_{q(v,w)}[h(v,w)].
+\end{aligned}$$
+
+Now substitute the particular logarithm $h(v,w)=\log[q(v\mid w)/
+p_\theta(v\mid w)]$:
+
+$$\begin{aligned}
+&\mathbb E_{q(u,w)}\mathbb E_{q(v\mid u,w)}
+\left[\log\frac{q(v\mid w)}{p_\theta(v\mid w)}\right]\\
+&\qquad=\mathbb E_{q(v,w)}
+\left[\log\frac{q(v\mid w)}{p_\theta(v\mid w)}\right]\\
+&\qquad=\mathbb E_{q(w)}
+D_{\mathrm{KL}}\left(
+q(v\mid w)\,\middle\|\,p_\theta(v\mid w)
+\right).
+\end{aligned}$$
+
+This is the average error between the desired marginal reverse distribution
+and the learned one.
+
+Combining the two terms gives the identity
 
 $$\boxed{\begin{aligned}
 &\mathbb E_{q(x_0,x_t)}D_{\mathrm{KL}}\left(
@@ -269,7 +404,17 @@ q(x_{t-1}\mid x_t,x_0)\parallel p_\theta(x_{t-1}\mid x_t)\right)\\
 q(x_{t-1}\mid x_t)\parallel p_\theta(x_{t-1}\mid x_t)\right).
 \end{aligned}}\tag{1}$$
 
-For a fixed forward process, the conditional mutual information does not depend on $\theta$. Minimizing the example-conditioned KL objective therefore minimizes the true reverse-kernel KL objective. This is an equality between objectives up to a constant; the two KL values are not generally equal.
+The left side is the tractable training objective. The right side separates
+it into the information supplied by knowing $X_0$ and the error in the
+learned marginal reverse distribution. With the data law and forward process
+held fixed, the information term does not depend on $\theta$. Thus the two
+objectives differ only by an additive constant: they have the same gradient
+and the same minimizers over $\theta$, even if the chosen model family cannot
+represent the exact reverse kernel. Their numerical values are generally
+different. Even a perfect marginal reverse model leaves the information term,
+because its training target had the extra information $X_0$. If the forward
+schedule is also optimized, this information term can depend on that schedule
+and cannot generally be discarded for schedule optimization.
 
 ### 6.1. Where the KL term appears in the paper's likelihood bound
 
@@ -286,6 +431,208 @@ q(x_{t-1}\mid x_t,x_0)\parallel p_\theta(x_{t-1}\mid x_t)
 With the forward schedule and terminal prior fixed, the entropy terms do not depend on the reverse-kernel parameters. Maximizing this bound with respect to $\theta$ is therefore equivalent to minimizing the sum of example-conditioned KL terms. Equation (1) explains why those tractable terms train the marginal reverse kernel that is used at generation time.
 
 If the schedule is learned as well, the conditional mutual information and entropy terms generally depend on that schedule. They may not then be dropped when optimizing the schedule. The equivalence in Equation (1) is for optimizing the reverse model while holding the forward process fixed.
+
+### 6.2. From the Gaussian KL term to the DDPM training loss
+
+The KL identity above applies to any corruption process. For DDPM, use a
+Gaussian forward process. This keeps the same idea—fit an example-conditioned
+posterior, then average over clean examples—but makes the KL reducible to a
+squared-error loss.
+
+Define
+
+$$\alpha_t=1-\beta_t,\qquad
+\bar\alpha_t=\prod_{s=1}^t\alpha_s,\qquad \bar\alpha_0=1,$$
+
+and construct a noisy training example with
+
+$$X_t=\sqrt{\bar\alpha_t}X_0+
+\sqrt{1-\bar\alpha_t}\,\epsilon,\qquad
+X_0\sim q_0,\quad \epsilon\sim\mathcal N(0,I).$$
+
+The example-conditioned reverse posterior is
+
+$$q(x_{t-1}\mid x_t,x_0)
+=\mathcal N\!\left(\widetilde\mu_t(x_t,x_0),
+\widetilde\beta_t I\right),$$
+
+where
+
+$$\widetilde\beta_t=
+\frac{\beta_t(1-\bar\alpha_{t-1})}{1-\bar\alpha_t},$$
+
+$$\widetilde\mu_t(x_t,x_0)
+=\frac{\sqrt{\bar\alpha_{t-1}}\beta_t}{1-\bar\alpha_t}x_0
++\frac{\sqrt{\alpha_t}(1-\bar\alpha_{t-1})}
+{1-\bar\alpha_t}x_t.$$
+
+For the interior steps $2\le t\le T$, take the learned reverse kernel to be
+
+$$p_\theta(x_{t-1}\mid x_t)
+=\mathcal N\!\left(\mu_\theta(x_t,t),\sigma_t^2I\right),$$
+
+with fixed variance $\sigma_t^2$. The KL divergence between these two
+Gaussians is
+
+$$\begin{aligned}
+&D_{\mathrm{KL}}\left(
+\mathcal N(\widetilde\mu_t,\widetilde\beta_tI)
+\,\middle\|\,
+\mathcal N(\mu_\theta,\sigma_t^2I)\right)\\
+&=\frac{\|\widetilde\mu_t-\mu_\theta\|^2}{2\sigma_t^2}
++\frac d2\left(
+\frac{\widetilde\beta_t}{\sigma_t^2}-1
++\log\frac{\sigma_t^2}{\widetilde\beta_t}
+\right).
+\end{aligned}$$
+
+The second term depends on the schedules and fixed variances, but not on
+$\theta$. Thus, minimizing this KL over the reverse mean is the same as
+minimizing the squared error between $\mu_\theta$ and the known posterior
+mean $\widetilde\mu_t$.
+
+The noise used to construct $x_t$ is known in each training pair. Rearrange
+the forward equation:
+
+$$x_0=\frac{x_t-\sqrt{1-\bar\alpha_t}\,\epsilon}
+{\sqrt{\bar\alpha_t}}.$$
+
+Substitute this expression into the posterior mean above. Using
+$\beta_t+\alpha_t(1-\bar\alpha_{t-1})=1-\bar\alpha_t$, the coefficients
+simplify as follows:
+
+$$\begin{aligned}
+\widetilde\mu_t
+={}&\frac{\beta_t}{\sqrt{\alpha_t}(1-\bar\alpha_t)}
+\left(x_t-\sqrt{1-\bar\alpha_t}\,\epsilon\right)\\
+&+\frac{\sqrt{\alpha_t}(1-\bar\alpha_{t-1})}
+{1-\bar\alpha_t}x_t\\
+={}&\frac{1}{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\epsilon\right).
+\end{aligned}$$
+
+For each training pair, $\epsilon$ is known because it was sampled to create
+$x_t$. At generation time, only $x_t$ and $t$ are available, so the noise
+cannot be recovered exactly from the noisy state alone. The network must
+estimate the appropriate noise prediction from $x_t$ and $t$.
+
+This suggests parameterizing the learned mean by a neural network that
+predicts the training noise:
+
+$$\mu_\theta(x_t,t)=\frac{1}{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}
+\epsilon_\theta(x_t,t)\right).$$
+
+Subtract the two means; the $x_t$ terms cancel:
+
+$$\widetilde\mu_t-\mu_\theta
+=-\frac{\beta_t}{\sqrt{\alpha_t(1-\bar\alpha_t)}}
+\left(\epsilon-\epsilon_\theta(x_t,t)\right).$$
+
+Putting this into the Gaussian KL gives its trainable part:
+
+$$\boxed{\mathcal L_{t-1}(\theta)
+=w_t\,\mathbb E_{\substack{X_0\sim q_0\\
+\epsilon\sim\mathcal N(0,I)}}
+\left[\|\epsilon-\epsilon_\theta(X_t,t)\|^2\right]+C_t,}$$
+
+where
+
+$$w_t=\frac{\beta_t^2}
+{2\sigma_t^2\alpha_t(1-\bar\alpha_t)},\qquad
+C_t=\frac d2\left(
+\frac{\widetilde\beta_t}{\sigma_t^2}-1
++\log\frac{\sigma_t^2}{\widetilde\beta_t}
+\right).$$
+
+Here $X_t$ is generated from $X_0$ and $\epsilon$ using the forward equation.
+For fixed reverse variances, $C_t$ is constant with respect to $\theta$ and
+can be dropped during network optimization. This is the weighted
+noise-prediction objective obtained from the interior KL terms (Ho et al.,
+Eq. 12).
+
+Ho et al.'s simplified objective makes one additional choice: it removes the
+time-dependent weights $w_t$ and samples the time index uniformly. In their
+notation, the resulting loss is
+
+$$\boxed{\mathcal L_{\mathrm{simple}}(\theta)
+=\mathbb E_{\substack{t\sim\operatorname{Uniform}\{1,\ldots,T\}\\
+X_0\sim q_0,\;\epsilon\sim\mathcal N(0,I)}}
+\left[\|\epsilon-\epsilon_\theta(X_t,t)\|^2\right],}$$
+
+with $X_t$ constructed as above. The weighted ELBO derivation applies to
+interior steps $2\le t\le T$; the simplified loss also uses this
+noise-regression form at $t=1$. It is therefore a reweighted training
+objective, rather than the unmodified negative ELBO. See [Ho et al. (2020),
+Eqs. 12 and 14](https://arxiv.org/abs/2006.11239).
+
+#### Why the noise target is a score target
+
+For a given clean example, the conditional forward density is
+
+$$q(x_t\mid x_0)=\mathcal N\!\left(
+x_t;\sqrt{\bar\alpha_t}x_0,(1-\bar\alpha_t)I\right).$$
+
+Its score with respect to the noisy observation is known exactly:
+
+$$\nabla_{x_t}\log q(x_t\mid x_0)
+=-\frac{x_t-\sqrt{\bar\alpha_t}x_0}{1-\bar\alpha_t}
+=-\frac{\epsilon}{\sqrt{1-\bar\alpha_t}}.$$
+
+Thus each sampled pair $(x_0,x_t)$ supplies a known **conditional score
+target**. Predicting $\epsilon$ is equivalent to predicting this score up to
+the known scale factor $-1/\sqrt{1-\bar\alpha_t}$.
+
+Why does regression on this conditional target give the score we need at
+generation time? The network sees $x_t$, not $x_0$. For squared error, fix an
+input $x_t$ and write $m=\mathbb E[\epsilon\mid X_t=x_t]$. Then
+
+$$\mathbb E[\|\epsilon-a\|^2\mid X_t=x_t]
+=\mathbb E[\|\epsilon-m\|^2\mid X_t=x_t]+\|m-a\|^2,$$
+
+so the minimizing prediction is $a=m$. Therefore, at the population optimum,
+$\epsilon_\theta(x_t,t)=\mathbb E[\epsilon\mid X_t=x_t]$. Averaging the
+conditional score over the possible clean origins gives the marginal score.
+To see this, first write the noisy marginal density as
+
+$$p_t(x_t)=\int q(x_t\mid x_0)\,q_0(dx_0).$$
+
+Differentiate with respect to $x_t$ and use
+$\nabla q=q\nabla\log q$:
+
+$$\begin{aligned}
+\nabla_{x_t}p_t(x_t)
+&=\int \nabla_{x_t}q(x_t\mid x_0)\,q_0(dx_0)\\
+&=\int q(x_t\mid x_0)
+\nabla_{x_t}\log q(x_t\mid x_0)\,q_0(dx_0).
+\end{aligned}$$
+
+Divide by $p_t(x_t)$ and apply Bayes' rule to the posterior measure
+$q(dx_0\mid x_t)=q(x_t\mid x_0)q_0(dx_0)/p_t(x_t)$. This gives
+
+$$\nabla_{x_t}\log p_t(x_t)
+=\mathbb E\left[
+\nabla_{x_t}\log q(x_t\mid X_0)\mid X_t=x_t
+\right].$$
+
+Now substitute the Gaussian conditional score and the optimal noise
+regression prediction:
+
+$$\begin{aligned}
+\nabla_{x_t}\log p_t(x_t)
+&=-\frac{\mathbb E[\epsilon\mid X_t=x_t]}
+{\sqrt{1-\bar\alpha_t}}\\
+&=-\frac{\epsilon_\theta^*(x_t,t)}
+{\sqrt{1-\bar\alpha_t}}.
+\end{aligned}$$
+
+The sampled noise is the supervised label; the learned function is its
+conditional mean given the noisy input. After rescaling, that conditional
+mean is the marginal score used by score-based sampling. It also gives the
+mean of the marginal reverse kernel: averaging $\widetilde\mu_t$ over
+$X_0\mid X_t=x_t$ is equivalent to replacing $\epsilon$ in its linear
+formula by $\mathbb E[\epsilon\mid X_t=x_t]$. The noise predictor therefore
+provides both the marginal score and the posterior-mean reverse update.
 
 ## 7. Extending the target to binary vectors
 
